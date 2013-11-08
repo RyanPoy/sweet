@@ -94,25 +94,19 @@ class RecordManager(object):
 #         self._select.append(select)
 #         return self
         
-    def where(self, *args, **kwargs):
-        if args:
-            where = args[0] if len(args) == 1 else args
-        elif kwargs:
-#            for key in kwargs.keys(): # must use keys, not iterkeys.
+    def where(self, *sql_and_params, **conditions):
+        if sql_and_params:
+            self._wheres.append(sql_and_params)
+        elif conditions:
+#            for key in condtions.keys(): # must use keys, not iterkeys.
 #                if type(key) is self._model_class.__metaclass__:
 #                if type(key) is self._model_class:
 #                    new_key = '%s_id' % Inflection.hungarian_name_of(key.__class__.__name__)
-#                    kwargs[new_key] = key.id
-#                    kwargs.pop(key)
-            where = kwargs
-        else:           
-            where = None
-            
-        if where:
-            self._wheres.append(where)
-
+#                    condtions[new_key] = key.id
+#                    condtions.pop(key)
+            self._wheres.append(conditions)
         return self 
-    
+
 #     def order(self, order):
 #         if order:
 #             self._orders.append(order) 
@@ -205,56 +199,24 @@ class RecordManager(object):
     def __add_conditions_of(self, sql, params, conditions, where_or_having='WHERE'):
         condition_sqls = []
         for condition in conditions:
-            condition_sql, condition_params = '', []
-            
-            if is_str(condition):
-                condition_sql, condition_params = self.__add_string_conditions(condition_sql, condition)
-                
-            elif is_array(condition):
-                condition_sql, condition_params = self.__add_array_conditions(condition_sql, condition)
-                    
-            elif is_hash(condition):
-                condition_sql, condition_params = self.__add_hash_conditions(condition_sql, condition)
-                
-            if condition_sql: 
-                condition_sqls.append(condition_sql)
-
-            if condition_params:
-                params.extend(condition_params)
-            
+            if is_array(condition):
+                if len(condition) == 1: # 只有一个，表示是一个不带参数的sql
+                    condition_sqls.append(condition[0])
+                else:
+                    condition_sqls.append(condition[0])
+                    params.extend(condition[1:])
+            elif is_hash(condition): # 表示是 key:value 的方式, eg. where(name='abc').where(age=1)
+                for k, v in condition.iteritems():
+                    if is_array(v):
+                        interrogations = ', '.join(['?'] * len(v))
+                        condition_sqls.append('%s.%s in (%s)' % (self._table_name, k, interrogations))
+                        params.extend(list(v)) # 如果是set，就必须转一下
+                    else:
+                        condition_sqls.append('%s.%s = ?' % (self._table_name, k))
+                        params.append(v)
         if condition_sqls:
             sql = '%s %s %s' % (sql, where_or_having, ' AND '.join(condition_sqls))
-         
         return sql
-    
-    def __add_string_conditions(self, sql, condition):
-        return condition.strip(), []
-        
-    def __add_array_conditions(self, sql, condition):
-        params = []
-        if condition and is_str(condition[0]):
-#            sql = '%s' % condition[0].strip().replace('?', '%s')
-            sql = '%s' % condition[0].strip()
-            params = list(condition)[1:]
-        else:
-            sql = ''
-        return sql, params
-    
-    def __add_hash_conditions(self, sql, condition):
-        params = []
-        where_sql_list = []
-        for key, value in condition.iteritems():
-            if is_array(value):
-                interrogations = ', '.join(['?'] * len(value))
-                where_sql_list.append('%s.%s in (%s)' % (self._table_name, key, interrogations))
-                params.extend(list(value)) 
-            else:
-                where_sql_list.append('%s.%s = ?' % (self._table_name, key))
-                params.append(value)
-                
-        sql = ' AND '.join(where_sql_list)
-
-        return sql, params
     
 #     def __add_order(self, sql, orders):
 #         order_str = ', '.join([ order for order in orders if order ])

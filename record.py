@@ -231,6 +231,12 @@ class ActiveRecord(object):
     
     @classmethod
     def where(cls, *args, **kwargs):
+        """ condition query
+        eg.
+            User.where(username="abc").where(password="123")
+            User.where("username='abc' and password='123'")
+            User.where("username=? and password=?", 'abc', '123')
+        """
         return RecordManager(cls).where(*args, **kwargs)
 
     @classmethod

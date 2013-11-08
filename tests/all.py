@@ -5,6 +5,8 @@ from test_activerecord_create_and_save import ActiveRecordCreateAndSaveTest
 from test_activerecord_delete import ActiveRecordDeleteTest
 from test_activerecord_update import ActiveRecordUpdateTest
 from test_activerecord_find import ActiveRecordFindTest
+from test_activerecord_where import ActiveRecordWhereTest
+
 
 tests = [
     ActiveRecordInitTest,
@@ -12,6 +14,7 @@ tests = [
     ActiveRecordDeleteTest,
     ActiveRecordUpdateTest,
     ActiveRecordFindTest,
+    ActiveRecordWhereTest
 ]
 
 

@@ -3,6 +3,7 @@ from itertools import izip
 from pyrails.schema import Table, Column
 from pyrails.support import is_str, is_datetime, is_date, flatten, str2date, str2datetime
 import MySQLdb
+import time
 import itertools
 
 
@@ -51,9 +52,14 @@ class Adapter(object):
             cursor.close()
             
     def _execute(self, cursor, sql, params=[]):
-        self.__show_sql(sql, params)
+        btime = time.time()
+        raw_sql = ''
+        if self.show_sql:
+            raw_sql = self.__show_sql(sql, params)
         sql = sql.replace('?', '%s')
         cursor.execute(sql, params)
+        if self.show_sql:
+            print '##', raw_sql, (time.time() - btime)
         return self
     
     def get_table_by(self, name):
@@ -99,10 +105,8 @@ class Adapter(object):
         self.close()
 
     def __show_sql(self, sql, params):
-        if not self.show_sql:
-            return
         if not params:
-            print sql
+            return sql
         else:
             formated_params = []
             for param in params:
@@ -116,4 +120,4 @@ class Adapter(object):
                     param = str(param)
                 formated_params.append(param)
             formated_params.append(';')
-            print '##', ''.join(flatten(izip(sql.split('?'), formated_params)))
+            return ''.join(flatten(izip(sql.split('?'), formated_params)))
