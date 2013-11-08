@@ -9,6 +9,7 @@ from test_activerecord_where import ActiveRecordWhereTest
 from test_activerecord_group_and_having import ActiveRecordGroupAndHavingTest
 from test_activerecord_order import ActiveRecordOrderTest
 from test_activerecord_limit import ActiveRecordLimitTest
+from test_activerecord_func import ActiveRecordFuncTest
 
 tests = [
     ActiveRecordInitTest,
@@ -20,6 +21,7 @@ tests = [
     ActiveRecordGroupAndHavingTest,
     ActiveRecordOrderTest,
     ActiveRecordLimitTest,
+    ActiveRecordFuncTest,
 ]
 
 

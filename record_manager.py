@@ -72,12 +72,12 @@ class RecordManager(object):
         return records[0] if len(not_repeat_ids) == 1 else records
 
     def count(self, column_name='*'):
-        return self.func('COUNT')
+        return self.__func('COUNT')
     
     def sum(self, column_name):
-        return self.func('SUM', column_name)
+        return self.__func('SUM', column_name)
     
-    def func(self, func_name, func_value='*'):
+    def __func(self, func_name, func_value='*'):
         self._func = (func_name, func_value)
         sql, params = self.delete_or_update_or_find_sql()
         row = self._db.fetchone(sql, params)

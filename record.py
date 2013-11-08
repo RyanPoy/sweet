@@ -202,14 +202,32 @@ class ActiveRecord(object):
     
     @classproperty
     def all(cls):
+        """ find all records
+        @return a record array
+        eg.
+            User.all
+            User.where(age=10).all
+        """
         return RecordManager(cls).all
     
     @classproperty
     def first(cls):
+        """ find the first record
+        @return a record
+        eg.
+            User.first
+            User.where(age=10).first
+        """
         return RecordManager(cls).first
     
     @classproperty
     def last(cls):
+        """ find the last record
+        @return a record
+        eg.
+            User.last
+            User.where(age=10).last
+        """
         return RecordManager(cls).last
 
     @classmethod
@@ -251,13 +269,25 @@ class ActiveRecord(object):
         """
         return RecordManager(cls).limit(limit, offset)
 
-    # @classmethod
-    # def count(cls):
-    #     return RecordManager(cls).count()
+    @classmethod
+    def count(cls):
+        """ get count number
+        @return a number
+        eg. 
+            User.count()
+            User.where('username=123').count()
+        """
+        return RecordManager(cls).count()
     
-    # @classmethod
-    # def sum(cls, attribute_name):
-    #     return RecordManager(cls).sum(attribute_name)
+    @classmethod
+    def sum(cls, attribute_name):
+        """ get sum number
+        @return number
+        eg.
+            User.sum(age)
+            User.where(username=123).sum()
+        """
+        return RecordManager(cls).sum(attribute_name)
 
     @classmethod
     def order(cls, *args):
