@@ -31,7 +31,7 @@ create table if not exists %s (
         User.create(username="xyz", password="123", age=1)
         User.create(username="opq", password="456", age=2)
 
-        us = User.order('age').all()
+        us = User.order('age').all
         self.assertEqual(6, len(us))
         self.assertEqual('xyz', us[0].username)
         self.assertEqual('opq', us[1].username)
@@ -49,7 +49,7 @@ create table if not exists %s (
         User.create(username="xyz", password="123", age=1)
         User.create(username="opq", password="456", age=2)
 
-        us = User.order('age DESC').all()
+        us = User.order('age DESC').all
         self.assertEqual(6, len(us))
         self.assertEqual('abc', us[0].username)
         self.assertEqual('kmn', us[1].username)

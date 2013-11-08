@@ -26,7 +26,7 @@ create table if not exists %s (
         class User(ActiveRecord): pass
         User.create(username="abc", password="123")
         User.create(username="efg", password="456")
-        us = User.where('username="abc"').where('password="123"').all()
+        us = User.where('username="abc"').where('password="123"').all
         self.assertEqual(1, len(us))
 
         self.assertEqual('abc', us[0].username)
@@ -37,7 +37,7 @@ create table if not exists %s (
         User.create(username="abc", password="123")
         User.create(username="efg", password="456")
 
-        us = User.where('username=?', 'efg').all()
+        us = User.where('username=?', 'efg').all
         self.assertEqual(1, len(us))
 
         self.assertEqual('efg', us[0].username)
@@ -48,12 +48,12 @@ create table if not exists %s (
         User.create(username="abc", password="123")
         User.create(username="efg", password="456")
 
-        us = User.where(username='efg').where(password="456").all()
+        us = User.where(username='efg').where(password="456").all
         self.assertEqual(1, len(us))
         self.assertEqual('efg', us[0].username)
         self.assertEqual('456', us[0].password)
 
-        us = User.where(username='abc', password="123").all()
+        us = User.where(username='abc', password="123").all
         self.assertEqual(1, len(us))
         self.assertEqual('abc', us[0].username)
         self.assertEqual('123', us[0].password)
@@ -65,7 +65,7 @@ create table if not exists %s (
         User.create(username="efg", password="123")
         User.create(username="efg", password="456")
 
-        us = User.where(username='efg').where('password=?', '123').all()
+        us = User.where(username='efg').where('password=?', '123').all
         self.assertEqual(1, len(us))
         self.assertEqual('efg', us[0].username)
         self.assertEqual('123', us[0].password)

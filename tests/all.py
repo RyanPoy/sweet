@@ -7,7 +7,8 @@ from test_activerecord_update import ActiveRecordUpdateTest
 from test_activerecord_find import ActiveRecordFindTest
 from test_activerecord_where import ActiveRecordWhereTest
 from test_activerecord_group_and_having import ActiveRecordGroupAndHavingTest
-
+from test_activerecord_order import ActiveRecordOrderTest
+from test_activerecord_limit import ActiveRecordLimitTest
 
 tests = [
     ActiveRecordInitTest,
@@ -17,6 +18,8 @@ tests = [
     ActiveRecordFindTest,
     ActiveRecordWhereTest,
     ActiveRecordGroupAndHavingTest,
+    ActiveRecordOrderTest,
+    ActiveRecordLimitTest,
 ]
 
 

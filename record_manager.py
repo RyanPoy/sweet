@@ -13,8 +13,8 @@ class RecordManager(object):
         self._update_attrs_dict = {}
         self._select        = []
         self._wheres        = []
-        # self._limit         = None
-        # self._offset        = None
+        self._limit         = None
+        self._offset        = None
         self._orders        = []
         self._groups        = []
         self._havings       = []
@@ -24,26 +24,27 @@ class RecordManager(object):
         self._table_name    = self._model_class.table_name
         self._db            = self._model_class._get_db()
     
+    @property    
     def all(self):
         sql, params = self.delete_or_update_or_find_sql()
         rows = self._db.fetchall(sql, params)
         return [ self._model_class(**field_name_value_dict_row) for field_name_value_dict_row in rows ]
     
-#     @property
-#     def first(self):
-#         sql, params = self.limit(1, 0).delete_or_update_or_find_sql()
-#         row = self._db.fetchone(sql, params)
-#         return self._model_class(**row) if row else None
+    @property
+    def first(self):
+        sql, params = self.limit(1, 0).delete_or_update_or_find_sql()
+        row = self._db.fetchone(sql, params)
+        return self._model_class(**row) if row else None
 
-#     @property
-#     def last(self):
-#         count = self.count()
-#         self._func = None
-#         if count < 0:
-#             return None
-#         sql, params = self.limit(1, count - 1).delete_or_update_or_find_sql()
-#         row = self._db.fetchone(sql, params)
-#         return self._model_class(**row) if row else None
+    @property
+    def last(self):
+        count = self.count()
+        self._func = None
+        if count < 0:
+            return None
+        sql, params = self.limit(1, count - 1).delete_or_update_or_find_sql()
+        row = self._db.fetchone(sql, params)
+        return self._model_class(**row) if row else None
     
     def save(self, model):
         sql = 'INSERT INTO %s (%s) VALUES (%s)' % (model.table_name_sql, model.column_names_sql, model.column_placeholder_sql)
@@ -64,28 +65,28 @@ class RecordManager(object):
         return self._db.execute_rowcount(sql, params)
 
     def find(self, *ids):
-        records = self.where(id=ids).all()
+        records = self.where(id=ids).all
         not_repeat_ids = set(ids)
         if len(records) != len(not_repeat_ids):
             raise RecordNotFound()
         return records[0] if len(not_repeat_ids) == 1 else records
 
-#     def count(self, column_name='*'):
-#         return self.func('COUNT')
+    def count(self, column_name='*'):
+        return self.func('COUNT')
     
-#     def sum(self, column_name):
-#         return self.func('SUM', column_name)
+    def sum(self, column_name):
+        return self.func('SUM', column_name)
     
-#     def func(self, func_name, func_value='*'):
-#         self._func = (func_name, func_value)
-#         sql, params = self.delete_or_update_or_find_sql()
-#         row = self._db.fetchone(sql, params)
-#         self._func = None
-#         return row.values()[0] if row else 0
+    def func(self, func_name, func_value='*'):
+        self._func = (func_name, func_value)
+        sql, params = self.delete_or_update_or_find_sql()
+        row = self._db.fetchone(sql, params)
+        self._func = None
+        return row.values()[0] if row else 0
     
-#     def limit(self, limit, offset=0):
-#         self._limit, self._offset = limit, offset
-#         return self
+    def limit(self, limit, offset=0):
+        self._limit, self._offset = limit, offset
+        return self
             
 #     def select(self, *args):
 #         select = []
@@ -137,7 +138,7 @@ class RecordManager(object):
         
         sql = self.__add_group_having(sql, self._groups, self._havings, params)
         sql = self.__add_order(sql, self._orders)
-        # sql = self.__add_limit_offset(sql, self._limit, self._offset)
+        sql = self.__add_limit_offset(sql, self._limit, self._offset)
         
         return sql, params
 
@@ -156,14 +157,13 @@ class RecordManager(object):
             select_sql = ', '.join([ '%s.%s' % (self._table_name, s) for s in flatten(self._select) ])
             return 'SELECT %s FROM %s' % (select_sql, self._table_name)
     
-#     def __add_limit_offset(self, sql, limit, offset):
-#         limit, offset = to_i(limit), to_i(offset)
-
-#         if limit:
-#             sql += ' LIMIT %s' % limit
-#             if offset:
-#                 sql += ' OFFSET %s' % offset
-#         return sql
+    def __add_limit_offset(self, sql, limit, offset):
+        limit, offset = to_i(limit), to_i(offset)
+        if limit:
+            sql += ' LIMIT %s' % limit
+            if offset:
+                sql += ' OFFSET %s' % offset
+        return sql
     
     def __add_group_having(self, sql, groups, havings, params):
         new_groups = []

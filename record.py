@@ -200,17 +200,17 @@ class ActiveRecord(object):
     #         cls.__association_dict__ = {}
     #     return cls.__association_dict__
     
-    # @classproperty
-    # def all(cls):
-    #     return RecordManager(cls).all
+    @classproperty
+    def all(cls):
+        return RecordManager(cls).all
     
-    # @classproperty
-    # def first(cls):
-    #     return RecordManager(cls).first
+    @classproperty
+    def first(cls):
+        return RecordManager(cls).first
     
-    # @classproperty
-    # def last(cls):
-    #     return RecordManager(cls).last
+    @classproperty
+    def last(cls):
+        return RecordManager(cls).last
 
     @classmethod
     def create(cls, **attributes):
@@ -236,13 +236,20 @@ class ActiveRecord(object):
     @classmethod
     def find(cls, *ids):
         """ find record by ids
-        @return a record array if all found. else throw RecordNotFound exception
+        @return:    if there is a id and found it will return a record
+                    if there are many ids and found them will return a record array
+                    if any id not found, throw RecordNotFound exception
         """
         return RecordManager(cls).find(*ids)
 
-    # @classmethod
-    # def limit(cls, limit=0, offset=0):
-    #     return RecordManager(cls).limit(limit, offset)
+    @classmethod
+    def limit(cls, limit=0, offset=0):
+        """ limit query
+        eg. 
+            User.limit(10)
+            User.limit(10, 1)
+        """
+        return RecordManager(cls).limit(limit, offset)
 
     # @classmethod
     # def count(cls):

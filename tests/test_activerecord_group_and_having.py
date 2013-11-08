@@ -32,7 +32,7 @@ create table if not exists %s (
         User.create(username="hij", password="456", age=1)
 
 
-        us = User.where(age='1').group('username').having(password="123").all()
+        us = User.where(age='1').group('username').having(password="123").all
         self.assertEqual(3, len(us))
         self.assertEqual('abc', us[0].username)
         self.assertEqual('123', us[0].password)
