@@ -264,12 +264,21 @@ class ActiveRecord(object):
     #         return RecordManager(cls).order(args[0]) 
     #     return RecordManager(cls)
 
-    # @classmethod
-    # def group(cls, group):
-    #     return RecordManager(cls).group(group)
+    @classmethod
+    def group(cls, group):
+        """ group query
+        eg. 
+            User.group('username')
+        """
+        return RecordManager(cls).group(group)
 
     @classmethod
     def having(cls, *args, **kwargs):
+        """ having query when group
+        Note: if there is not use group, the having will be not useful
+        eg.
+            User.group('username').having(age=1)
+        """
         return RecordManager(cls).having(*args, **kwargs)
 
     # @classmethod
