@@ -16,8 +16,8 @@ class RecordManager(object):
         # self._limit         = None
         # self._offset        = None
         # self._orders        = []
-        # self._groups        = []
-        # self._havings       = []
+        self._groups        = []
+        self._havings       = []
         self._joins         = []
         self._func          = None
         self._model_class   = model_class
@@ -95,8 +95,28 @@ class RecordManager(object):
 #         return self
         
     def where(self, *sql_and_params, **conditions):
+        return self.__where_or_having(self._wheres, *sql_and_params, **conditions)
+
+#     def order(self, order):
+#         if order:
+#             self._orders.append(order) 
+#         return self
+
+    def group(self, group):
+        self._groups.append(group)
+        return self
+
+    def having(self, *sql_and_params, **conditions):
+        return self.__where_or_having(self._havings, *sql_and_params, **conditions)
+    
+#     def joins(self, *joins):
+#         if joins:
+#             self._joins = joins[0] if len(joins) == 1 else joins
+#         return self
+    
+    def __where_or_having(self, codition_collection, *sql_and_params, **conditions):
         if sql_and_params:
-            self._wheres.append(sql_and_params)
+            codition_collection.append(sql_and_params)
         elif conditions:
 #            for key in condtions.keys(): # must use keys, not iterkeys.
 #                if type(key) is self._model_class.__metaclass__:
@@ -104,41 +124,9 @@ class RecordManager(object):
 #                    new_key = '%s_id' % Inflection.hungarian_name_of(key.__class__.__name__)
 #                    condtions[new_key] = key.id
 #                    condtions.pop(key)
-            self._wheres.append(conditions)
-        return self 
-
-#     def order(self, order):
-#         if order:
-#             self._orders.append(order) 
-#         return self
-
-#     def group(self, group):
-#         self._groups.append(group)
-#         return self
-
-#     def having(self, *args, **kwargs):
-#         if args:
-#             having = args[0] if len(args) == 1 else args
-#         elif kwargs:
-# #            for key in kwargs.keys(): # must use keys, can not use iterkeys.
-# #                if type(key) is self._model_class.__metaclass__:
-# #                    new_key = '%s_id' % Inflection.hungarian_name_of(key.__class__.__name__)
-# #                    kwargs[new_key] = key.id
-# #                    kwargs.pop(key)
-#             having = kwargs
-#         else:           
-#             having = None
+            codition_collection.append(conditions)
+        return self
             
-#         if having:
-#             self._havings.append(having)
-            
-#         return self 
-    
-#     def joins(self, *joins):
-#         if joins:
-#             self._joins = joins[0] if len(joins) == 1 else joins
-#         return self
-    
     def delete_or_update_or_find_sql(self):
         params  = []
 
@@ -146,7 +134,7 @@ class RecordManager(object):
         # sql = self.__add_joins(sql, self._joins)
         sql = self.__add_wheres(sql, params, self._wheres)
         
-        # sql = self.__add_group_having(sql, self._groups, self._havings, params)
+        sql = self.__add_group_having(sql, self._groups, self._havings, params)
         # sql = self.__add_order(sql, self._orders)
         # sql = self.__add_limit_offset(sql, self._limit, self._offset)
         
@@ -176,19 +164,19 @@ class RecordManager(object):
 #                 sql += ' OFFSET %s' % offset
 #         return sql
     
-#     def __add_group_having(self, sql, groups, havings, params):
-#         new_groups = []
-#         for group in groups:
-#             if group and group.strip():
-#                 new_groups.extend(group.split(','))
+    def __add_group_having(self, sql, groups, havings, params):
+        new_groups = []
+        for group in groups:
+            if group and group.strip():
+                new_groups.extend(group.split(','))
         
-#         new_groups = [ '%s.%s' % (self._table_name, group.strip()) 
-#                         for group in new_groups if group and group.strip() ]
-#         if new_groups:
-#             sql = '%s GROUP BY %s' % (sql, ','.join(new_groups))
-#             sql = self.__add_conditions_of(sql, params, havings, 'HAVING')
+        new_groups = [ '%s.%s' % (self._table_name, group.strip()) 
+                        for group in new_groups if group and group.strip() ]
+        if new_groups:
+            sql = '%s GROUP BY %s' % (sql, ','.join(new_groups))
+            sql = self.__add_conditions_of(sql, params, havings, 'HAVING')
         
-#         return sql
+        return sql
     
     def __add_wheres(self, sql, params, wheres):
         if self._joins:

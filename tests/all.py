@@ -6,6 +6,7 @@ from test_activerecord_delete import ActiveRecordDeleteTest
 from test_activerecord_update import ActiveRecordUpdateTest
 from test_activerecord_find import ActiveRecordFindTest
 from test_activerecord_where import ActiveRecordWhereTest
+from test_activerecord_group_and_having import ActiveRecordGroupAndHavingTest
 
 
 tests = [
@@ -14,7 +15,8 @@ tests = [
     ActiveRecordDeleteTest,
     ActiveRecordUpdateTest,
     ActiveRecordFindTest,
-    ActiveRecordWhereTest
+    ActiveRecordWhereTest,
+    ActiveRecordGroupAndHavingTest,
 ]
 
 

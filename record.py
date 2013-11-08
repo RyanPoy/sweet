@@ -268,9 +268,9 @@ class ActiveRecord(object):
     # def group(cls, group):
     #     return RecordManager(cls).group(group)
 
-    # @classmethod
-    # def having(cls, *args, **kwargs):
-    #     return RecordManager(cls).having(*args, **kwargs)
+    @classmethod
+    def having(cls, *args, **kwargs):
+        return RecordManager(cls).having(*args, **kwargs)
 
     # @classmethod
     # def join(cls, *joins):
