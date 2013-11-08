@@ -258,11 +258,11 @@ class ActiveRecord(object):
     # def sum(cls, attribute_name):
     #     return RecordManager(cls).sum(attribute_name)
 
-    # @classmethod
-    # def order(cls, *args):
-    #     if args:
-    #         return RecordManager(cls).order(args[0]) 
-    #     return RecordManager(cls)
+    @classmethod
+    def order(cls, *args):
+        if args:
+            return RecordManager(cls).order(args[0]) 
+        return RecordManager(cls)
 
     @classmethod
     def group(cls, group):

@@ -15,7 +15,7 @@ class RecordManager(object):
         self._wheres        = []
         # self._limit         = None
         # self._offset        = None
-        # self._orders        = []
+        self._orders        = []
         self._groups        = []
         self._havings       = []
         self._joins         = []
@@ -97,13 +97,14 @@ class RecordManager(object):
     def where(self, *sql_and_params, **conditions):
         return self.__where_or_having(self._wheres, *sql_and_params, **conditions)
 
-#     def order(self, order):
-#         if order:
-#             self._orders.append(order) 
-#         return self
+    def order(self, order):
+        if order:
+            self._orders.append(order) 
+        return self
 
     def group(self, group):
-        self._groups.append(group)
+        if group:
+            self._groups.append(group)
         return self
 
     def having(self, *sql_and_params, **conditions):
@@ -135,7 +136,7 @@ class RecordManager(object):
         sql = self.__add_wheres(sql, params, self._wheres)
         
         sql = self.__add_group_having(sql, self._groups, self._havings, params)
-        # sql = self.__add_order(sql, self._orders)
+        sql = self.__add_order(sql, self._orders)
         # sql = self.__add_limit_offset(sql, self._limit, self._offset)
         
         return sql, params
@@ -206,9 +207,9 @@ class RecordManager(object):
             sql = '%s %s %s' % (sql, where_or_having, ' AND '.join(condition_sqls))
         return sql
     
-#     def __add_order(self, sql, orders):
-#         order_str = ', '.join([ order for order in orders if order ])
-#         return '%s ORDER BY %s' % (sql, order_str) if order_str else sql
+    def __add_order(self, sql, orders):
+        order_str = ', '.join([ order for order in orders if order ])
+        return '%s ORDER BY %s' % (sql, order_str) if order_str else sql
 
 #     def __add_joins(self, sql, joins):
 #         """
