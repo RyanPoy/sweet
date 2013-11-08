@@ -1,84 +1,13 @@
 #coding: utf8
 # # from pyrails.associations import Association
+from pyrails.method_missing import FindMethodMissing, CreateOrBuildMethodMissing
 from pyrails.record_manager import RecordManager
 from pyrails.decorates import classproperty
 from pyrails.inflection import Inflection
 from pyrails.db import get_database
+
 # from pyrails.exceptions import RecordValidateError, RecordHasNotBeenPersisted
 
-# from pyrails.support import classproperty, hungarian_name_of
-# import re
-
-
-# class FindMethodMissing(object):
-
-#     __find_by_pattern = re.compile('^find_(all_by|by)_([_a-zA-Z]\w*)$')
-#     __find_or_by_pattern = re.compile('^find_or_(init|create)_by_([_a-zA-Z]\w*)$')
-
-#     def __init__(self, instance, method_name):
-#         self.__name = method_name
-#         self.__model_instance = instance
-
-#     @classmethod
-#     def match(cls, name):
-#         return cls.__find_by_pattern.match(name) or cls.__find_or_by_pattern.match(name)
-
-#     def __call__(self, *args):
-#         def extract_scope_or_method_and_arguments(match, args):
-#             groups = match.groups()
-#             scope = groups[0]
-#             args_name = groups[1].split('_and_')
-#             return scope, dict(zip(args_name, args))
-
-#         r = None
-#         match = self.__class__.__find_by_pattern.match(self.__name)
-#         if match:
-#             scope, argments = extract_scope_or_method_and_arguments(match, args)
-#             if scope == 'all_by':
-#                 r = self.__model_instance.where(argments).all
-#             else: # must 'by'
-#                 r = self.__model_instance.where(argments).first
-#         else:
-#             match = self.__class__.__find_or_by_pattern.match(self.__name)
-#             if match:
-#                 scope, argments = extract_scope_or_method_and_arguments(match, args)
-#                 if scope == 'create':
-#                     r = self.__model_instance.create(**argments)
-#                 else: # must 'init'
-#                     r = self.__model_instance(**argments)
-#         return r
-
-
-# class CreateOrBuildMethodMissing(object):
-
-#     __pattern = re.compile('^(create|build)_([_a-zA-Z]\w*)$')
-
-#     def __init__(self, instance, method_name):
-#         self.__name = method_name
-#         self.__model_instance = instance
-
-#     @classmethod
-#     def match(cls, name):
-#         return cls.__pattern.match(name)
-            
-#     def __call__(self, *args, **kwargs):
-#         r = None
-#         match = self.__class__.__pattern.match(self.__name)
-#         if match:
-#             scope, association_propert_name = match.groups()
-#             association = self.__model_instance.association_dict.get(association_propert_name, None)
-#             if not association:
-#                 raise AttributeError("'%s' object has no attribute '%s'" % (self.__model_instance.__class__.__name__, self.__name))
-#             foreign_key = association.foreign_key
-#             if foreign_key not in kwargs:
-#                 kwargs[foreign_key] = self.__model_instance.id
-#             if scope == 'create':
-#                 r = association.target.create(*args, **kwargs)
-#             else: # must 'build'
-#                 r = association.target(*args, **kwargs)
-#             setattr(self.__model_instance, association_propert_name, r)
-#         return r
-    
 
 class ActiveRecord(object):
     """
@@ -128,40 +57,40 @@ class ActiveRecord(object):
     """
     __db__ = None
 
-    # class __metaclass__(type):
-    #     def __init__(cls, name, bases, attr):
-    #         model_instance = type.__init__(cls, name, bases, attr)
-    #         # if name != 'ActiveRecord':
-    #         #     for assocation in Association._next:
-    #         #         assocation._register(cls)
-    #         return model_instance 
+    class __metaclass__(type):
+        def __init__(cls, name, bases, attr):
+            model_instance = type.__init__(cls, name, bases, attr)
+            # if name != 'ActiveRecord':
+            #     for assocation in Association._next:
+            #         assocation._register(cls)
+            return model_instance 
         
-    #     def __getattribute__(self, name):
-    #         try:
-    #             return type.__getattribute__(self, name)
-    #         except AttributeError, _:
-    #             if FindMethodMissing.match(name):
-    #                 return FindMethodMissing(self, name)
-    #             raise
+        def __getattribute__(self, name):
+            try:
+                return type.__getattribute__(self, name)
+            except AttributeError, _:
+                if FindMethodMissing.match(name):
+                    return FindMethodMissing(self, name)
+                raise
 
     def __init__(self, **attributes):
         self.id = None
         for k, v in attributes.iteritems():
             setattr(self, k, v)
 
-    # def __getattribute__(self, name):
-    #     try:
-    #         return super(ActiveRecord, self).__getattribute__(name)
-    #     except AttributeError, _:
-    #         association = self.association_dict.get(name, None)
-    #         # if association:
-    #         #     if association._type == Association.Type.belongs_to:
-    #         #         return association.target.find(getattr(self, association.foreign_key))
-    #         #     elif association._type == Association.Type.has_one:
-    #         #         return association.target.where({association.foreign_key: self.id}).first
-    #         if CreateOrBuildMethodMissing.match(name):
-    #             return CreateOrBuildMethodMissing(self, name)
-    #         raise
+    def __getattribute__(self, name):
+        try:
+            return super(ActiveRecord, self).__getattribute__(name)
+        except AttributeError, _:
+            # association = self.association_dict.get(name, None)
+            # if association:
+            #     if association._type == Association.Type.belongs_to:
+            #         return association.target.find(getattr(self, association.foreign_key))
+            #     elif association._type == Association.Type.has_one:
+            #         return association.target.where({association.foreign_key: self.id}).first
+            if CreateOrBuildMethodMissing.match(name):
+                return CreateOrBuildMethodMissing(self, name)
+            raise
 
     @classproperty
     def table_name(cls):

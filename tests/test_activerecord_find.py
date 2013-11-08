@@ -51,6 +51,14 @@ create table if not exists %s (
         User.create(username="abc", password="123")
         self.assertRaises(RecordNotFound, User.find, 1, 2)
 
+    def test_find_method_missing(self):
+        class User(ActiveRecord): pass
+        User.create(username="abc", password="123")
+        User.create(username="efg", password="456")
+
+        u = User.find_by_username_and_password('efg', '456')
+        self.assertEqual('efg', u.username)
+        self.assertEqual('456', u.password)
 
 if __name__ == '__main__':
     unittest.main()
