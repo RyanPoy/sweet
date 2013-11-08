@@ -222,12 +222,6 @@ class ActiveRecord(object):
         """
         record = cls(**attributes)
         return record if record.save() else None
-
-    # @classmethod
-    # def create_(cls, hash_attributes={},  **kw_attributes):
-    #     record = cls(hash_attributes, **kw_attributes)
-    #     record.save_()
-    #     return record
     
     @classmethod
     def where(cls, *args, **kwargs):
@@ -260,6 +254,12 @@ class ActiveRecord(object):
 
     @classmethod
     def order(cls, *args):
+        """ order query
+        eg.
+            User.order('age')
+            User.order('age ASC')
+            User.order('age DESC')
+        """
         if args:
             return RecordManager(cls).order(args[0]) 
         return RecordManager(cls)
