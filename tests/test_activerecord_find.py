@@ -60,5 +60,6 @@ create table if not exists %s (
         self.assertEqual('efg', u.username)
         self.assertEqual('456', u.password)
 
+
 if __name__ == '__main__':
     unittest.main()

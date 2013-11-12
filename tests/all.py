@@ -10,6 +10,8 @@ from test_activerecord_group_and_having import ActiveRecordGroupAndHavingTest
 from test_activerecord_order import ActiveRecordOrderTest
 from test_activerecord_limit import ActiveRecordLimitTest
 from test_activerecord_func import ActiveRecordFuncTest
+from test_association_belongs_to import BelongsToTest
+
 
 tests = [
     ActiveRecordInitTest,
@@ -22,6 +24,7 @@ tests = [
     ActiveRecordOrderTest,
     ActiveRecordLimitTest,
     ActiveRecordFuncTest,
+    BelongsToTest,
 ]
 
 

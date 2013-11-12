@@ -1,11 +1,10 @@
 #coding: utf8
-# # from pyrails.associations import Association
 from pyrails.method_missing import FindMethodMissing, CreateOrBuildMethodMissing
 from pyrails.record_manager import RecordManager
+from pyrails.associations import Association
 from pyrails.decorates import classproperty
 from pyrails.inflection import Inflection
 from pyrails.db import get_database
-
 # from pyrails.exceptions import RecordValidateError, RecordHasNotBeenPersisted
 
 
@@ -60,9 +59,9 @@ class ActiveRecord(object):
     class __metaclass__(type):
         def __init__(cls, name, bases, attr):
             model_instance = type.__init__(cls, name, bases, attr)
-            # if name != 'ActiveRecord':
-            #     for assocation in Association._next:
-            #         assocation._register(cls)
+            if name != 'ActiveRecord':
+                for assocation in Association._next:
+                    assocation._register(cls)
             return model_instance 
         
         def __getattribute__(self, name):
@@ -82,12 +81,12 @@ class ActiveRecord(object):
         try:
             return super(ActiveRecord, self).__getattribute__(name)
         except AttributeError, _:
-            # association = self.association_dict.get(name, None)
-            # if association:
-            #     if association._type == Association.Type.belongs_to:
-            #         return association.target.find(getattr(self, association.foreign_key))
-            #     elif association._type == Association.Type.has_one:
-            #         return association.target.where({association.foreign_key: self.id}).first
+            association = self.association_dict.get(name, None)
+            if association:
+                if association._type == Association.Type.belongs_to:
+                    return association.target.find(getattr(self, association.foreign_key))
+                # elif association._type == Association.Type.has_one:
+                #     return association.target.where({association.foreign_key: self.id}).first
             if CreateOrBuildMethodMissing.match(name):
                 return CreateOrBuildMethodMissing(self, name)
             raise
@@ -123,11 +122,11 @@ class ActiveRecord(object):
             cls.__column_placeholder_sql__ = ', '.join( ['?'] * len(cls.column_names) )
         return cls.__column_placeholder_sql__
     
-    # @classproperty
-    # def association_dict(cls):
-    #     if not hasattr(cls, '__association_dict__'):
-    #         cls.__association_dict__ = {}
-    #     return cls.__association_dict__
+    @classproperty
+    def association_dict(cls):
+        if not hasattr(cls, '__association_dict__'):
+            cls.__association_dict__ = {}
+        return cls.__association_dict__
     
     @classproperty
     def all(cls):

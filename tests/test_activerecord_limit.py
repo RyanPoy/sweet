@@ -79,5 +79,6 @@ create table if not exists %s (
         self.assertEqual('456', u.password)
         self.assertEqual(2, u.age)
 
+
 if __name__ == '__main__':
     unittest.main()
