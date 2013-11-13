@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+#coding: utf8
 import unittest
 from test_activerecord_init import ActiveRecordInitTest
 from test_activerecord_create_and_save import ActiveRecordCreateAndSaveTest
@@ -11,6 +11,7 @@ from test_activerecord_order import ActiveRecordOrderTest
 from test_activerecord_limit import ActiveRecordLimitTest
 from test_activerecord_func import ActiveRecordFuncTest
 from test_association_belongs_to import BelongsToTest
+from test_association_has_one import HasOneTest
 
 
 tests = [
@@ -25,6 +26,7 @@ tests = [
     ActiveRecordLimitTest,
     ActiveRecordFuncTest,
     BelongsToTest,
+    HasOneTest,
 ]
 
 

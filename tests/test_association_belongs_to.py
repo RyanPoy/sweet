@@ -86,7 +86,7 @@ create table if not exists children (
         class Child(ActiveRecord): belongs_to(Father)
     
         fid = Father.create(name='Bob').id
-        c = Child.create(created_at = '2011-10-10 12:12:12', father_id = fid)
+        c = Child.create(created_at='2011-10-10 12:12:12', father_id=fid)
         f = c.father
         self.assertEqual(fid, f.id)
         self.assertEqual('Bob', f.name)

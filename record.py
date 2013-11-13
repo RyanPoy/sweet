@@ -84,9 +84,13 @@ class ActiveRecord(object):
             association = self.association_dict.get(name, None)
             if association:
                 if association._type == Association.Type.belongs_to:
+                    # A belongs_to B
+                    # A.B  => "SEELCT B.* FROM B WHERE id = A.B_id"
                     return association.target.find(getattr(self, association.foreign_key))
-                # elif association._type == Association.Type.has_one:
-                #     return association.target.where({association.foreign_key: self.id}).first
+                elif association._type == Association.Type.has_one:
+                    # A has_one B
+                    # A.B => "SELECT B.* FROM B WHERE A_id = A.id"
+                    return association.target.where(**{association.foreign_key: self.id}).first
             if CreateOrBuildMethodMissing.match(name):
                 return CreateOrBuildMethodMissing(self, name)
             raise

@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+#coding: utf8
 from collections import namedtuple
 from pyrails.exceptions import UnsupportAssociation
 from pyrails.support import is_str, import_object
@@ -17,6 +17,7 @@ class Association(object):
         attr_name 最终结果：自定义 或者 target_class_or_classpath的最后部分的小写的单数(has_one, belongs_to)或者复数(has_many)
         foreign_key   最终结果：自定义 或者 当belongs_to的时候为：attr_name的单数 + "_id"
                                          当 has_one, has_many的时候，为：类名 + '_id'
+                    注意：foreign_key 永远是对当前的 class 而言，而不是针对target而言的
         """
         self.__target_class_or_classpath = target_class_or_classpath
         self._type = _type
