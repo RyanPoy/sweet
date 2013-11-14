@@ -2,6 +2,7 @@
 from pyrails.exceptions import RecordNotFound
 from pyrails.support import is_array, is_str, is_hash, flatten, to_i
 from pyrails.inflection import Inflection
+from pyrails.associations import Association
 
 
 class SQLBuilder(object):
@@ -11,7 +12,7 @@ class SQLBuilder(object):
     def __init__(self, model_class):
         self._deleteall_or_updateall = None
         self._update_attrs_dict = {}
-        self._select        = []
+        self._selects       = []
         self._wheres        = []
         self._limit         = None
         self._offset        = None
@@ -88,12 +89,10 @@ class SQLBuilder(object):
         self._limit, self._offset = limit, offset
         return self
 
-#     def select(self, *args):
-#         select = []
-#         if args:
-#             select = args[0] if len(args) == 1 else args
-#         self._select.append(select)
-#         return self
+    def select(self, *args):
+        for arg in args:
+            self._selects.append(arg)
+        return self
         
     def where(self, *sql_and_params, **conditions):
         return self.__where_or_having(self._wheres, *sql_and_params, **conditions)
@@ -150,10 +149,10 @@ class SQLBuilder(object):
             return 'UPDATE %s SET %s' % (self._table_name, columns_sql)
         elif self._func:
             return 'SELECT %s(%s) AS %s FROM %s' % (self._func[0].upper(), self._func[1], self._func[0].lower(), self._table_name)
-        elif not self._select:
+        elif not self._selects:
             return 'SELECT %s.* FROM %s' % (self._table_name, self._table_name)
         else:
-            select_sql = ', '.join([ '%s.%s' % (self._table_name, s) for s in flatten(self._select) ])
+            select_sql = ', '.join([ '%s.%s' % (self._table_name, s) for s in flatten(self._selects) ])
             return 'SELECT %s FROM %s' % (select_sql, self._table_name)
     
     def __add_limit_offset(self, sql, limit, offset):
@@ -219,17 +218,27 @@ class SQLBuilder(object):
         for join in joins: 
             # must be a string or list
             if is_str(join):
+                # print '*'*10, self._model_class, join, self._model_class.association_dict.keys()
                 association = self._model_class.association_dict.get(join, None)
                 if association: # a association: belongs_to, has_one, has_many
                     target_class = association.target
+                    if association._type == Association.Type.belongs_to:
+                        # print association._type
+                        pass
+                    elif association._type == Association.Type.has_one:
+                        # print association._type
+                        pass
+                    elif association._type == Association.Type.has_many:
+                        # print association._type
+                        pass
                     buff.append('INNER JOIN %s' % target_class.table_name)
-                    params.append('%s.%s_id = %s.id' % (target_class.table_name, Inflection.hungarian_name_of(self._model_class.__name__), target_class.table_name))
+                    params.append('%s.%s_id = %s.id' % (target_class.table_name, Inflection.hungarian_name_of(self._model_class.__name__), self._model_class.table_name))
                 else:
                     buff.append(join)
-        join_sql =  '%s %s' % (sql, ' '.join([ j.strip() for j in buff ]))
+        join_sql = ' '.join([ j.strip() for j in buff ])
         if params:
             join_sql = '%s ON %s' % (join_sql, 'And '.join(params))
-        return join_sql
+        return '%s %s' % (sql, join_sql) if join_sql else sql
     
 #     def __iter__(self):
 #         return iter(self.all)

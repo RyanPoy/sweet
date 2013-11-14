@@ -1,5 +1,6 @@
 #coding: utf8
 import unittest
+from test_sql_builder import SQLBuilderTest
 from test_activerecord_init import ActiveRecordInitTest
 from test_activerecord_create_and_save import ActiveRecordCreateAndSaveTest
 from test_activerecord_delete import ActiveRecordDeleteTest
@@ -15,6 +16,8 @@ from test_association_has_one import HasOneTest
 
 
 tests = [
+    SQLBuilderTest,
+
     ActiveRecordInitTest,
     ActiveRecordCreateAndSaveTest,
     ActiveRecordDeleteTest,
@@ -25,6 +28,7 @@ tests = [
     ActiveRecordOrderTest,
     ActiveRecordLimitTest,
     ActiveRecordFuncTest,
+    
     BelongsToTest,
     HasOneTest,
 ]
