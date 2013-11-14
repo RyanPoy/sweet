@@ -4,6 +4,7 @@ from decimal import Decimal
 import time
 import re
 
+
 # data type transfer variables and functions
 FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE')
 ISO_DATE = r'^(\d{4})-(\d\d)-(\d\d)$'
@@ -36,10 +37,15 @@ def to_decimal(v):
     try:                return Decimal(v)
     except:             return Decimal(0)
 
+datetime2str    = lambda dt, format='%Y-%m-%d %H:%M:%S': dt.strftime(format)
+date2str        = lambda d, format='%Y-%m-%d': d.strftime(format)
 
 datetime2date   = lambda dt: date(dt.year, dt.month, dt.day)
 str2binary      = lambda v: v # Used to convert from Strings to BLOBs
 binary2str      = lambda v: v # Used to convert from BLOBs to Strings
+
+microseconds    = lambda t: to_i((to_f(t) % 1) * 1000000) # '0.123456' -> 123456; '1.123456' -> 123456
+    
 
 def str2datetime(s):
     if s is None:     return None
@@ -49,7 +55,7 @@ def str2datetime(s):
 
 def str2date(s):
     if s is None:           return None
-    if is_datetime(s):      return datetime_to_date(s)
+    if is_datetime(s):      return datetime2date(s)
     if is_date(s):          return s
     if not is_str(s):       return s
     if not s.strip():       return None    
@@ -81,7 +87,7 @@ def __fallback_str2date(string):
     return date(tm_struct.tm_year, tm_struct.tm_mon, tm_struct.tm_mday)
 
 
-def __fallback_stri2datetime(string):
+def __fallback_str2datetime(string):
     try:
         d = str2date(string)
         return datetime(d.year, d.month, d.day)
