@@ -47,6 +47,12 @@ class SQLBuilderTest(unittest.TestCase):
         self.assertEqual("SELECT users.* FROM users WHERE users.type = ? AND users.name in (?, ?) LIMIT 10 OFFSET 1", sql)
         self.assertEquals([1, 'pengyi', 'poy'], params)
         
+    def test_where_when_like_query(self):
+        class User(ActiveRecord): pass
+        sql, params = SQLBuilder(User).where('name like "?abc%" AND type = ?', 1).limit(10, 1).delete_or_update_or_find_sql()
+        self.assertEqual('SELECT users.* FROM users WHERE name like "?abc%" AND type = ? LIMIT 10 OFFSET 1', sql)
+        self.assertEquals([1], params)
+
     def test_where_with_chain(self):
         class User(ActiveRecord):
             pass

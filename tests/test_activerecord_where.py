@@ -58,6 +58,15 @@ create table if not exists %s (
         self.assertEqual('abc', us[0].username)
         self.assertEqual('123', us[0].password)
 
+    # def test_where_when_like_query(self):
+    #     class User(ActiveRecord): pass
+    #     User.create(username="abc", password="123")
+    #     User.create(username="efg", password="456")
+    #     us = User.where('username like "e?g"', '?').all
+    #     self.assertEqual(1, len(us))
+    #     self.assertEqual('efg', us[0].username)
+    #     self.assertEqual('456', us[0].password)
+
     def test_where_with_complex_coditions(self):
         class User(ActiveRecord): pass
         User.create(username="abc", password="123")

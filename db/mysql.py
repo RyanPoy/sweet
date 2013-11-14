@@ -56,7 +56,7 @@ class Adapter(object):
         raw_sql = ''
         if self.show_sql:
             raw_sql = self.__show_sql(sql, params)
-        sql = sql.replace('?', '%s')
+        sql = sql.replace('?', '%s') # @TODO: should fix a bug if query like this: select users.* from users where users.name like "?abc"
         cursor.execute(sql, params)
         if self.show_sql:
             print '##', raw_sql, (time.time() - btime)
