@@ -222,17 +222,16 @@ class SQLBuilder(object):
                 association = self._model_class.association_dict.get(join, None)
                 if association: # a association: belongs_to, has_one, has_many
                     target_class = association.target
+                    buff.append('INNER JOIN %s' % target_class.table_name)
                     if association._type == Association.Type.belongs_to:
-                        # print association._type
-                        pass
+                        params.append('%s.id = %s.%s_id' % (target_class.table_name, self._model_class.table_name, Inflection.hungarian_name_of(target_class.__name__)))
                     elif association._type == Association.Type.has_one:
-                        # print association._type
-                        pass
+                        params.append('%s.%s_id = %s.id' % (target_class.table_name, Inflection.hungarian_name_of(self._model_class.__name__), self._model_class.table_name))
                     elif association._type == Association.Type.has_many:
                         # print association._type
                         pass
-                    buff.append('INNER JOIN %s' % target_class.table_name)
-                    params.append('%s.%s_id = %s.id' % (target_class.table_name, Inflection.hungarian_name_of(self._model_class.__name__), self._model_class.table_name))
+                    
+                    
                 else:
                     buff.append(join)
         join_sql = ' '.join([ j.strip() for j in buff ])

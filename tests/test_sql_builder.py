@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 from pyrails.sql_builder import SQLBuilder
 from pyrails.record import ActiveRecord
-from pyrails.associations import has_one
+from pyrails.associations import has_one, belongs_to
 import unittest
 
 
@@ -90,13 +90,22 @@ class SQLBuilderTest(unittest.TestCase):
         self.assertEqual('SELECT users.* FROM users INNER JOIN orders ON orders.user_id = user.id AND users.name in (?, ?)', sql)
         self.assertEquals(['pengyi', 'poy'], params)
 
-    def test_associations_joins(self):
+    def test_associations_has_one_joins(self):
         class Post(ActiveRecord): pass
         class User(ActiveRecord): has_one(Post)
 
         c = SQLBuilder(User).where(name=['pengyi', 'poy']).joins('post')
         sql, params = c.delete_or_update_or_find_sql()
         self.assertEqual('SELECT users.* FROM users INNER JOIN posts ON posts.user_id = users.id AND users.name in (?, ?)', sql)
+        self.assertEquals(['pengyi', 'poy'], params)
+
+    def test_associations_belongs_to_joins(self):
+        class User(ActiveRecord): pass
+        class Post(ActiveRecord): belongs_to(User)
+
+        c = SQLBuilder(Post).where(name=['pengyi', 'poy']).joins('user')
+        sql, params = c.delete_or_update_or_find_sql()
+        self.assertEqual('SELECT posts.* FROM posts INNER JOIN users ON users.id = posts.user_id AND posts.name in (?, ?)', sql)
         self.assertEquals(['pengyi', 'poy'], params)
 
 
