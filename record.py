@@ -1,6 +1,6 @@
 #coding: utf8
 from pyrails.method_missing import FindMethodMissing, CreateOrBuildMethodMissing
-from pyrails.record_manager import RecordManager
+from pyrails.sql_builder import SQLBuilder
 from pyrails.associations import Association
 from pyrails.decorates import classproperty
 from pyrails.inflection import Inflection
@@ -140,7 +140,7 @@ class ActiveRecord(object):
             User.all
             User.where(age=10).all
         """
-        return RecordManager(cls).all
+        return SQLBuilder(cls).all
     
     @classproperty
     def first(cls):
@@ -150,7 +150,7 @@ class ActiveRecord(object):
             User.first
             User.where(age=10).first
         """
-        return RecordManager(cls).first
+        return SQLBuilder(cls).first
     
     @classproperty
     def last(cls):
@@ -160,7 +160,7 @@ class ActiveRecord(object):
             User.last
             User.where(age=10).last
         """
-        return RecordManager(cls).last
+        return SQLBuilder(cls).last
 
     @classmethod
     def create(cls, **attributes):
@@ -181,7 +181,7 @@ class ActiveRecord(object):
             User.where("username='abc' and password='123'")
             User.where("username=? and password=?", 'abc', '123')
         """
-        return RecordManager(cls).where(*args, **kwargs)
+        return SQLBuilder(cls).where(*args, **kwargs)
 
     @classmethod
     def find(cls, *ids):
@@ -190,7 +190,7 @@ class ActiveRecord(object):
                     if there are many ids and found them will return a record array
                     if any id not found, throw RecordNotFound exception
         """
-        return RecordManager(cls).find(*ids)
+        return SQLBuilder(cls).find(*ids)
 
     @classmethod
     def limit(cls, limit=0, offset=0):
@@ -199,7 +199,7 @@ class ActiveRecord(object):
             User.limit(10)
             User.limit(10, 1)
         """
-        return RecordManager(cls).limit(limit, offset)
+        return SQLBuilder(cls).limit(limit, offset)
 
     @classmethod
     def count(cls):
@@ -209,7 +209,7 @@ class ActiveRecord(object):
             User.count()
             User.where('username=123').count()
         """
-        return RecordManager(cls).count()
+        return SQLBuilder(cls).count()
     
     @classmethod
     def sum(cls, attribute_name):
@@ -219,7 +219,7 @@ class ActiveRecord(object):
             User.sum(age)
             User.where(username=123).sum()
         """
-        return RecordManager(cls).sum(attribute_name)
+        return SQLBuilder(cls).sum(attribute_name)
 
     @classmethod
     def order(cls, *args):
@@ -230,8 +230,8 @@ class ActiveRecord(object):
             User.order('age DESC')
         """
         if args:
-            return RecordManager(cls).order(args[0]) 
-        return RecordManager(cls)
+            return SQLBuilder(cls).order(args[0]) 
+        return SQLBuilder(cls)
 
     @classmethod
     def group(cls, group):
@@ -239,7 +239,7 @@ class ActiveRecord(object):
         eg. 
             User.group('username')
         """
-        return RecordManager(cls).group(group)
+        return SQLBuilder(cls).group(group)
 
     @classmethod
     def having(cls, *args, **kwargs):
@@ -248,11 +248,11 @@ class ActiveRecord(object):
         eg.
             User.group('username').having(age=1)
         """
-        return RecordManager(cls).having(*args, **kwargs)
+        return SQLBuilder(cls).having(*args, **kwargs)
 
-    # @classmethod
-    # def join(cls, *joins):
-    #     return RecordManager(cls).join(*joins)
+    @classmethod
+    def joins(cls, *joins):
+        return SQLBuilder(cls).joins(*joins)
     
     def valid(self):
         return True
@@ -272,7 +272,7 @@ class ActiveRecord(object):
             self.where(id = self.id).update_all(attrs_dict)
             return self
         else:
-            return RecordManager(self.__class__).save(self)
+            return SQLBuilder(self.__class__).save(self)
  
     def update_attributes(self, **attributes):
         """ update attributes
@@ -303,7 +303,7 @@ class ActiveRecord(object):
         
     @classmethod
     def update_all(cls, **attributes):
-        RecordManager(cls).update_all(**attributes)
+        SQLBuilder(cls).update_all(**attributes)
         return True
 
     def delete(self):
@@ -321,7 +321,7 @@ class ActiveRecord(object):
             User.delete_all()
             User.find(1, 2, 3).delete_all()
         """
-        RecordManager(cls).delete_all()
+        SQLBuilder(cls).delete_all()
         return True
 
     @classmethod

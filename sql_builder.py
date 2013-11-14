@@ -4,7 +4,7 @@ from pyrails.support import is_array, is_str, is_hash, flatten, to_i
 from pyrails.inflection import Inflection
 
 
-class RecordManager(object):
+class SQLBuilder(object):
     
     DELETE_STR, UPDATE_STR = 'DELETE', 'UPDATE'
 
@@ -87,7 +87,7 @@ class RecordManager(object):
     def limit(self, limit, offset=0):
         self._limit, self._offset = limit, offset
         return self
-            
+
 #     def select(self, *args):
 #         select = []
 #         if args:
@@ -111,10 +111,10 @@ class RecordManager(object):
     def having(self, *sql_and_params, **conditions):
         return self.__where_or_having(self._havings, *sql_and_params, **conditions)
     
-#     def joins(self, *joins):
-#         if joins:
-#             self._joins = joins[0] if len(joins) == 1 else joins
-#         return self
+    def joins(self, *joins):
+        for join in joins:
+            self._joins.append(join)
+        return self
     
     def __where_or_having(self, codition_collection, *sql_and_params, **conditions):
         if sql_and_params:
@@ -133,13 +133,12 @@ class RecordManager(object):
         params  = []
 
         sql = self.__add_delete_or_update_or_select_or_function(params)
-        # sql = self.__add_joins(sql, self._joins)
+        sql = self.__add_joins(sql, self._joins)
         sql = self.__add_wheres(sql, params, self._wheres)
         
         sql = self.__add_group_having(sql, self._groups, self._havings, params)
         sql = self.__add_order(sql, self._orders)
         sql = self.__add_limit_offset(sql, self._limit, self._offset)
-        
         return sql, params
 
     def __add_delete_or_update_or_select_or_function(self, params):
@@ -211,24 +210,26 @@ class RecordManager(object):
         order_str = ', '.join([ order for order in orders if order ])
         return '%s ORDER BY %s' % (sql, order_str) if order_str else sql
 
-#     def __add_joins(self, sql, joins):
-#         """
-#         @param joins: Either an SQL fragment for additional joins like 
-#                         "LEFT JOIN comments ON comments.post_id = id" (rarely needed)
-#         """
-#         buff = []
-#         params = []
-#         for join in joins:
-#             if is_str(join):
-#                 buff.append(join)
-#             elif is_ar(join):
-#                 buff.append('INNER JOIN %s' % join.table_name)
-#                 params.append('%s.%s_id = %s.id' % (join.table_name, Inflection.hungarian_name_of(self._model_class.__name__), join.table_name))
-#         join_sql =  '%s %s' % (sql, ' '.join([ j.strip() for j in buff ]))
-#         if params:
-#             join_sql = '%s ON %s' % (join_sql, 'And '.join(params))
-
-#         return '%s %s' % (sql, join_sql)
+    def __add_joins(self, sql, joins):
+        """
+        @param joins: Either an SQL fragment for additional joins like 
+                        "LEFT JOIN comments ON comments.post_id = id" (rarely needed)
+        """
+        buff, params = [], []
+        for join in joins: 
+            # must be a string or list
+            if is_str(join):
+                association = self._model_class.association_dict.get(join, None)
+                if association: # a association: belongs_to, has_one, has_many
+                    target_class = association.target
+                    buff.append('INNER JOIN %s' % target_class.table_name)
+                    params.append('%s.%s_id = %s.id' % (target_class.table_name, Inflection.hungarian_name_of(self._model_class.__name__), target_class.table_name))
+                else:
+                    buff.append(join)
+        join_sql =  '%s %s' % (sql, ' '.join([ j.strip() for j in buff ]))
+        if params:
+            join_sql = '%s ON %s' % (join_sql, 'And '.join(params))
+        return join_sql
     
 #     def __iter__(self):
 #         return iter(self.all)
