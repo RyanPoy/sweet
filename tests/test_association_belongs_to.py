@@ -69,7 +69,7 @@ create table if not exists children (
         self.assertEqual('dad', association.attr_name)
         self.assertEqual('dad_id', association.foreign_key)
         self.assertTrue(association.dependent)
-
+    
     def test_belongs_to_create(self):
         class Father(ActiveRecord): pass
         class Child(ActiveRecord): belongs_to(Father)
@@ -80,7 +80,7 @@ create table if not exists children (
         self.assertEqual(cid, c.id)
         self.assertEqual(fid, c.father_id)
         self.assertEqual('2011-10-10 12:12:12', c.created_at.strftime('%Y-%m-%d %H:%M:%S'))
-        
+
     def test_belongs_to_query(self):
         class Father(ActiveRecord): pass
         class Child(ActiveRecord): belongs_to(Father)

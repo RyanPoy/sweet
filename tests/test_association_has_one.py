@@ -29,7 +29,7 @@ create table if not exists cards (
 
     def tearDown(self):
         drop_table('users')
-        drop_table('cards')    
+        drop_table('cards')
 
     # has one association
     def test_has_one(self):
@@ -84,15 +84,6 @@ create table if not exists cards (
         card1 = Card.create(user_id=user.id, created_at='2012-10-10 12:12:12')
         card2 = user.card
         self.assertEqual(card1.id, card2.id)
-
-    # def test_has_one_build(self):
-    #     class Card(ActiveRecord): pass
-    #     class User(ActiveRecord): has_one(Card)
-
-    #     u = User.create(name='pengyi')
-    #     c = u.build_card(created_at='2012-10-10 12:12:12')
-    #     self.assertIsNone(c.id)
-    #     self.assertEqual(u.card, c)
         
     # def test_has_one_query(self):
     #     class Card(ActiveRecord):
