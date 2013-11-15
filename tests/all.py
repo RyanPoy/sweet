@@ -1,13 +1,13 @@
 #coding: utf8
 import unittest
 from test_activerecord_group_and_having import ActiveRecordGroupAndHavingTest
-from test_activerecord_join_and_include import ActiveRecordJoinAndIncludeTest
 from test_activerecord_create_and_save import ActiveRecordCreateAndSaveTest
 from test_activerecord_delete import ActiveRecordDeleteTest
 from test_activerecord_update import ActiveRecordUpdateTest
 from test_activerecord_where import ActiveRecordWhereTest
 from test_activerecord_order import ActiveRecordOrderTest
 from test_activerecord_limit import ActiveRecordLimitTest
+from test_activerecord_joins import ActiveRecordJoinsTest
 from test_activerecord_init import ActiveRecordInitTest
 from test_activerecord_find import ActiveRecordFindTest
 from test_activerecord_func import ActiveRecordFuncTest
@@ -29,8 +29,7 @@ tests = [
     ActiveRecordOrderTest,
     ActiveRecordLimitTest,
     ActiveRecordFuncTest,
-    
-    ActiveRecordJoinAndIncludeTest,
+    ActiveRecordJoinsTest,
 
     BelongsToTest,
     HasOneTest,

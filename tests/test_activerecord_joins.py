@@ -13,7 +13,7 @@ class Child(ActiveRecord):
     belongs_to(Father)
 
 
-class ActiveRecordJoinAndIncludeTest(unittest.TestCase):
+class ActiveRecordJoinsTest(unittest.TestCase):
     
     def setUp(self):
         drop_table('fathers')
