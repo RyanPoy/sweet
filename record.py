@@ -81,7 +81,7 @@ class ActiveRecord(object):
         try:
             return super(ActiveRecord, self).__getattribute__(name)
         except AttributeError, _:
-            association = self.association_dict.get(name, None)
+            association = self.association_of(name)
             if association:
                 if association._type == Association.Type.belongs_to:
                     # A belongs_to B
@@ -131,6 +131,10 @@ class ActiveRecord(object):
         if not hasattr(cls, '__association_dict__'):
             cls.__association_dict__ = {}
         return cls.__association_dict__
+
+    @classmethod
+    def association_of(cls, name):
+        return cls.association_dict.get(name, None)
     
     @classproperty
     def all(cls):

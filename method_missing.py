@@ -58,7 +58,7 @@ class CreateOrBuildMethodMissing(object):
         match = self.__class__.__pattern.match(self.__name)
         if match:
             scope, association_propert_name = match.groups()
-            association = self.__model_instance.association_dict.get(association_propert_name, None)
+            association = self.__model_instance.association_of(association_propert_name)
             if not association:
                 raise AttributeError("'%s' object has no attribute '%s'" % (self.__model_instance.__class__.__name__, self.__name))
             foreign_key = association.foreign_key

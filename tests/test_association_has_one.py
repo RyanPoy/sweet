@@ -37,7 +37,7 @@ create table if not exists cards (
         class User(ActiveRecord): has_one(Card)
 
         self.assertEqual(1, len(User.association_dict))
-        association = User.association_dict['card']
+        association = User.association_of('card')
         self.assertEqual(Association.Type.has_one, association._type)
         self.assertEqual(Card, association.target)
         self.assertEqual('card', association.attr_name)
@@ -49,7 +49,7 @@ create table if not exists cards (
         class User(ActiveRecord): has_one(Card, attr_name="mycard", foreign_key='uid', dependent=True)
 
         self.assertEqual(1, len(User.association_dict))
-        association = User.association_dict['mycard']
+        association = User.association_of('mycard')
         self.assertEqual(Association.Type.has_one, association._type)
         self.assertEqual(Card, association.target)
         self.assertEqual('mycard', association.attr_name)

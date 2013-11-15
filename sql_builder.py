@@ -214,31 +214,56 @@ class SQLBuilder(object):
         @param joins: Either an SQL fragment for additional joins like 
                         "LEFT JOIN comments ON comments.post_id = id" (rarely needed)
         """
-        buff, params = [], []
+        buff = []
         for join in joins: 
             # must be a string or list
             if is_str(join):
-                # print '*'*10, self._model_class, join, self._model_class.association_dict.keys()
-                association = self._model_class.association_dict.get(join, None)
-                if association: # a association: belongs_to, has_one, has_many
-                    target_class = association.target
-                    buff.append('INNER JOIN %s' % target_class.table_name)
-                    if association._type == Association.Type.belongs_to:
-                        params.append('%s.id = %s.%s_id' % (target_class.table_name, self._model_class.table_name, Inflection.hungarian_name_of(target_class.__name__)))
-                    elif association._type == Association.Type.has_one:
-                        params.append('%s.%s_id = %s.id' % (target_class.table_name, Inflection.hungarian_name_of(self._model_class.__name__), self._model_class.table_name))
-                    elif association._type == Association.Type.has_many:
-                        # print association._type
-                        pass
-                    
-                    
-                else:
-                    buff.append(join)
-        join_sql = ' '.join([ j.strip() for j in buff ])
-        if params:
-            join_sql = '%s ON %s' % (join_sql, 'And '.join(params))
-        return '%s %s' % (sql, join_sql) if join_sql else sql
-    
+                self.__add_str_join(buff, join)
+            elif is_hash(join):
+                self.__add_hash_join(buff, join)
+        return '%s %s' % (sql, ' '.join(buff)) if buff else sql
+
+    def __add_hash_join(self, buff, join):
+        for k, v in join.iteritems():
+            self.__add_str_join(buff, k)
+            if is_str(v):
+                k_association = self._model_class.association_of(k)
+                k_class = k_association.target
+
+                v_association = k_class.association_of(join)
+
+
+    def __add_str_join(self, buff, join):
+        # print '*'*10, self._model_class, join, self._model_class.association_dict.keys()
+        association = self._model_class.association_dict.get(join, None)
+        if association: # a association: belongs_to, has_one, has_many
+            _sql = self.__add_join(association._type, self._model_class, association.target)
+            if _sql:
+                buff.append(_sql)
+        else:
+            buff.append(join)
+        return self
+
+    def __add_join(self, association_type, this_class, target_class):
+        """ 
+        eg.
+            __add_association_join(Association.Type.belongs_to, Post, User)
+          ==> INNERT JOIN users ON users.id = posts.user_id
+
+            __add_association_join(Association.Type.has_one, User, Post)
+          ==> INNERT JOIN posts ON post.user_id = users.id
+
+            __ad__association_join(Association.Type.has_many, User, Post)
+          ==> INNERT JOIN posts ON post_user_id = users.id
+        """
+        if association_type == Association.Type.belongs_to:
+            return 'INNER JOIN %s ON %s.id = %s.%s_id' % (target_class.table_name, target_class.table_name, this_class.table_name, Inflection.hungarian_name_of(target_class.__name__))
+        elif association_type == Association.Type.has_one:
+            return 'INNER JOIN %s ON %s.%s_id = %s.id' % (target_class.table_name, target_class.table_name, Inflection.hungarian_name_of(this_class.__name__), this_class.table_name)
+        elif association_type == Association.Type.has_many:
+            # print association._type
+            return ''
+
 #     def __iter__(self):
 #         return iter(self.all)
 

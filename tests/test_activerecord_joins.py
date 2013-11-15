@@ -34,7 +34,7 @@ create table if not exists children (
     PRIMARY KEY (id)
 );
 """)
-        
+
     def tearDown(self):
         drop_table('fathers')
         drop_table('children')
@@ -55,6 +55,16 @@ create table if not exists children (
 
         c = Child.joins('father').where('fathers.name = ?', 'pengyi').first
         self.assertEqual('2012-10-10 12:12:12', datetime2str(c.created_at))
+
+    # def test_cache_of_belongs_to_join(self):
+    #     f = Father.create(name='pengyi')
+    #     f.create_child(created_at='2012-10-10 12:12:12')
+
+    #     c = Child.first
+    #     self.assertFalse('father' in c.__dict__)
+
+    #     c = Child.joins('father').where('fathers.name = ?', 'pengyi').first
+    #     self.assertTrue('father' in c.__dict__)
 
     def test_has_one_join_query(self):
         f = Father.create(name='pengyi')
