@@ -256,6 +256,32 @@ class ActiveRecord(object):
 
     @classmethod
     def joins(cls, *joins):
+        """
+        Joining a Single Association
+            Category.joins('posts')
+        # => SELECT categories.* FROM categories
+               INNER JOIN posts ON posts.category_id = categories.id
+
+        Joining Multiple Associations
+            Post.joins('category', 'comments')
+        # => SELECT posts.* FROM posts
+               INNER JOIN categories ON posts.category_id = categories.id
+               INNER JOIN comments ON comments.post_id = posts.id
+        
+        Joining Nested Associations (Single Level)
+            Post.joins({'comments': 'guest'})
+        # => SELECT posts.* FROM posts
+               INNER JOIN comments ON comments.post_id = posts.id
+               INNER JOIN guests ON guests.comment_id = comments.id
+
+        Joining Nested Associations (Multiple Level)
+            Category.joins({ 'posts': [{'comments': 'guest'}, 'tags'])
+        # => SELECT categories.* FROM categories
+               INNER JOIN posts ON posts.category_id = categories.id
+               INNER JOIN comments ON comments.post_id = posts.id
+               INNER JOIN guests ON guests.comment_id = comments.id
+               INNER JOIN tags ON tags.post_id = posts.id
+        """
         return SQLBuilder(cls).joins(*joins)
     
     def valid(self):
