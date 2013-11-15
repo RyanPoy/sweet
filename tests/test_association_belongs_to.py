@@ -1,7 +1,6 @@
 #coding: utf8
 from pyrails.associations import belongs_to, Association, has_one
 from pyrails.tests import create_table, drop_table
-from pyrails.support import datetime2str
 from pyrails.record import ActiveRecord
 import unittest
 
@@ -88,26 +87,6 @@ create table if not exists children (
         self.assertEqual(cid, c.id)
         self.assertEqual(fid, c.father_id)
         self.assertEqual('2011-10-10 12:12:12', c.created_at.strftime('%Y-%m-%d %H:%M:%S'))
-
-    def test_belongs_to_query(self):
-        class Father(ActiveRecord): pass
-        class Child(ActiveRecord): belongs_to(Father)
-    
-        fid = Father.create(name='Bob').id
-        c = Child.create(created_at='2011-10-10 12:12:12', father_id=fid)
-        f = c.father
-        self.assertEqual(fid, f.id)
-        self.assertEqual('Bob', f.name)
-
-    def test_has_one_join_query(self):
-        f = Father.create(name='pengyi')
-        f.create_child(created_at='2012-10-10 12:12:12')
-
-        c = Child.joins('father').where('fathers.name = ?', 'poy').first
-        self.assertTrue(c is None)
-
-        c = Child.joins('father').where('fathers.name = ?', 'pengyi').first
-        self.assertEqual('2012-10-10 12:12:12', datetime2str(c.created_at))
 
 
 if __name__ == '__main__':
