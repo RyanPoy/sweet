@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
-from pyrails.sql_builder import SQLBuilder
-from pyrails.record import ActiveRecord
-from pyrails.associations import has_one, belongs_to
+from pyrails.active_record import SQLBuilder
+from pyrails.active_record import ActiveRecord
+from pyrails.active_record import has_one, belongs_to
 import unittest
 
 

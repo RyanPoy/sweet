@@ -1,8 +1,8 @@
 #coding: utf8
-from pyrails.associations import belongs_to, has_one
+from pyrails.active_record import belongs_to, has_one
 from pyrails.tests import create_table, drop_table
 from pyrails.active_support import datetime2str
-from pyrails.record import ActiveRecord
+from pyrails.active_record import ActiveRecord
 import unittest
 
 

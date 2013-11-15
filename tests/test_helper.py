@@ -1,5 +1,5 @@
 #coding: utf8
-from pyrails.record import ActiveRecord
+from pyrails.active_record import ActiveRecord
 
 class Father(ActiveRecord):
     pass

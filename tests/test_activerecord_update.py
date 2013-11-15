@@ -1,6 +1,6 @@
 #coding: utf8
 from pyrails.tests import create_table, drop_table
-from pyrails.record import ActiveRecord
+from pyrails.active_record import ActiveRecord
 import unittest
 
 

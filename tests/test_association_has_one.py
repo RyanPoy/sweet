@@ -1,6 +1,6 @@
 #coding: utf8
-from pyrails.associations import Association, has_one
-from pyrails.record import ActiveRecord
+from pyrails.active_record import Association, has_one
+from pyrails.active_record import ActiveRecord
 from pyrails.tests import drop_table, create_table
 import unittest
 
