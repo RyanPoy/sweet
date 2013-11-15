@@ -149,11 +149,14 @@ class SQLBuilder(object):
             return 'UPDATE %s SET %s' % (self._table_name, columns_sql)
         elif self._func:
             return 'SELECT %s(%s) AS %s FROM %s' % (self._func[0].upper(), self._func[1], self._func[0].lower(), self._table_name)
-        elif not self._selects:
-            return 'SELECT %s.* FROM %s' % (self._table_name, self._table_name)
-        else:
+        # elif self._joins:
+        #     pass
+        elif self._selects:
             select_sql = ', '.join([ '%s.%s' % (self._table_name, s) for s in flatten(self._selects) ])
             return 'SELECT %s FROM %s' % (select_sql, self._table_name)
+        else:
+            return 'SELECT %s.* FROM %s' % (self._table_name, self._table_name)
+            
     
     def __add_limit_offset(self, sql, limit, offset):
         limit, offset = to_i(limit), to_i(offset)
@@ -236,9 +239,7 @@ class SQLBuilder(object):
             k_class = k_association.target
 
             if is_str(v):
-                v_association = k_class.association_of(v)
-                v_class = v_association.target
-                self.__add_join(buff, v_association._type, k_class, v_class)
+                self.__add_str_join(buff, k_class, v)
             elif is_array(v):
                 self.__add_array_joins(buff, k_class, v)
             elif is_hash(v):
