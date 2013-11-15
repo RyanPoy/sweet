@@ -108,14 +108,51 @@ class SQLBuilderTest(unittest.TestCase):
         self.assertEqual('SELECT posts.* FROM posts INNER JOIN users ON users.id = posts.user_id AND posts.name in (?, ?)', sql)
         self.assertEquals(['pengyi', 'poy'], params)
 
-    # def test_associations_nested_blongs_to_joins(self):
-    #     class Father(ActiveRecord): pass
-    #     class User(ActiveRecord): belongs_to(Father)
-    #     class Post(ActiveRecord): belongs_to(User)
-    #     c = SQLBuilder(Post).where(name=['pengyi', 'poy']).joins({'user': 'father'})
-    #     sql, params = c.delete_or_update_or_find_sql()
-    #     self.assertEqual('SELECT posts.* FROM posts INNER JOIN users ON users.id = posts.user_id INNER JOIN fathers ON fathers.id = users.father_id AND posts.name in (?, ?)', sql)
-    #     self.assertEquals(['pengyi', 'poy'], params)
+    def test_associations_single_nested_blongs_to_joins(self):
+        class Father(ActiveRecord): pass
+        class User(ActiveRecord): belongs_to(Father)
+        class Post(ActiveRecord): belongs_to(User)
+        c = SQLBuilder(Post).where(name=['pengyi', 'poy']).joins({'user': 'father'})
+        sql, params = c.delete_or_update_or_find_sql()
+        self.assertEqual('SELECT posts.* FROM posts INNER JOIN users ON users.id = posts.user_id INNER JOIN fathers ON fathers.id = users.father_id AND posts.name in (?, ?)', sql)
+        self.assertEquals(['pengyi', 'poy'], params)
+
+    def test_associations_multi_nested_blongs_to_joins(self):
+        class Company(ActiveRecord): pass
+        class Father(ActiveRecord): belongs_to(Company)
+        class User(ActiveRecord): belongs_to(Father)
+        class Post(ActiveRecord): belongs_to(User)
+        c = SQLBuilder(Post).where(name=['pengyi', 'poy']).joins({'user': {'father': 'company'}})
+        sql, params = c.delete_or_update_or_find_sql()
+        self.assertEqual('SELECT posts.* FROM posts INNER JOIN users ON users.id = posts.user_id INNER JOIN fathers ON fathers.id = users.father_id INNER JOIN companies ON companies.id = fathers.company_id AND posts.name in (?, ?)', sql)
+        self.assertEquals(['pengyi', 'poy'], params)
+
+    def test_associations_complex_blongs_to_joins(self):    
+        class Company(ActiveRecord): pass
+        class Father(ActiveRecord): belongs_to(Company)
+        class User(ActiveRecord): belongs_to(Father)
+        class Post(ActiveRecord): 
+            belongs_to(User)
+            belongs_to(Father)
+            belongs_to(Company)
+        c = SQLBuilder(Post).where(name=['pengyi', 'poy']).joins('company', {'father': 'company'}, {'user': {'father': 'company'}})
+        sql, params = c.delete_or_update_or_find_sql()
+        self.assertEqual('SELECT posts.* FROM posts INNER JOIN companies ON companies.id = posts.company_id INNER JOIN fathers ON fathers.id = posts.father_id INNER JOIN companies ON companies.id = fathers.company_id INNER JOIN users ON users.id = posts.user_id INNER JOIN fathers ON fathers.id = users.father_id INNER JOIN companies ON companies.id = fathers.company_id AND posts.name in (?, ?)', sql)
+        self.assertEquals(['pengyi', 'poy'], params)
+
+    def test_associations_multi_nested_and_level_blongs_to_joins(self):
+        class Company(ActiveRecord): pass
+        class Father(ActiveRecord): belongs_to(Company)
+        class User(ActiveRecord): 
+            belongs_to(Father)
+            belongs_to(Company)
+        class Post(ActiveRecord): 
+            belongs_to(User)
+        c = SQLBuilder(Post).where(name=['pengyi', 'poy']).joins({ 'user': [ {'father': 'company'}, 'company'] })
+        sql, params = c.delete_or_update_or_find_sql()
+        self.assertEqual('SELECT posts.* FROM posts INNER JOIN users ON users.id = posts.user_id INNER JOIN fathers ON fathers.id = users.father_id INNER JOIN companies ON companies.id = fathers.company_id INNER JOIN companies ON companies.id = users.company_id AND posts.name in (?, ?)', sql)
+        self.assertEquals(['pengyi', 'poy'], params)
+
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

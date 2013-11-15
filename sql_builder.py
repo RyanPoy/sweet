@@ -210,41 +210,49 @@ class SQLBuilder(object):
         return '%s ORDER BY %s' % (sql, order_str) if order_str else sql
 
     def __add_joins(self, sql, joins):
+        buff = []
+        self.__add_array_joins(buff, self._model_class, joins)
+        if buff:
+            return '%s %s' % (sql, ' '.join(buff))
+        return sql
+
+    def __add_array_joins(self, buff, this_class, joins):
         """
         @param joins: Either an SQL fragment for additional joins like 
                         "LEFT JOIN comments ON comments.post_id = id" (rarely needed)
         """
-        buff = []
         for join in joins: 
             # must be a string or list
             if is_str(join):
-                self.__add_str_join(buff, join)
+                self.__add_str_join(buff, this_class, join)
             elif is_hash(join):
-                self.__add_hash_join(buff, join)
-        return '%s %s' % (sql, ' '.join(buff)) if buff else sql
+                self.__add_hash_joins(buff, this_class, join)
 
-    def __add_hash_join(self, buff, join):
-        for k, v in join.iteritems():
-            self.__add_str_join(buff, k)
+    def __add_hash_joins(self, buff, this_class, joins):
+        for k, v in joins.iteritems():
+            self.__add_str_join(buff, this_class, k)
+            
+            k_association = this_class.association_of(k)
+            k_class = k_association.target
+
             if is_str(v):
-                k_association = self._model_class.association_of(k)
-                k_class = k_association.target
+                v_association = k_class.association_of(v)
+                v_class = v_association.target
+                self.__add_join(buff, v_association._type, k_class, v_class)
+            elif is_array(v):
+                self.__add_array_joins(buff, k_class, v)
+            elif is_hash(v):
+                self.__add_hash_joins(buff, k_class, v)
 
-                v_association = k_class.association_of(join)
-
-
-    def __add_str_join(self, buff, join):
-        # print '*'*10, self._model_class, join, self._model_class.association_dict.keys()
-        association = self._model_class.association_dict.get(join, None)
+    def __add_str_join(self, buff, this_class, join):
+        association = this_class.association_dict.get(join, None)
         if association: # a association: belongs_to, has_one, has_many
-            _sql = self.__add_join(association._type, self._model_class, association.target)
-            if _sql:
-                buff.append(_sql)
+            self.__add_join(buff, association._type, this_class, association.target)
         else:
             buff.append(join)
         return self
 
-    def __add_join(self, association_type, this_class, target_class):
+    def __add_join(self, buff, association_type, this_class, target_class):
         """ 
         eg.
             __add_association_join(Association.Type.belongs_to, Post, User)
@@ -257,12 +265,14 @@ class SQLBuilder(object):
           ==> INNERT JOIN posts ON post_user_id = users.id
         """
         if association_type == Association.Type.belongs_to:
-            return 'INNER JOIN %s ON %s.id = %s.%s_id' % (target_class.table_name, target_class.table_name, this_class.table_name, Inflection.hungarian_name_of(target_class.__name__))
+            _sql = 'INNER JOIN %s ON %s.id = %s.%s_id' % (target_class.table_name, target_class.table_name, this_class.table_name, Inflection.hungarian_name_of(target_class.__name__))
         elif association_type == Association.Type.has_one:
-            return 'INNER JOIN %s ON %s.%s_id = %s.id' % (target_class.table_name, target_class.table_name, Inflection.hungarian_name_of(this_class.__name__), this_class.table_name)
+            _sql = 'INNER JOIN %s ON %s.%s_id = %s.id' % (target_class.table_name, target_class.table_name, Inflection.hungarian_name_of(this_class.__name__), this_class.table_name)
         elif association_type == Association.Type.has_many:
             # print association._type
-            return ''
+            _sql = ''
+        if _sql:
+            buff.append(_sql)
 
 #     def __iter__(self):
 #         return iter(self.all)
