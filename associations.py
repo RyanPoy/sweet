@@ -1,9 +1,6 @@
 #coding: utf8
 from collections import namedtuple
-from pyrails.exceptions import UnsupportAssociation
-from pyrails.support import is_str, import_object
-from pyrails.decorates import classproperty
-from pyrails.inflection import Inflection
+from pyrails.active_support import UnsupportAssociation, is_str, import_object, classproperty, Inflection
 
 
 class Association(object):

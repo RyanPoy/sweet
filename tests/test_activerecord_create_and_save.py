@@ -2,7 +2,7 @@
 from pyrails.tests import create_table, drop_table
 from pyrails.record import ActiveRecord
 from pyrails.associations import has_one
-from pyrails.support import datetime2str
+from pyrails.active_support import datetime2str
 import unittest
 
 

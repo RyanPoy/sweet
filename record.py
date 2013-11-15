@@ -2,10 +2,9 @@
 from pyrails.method_missing import FindMethodMissing, CreateOrBuildMethodMissing
 from pyrails.sql_builder import SQLBuilder
 from pyrails.associations import Association
-from pyrails.decorates import classproperty
-from pyrails.inflection import Inflection
+from pyrails.active_support import classproperty, Inflection
 from pyrails.db import get_database
-# from pyrails.exceptions import RecordValidateError, RecordHasNotBeenPersisted
+# from pyrails.active_support import RecordValidateError, RecordHasNotBeenPersisted
 
 
 class ActiveRecord(object):

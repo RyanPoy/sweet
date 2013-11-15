@@ -1,5 +1,5 @@
 #coding: utf-8
-from pyrails.support import import_object
+from pyrails.active_support import import_object
 import copy
 
 DEBUG = True

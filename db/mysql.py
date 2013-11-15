@@ -1,7 +1,7 @@
 #coding: utf8
 from itertools import izip
 from pyrails.schema import Table, Column
-from pyrails.support import is_str, is_datetime, is_date, flatten, str2date, str2datetime
+from pyrails.active_support import is_str, is_datetime, is_date, flatten, str2date, str2datetime
 import MySQLdb
 import time
 import itertools

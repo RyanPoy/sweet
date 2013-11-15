@@ -1,7 +1,5 @@
 #coding: utf8
-from pyrails.exceptions import RecordNotFound
-from pyrails.support import is_array, is_str, is_hash, flatten, to_i
-from pyrails.inflection import Inflection
+from pyrails.active_support import RecordNotFound, Inflection, is_array, is_str, is_hash, flatten, to_i
 from pyrails.associations import Association
 
 

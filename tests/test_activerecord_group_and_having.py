@@ -1,7 +1,6 @@
 #coding: utf8
 from pyrails.tests import create_table, drop_table
 from pyrails.record import ActiveRecord
-from pyrails.exceptions import RecordNotFound
 import unittest
 
 
