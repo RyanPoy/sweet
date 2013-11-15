@@ -2,4 +2,4 @@
 from pyrails.active_support.decorates import *
 from pyrails.active_support.exceptions import *
 from pyrails.active_support.inflection import *
-from pyrails.active_support.support import *
+from pyrails.active_support.utils import *
