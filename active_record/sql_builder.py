@@ -1,6 +1,6 @@
 #coding: utf8
 from pyrails.active_support import RecordNotFound, Inflection, is_array, is_str, is_hash, flatten, to_i
-from pyrails.associations import Association
+from pyrails.active_record.associations import Association
 
 
 class SQLBuilder(object):

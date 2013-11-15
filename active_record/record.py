@@ -1,7 +1,7 @@
 #coding: utf8
-from pyrails.method_missing import FindMethodMissing, CreateOrBuildMethodMissing
-from pyrails.sql_builder import SQLBuilder
-from pyrails.associations import Association
+from pyrails.active_record.method_missing import FindMethodMissing, CreateOrBuildMethodMissing
+from pyrails.active_record.sql_builder import SQLBuilder
+from pyrails.active_record.associations import Association
 from pyrails.active_support import classproperty, Inflection
 from pyrails.db import get_database
 # from pyrails.active_support import RecordValidateError, RecordHasNotBeenPersisted

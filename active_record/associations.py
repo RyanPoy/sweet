@@ -32,7 +32,7 @@ class Association(object):
         """
         should be return aaa_bbb or ccc string value
         """
-        from pyrails.record import ActiveRecord
+        from pyrails.active_record import ActiveRecord
 
         if is_str(self.__target_class_or_classpath):
             target_name_str = self.__target_class_or_classpath.split('.')[-1]
