@@ -134,10 +134,13 @@ class ActiveRecord(object):
             cls.__column_names__ = [ x.name for x in cls._get_db().get_table_by(cls.table_name).columns ]
         return cls.__column_names__
 
-    @classproperty
-    def column_names_sql(cls):
+    @classmethod
+    def column_names_sql(cls, table_alias=None):
         if not hasattr(cls, '__column_names_sql__'):
-            cls.__column_names_sql__ = ', '.join( map(lambda x: '`%s`' % x, cls.column_names) )
+            if table_alias:
+                cls.__column_names_sql__ = ', '.join([ '%s.`%s` AS %s_r%s' % (table_alias, cn, table_alias, idx) for idx, cn in enumerate(cls.column_names) ])
+            else:
+                cls.__column_names_sql__ = ', '.join( map(lambda x: '`%s`' % x, cls.column_names) )
         return cls.__column_names_sql__
             
     @classproperty

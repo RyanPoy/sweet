@@ -67,7 +67,7 @@ class SQLBuilder(object):
         return self._model_class(**row) if row else None
     
     def save(self, model):
-        sql = 'INSERT INTO %s (%s) VALUES (%s)' % (model.table_name_sql, model.column_names_sql, model.column_placeholder_sql)
+        sql = 'INSERT INTO %s (%s) VALUES (%s)' % (model.table_name_sql, model.column_names_sql(), model.column_placeholder_sql)
         params = [ getattr(model, c, None) for c in model.column_names ]
         model.id = self._db.execute_lastrowid(sql, params)
         return model.id
