@@ -235,6 +235,7 @@ class SQLBuilder(object):
     def __add_joins(self, sql, joins):
         buff = []
         self.__add_array_joins(buff, self._model_class, joins)
+        print ' '.join(buff)
         if buff:
             return '%s %s' % (sql, ' '.join(buff))
         return sql
@@ -287,11 +288,8 @@ class SQLBuilder(object):
         """
         if association_type == Association.Type.belongs_to:
             _sql = 'INNER JOIN %s ON %s.id = %s.%s_id' % (target_class.table_name, target_class.table_name, this_class.table_name, Inflection.hungarian_name_of(target_class.__name__))
-        elif association_type == Association.Type.has_one:
+        elif association_type == Association.Type.has_one or association_type == Association.Type.has_many:
             _sql = 'INNER JOIN %s ON %s.%s_id = %s.id' % (target_class.table_name, target_class.table_name, Inflection.hungarian_name_of(this_class.__name__), this_class.table_name)
-        elif association_type == Association.Type.has_many:
-            # print association._type
-            _sql = ''
         self.__join_table_list.append(target_class.table_name)
         if _sql:
             buff.append(_sql)
