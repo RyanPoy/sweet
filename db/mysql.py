@@ -73,14 +73,16 @@ class Adapter(object):
             cursor.close()
             
     def _execute(self, cursor, sql, params=[]):
-        btime = time.time()
-        raw_sql = ''
-        if self.show_sql:
-            raw_sql = self.__show_sql(sql, params)
-        sql = sql.replace('?', '%s') # @TODO: should fix a bug if query like this: select users.* from users where users.name like "?abc"
-        cursor.execute(sql, params)
-        if self.show_sql:
-            print '##', raw_sql, (time.time() - btime)
+        try:
+            btime = time.time()
+            raw_sql = ''
+            if self.show_sql:
+                raw_sql = self.__show_sql(sql, params)
+            sql = sql.replace('?', '%s') # @TODO: should fix a bug if query like this: select users.* from users where users.name like "?abc"
+            cursor.execute(sql, params)
+        finally:
+            if self.show_sql:
+                print (time.time() - btime), '\t|', raw_sql
         return self
     
     def get_table_by(self, name):
