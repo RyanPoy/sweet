@@ -33,6 +33,7 @@ from test_activerecord_init import ActiveRecordInitTest
 from test_activerecord_find import ActiveRecordFindTest
 from test_activerecord_func import ActiveRecordFuncTest
 from test_association_belongs_to import BelongsToTest
+from test_association_has_many import HasManyTest
 from test_association_has_one import HasOneTest
 from test_sql_builder import SQLBuilderTest
 
@@ -54,6 +55,7 @@ tests = [
 
     BelongsToTest,
     HasOneTest,
+    HasManyTest,
 ]
 
 
