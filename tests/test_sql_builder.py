@@ -110,6 +110,15 @@ class SQLBuilderTest(unittest.TestCase):
         self.assertEqual('SELECT posts.* FROM posts INNER JOIN users ON users.id = posts.user_id AND posts.name in (?, ?)', sql)
         self.assertEquals(['pengyi', 'poy'], params)
 
+    def test_associations_customer_fkname_belongs_to_joins(self):
+        class User(ActiveRecord): pass
+        class Post(ActiveRecord): belongs_to(User, foreign_key='author_id')
+
+        c = SQLBuilder(Post).where(name=['pengyi', 'poy']).joins('user')
+        sql, params = c.delete_or_update_or_find_sql()
+        self.assertEqual('SELECT posts.* FROM posts INNER JOIN users ON users.id = posts.author_id AND posts.name in (?, ?)', sql)
+        self.assertEquals(['pengyi', 'poy'], params)
+
     def test_associations_single_nested_blongs_to_joins(self):
         class Father(ActiveRecord): pass
         class User(ActiveRecord): belongs_to(Father)
