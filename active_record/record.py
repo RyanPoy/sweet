@@ -107,7 +107,7 @@ class ActiveRecord(object):
         association = self.association_of(name)
         if association:
             if association.is_belongs_to():
-                setattr(self, '%s_id' % Inflection.singularize(association.target.table_name), value.id)
+                setattr(self, association.target._fk_name, value.id)
         return relt
 
     def __getattribute__(self, name):
@@ -140,6 +140,14 @@ class ActiveRecord(object):
             if CreateOrBuildMethodMissing.match(name):
                 return CreateOrBuildMethodMissing(self, name)
             raise
+
+    @classproperty
+    def _fk_name(cls):
+        """ the foreign key name
+        eg.  Card belongs to User
+            User._fk_name equal user_id
+        """
+        return '%s_id' % Inflection.singularize(cls.table_name)
 
     @classproperty
     def table_name(cls):

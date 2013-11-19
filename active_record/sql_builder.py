@@ -21,7 +21,6 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from pyrails.active_support import RecordNotFound, Inflection, is_array, is_str, is_hash, flatten, to_i
-from pyrails.active_record.associations import Association
 
 
 class SQLBuilder(object):
