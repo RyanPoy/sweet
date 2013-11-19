@@ -39,6 +39,7 @@ class SQLBuilder(object):
         self._groups        = []
         self._havings       = []
         self._joins         = []
+        self.__join_table_list = []
         self._func          = None
         self._model_class   = model_class
         self._table_name    = self._model_class.table_name
@@ -168,11 +169,11 @@ class SQLBuilder(object):
             return 'UPDATE %s SET %s' % (self._table_name, columns_sql)
         elif self._func:
             return 'SELECT %s(%s) AS %s FROM %s' % (self._func[0].upper(), self._func[1], self._func[0].lower(), self._table_name)
-        # elif self._joins:
-        #     pass
         elif self._selects:
             select_sql = ', '.join([ '%s.%s' % (self._table_name, s) for s in flatten(self._selects) ])
             return 'SELECT %s FROM %s' % (select_sql, self._table_name)
+        # elif self._joins:
+        #     pass
         else:
             return 'SELECT %s.* FROM %s' % (self._table_name, self._table_name)
             
@@ -291,6 +292,7 @@ class SQLBuilder(object):
         elif association_type == Association.Type.has_many:
             # print association._type
             _sql = ''
+        self.__join_table_list.append(target_class.table_name)
         if _sql:
             buff.append(_sql)
 

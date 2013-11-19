@@ -1,7 +1,5 @@
 # -*- coding:utf-8 -*-
-from pyrails.active_record import SQLBuilder
-from pyrails.active_record import ActiveRecord
-from pyrails.active_record import has_one, belongs_to
+from pyrails.active_record import SQLBuilder, ActiveRecord, has_one, belongs_to
 import unittest
 
 
@@ -91,11 +89,15 @@ class SQLBuilderTest(unittest.TestCase):
         self.assertEquals(['pengyi', 'poy'], params)
 
     def test_associations_has_one_joins(self):
-        class Post(ActiveRecord): pass
-        class User(ActiveRecord): has_one(Post)
+        class Post(ActiveRecord): 
+            __column_names__ = ['id', 'title', 'content', 'user_id']
+        class User(ActiveRecord): 
+            __column_names__ = ['id', 'name', 'password']
+            has_one(Post)
 
         c = SQLBuilder(User).where(name=['pengyi', 'poy']).joins('post')
         sql, params = c.delete_or_update_or_find_sql()
+        #self.assertEqual('SELECT t0.id AS t0_r0, t0.name AS t0_r1, t0.password AS t0_r2, t1.id as t1_r0, t1.title AS t1_r1, t1.content AS t1_r2, t1.user_id AS t1_r3 FROM users AS t0 INNER JOIN posts as t1 ON t1.user_id = t0.id AND t0.name in (?, ?)', sql)
         self.assertEqual('SELECT users.* FROM users INNER JOIN posts ON posts.user_id = users.id AND users.name in (?, ?)', sql)
         self.assertEquals(['pengyi', 'poy'], params)
 
@@ -152,6 +154,41 @@ class SQLBuilderTest(unittest.TestCase):
         sql, params = c.delete_or_update_or_find_sql()
         self.assertEqual('SELECT posts.* FROM posts INNER JOIN users ON users.id = posts.user_id INNER JOIN fathers ON fathers.id = users.father_id INNER JOIN companies ON companies.id = fathers.company_id INNER JOIN companies ON companies.id = users.company_id AND posts.name in (?, ?)', sql)
         self.assertEquals(['pengyi', 'poy'], params)
+
+    # def test_sql_build_join_table_list_after__add_joins(self):
+    #     class User(ActiveRecord): pass
+    #     class Post(ActiveRecord): belongs_to(User)
+    #     sb = SQLBuilder(Post)
+    #     self.assertEqual([], sb._SQLBuilder__join_table_list)
+    #     s = sb._SQLBuilder__add_joins('', ['user'])
+
+    #     self.assertEqual(s, ' INNER JOIN users ON users.id = posts.user_id')
+    #     self.assertEqual(['users'], sb._SQLBuilder__join_table_list)
+
+    #     class Company(ActiveRecord): pass
+    #     class Father(ActiveRecord): belongs_to(Company)
+    #     class User(ActiveRecord): belongs_to(Father)
+    #     class Post(ActiveRecord): 
+    #         belongs_to(User)
+    #         belongs_to(Father)
+    #         belongs_to(Company)
+    #     sb = SQLBuilder(Post)
+    #     sb._SQLBuilder__add_joins('', [ 'company', {'father': 'company'}, {'user': {'father': 'company'}} ])
+    #     self.assertEqual(['companies', 'fathers', 'companies', 'users', 'fathers', 'companies'], sb._SQLBuilder__join_table_list)
+
+    #     self.assertEqual(3, len(sb._SQLBuilder__join_table_relation_dict()))
+    #     self.assertTrue('companies' in sb._SQLBuilder__join_table_relation_dict)
+    #     self.assertTrue('fathers' in sb._SQLBuilder__join_table_relation_dict)
+    #     self.assertTrue('users' in sb._SQLBuilder__join_table_relation_dict)
+
+    #     self.assertEqual(1, len(sb._SQLBuilder__join_table_relation_dict['companies']))
+    #     self.assertTrue('companies' in sb._SQLBuilder__join_table_relation_dict['companies'])
+
+    #     self.assertEqual(1, len(sb._SQLBuilder__join_table_relation_dict['users']))
+    #     self.assertTrue('fathers' in sb._SQLBuilder__join_table_relation_dict['users'])
+        
+    #     self.assertEqual(1, len(sb._SQLBuilder__join_table_relation_dict['users']['fathers']))
+    #     self.assertTrue('companies' in sb._SQLBuilder__join_table_relation_dict['users']['fathers'])
 
 
 if __name__ == "__main__":
