@@ -142,14 +142,6 @@ class ActiveRecord(object):
             raise
 
     @classproperty
-    def _fk_name(cls):
-        """ the foreign key name
-        eg.  Card belongs to User
-            User._fk_name equal user_id
-        """
-        return '%s_id' % Inflection.singularize(cls.table_name)
-
-    @classproperty
     def table_name(cls):
         if not hasattr(cls, '__table_name__'):
             table_name = Inflection.pluralize(cls.__name__)
