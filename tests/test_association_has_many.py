@@ -71,7 +71,7 @@ create table if not exists cards (
 
         self.assertEqual(1, len(User.association_dict))
         association = User.association_of('cards')
-        self.assertEqual(Association.Type.has_many, association._type)
+        self.assertTrue(association.is_has_many())
         self.assertEqual(Card, association.target)
         self.assertEqual('cards', association.attr_name)
         self.assertEqual('user_id', association.foreign_key)
@@ -83,7 +83,7 @@ create table if not exists cards (
 
         self.assertEqual(1, len(User.association_dict))
         association = User.association_of('mycards')
-        self.assertEqual(Association.Type.has_many, association._type)
+        self.assertTrue(association.is_has_many())
         self.assertEqual(Card, association.target)
         self.assertEqual('mycards', association.attr_name)
         self.assertEqual('uid', association.foreign_key)
