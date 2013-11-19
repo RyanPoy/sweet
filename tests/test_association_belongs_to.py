@@ -67,7 +67,7 @@ create table if not exists children (
         
         self.assertEqual(1, len(Child.association_dict))
         association = Child.association_of('father')
-        self.assertEqual(Association.Type.belongs_to, association._type)
+        self.assertTrue(association.is_belongs_to())
         self.assertEqual(Father, association.target)
         self.assertEqual('father', association.attr_name)
         self.assertEqual('father_id', association.foreign_key)
@@ -80,7 +80,7 @@ create table if not exists children (
         
         self.assertEqual(1, len(Child.association_dict))
         association = Child.association_of('father')
-        self.assertEqual(Association.Type.belongs_to, association._type)
+        self.assertTrue(association.is_belongs_to())
         self.assertEqual(Father, association.target)
         self.assertEqual('father', association.attr_name)
         self.assertEqual('father_id', association.foreign_key)
@@ -92,7 +92,7 @@ create table if not exists children (
             belongs_to(Father, attr_name="dad", foreign_key="dad_id", dependent=True)
         self.assertEqual(1, len(Child.association_dict))
         association = Child.association_of('dad')
-        self.assertEqual(Association.Type.belongs_to, association._type)
+        self.assertTrue(association.is_belongs_to())
         self.assertEqual(Father, association.target)
         self.assertEqual('dad', association.attr_name)
         self.assertEqual('dad_id', association.foreign_key)

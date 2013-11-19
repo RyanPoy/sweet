@@ -269,12 +269,12 @@ class SQLBuilder(object):
     def __add_str_join(self, buff, this_class, join):
         association = this_class.association_dict.get(join, None)
         if association: # a association: belongs_to, has_one, has_many
-            self.__add_join(buff, association._type, this_class, association.target)
+            self.__add_join(buff, association, this_class, association.target)
         else:
             buff.append(join)
         return self
 
-    def __add_join(self, buff, association_type, this_class, target_class):
+    def __add_join(self, buff, association, this_class, target_class):
         """ 
         eg.
             __add_association_join(Association.Type.belongs_to, Post, User)
@@ -286,9 +286,9 @@ class SQLBuilder(object):
             __ad__association_join(Association.Type.has_many, User, Post)
           ==> INNERT JOIN posts ON post_user_id = users.id
         """
-        if association_type == Association.Type.belongs_to:
+        if association.is_belongs_to():
             _sql = 'INNER JOIN %s ON %s.id = %s.%s_id' % (target_class.table_name, target_class.table_name, this_class.table_name, Inflection.hungarian_name_of(target_class.__name__))
-        elif association_type == Association.Type.has_one or association_type == Association.Type.has_many:
+        elif association.is_has_one() or association.is_has_many():
             _sql = 'INNER JOIN %s ON %s.%s_id = %s.id' % (target_class.table_name, target_class.table_name, Inflection.hungarian_name_of(this_class.__name__), this_class.table_name)
         self.__join_table_list.append(target_class.table_name)
         if _sql:

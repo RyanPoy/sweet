@@ -84,7 +84,7 @@ class CreateOrBuildMethodMissing(object):
             association = self.__model_instance.association_of(association_propert_name) # belongs_to or has_one
             if not association:
                 association = self.__model_instance.association_of(Inflection.pluralize(association_propert_name)) # has_many
-            if not association: #or association._type == Association.Type.belongs_to:
+            if not association: #or association.is_belongs_to():
                 raise AttributeError("'%s' object has no attribute '%s'" % (self.__model_instance.__class__.__name__, self.__name))
             foreign_key = association.foreign_key
             if foreign_key not in kwargs:

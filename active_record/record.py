@@ -106,7 +106,7 @@ class ActiveRecord(object):
         # so:  card.user_id = u.id 
         association = self.association_of(name)
         if association:
-            if association._type == Association.Type.belongs_to:
+            if association.is_belongs_to():
                 setattr(self, '%s_id' % Inflection.singularize(association.target.table_name), value.id)
         return relt
 
@@ -116,20 +116,20 @@ class ActiveRecord(object):
         except AttributeError, _:
             association = self.association_of(name)
             if association:
-                if association._type == Association.Type.belongs_to:
+                if association.is_belongs_to():
                     # A belongs_to B
                     # A.B  => "SEELCT B.* FROM B WHERE id = A.B_id"
                     return association.target.find(getattr(self, association.foreign_key))
-                elif association._type == Association.Type.has_one:
+                elif association.is_has_one():
                     # A has_one B
                     # A.B => "SELECT B.* FROM B WHERE A_id = A.id"
                     return association.target.where(**{association.foreign_key: self.id}).first
-                elif association._type == Association.Type.has_many:
+                elif association.is_has_many():
                     # A has_many B through C
                     if association.through:
                         # A.Bs  => "SELECT B.* FROM B INNER JOIN C ON C.b_id = B.id AND C.a_id = A.id"
                         through_association = self.association_of(association.through)
-                        if through_association._type == Association.Type.has_many:
+                        if through_association.is_has_many():
                             return association.target.joins(association.through) \
                                         .where('%s.%s_id = %s' % (association.through, Inflection.hungarian_name_of(self.__class__.__name__), self.id)) \
                                         .all

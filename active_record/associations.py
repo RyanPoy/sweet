@@ -24,9 +24,10 @@ from collections import namedtuple
 from pyrails.active_support import UnsupportAssociation, is_str, import_object, classproperty, Inflection
 
 
+association_types = ['belongs_to', 'has_one', 'has_many']
 class Association(object):
     
-    Type = namedtuple('Type', ['belongs_to', 'has_one', 'has_many'])._make(['belongs_to', 'has_one', 'has_many'])
+    Type = namedtuple('Type', association_types)._make(association_types)
     
     __associations = []
     
@@ -50,6 +51,15 @@ class Association(object):
         self.through        = through
         
         self.__class__.__associations.append(self)
+
+    def is_belongs_to(self):
+        return self._type == self.__class__.Type.belongs_to
+
+    def is_has_one(self):
+        return self._type == self.__class__.Type.has_one
+
+    def is_has_many(self):
+        return self._type == self.__class__.Type.has_many
 
     def __extract_target_name(self):
         """
