@@ -113,7 +113,6 @@ create table if not exists sons (
         f1 = Father.joins('sons').where('sons.name = "son1"').first
         self.assertEqual(f.id, f1.id)
 
-
     # def test_cache_of_belongs_to_join(self):
     #     f = Father.create(name='pengyi')
     #     f.create_child(created_at='2012-10-10 12:12:12')
