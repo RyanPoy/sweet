@@ -30,7 +30,7 @@ class Association(object):
     
     __associations = []
     
-    def __init__(self, target_class_or_classpath, _type, attr_name = None, foreign_key = None, dependent = False):
+    def __init__(self, target_class_or_classpath, _type, attr_name=None, foreign_key=None, dependent=False, through=None):
         """
         attr_name 最终结果：自定义 或者 target_class_or_classpath的最后部分的小写的单数(has_one, belongs_to)或者复数(has_many)
         foreign_key   最终结果：自定义 或者 当belongs_to的时候为：attr_name的单数 + "_id"
@@ -40,12 +40,14 @@ class Association(object):
         self.__target_class_or_classpath = target_class_or_classpath
         self._type = _type
 
-        _target_name = self.__extract_target_name()
-        self._has_input_attr_name = attr_name is not None
+        _target_name                = self.__extract_target_name()
+        self._has_input_attr_name   = attr_name is not None
         self._has_input_foreign_key = foreign_key is not None
-        self.attr_name = attr_name or self.__extract_attr_name(_target_name)
-        self.foreign_key   = foreign_key or self.__extract_foreign_key(_target_name)
-        self.dependent     = dependent
+
+        self.attr_name      = attr_name or self.__extract_attr_name(_target_name)
+        self.foreign_key    = foreign_key or self.__extract_foreign_key(_target_name)
+        self.dependent      = dependent
+        self.through        = through
         
         self.__class__.__associations.append(self)
 
@@ -106,8 +108,8 @@ def has_one(target_class_or_classpath, attr_name=None, foreign_key=None, depende
     return Association(target_class_or_classpath, Association.Type.has_one, attr_name, foreign_key, dependent)
 
 
-def has_many(target_class_or_classpath, attr_name=None, foreign_key=None, dependent=False):
-    return Association(target_class_or_classpath, Association.Type.has_many, attr_name, foreign_key, dependent)
+def has_many(target_class_or_classpath, attr_name=None, foreign_key=None, dependent=False, through=None):
+    return Association(target_class_or_classpath, Association.Type.has_many, attr_name, foreign_key, dependent, through)
 
 
 #class has_and_belongs_to_many(Association):
