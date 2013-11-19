@@ -96,6 +96,12 @@ class ActiveRecord(object):
         self.id = None
         for k, v in attributes.iteritems():
             setattr(self, k, v)
+            asscoication = self.association_of(k)
+            if asscoication:
+                if asscoication._type == Association.Type.belongs_to:
+                    setattr(self, '%s_id' % Inflection.singularize(asscoication.target.table_name), v.id)
+                elif asscoication._type == Association.Type.has_one or asscoication._type == Association.Type.has_many:
+                    setattr(v, '%s' % Inflection.singularize(self.table_name), self)
 
     def __getattribute__(self, name):
         try:
@@ -111,6 +117,19 @@ class ActiveRecord(object):
                     # A has_one B
                     # A.B => "SELECT B.* FROM B WHERE A_id = A.id"
                     return association.target.where(**{association.foreign_key: self.id}).first
+                elif association._type == Association.Type.has_many:
+                    # A has_many B through C
+                    if association.through:
+                        # A.Bs  => "SELECT B.* FROM B INNER JOIN C ON C.b_id = B.id AND C.a_id = A.id"
+                        through_association = self.association_of(association.through)
+                        if through_association._type == Association.Type.has_many:
+                            return association.target.joins(association.through) \
+                                        .where('%s.%s_id = %s' % (association.through, Inflection.hungarian_name_of(self.__class__.__name__), self.id)) \
+                                        .all
+                    else:
+                        # A has_many B
+                        # A.Bs => "SELECT B.* FROM B WHERE A_id = A.id"
+                        return association.target.where(**{association.foreign_key: self.id}).all
             if CreateOrBuildMethodMissing.match(name):
                 return CreateOrBuildMethodMissing(self, name)
             raise
