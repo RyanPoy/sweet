@@ -359,7 +359,8 @@ class ActiveRecord(object):
             self.where(id = self.id).update_all(attrs_dict)
             return self
         else:
-            return SQLBuilder(self.__class__).save(self)
+            self.id = SQLBuilder(self.__class__).save(self)
+            return self
  
     def update_attributes(self, **attributes):
         """ update attributes

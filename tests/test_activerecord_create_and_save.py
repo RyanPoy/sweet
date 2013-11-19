@@ -21,15 +21,29 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from pyrails.tests import create_table, drop_table
-from pyrails.active_record import ActiveRecord, has_one
+from pyrails.active_record import ActiveRecord, has_one, belongs_to
 from pyrails.active_support import datetime2str
 import unittest
+
+
+class Card(ActiveRecord): belongs_to('pyrails.tests.test_activerecord_create_and_save.User')
+class User(ActiveRecord): has_one(Card)
 
 
 class ActiveRecordCreateAndSaveTest(unittest.TestCase):
 
     def setUp(self):
+        drop_table('cards')
         drop_table('users')
+
+        create_table("""
+create table if not exists cards (
+    id int auto_increment,
+    name varchar(32) not null,
+    user_id integer,
+    PRIMARY KEY (id)
+);""")
+
         create_table("""
 create table if not exists users (
     id int auto_increment,
@@ -40,7 +54,29 @@ create table if not exists users (
 );""")
         
     def tearDown(self):
+        drop_table('cards')
         drop_table('users')
+
+    def test_save(self):
+        class User(ActiveRecord): pass
+        u = User(username="abc", password="123")
+        u.save()
+        self.assertEqual('abc', u.username)
+        self.assertEqual('123', u.password)
+        self.assertTrue(u.id is not None)
+
+    def test_save_has_association(self):
+        u = User(username="abc", password="123").save()
+        c = Card(name="card1", user=u).save()
+        self.assertEqual(c.user_id, u.id)
+
+    def test_should_find_record_after_save(self):
+        class User(ActiveRecord): pass
+        User(username="abc", password="123").save()
+        u = User.find(1)
+        self.assertEqual('abc', u.username)
+        self.assertEqual('123', u.password)
+        self.assertEqual(1, u.id)
 
     def test_create(self):
         class User(ActiveRecord): pass
@@ -50,21 +86,6 @@ create table if not exists users (
         self.assertTrue(u.id is not None)
 
     def test_should_find_record_after_create(self):
-        class User(ActiveRecord): pass
-        User.create(username="abc", password="123")
-        u = User.find(1)
-        self.assertEqual('abc', u.username)
-        self.assertEqual('123', u.password)
-        self.assertEqual(1, u.id)
-
-    def test_save(self):
-        class User(ActiveRecord): pass
-        u = User.create(username="abc", password="123")
-        self.assertEqual('abc', u.username)
-        self.assertEqual('123', u.password)
-        self.assertTrue(u.id is not None)
-
-    def test_should_find_record_after_save(self):
         class User(ActiveRecord): pass
         User.create(username="abc", password="123")
         u = User.find(1)
