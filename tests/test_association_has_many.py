@@ -117,69 +117,68 @@ create table if not exists cards (
         card2 = user.cards[0]
         self.assertEqual(card1.id, card2.id)
 
-    # def test_has_many_through(self):
-    #     try:
-    #         drop_table('student_teachers')
-    #         drop_table('students')
-    #         drop_table('teachers')
+    def test_has_many_through(self):
+        try:
+            drop_table('student_teachers')
+            drop_table('students')
+            drop_table('teachers')
 
-    #         create_table("""
-    #         create table if not exists students (
-    #             id int auto_increment,
-    #             name varchar(32) not null,
-    #             PRIMARY KEY (id)
-    #         );
-    #         """)
+            create_table("""
+            create table if not exists students (
+                id int auto_increment,
+                name varchar(32) not null,
+                PRIMARY KEY (id)
+            );
+            """)
 
-    #         create_table("""
-    #         create table if not exists teachers (
-    #             id int auto_increment,
-    #             created_at datetime,
-    #             age int,
-    #             PRIMARY KEY (id)
-    #         );
-    #         """)
+            create_table("""
+            create table if not exists teachers (
+                id int auto_increment,
+                created_at datetime,
+                name varchar(32) not null,
+                PRIMARY KEY (id)
+            );
+            """)
 
-    #         create_table("""
-    #         create table if not exists student_teachers (
-    #             id int auto_increment,
-    #             student_id int,
-    #             teacher_id int,
-    #             PRIMARY KEY (id)
-    #         );
-    #         """)
-    #         s1 = Student.create(name="stu1")
-    #         s2 = Student.create(name="stu2")
-    #         s3 = Student.create(name="stu3")
+            create_table("""
+            create table if not exists student_teachers (
+                id int auto_increment,
+                student_id int,
+                teacher_id int,
+                PRIMARY KEY (id)
+            );
+            """)
+            s1 = Student.create(name="stu1")
+            s2 = Student.create(name="stu2")
+            s3 = Student.create(name="stu3")
 
-    #         t1 = Teacher.create(name="tea1")
-    #         t2 = Teacher.create(name="tea2")
-    #         t3 = Teacher.create(name="tea3")
+            t1 = Teacher.create(name="tea1")
+            t2 = Teacher.create(name="tea2")
+            t3 = Teacher.create(name="tea3")
 
-    #         StudentTeacher.create(student=s1, teacher=t1)
-    #         StudentTeacher.create(student=s1, teacher=t2)
-    #         StudentTeacher.create(student=s1, teacher=t3)
+            StudentTeacher.create(student=s1, teacher=t1)
+            StudentTeacher.create(student=s1, teacher=t2)
+            StudentTeacher.create(student=s1, teacher=t3)
 
-    #         StudentTeacher.create(student=s2, teacher=t2)
-    #         StudentTeacher.create(student=s2, teacher=t3)
+            StudentTeacher.create(student=s2, teacher=t2)
+            StudentTeacher.create(student=s2, teacher=t3)
 
-    #         ts = s1.teachers
-    #         self.assertEqual(3, len(ts))
-    #         self.assertEqual('tea1', ts[0].name)
-    #         self.assertEqual('tea2', ts[1].name)
-    #         self.assertEqual('tea3', ts[2].name)
+            ts = s1.teachers
+            self.assertEqual(3, len(ts))
+            self.assertEqual('tea1', ts[0].name)
+            self.assertEqual('tea2', ts[1].name)
+            self.assertEqual('tea3', ts[2].name)
 
-    #         ts = s2.teachers
-    #         self.assertEqual(2, len(ts))
-    #         self.assertEqual('tea2', ts[0].name)
-    #         self.assertEqual('tea3', ts[1].name)
+            ts = s2.teachers
+            self.assertEqual(2, len(ts))
+            self.assertEqual('tea2', ts[0].name)
+            self.assertEqual('tea3', ts[1].name)
 
-    #         self.assertEqual(0, len(s3.teachers))
-
-    #     finally:
-    #         drop_table('student_teachers')
-    #         drop_table('students')
-    #         drop_table('teachers')
+            self.assertEqual(0, len(s3.teachers))
+        finally:
+            drop_table('student_teachers')
+            drop_table('students')
+            drop_table('teachers')
 
 
 if __name__ == '__main__':
