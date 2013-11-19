@@ -62,17 +62,26 @@ create table if not exists cards (
         self.assertEqual('abc', u.username)
         self.assertEqual('123', u.password)
 
+    def test_init_with_assoication_record(self):
+        u = User.create(name='pengyi')
+        c = Card(created_at='2012-10-10 12:12:12', user=u)
+        self.assertIsNone(c.id)
+        self.assertEqual(u, c.user)
+        self.assertEqual(u.id, c.user_id)
+
+    def test_set_association_record_attribute(self):
+        u = User.create(name='pengyi')
+        c = Card(created_at='2012-10-10 12:12:12')
+        c.user = u
+        self.assertIsNone(c.id)
+        self.assertEqual(u, c.user)
+        self.assertEqual(u.id, c.user_id)
+
     def test_has_one_build(self):
         u = User.create(name='pengyi')
         c = u.build_card(created_at='2012-10-10 12:12:12')
         self.assertIsNone(c.id)
         self.assertEqual(u.card, c)
-
-    # def test_init_with_assoication_record(self):
-    #     u = User.create(name='pengyi')
-    #     c = Card(created_at='2012-10-10 12:12:12', user=u)
-    #     self.assertIsNone(c.id)
-    #     self.assertEqual(u.card, c)
 
 
 if __name__ == '__main__':

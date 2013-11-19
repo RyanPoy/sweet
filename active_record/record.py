@@ -96,12 +96,19 @@ class ActiveRecord(object):
         self.id = None
         for k, v in attributes.iteritems():
             setattr(self, k, v)
-            asscoication = self.association_of(k)
-            if asscoication:
-                if asscoication._type == Association.Type.belongs_to:
-                    setattr(self, '%s_id' % Inflection.singularize(asscoication.target.table_name), v.id)
-                elif asscoication._type == Association.Type.has_one or asscoication._type == Association.Type.has_many:
-                    setattr(v, '%s' % Inflection.singularize(self.table_name), self)
+
+    def __setattr__(self, name, value):
+        relt = super(ActiveRecord, self).__setattr__(name, value)
+        # check a assoication, set association.target.id
+        # eg. Card belong_to User
+        #      u = User.find(1)
+        #      card.user = u
+        # so:  card.user_id = u.id 
+        association = self.association_of(name)
+        if association:
+            if association._type == Association.Type.belongs_to:
+                setattr(self, '%s_id' % Inflection.singularize(association.target.table_name), value.id)
+        return relt
 
     def __getattribute__(self, name):
         try:
