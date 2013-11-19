@@ -107,7 +107,7 @@ class ActiveRecord(object):
         association = self.association_of(name)
         if association:
             if association.is_belongs_to():
-                setattr(self, association.target._fk_name, value.id)
+                setattr(self, association.foreign_key, value.id)
         return relt
 
     def __getattribute__(self, name):
@@ -131,7 +131,7 @@ class ActiveRecord(object):
                         through_association = self.association_of(association.through)
                         if through_association.is_has_many():
                             return association.target.joins(association.through) \
-                                        .where('%s.%s_id = %s' % (association.through, Inflection.hungarian_name_of(self.__class__.__name__), self.id)) \
+                                        .where('%s.%s = %s' % (association.through, through_association.foreign_key, self.id)) \
                                         .all
                     else:
                         # A has_many B
