@@ -21,6 +21,7 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import re
+from pyrails.active_support import Inflection
 
 
 class FindMethodMissing(object):
@@ -75,12 +76,15 @@ class CreateOrBuildMethodMissing(object):
         return cls.__pattern.match(name)
             
     def __call__(self, *args, **kwargs):
+        from pyrails.active_record import Association
         r = None
         match = self.__class__.__pattern.match(self.__name)
         if match:
             scope, association_propert_name = match.groups()
-            association = self.__model_instance.association_of(association_propert_name)
+            association = self.__model_instance.association_of(association_propert_name) # belongs_to or has_one
             if not association:
+                association = self.__model_instance.association_of(Inflection.pluralize(association_propert_name)) # has_many
+            if not association: #or association._type == Association.Type.belongs_to:
                 raise AttributeError("'%s' object has no attribute '%s'" % (self.__model_instance.__class__.__name__, self.__name))
             foreign_key = association.foreign_key
             if foreign_key not in kwargs:
