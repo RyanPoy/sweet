@@ -234,7 +234,6 @@ class SQLBuilder(object):
     def __add_joins(self, sql, joins):
         buff = []
         self.__add_array_joins(buff, self._model_class, joins)
-        print ' '.join(buff)
         if buff:
             return '%s %s' % (sql, ' '.join(buff))
         return sql
@@ -268,12 +267,12 @@ class SQLBuilder(object):
     def __add_str_join(self, buff, this_class, join):
         association = this_class.association_dict.get(join, None)
         if association: # a association: belongs_to, has_one, has_many
-            self.__add_join(buff, association, this_class, association.target)
+            self.__add_join(buff, association, this_class)
         else:
             buff.append(join)
         return self
 
-    def __add_join(self, buff, association, this_class, target_class):
+    def __add_join(self, buff, association, this_class):
         """ 
         eg.
             __add_association_join(Association.Type.belongs_to, Post, User)
@@ -285,10 +284,11 @@ class SQLBuilder(object):
             __ad__association_join(Association.Type.has_many, User, Post)
           ==> INNERT JOIN posts ON post_user_id = users.id
         """
+        target_class = association.target
         if association.is_belongs_to():
-            _sql = 'INNER JOIN %s ON %s.id = %s.%s_id' % (target_class.table_name, target_class.table_name, this_class.table_name, Inflection.hungarian_name_of(target_class.__name__))
+            _sql = 'INNER JOIN %s ON %s.id = %s.%s' % (target_class.table_name, target_class.table_name, this_class.table_name, association.foreign_key)
         elif association.is_has_one() or association.is_has_many():
-            _sql = 'INNER JOIN %s ON %s.%s_id = %s.id' % (target_class.table_name, target_class.table_name, Inflection.hungarian_name_of(this_class.__name__), this_class.table_name)
+            _sql = 'INNER JOIN %s ON %s.%s = %s.id' % (target_class.table_name, target_class.table_name, association.foreign_key, this_class.table_name)
         self.__join_table_list.append(target_class.table_name)
         if _sql:
             buff.append(_sql)
