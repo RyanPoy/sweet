@@ -36,6 +36,3 @@ class RecordValidateError(Exception):
 class ColumnExistError(Exception):
     pass
 
-
-class UnsupportAssociation(Exception):
-    pass
