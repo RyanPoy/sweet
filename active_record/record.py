@@ -148,7 +148,7 @@ class ActiveRecord(object):
     @classproperty
     def table_name(cls):
         if not hasattr(cls, '__table_name__'):
-            table_name = Inflection.pluralize(cls.__name__)
+            table_name = Inflection.pluralize_of(cls.__name__)
             cls.__table_name__ = Inflection.hungarian_of(table_name)
         return cls.__table_name__
 

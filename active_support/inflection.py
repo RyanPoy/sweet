@@ -91,15 +91,15 @@ class Inflection(object):
     @classmethod
     def singularize_of(cls, word):
         '''Singularizes English nouns.'''
-        return cls.__singularize_or_pluralize(word, cls.singularize_rules, cls.singularize_irregular_words)
+        return cls.__singularize_or_pluralize_of(word, cls.singularize_rules, cls.singularize_irregular_words)
 
     @classmethod
-    def pluralize(cls, word):
+    def pluralize_of(cls, word):
         '''Pluralizes English nouns.'''
-        return cls.__singularize_or_pluralize(word, cls.pluralize_rules, cls.pluralize_irregular_words)
+        return cls.__singularize_or_pluralize_of(word, cls.pluralize_rules, cls.pluralize_irregular_words)
         
     @classmethod
-    def __singularize_or_pluralize(cls, word, rules, irregular_words):
+    def __singularize_or_pluralize_of(cls, word, rules, irregular_words):
         if cls.__is_uncountable(word):
             return word
         result = cls.__irregular(word, irregular_words)

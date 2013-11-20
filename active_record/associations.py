@@ -71,7 +71,7 @@ class Association(object):
     def __extract_attr_name(self):
         _target_name = self.__extract_target_name()
         if self.is_has_many() or self.is_has_and_belongs_to_many():
-            _target_name = Inflection.hungarian_of(Inflection.pluralize(_target_name))
+            _target_name = Inflection.hungarian_of(Inflection.pluralize_of(_target_name))
         else: # belongs_to, has_one
             _target_name = Inflection.hungarian_of(_target_name)
         return _target_name
@@ -98,8 +98,8 @@ class Association(object):
                 self.foreign_key = '%s_id' % Inflection.hungarian_of(self.__extract_target_name())
         if not self.join_table:
             if self.is_has_and_belongs_to_many():
-                target_name = Inflection.hungarian_of(Inflection.pluralize(self.__extract_target_name()))
-                owner_name = Inflection.hungarian_of(Inflection.pluralize(owner_class.__name__))
+                target_name = Inflection.hungarian_of(Inflection.pluralize_of(self.__extract_target_name()))
+                owner_name = Inflection.hungarian_of(Inflection.pluralize_of(owner_class.__name__))
                 if owner_name > target_name:
                     self.join_table = '%s_%s' % (target_name, owner_name)
                 else:
