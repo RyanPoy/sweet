@@ -37,8 +37,6 @@ class Father(ActiveRecord):
     has_many(Son, foreign_key='dad_id')
 
 
-
-
 class ActiveRecordJoinsTest(unittest.TestCase):
     
     def setUp(self):
