@@ -21,17 +21,17 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from collections import namedtuple
-from pyrails.active_support import UnsupportAssociation, is_str, import_object, classproperty, Inflection
+from pyrails.active_support import is_str, import_object, classproperty, Inflection
 
 
-association_types = ['belongs_to', 'has_one', 'has_many']
+association_types = ['belongs_to', 'has_one', 'has_many', 'has_and_belongs_to_many']
 class Association(object):
     
     Type = namedtuple('Type', association_types)._make(association_types)
     
     __associations = []
     
-    def __init__(self, target_class_or_classpath, _type, attr_name=None, foreign_key=None, dependent=False, through=None):
+    def __init__(self, target_class_or_classpath, _type, attr_name=None, foreign_key=None, dependent=False, through=None, join_table=None):
         """
         attr_name 最终结果：自定义 或者 target_class_or_classpath的最后部分的小写的单数(has_one, belongs_to)或者复数(has_many)
         foreign_key   最终结果：自定义 或者 当belongs_to的时候为：attr_name的单数 + "_id"
@@ -39,16 +39,13 @@ class Association(object):
                     注意：foreign_key 永远是对当前的 class 而言，而不是针对target而言的
         """
         self.__target_class_or_classpath = target_class_or_classpath
-        self._type = _type
+        self._type          = _type
 
-        _target_name                = self.__extract_target_name()
-        self._has_input_attr_name   = attr_name is not None
-        self._has_input_foreign_key = foreign_key is not None
-
-        self.attr_name      = attr_name or self.__extract_attr_name(_target_name)
-        self.foreign_key    = foreign_key or self.__extract_foreign_key(_target_name)
+        self.attr_name      = attr_name or self.__extract_attr_name()
+        self.foreign_key    = foreign_key
         self.dependent      = dependent
         self.through        = through
+        self.join_table     = join_table
         
         self.__class__.__associations.append(self)
 
@@ -61,33 +58,23 @@ class Association(object):
     def is_has_many(self):
         return self._type == self.__class__.Type.has_many
 
+    def is_has_and_belongs_to_many(self):
+        return self._type == self.__class__.Type.has_and_belongs_to_many
+        
     def __extract_target_name(self):
         """
         should be return aaa_bbb or ccc string value
         """
-        from pyrails.active_record import ActiveRecord
+        return self.__target_class_or_classpath.split('.')[-1] if is_str(self.__target_class_or_classpath) \
+            else self.__target_class_or_classpath.__name__
 
-        if is_str(self.__target_class_or_classpath):
-            target_name_str = self.__target_class_or_classpath.split('.')[-1]
-        elif issubclass(self.__target_class_or_classpath, ActiveRecord):
-            target_name_str = self.__target_class_or_classpath.__name__
-        else:
-            raise UnsupportAssociation()
-        return target_name_str
-
-    def __extract_attr_name(self, _target_name):
-        if self._type == self.Type.has_many:
+    def __extract_attr_name(self):
+        _target_name = self.__extract_target_name()
+        if self.is_has_many() or self.is_has_and_belongs_to_many():
             _target_name = Inflection.hungarian_name_of(Inflection.pluralize(_target_name))
         else: # belongs_to, has_one
             _target_name = Inflection.hungarian_name_of(_target_name)
         return _target_name
-    
-    def __extract_foreign_key(self, _target_name):
-        if self._type == self.Type.has_many:
-            _target_name = Inflection.singularize(self.attr_name)
-        else: # belongs_to, has_one
-            _target_name = self.attr_name
-        return '%s_id' % _target_name
     
     @property
     def target(self):
@@ -104,9 +91,19 @@ class Association(object):
         return 'attr_name[%s]; foreign_key[%s]; dependent[%s]; target[%s]' % (self.attr_name, self.foreign_key, self.dependent, self.target)
     
     def _register(self, owner_class):
-        if self._type == Association.Type.has_one or self._type == Association.Type.has_many:
-            if not self._has_input_foreign_key:
+        if not self.foreign_key:
+            if self.is_has_one() or self.is_has_many():
                 self.foreign_key = '%s_id' % Inflection.hungarian_name_of(owner_class.__name__)
+            else: # belongs_to or has_and_belongs_to_many
+                self.foreign_key = '%s_id' % Inflection.hungarian_name_of(self.__extract_target_name())
+        if not self.join_table:
+            if self.is_has_and_belongs_to_many():
+                target_name = Inflection.hungarian_name_of(Inflection.pluralize(self.__extract_target_name()))
+                owner_name = Inflection.hungarian_name_of(Inflection.pluralize(owner_class.__name__))
+                if owner_name > target_name:
+                    self.join_table = '%s_%s' % (target_name, owner_name)
+                else:
+                    self.join_table = '%s_%s' % (owner_name, target_name)
         owner_class.association_dict[self.attr_name] = self
 
         
@@ -121,8 +118,5 @@ def has_one(target_class_or_classpath, attr_name=None, foreign_key=None, depende
 def has_many(target_class_or_classpath, attr_name=None, foreign_key=None, dependent=False, through=None):
     return Association(target_class_or_classpath, Association.Type.has_many, attr_name, foreign_key, dependent, through)
 
-
-#class has_and_belongs_to_many(Association):
-#    def __register__(self, owner):
-#        self.target._has_and_belongs_to_many.add(owner)
-#        owner._has_and_belongs_to_many.add(self.target)
+def has_and_belongs_to_many(target_class_or_classpath, attr_name=None, foreign_key=None, dependent=False, join_table=None):
+    return Association(target_class_or_classpath, Association.Type.has_and_belongs_to_many, attr_name, foreign_key, dependent, join_table)
