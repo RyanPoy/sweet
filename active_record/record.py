@@ -21,7 +21,7 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from pyrails.active_record.method_missing import FindMethodMissing, CreateOrBuildMethodMissing
-from pyrails.active_record.sql_builder import SQLBuilder
+from pyrails.active_record.sql_builder import Collection
 from pyrails.active_record.associations import Association
 from pyrails.active_support import classproperty, Inflection
 from pyrails.db import get_database
@@ -197,7 +197,7 @@ class ActiveRecord(object):
             User.all
             User.where(age=10).all
         """
-        return SQLBuilder(cls).all
+        return Collection(cls).all
     
     @classproperty
     def first(cls):
@@ -207,7 +207,7 @@ class ActiveRecord(object):
             User.first
             User.where(age=10).first
         """
-        return SQLBuilder(cls).first
+        return Collection(cls).first
     
     @classproperty
     def last(cls):
@@ -217,7 +217,7 @@ class ActiveRecord(object):
             User.last
             User.where(age=10).last
         """
-        return SQLBuilder(cls).last
+        return Collection(cls).last
 
     @classmethod
     def create(cls, **attributes):
@@ -238,7 +238,7 @@ class ActiveRecord(object):
             User.where("username='abc' and password='123'")
             User.where("username=? and password=?", 'abc', '123')
         """
-        return SQLBuilder(cls).where(*args, **kwargs)
+        return Collection(cls).where(*args, **kwargs)
 
     @classmethod
     def find(cls, *ids):
@@ -247,7 +247,7 @@ class ActiveRecord(object):
                     if there are many ids and found them will return a record array
                     if any id not found, throw RecordNotFound exception
         """
-        return SQLBuilder(cls).find(*ids)
+        return Collection(cls).find(*ids)
 
     @classmethod
     def limit(cls, limit=0, offset=0):
@@ -256,7 +256,7 @@ class ActiveRecord(object):
             User.limit(10)
             User.limit(10, 1)
         """
-        return SQLBuilder(cls).limit(limit, offset)
+        return Collection(cls).limit(limit, offset)
 
     @classmethod
     def count(cls):
@@ -266,7 +266,7 @@ class ActiveRecord(object):
             User.count()
             User.where('username=123').count()
         """
-        return SQLBuilder(cls).count()
+        return Collection(cls).count()
     
     @classmethod
     def sum(cls, attribute_name):
@@ -276,7 +276,7 @@ class ActiveRecord(object):
             User.sum(age)
             User.where(username=123).sum()
         """
-        return SQLBuilder(cls).sum(attribute_name)
+        return Collection(cls).sum(attribute_name)
 
     @classmethod
     def order(cls, *args):
@@ -287,8 +287,8 @@ class ActiveRecord(object):
             User.order('age DESC')
         """
         if args:
-            return SQLBuilder(cls).order(args[0]) 
-        return SQLBuilder(cls)
+            return Collection(cls).order(args[0]) 
+        return Collection(cls)
 
     @classmethod
     def group(cls, group):
@@ -296,7 +296,7 @@ class ActiveRecord(object):
         eg. 
             User.group('username')
         """
-        return SQLBuilder(cls).group(group)
+        return Collection(cls).group(group)
 
     @classmethod
     def having(cls, *args, **kwargs):
@@ -305,7 +305,7 @@ class ActiveRecord(object):
         eg.
             User.group('username').having(age=1)
         """
-        return SQLBuilder(cls).having(*args, **kwargs)
+        return Collection(cls).having(*args, **kwargs)
 
     @classmethod
     def joins(cls, *joins):
@@ -335,7 +335,7 @@ class ActiveRecord(object):
                INNER JOIN guests ON guests.comment_id = comments.id
                INNER JOIN tags ON tags.post_id = posts.id
         """
-        return SQLBuilder(cls).joins(*joins)
+        return Collection(cls).joins(*joins)
     
     def valid(self):
         return True
@@ -355,7 +355,7 @@ class ActiveRecord(object):
             self.where(id = self.id).update_all(attrs_dict)
             return self
         else:
-            self.id = SQLBuilder(self.__class__).save(self)
+            self.id = Collection(self.__class__).save(self)
             return self
  
     def update_attributes(self, **attributes):
@@ -386,7 +386,7 @@ class ActiveRecord(object):
         
     @classmethod
     def update_all(cls, **attributes):
-        SQLBuilder(cls).update_all(**attributes)
+        Collection(cls).update_all(**attributes)
         return True
 
     def delete(self):
@@ -404,7 +404,7 @@ class ActiveRecord(object):
             User.delete_all()
             User.find(1, 2, 3).delete_all()
         """
-        SQLBuilder(cls).delete_all()
+        Collection(cls).delete_all()
         return True
 
     @classmethod

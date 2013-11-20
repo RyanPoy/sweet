@@ -23,7 +23,7 @@
 from pyrails.active_support import RecordNotFound, Inflection, is_array, is_str, is_hash, flatten, to_i
 
 
-class SQLBuilder(object):
+class Collection(object):
     
     DELETE_STR, UPDATE_STR = 'DELETE', 'UPDATE'
 
