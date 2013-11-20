@@ -82,7 +82,7 @@ class ActiveRecord(object):
             if name != 'ActiveRecord':
                 for assocation in Association._next:
                     assocation._register(cls)
-            return model_instance 
+            return model_instance
         
         def __getattribute__(self, name):
             try:
