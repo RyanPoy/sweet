@@ -135,7 +135,7 @@ class Inflection(object):
         return word
 
     @classmethod
-    def pascal_name_of(cls, name):
+    def pascal_of(cls, name):
         """
         a_b_c       => ABC
         ab_ab_ab    => AbAbAb
