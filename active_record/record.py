@@ -359,8 +359,7 @@ class ActiveRecord(object):
     def update_attributes(self, **attributes):
         """ update attributes
         eg. 
-            u = User(username="abc", password="123")
-            u.update_attributes(username="efg", password="456")
+            u = User(username="abc", password="123").save().update_attributes(username="efg", password="456")
         """
         # def filter_of(attributes_dict):
         #     other = {}
@@ -381,7 +380,7 @@ class ActiveRecord(object):
         self.where(id = self.id).update_all(**attributes)
         for name, value in attributes.iteritems():
             setattr(self, name, value)
-        return True
+        return self
         
     @classmethod
     def update_all(cls, **attributes):
