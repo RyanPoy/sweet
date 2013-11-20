@@ -36,7 +36,7 @@ from test_association_has_and_belongs_to_many import HasAndBelongsToManyTest
 from test_association_belongs_to import BelongsToTest
 from test_association_has_many import HasManyTest
 from test_association_has_one import HasOneTest
-from test_sql_builder import CollectionTest
+from test_collection import CollectionTest
 
 
 tests = [
