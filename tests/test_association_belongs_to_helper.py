@@ -20,7 +20,42 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-from pyrails.active_record import ActiveRecord
+from pyrails.active_record import ActiveRecord, belongs_to
+from pyrails.tests import create_table, drop_table
 
-class Father(ActiveRecord):
+
+class Author(ActiveRecord):
     pass
+
+
+class Post(ActiveRecord):
+    belongs_to(Author)
+
+
+def create_authors():
+    create_table("""
+create table if not exists authors (
+    id int auto_increment,
+    name varchar(32) not null,
+    PRIMARY KEY (id)
+);
+""")
+
+
+def create_posts():
+    create_table("""
+create table if not exists posts (
+    id int auto_increment,
+    title varchar(32) not null,
+    author_id int,
+    PRIMARY KEY (id)
+);
+""")
+
+
+def drop_posts():
+    drop_table('posts')
+
+    
+def drop_authors():
+    drop_table('authors')

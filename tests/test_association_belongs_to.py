@@ -20,93 +20,91 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-from pyrails.active_record import ActiveRecord, belongs_to, has_one
-from pyrails.tests import create_table, drop_table
+from pyrails.tests.test_association_belongs_to_helper import *
 import unittest
-
-
-class Father(ActiveRecord): 
-    has_one('pyrails.tests.test_association_belongs_to.Child')
-
-class Child(ActiveRecord):
-    belongs_to(Father)
 
 
 class BelongsToTest(unittest.TestCase):
     
     def setUp(self):
-        drop_table('fathers')
-        drop_table('children')
-        
-        create_table("""
-create table if not exists fathers (
-    id int auto_increment,
-    name varchar(32) not null,
-    PRIMARY KEY (id)
-);
-""")
-        create_table("""
-create table if not exists children (
-    id int auto_increment,
-    created_at datetime,
-    father_id int,
-    PRIMARY KEY (id)
-);
-""")
+        drop_posts()
+        drop_authors()
+        create_authors()
+        create_posts()
         
     def tearDown(self):
-        drop_table('fathers')
-        drop_table('children')
+        drop_posts()
+        drop_authors()
         
-    # belongs to association define
     def test_belongs_to(self):
-        class Father(ActiveRecord): pass
-        class Child(ActiveRecord):
-            belongs_to(Father)
-        
-        self.assertEqual(1, len(Child.association_dict))
-        association = Child.association_of('father')
+        self.assertEqual(1, len(Post.association_dict))
+        association = Post.association_of('author')
         self.assertTrue(association.is_belongs_to())
-        self.assertEqual(Father, association.target)
-        self.assertEqual('father', association.attr_name)
-        self.assertEqual('father_id', association.foreign_key)
+        self.assertEqual(Author, association.target)
+        self.assertEqual('author', association.attr_name)
+        self.assertEqual('author_id', association.foreign_key)
         self.assertFalse(association.dependent)
 
-    def test_belongs_to_with_classpath_str(self):
-        from pyrails.tests.test_helper import Father
-        class Child(ActiveRecord):
-            belongs_to('pyrails.tests.test_helper.Father')
-        
-        self.assertEqual(1, len(Child.association_dict))
-        association = Child.association_of('father')
+    def test_belongs_to_with_customer_some_init_args(self):
+        class Post(ActiveRecord): belongs_to(Author, attr_name="user")
+
+        association = Post.association_of('user')
         self.assertTrue(association.is_belongs_to())
-        self.assertEqual(Father, association.target)
-        self.assertEqual('father', association.attr_name)
-        self.assertEqual('father_id', association.foreign_key)
+        self.assertEqual(Author, association.target)
+        self.assertEqual('user', association.attr_name)
+        self.assertEqual('author_id', association.foreign_key)
         self.assertFalse(association.dependent)
-        
-    def test_belongs_to_with_customer_init_args(self):
-        class Father(ActiveRecord): pass
-        class Child(ActiveRecord):
-            belongs_to(Father, attr_name="dad", foreign_key="dad_id", dependent=True)
-        self.assertEqual(1, len(Child.association_dict))
-        association = Child.association_of('dad')
+    
+    def test_belongs_to_with_customer_more_init_args(self):
+        class Post(ActiveRecord): belongs_to(Author, attr_name="user", foreign_key="user_id", dependent=True)
+
+        association = Post.association_of('user')
         self.assertTrue(association.is_belongs_to())
-        self.assertEqual(Father, association.target)
-        self.assertEqual('dad', association.attr_name)
-        self.assertEqual('dad_id', association.foreign_key)
+        self.assertEqual(Author, association.target)
+        self.assertEqual('user', association.attr_name)
+        self.assertEqual('user_id', association.foreign_key)
         self.assertTrue(association.dependent)
     
+    def test_belongs_to_find(self):
+        """ Post#author (similar to Author.find(author_id))
+        """
+        author = Author(name="author1").save()
+        Post(title="post1", author=author).save()
+        author = Post.find(1).author
+        self.assertEqual(1, author.id)
+        self.assertEqual('author1', author.name)
+
+    def test_belongs_to_set_attrbuite(self):
+        """ Post#author=(author) (similar to post.author_id = author.id)
+        """
+        author1 = Author(name="author1").save()
+        author2 = Author(name="author2").save()
+        Post(title="post1", author=author1).save()
+        post = Post.find(1)
+        post.author = author2
+
+        self.assertEqual(2, post.author_id)
+        self.assertEqual('author2', post.author.name)
+
+    def test_belongs_to_build(self):
+        """ Post#build_author (similar to post.author = Author())
+        """
+        post = Post(title="post1")
+        author = post.build_author(name='author1')
+        self.assertEqual('author1', post.author.name)
+        self.assertEqual('author1', author.name)
+        self.assertIsNone(author.id)
+        self.assertIsNone(post.author.id)
+
     def test_belongs_to_create(self):
-        class Father(ActiveRecord): pass
-        class Child(ActiveRecord): belongs_to(Father)
-    
-        fid = Father.create(name='Bob').id
-        cid = Child.create(created_at='2011-10-10 12:12:12', father_id=fid).id
-        c = Child.find(cid)
-        self.assertEqual(cid, c.id)
-        self.assertEqual(fid, c.father_id)
-        self.assertEqual('2011-10-10 12:12:12', c.created_at.strftime('%Y-%m-%d %H:%M:%S'))
+        """ Post#create_author (similar to post.author = Author(); post.author.save(); return post.author)
+        """
+        post = Post(title="post1")
+        post.create_author(name="author1")
+        author = Author.find(1)
+        self.assertEqual(1, author.id)
+        self.assertEqual('author1', author.name)
+        self.assertEqual(1, post.author.id)
 
 
 if __name__ == '__main__':

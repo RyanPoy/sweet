@@ -108,6 +108,8 @@ class ActiveRecord(object):
         if association:
             if association.is_belongs_to():
                 setattr(self, association.foreign_key, value.id)
+            # elif association.is_has_one():
+            #     setattr(value, association.foreign_key, self.id)
         return relt
 
     def __getattribute__(self, name):
