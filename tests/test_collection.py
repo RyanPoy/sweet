@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from pyrails.active_record import Collection, ActiveRecord, has_one, belongs_to
+from pyrails.activerecord import Collection, ActiveRecord, has_one, belongs_to
 import unittest
 
 

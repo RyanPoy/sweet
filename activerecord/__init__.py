@@ -22,7 +22,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-from pyrails.active_record.record import *
-from pyrails.active_record.collection import *
-from pyrails.active_record.associations import *
-from pyrails.active_record.method_missing import *
+from pyrails.activerecord.record import *
+from pyrails.activerecord.collection import *
+from pyrails.activerecord.associations import *
+from pyrails.activerecord.method_missing import *
