@@ -103,7 +103,7 @@ create table if not exists sons (
 
     def test_has_many_join_query(self):
         f = Father.create(name='pengyi')
-        f.create_son(name="son1")
+        f.sons.create(name="son1")
 
         f1 = Father.joins('sons').where('sons.name = "son2"').first
         self.assertIsNone(f1)
