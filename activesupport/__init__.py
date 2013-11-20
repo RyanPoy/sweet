@@ -20,7 +20,7 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-from pyrails.active_support.decorates import *
-from pyrails.active_support.exceptions import *
-from pyrails.active_support.inflection import *
-from pyrails.active_support.utils import *
+from pyrails.activesupport.decorates import *
+from pyrails.activesupport.exceptions import *
+from pyrails.activesupport.inflection import *
+from pyrails.activesupport.utils import *

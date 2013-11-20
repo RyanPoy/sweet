@@ -21,7 +21,7 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from collections import namedtuple
-from pyrails.active_support import is_str, import_object, classproperty, Inflection
+from pyrails.activesupport import is_str, import_object, classproperty, Inflection
 
 
 association_types = ['belongs_to', 'has_one', 'has_many', 'has_and_belongs_to_many']

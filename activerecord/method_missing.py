@@ -21,7 +21,7 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import re
-from pyrails.active_support import Inflection
+from pyrails.activesupport import Inflection
 
 
 class FindMethodMissing(object):

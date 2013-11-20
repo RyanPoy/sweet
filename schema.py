@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 from collections import namedtuple
-from pyrails.active_support import ColumnExistError, to_bool, to_i, to_f, to_decimal, str2datetime, str2date, binary2str
+from pyrails.activesupport import ColumnExistError, to_bool, to_i, to_f, to_decimal, str2datetime, str2date, binary2str
 
 
 column_types = [

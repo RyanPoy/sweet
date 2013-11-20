@@ -22,7 +22,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from pyrails.tests import create_table, drop_table
 from pyrails.activerecord import ActiveRecord
-from pyrails.active_support import RecordNotFound
+from pyrails.activesupport import RecordNotFound
 import unittest
 
 

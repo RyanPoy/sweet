@@ -22,7 +22,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from pyrails.activerecord import ActiveRecord, belongs_to, has_one, has_many
 from pyrails.tests import create_table, drop_table
-from pyrails.active_support import datetime2str
+from pyrails.activesupport import datetime2str
 import unittest
 
 

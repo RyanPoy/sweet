@@ -22,7 +22,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from itertools import izip
 from pyrails.schema import Table, Column
-from pyrails.active_support import is_str, is_datetime, is_date, flatten, str2date, str2datetime
+from pyrails.activesupport import is_str, is_datetime, is_date, flatten, str2date, str2datetime
 import MySQLdb
 import time
 import itertools
