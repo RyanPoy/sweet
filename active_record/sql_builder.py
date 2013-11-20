@@ -142,7 +142,7 @@ class SQLBuilder(object):
 #            for key in condtions.keys(): # must use keys, not iterkeys.
 #                if type(key) is self._model_class.__metaclass__:
 #                if type(key) is self._model_class:
-#                    new_key = '%s_id' % Inflection.hungarian_name_of(key.__class__.__name__)
+#                    new_key = '%s_id' % Inflection.hungarian_of(key.__class__.__name__)
 #                    condtions[new_key] = key.id
 #                    condtions.pop(key)
             codition_collection.append(conditions)

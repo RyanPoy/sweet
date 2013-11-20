@@ -91,7 +91,6 @@ create table if not exists sons (
         self.assertEqual('2012-10-10 12:12:12', datetime2str(c.created_at))
 
     def test_has_one_join_query(self):
-
         f = Father.create(name='pengyi')
         f.create_child(created_at='2012-10-10 12:12:12')
 

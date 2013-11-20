@@ -146,7 +146,7 @@ class Inflection(object):
         def is_char(ch):
             return 'a' <= ch <= 'z' or 'A' <= ch <= 'Z' or '0' <= ch <= '9'
             
-        name = cls.hungarian_name_of(name)
+        name = cls.hungarian_of(name)
         pos = 0
         for i, ch in enumerate(name):
             if is_letter(ch):
@@ -167,7 +167,7 @@ class Inflection(object):
         return ''.join(pascal_name)
 
     @classmethod
-    def hungarian_name_of(cls, name):
+    def hungarian_of(cls, name):
         """
         UserAddress  => user_address
         userAddress  => user_address
