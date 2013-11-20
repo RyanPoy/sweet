@@ -38,12 +38,13 @@ class SQLBuilder(object):
         self._groups        = []
         self._havings       = []
         self._joins         = []
-        self.__join_table_list = []
+        # self._join_table_list = []
         self._func          = None
         self._model_class   = model_class
         self._table_name    = self._model_class.table_name
         self._db            = self._model_class._get_db()
-    
+        self.__fk_value     = {}
+
     @property    
     def all(self):
         sql, params = self.delete_or_update_or_find_sql()
@@ -289,18 +290,39 @@ class SQLBuilder(object):
             _sql = 'INNER JOIN %s ON %s.id = %s.%s' % (target_class.table_name, target_class.table_name, this_class.table_name, association.foreign_key)
         elif association.is_has_one() or association.is_has_many():
             _sql = 'INNER JOIN %s ON %s.%s = %s.id' % (target_class.table_name, target_class.table_name, association.foreign_key, this_class.table_name)
-        self.__join_table_list.append(target_class.table_name)
+        # self._join_table_list.append(target_class.table_name)
         if _sql:
             buff.append(_sql)
+
+    def _set_fk_value_for_build_or_create(self, fk_name_and_value_dict):
+        self.__fk_value = fk_name_and_value_dict
+        return self
+
+    def build(self, **attributes):
+        for k, v in self.__fk_value.iteritems():
+            if k not in attributes:
+                attributes[k] = v
+        return self._model_class(**attributes)
+
+    def create(self, **attributes):
+        record = self.build(**attributes)
+        record.save()
+        return record
 
     def __iter__(self):
         return iter(self.all)
 
     def __len__(self):
-        return len(self.all)
+        cnt = self.count()
+        self._func = None
+        return cnt
     
     def __getitem__(self, index):
-        return self.all[index]
+        relt = self.limit(index+1, index).all
+        if not relt:
+            raise IndexError('%s out of collection range')
+        self._limit, self._offset = None, None
+        return relt[0]
 
     def __str__(self):
         return self.all

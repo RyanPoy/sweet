@@ -134,11 +134,13 @@ class ActiveRecord(object):
                         if through_association.is_has_many():
                             return association.target.joins(association.through) \
                                         .where('%s.%s = %s' % (association.through, through_association.foreign_key, self.id)) \
-                                        .all
+                                        ._set_fk_value_for_build_or_create({through_association.foreign_key: self.id})
+
                     else:
                         # A has_many B
                         # A.Bs => "SELECT B.* FROM B WHERE A_id = A.id"
-                        return association.target.where(**{association.foreign_key: self.id}).all
+                        return association.target.where(**{association.foreign_key: self.id}) \
+                                        ._set_fk_value_for_build_or_create({association.foreign_key: self.id})
             if CreateOrBuildMethodMissing.match(name):
                 return CreateOrBuildMethodMissing(self, name)
             raise
