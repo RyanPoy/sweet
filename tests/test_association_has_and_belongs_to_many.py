@@ -78,35 +78,15 @@ create table if not exists students_teachers (
         self.assertEqual('students_teachers', association.join_table)
         self.assertFalse(association.dependent)
 
-    # def test_belongs_to_with_classpath_str(self):
-    #     from pyrails.tests.test_helper import Father
-    #     class Child(ActiveRecord):
-    #         belongs_to('pyrails.tests.test_helper.Father')
+        self.assertEqual(1, len(Teacher.association_dict))
+        association = Teacher.association_of('students')
+        self.assertTrue(association.is_has_and_belongs_to_many())
+        self.assertEqual('students', association.attr_name)
+        self.assertEqual('student_id', association.foreign_key)
+        self.assertEqual('students_teachers', association.join_table)
+        self.assertFalse(association.dependent)
         
-    #     self.assertEqual(1, len(Child.association_dict))
-    #     association = Child.association_of('father')
-    #     self.assertTrue(association.is_belongs_to())
-    #     self.assertEqual(Father, association.target)
-    #     self.assertEqual('father', association.attr_name)
-    #     self.assertEqual('father_id', association.foreign_key)
-    #     self.assertFalse(association.dependent)
-        
-    # def test_belongs_to_with_customer_init_args(self):
-    #     class Father(ActiveRecord): pass
-    #     class Child(ActiveRecord):
-    #         belongs_to(Father, attr_name="dad", foreign_key="dad_id", dependent=True)
-    #     self.assertEqual(1, len(Child.association_dict))
-    #     association = Child.association_of('dad')
-    #     self.assertTrue(association.is_belongs_to())
-    #     self.assertEqual(Father, association.target)
-    #     self.assertEqual('dad', association.attr_name)
-    #     self.assertEqual('dad_id', association.foreign_key)
-    #     self.assertTrue(association.dependent)
-    
-    # def test_belongs_to_create(self):
-    #     class Father(ActiveRecord): pass
-    #     class Child(ActiveRecord): belongs_to(Father)
-    
+    # def test_has_and_belongs_to_many_create(self):
     #     fid = Father.create(name='Bob').id
     #     cid = Child.create(created_at='2011-10-10 12:12:12', father_id=fid).id
     #     c = Child.find(cid)
