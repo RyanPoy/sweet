@@ -21,7 +21,7 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from pyrails.active_record.method_missing import FindMethodMissing, CreateOrBuildMethodMissing
-from pyrails.active_record.sql_builder import Collection
+from pyrails.active_record.collection import Collection
 from pyrails.active_record.associations import Association
 from pyrails.active_support import classproperty, Inflection
 from pyrails.db import get_database
