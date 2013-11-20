@@ -89,7 +89,7 @@ class Inflection(object):
     ]
         
     @classmethod
-    def singularize(cls, word):
+    def singularize_of(cls, word):
         '''Singularizes English nouns.'''
         return cls.__singularize_or_pluralize(word, cls.singularize_rules, cls.singularize_irregular_words)
 
