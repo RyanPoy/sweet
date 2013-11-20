@@ -21,7 +21,7 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from pyrails.activerecord import ActiveRecord
-from pyrails.tests.test_association_has_and_belongs_to_many_helper import *
+from pyrails.tests.test_association_helper import *
 import unittest
 
 
