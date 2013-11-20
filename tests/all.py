@@ -32,6 +32,7 @@ from test_activerecord_joins import ActiveRecordJoinsTest
 from test_activerecord_init import ActiveRecordInitTest
 from test_activerecord_find import ActiveRecordFindTest
 from test_activerecord_func import ActiveRecordFuncTest
+from test_association_has_and_belongs_to_many import HasAndBelongsToManyTest
 from test_association_belongs_to import BelongsToTest
 from test_association_has_many import HasManyTest
 from test_association_has_one import HasOneTest
@@ -53,6 +54,7 @@ tests = [
     ActiveRecordFuncTest,
     ActiveRecordJoinsTest,
 
+    HasAndBelongsToManyTest,
     BelongsToTest,
     HasOneTest,
     HasManyTest,
