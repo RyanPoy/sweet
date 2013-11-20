@@ -293,14 +293,14 @@ class SQLBuilder(object):
         if _sql:
             buff.append(_sql)
 
-#     def __iter__(self):
-#         return iter(self.all)
+    def __iter__(self):
+        return iter(self.all)
 
-#     def __len__(self):
-#         return len(self.all)
+    def __len__(self):
+        return len(self.all)
     
-#     def __getitem__(self, index):
-#         return self.all[index]
+    def __getitem__(self, index):
+        return self.all[index]
 
-#     def __str__(self):
-#         return self.all
+    def __str__(self):
+        return self.all
