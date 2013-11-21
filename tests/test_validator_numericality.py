@@ -21,17 +21,11 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from pyrails.activerecord import NumericalityValidator, NoOptionError, OptionNameError
+from pyrails.activerecord import NumericalityValidator
 import unittest
 
 
 class NumericalityValidatorTest(unittest.TestCase):
-
-    def test_numericality_should_get_error_if_no_options(self):
-        self.assertRaises(NoOptionError, NumericalityValidator().validate, 10)
-        
-    def test_numericality_should_get_error_if_exclusion_options(self):
-        self.assertRaises(OptionNameError, NumericalityValidator().validate, 10, **{'fuck': 'fuck'})
         
     def test_numericality_should_return_false_if_value_is_null(self):
         self.assertFalse(NumericalityValidator().validate(None, greater_than = 10))
