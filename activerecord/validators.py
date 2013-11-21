@@ -20,6 +20,7 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+from pyrails.activesupport import is_str, is_num, is_blank_str
 import re
 
     
@@ -30,19 +31,13 @@ class PresenceValidator(object):
             return False
         
         if allow_blank:
-            if isinstance(value, str): # 字符串要单独处理
-                if not value.strip():
-                    return True
-            if not value:
-                return True
-        else:
-            if isinstance(value, str): # 字符串要单独处理
-                if not value.strip():
-                    return False
-            if (isinstance(value, str) or isinstance(value, list) 
-                or isinstance(value, dict) or isinstance(value, tuple)) and not value: # 数字0不用做这个判断
-                return False
-            
+            return True
+        
+        if is_str(value): # 字符串要单独处理
+            value = value.strip()
+        if value != 0 and not value: # emplty list, tuple, set, dict, str, unicode:
+            return False
+
         return True
     
     
@@ -52,11 +47,9 @@ class InclusionValidator(object):
         if value is None:
             return allow_null
             
-        if isinstance(value, str):
-            value = value.strip()
-            
-        if isinstance(value, str) and not value:
+        if is_str(value) and is_blank_str(value):
             return allow_blank
+
         return value in in_values
 
 
@@ -67,7 +60,7 @@ class NumericalityValidator(object):
         if value is None:
             return allow_null
 
-        if type(value) not in (int, long, float):
+        if not is_num(value):
             try:
                 value = float(value) if '.' in value else int(value)
             except ValueError, _:
@@ -108,16 +101,16 @@ class LengthValidator(object):
             return allow_null
         
         if allow_blank:
-            if isinstance(value, str):
-                if value.strip() == '':
-                    return True
+            if is_str(value) and is_blank_str(value):
+                return True
+
             if not value:
                 return True
         else:
-            if isinstance(value, str) or isinstance(value, unicode):
+            if is_str(value):
                 if not value.strip():
                     return False
-            if (isinstance(value, str) or isinstance(value, list) or isinstance(value, unicode)
+            if (is_str(value) or isinstance(value, list) 
                 or isinstance(value, dict) or isinstance(value, tuple)) and not value: # 数字0不用做这个判断
                 return False
             
@@ -141,10 +134,10 @@ class FormatValidator(object):
             return allow_null
         
         if allow_blank:
-            if isinstance(value, str) or isinstance(value, unicode):
+            if is_str(value) or isinstance(value, unicode):
                 if not value.strip():
                     return True
-            if (isinstance(value, str) or isinstance(value, list) or isinstance(value, unicode)
+            if (is_str(value) or isinstance(value, list) or isinstance(value, unicode)
                 or isinstance(value, dict) or isinstance(value, tuple)) and not value: # 数字0不用做这个判断
                 return True
         
@@ -157,10 +150,10 @@ class ExclusionValidator(object):
         if value is None:
             return allow_null
             
-        if isinstance(value, str):
+        if is_str(value):
             value = value.strip()
             
-        if (isinstance(value, str) or isinstance(value, list) 
+        if (is_str(value) or isinstance(value, list) 
                 or isinstance(value, dict) or isinstance(value, tuple)) and not value: # 数字0不用做这个判断
             return allow_blank
         
