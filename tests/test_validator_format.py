@@ -34,17 +34,14 @@ class FormatValidatorTest(unittest.TestCase):
         self.assertFalse(FormatValidator().validate('aba', '\d+'))
     
     def test_format_should_return_false_if_value_is_none_and_disallow_null(self):
-        self.assertFalse(FormatValidator().validate(None, allow_null = False))
+        self.assertFalse(FormatValidator().validate(None, None, allow_null=False))
         
     def test_format_should_return_true_if_value_is_none_and_allow_null(self):
-        self.assertTrue(FormatValidator().validate(None, allow_null = True))
+        self.assertTrue(FormatValidator().validate(None, None, allow_null=True))
 
-    def test_format_should_return_result_which_depends_with_if_value_is_blank_and_disallow_blank(self):
-        self.assertFalse(FormatValidator().validate('     ', **{'_with': '\d+', 'allow_blank': False}))
-        self.assertTrue(FormatValidator().validate('     ', **{'_with': '\s+', 'allow_blank': False}))
-
-    def test_format_should_return_false_if_value_is_blank_and_allow_blank(self):
-        self.assertRaises(TypeError, FormatValidator().validate, '     ', **{'allow_blank': False})
+    def test_format_should_return_false_if_value_is_blank_and_disallow_blank(self):
+        self.assertFalse(FormatValidator().validate('     ', **{'_with': '\s+', 'allow_blank': False}))
+        self.assertTrue(FormatValidator().validate('     ', **{'_with': '\s+', 'allow_blank': True}))
 
 
 if __name__ == '__main__':

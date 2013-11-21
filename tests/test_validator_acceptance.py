@@ -31,7 +31,7 @@ class AcceptanceValidatorTest(unittest.TestCase):
         self.assertTrue(AcceptanceValidator().validate(10))  
 
     def test_acceptance_should_return_false_if_disallow_null(self):
-        self.assertFalse(AcceptanceValidator().validate(None, allow_null = False))
+        self.assertFalse(AcceptanceValidator().validate(None, allow_null=False))
 
     def test_acceptance_should_return_true_if_allow_null(self):
         self.assertTrue(AcceptanceValidator().validate(None))

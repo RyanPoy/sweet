@@ -48,16 +48,16 @@ class LengthValidatorTest(unittest.TestCase):
         self.assertFalse(LengthValidator().validate('validations.value', maximum = 10))
 
     def test_length_should_return_true_if_value_is_null_and_allow_null(self):
-        self.assertTrue(LengthValidator().validate(None, allow_null = True))
+        self.assertTrue(LengthValidator().validate(None, allow_null=True))
         
     def test_length_should_return_false_if_value_is_null_and_disallow_null(self):
-        self.assertFalse(LengthValidator().validate(None, allow_null = False))
+        self.assertFalse(LengthValidator().validate(None, allow_null=False))
 
     def test_length_should_return_true_if_value_is_blank_str_and_allow_blank(self):
-        self.assertTrue(LengthValidator().validate('     ', allow_blank = True))
+        self.assertTrue(LengthValidator().validate('     ', allow_blank=True))
         
     def test_length_should_return_false_if_value_is_blank_and_disallow_blank(self):
-        self.assertFalse(LengthValidator().validate([], allow_blank = False))
+        self.assertFalse(LengthValidator().validate([], allow_blank=False))
         
 
 if __name__ == '__main__':

@@ -28,13 +28,13 @@ import unittest
 class ExclusionValidatorTest(unittest.TestCase):
 
     def test_exclusion_if_value_is_null_and_allow_null(self):
-        self.assertTrue(ExclusionValidator().validate(None, allow_null = True))
+        self.assertTrue(ExclusionValidator().validate(None, allow_null=True))
         
     def test_exclusion_if_value_is_null_and_disallow_null(self):
         self.assertFalse(ExclusionValidator().validate(None))
     
     def test_exclusion_if_value_is_blank_str_and_allow_blank(self):
-        self.assertTrue(ExclusionValidator().validate('   ', allow_blank = True))
+        self.assertTrue(ExclusionValidator().validate('   ', allow_blank=True))
 
     def test_exclusion_if_value_is_blank_str_and_disallow_blank(self):
         self.assertFalse(ExclusionValidator().validate('   '))

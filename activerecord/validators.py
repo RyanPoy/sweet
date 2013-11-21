@@ -122,15 +122,16 @@ class ConfirmationValidator(object):
 
 class FormatValidator(object):
     
-    def validate(self, value, _with=None, allow_null=True, allow_blank=True):
+    def validate(self, value, _with, allow_null=True, allow_blank=True):
         if value is None:
             return allow_null
         
-        if allow_blank:
-            if is_str(value) and is_blank_str(value):
-                return True
-            if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
-                return True
+        if is_str(value) and is_blank_str(value):
+            return allow_blank
+
+        if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
+            return allow_blank
+
         return True if re.match(_with, value) else False
 
     
