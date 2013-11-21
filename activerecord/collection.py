@@ -44,7 +44,6 @@ class Collection(object):
         self._table_name    = self._model_class.table_name
         self._db            = self._model_class._get_db()
 
-        self.__fk_value     = {}
         self.__has_and_belongs_to_many_association = None
 
     @property    
@@ -302,16 +301,6 @@ class Collection(object):
         if _sql:
             buff.append(_sql)
 
-    def _set_fk_value_for_build_or_create(self, fk_name_and_value_dict):
-        self.__fk_value = fk_name_and_value_dict
-        return self
-
-    def build(self, **attributes):
-        for k, v in self.__fk_value.iteritems():
-            if k not in attributes:
-                attributes[k] = v
-        return self._model_class(**attributes)
-
     def _set_has_and_belongs_to_many_association(self, association):
         self.__has_and_belongs_to_many_association = association
         return self
@@ -344,3 +333,39 @@ class Collection(object):
 
     def __str__(self):
         return self.all
+
+
+class HasManyCollection(Collection):
+
+    def __init__(self, model_class, fk_value={}):
+        super(HasManyCollection, self).__init__(model_class)
+        self._fk_value = fk_value
+
+    def build(self, **attributes):
+        for k, v in self._fk_value.iteritems():
+            if k not in attributes:
+                attributes[k] = v
+        return self._model_class(**attributes)
+
+    def create(self, **attributes):
+        record = self.build(**attributes)
+        record.save()
+        return record
+
+
+class HasAndBelongsToManyCollection(HasManyCollection):
+
+    def __init__(self, model_class, fk_value={}, has_and_belongs_to_many_association=None):
+        super(HasManyCollection, self).__init__(model_class)
+        self._fk_value = fk_value
+        self._has_and_belongs_to_many_association = has_and_belongs_to_many_association
+
+    def create(self, **attributes):
+        record = super(HasAndBelongsToManyCollection, self).create(**attributes)
+        self.__create_join_table_record(record.id)
+        return record
+
+    def __create_join_table_record(self, record_id):
+        association = self._has_and_belongs_to_many_association
+        sql = 'INSERT INTO %s (%s, %s) VALUES (?, ?)' % ( association.join_table, association.foreign_key, association.association_foreign_key)
+        self._db.execute_lastrowid(sql, [self._fk_value.values()[0], record_id])

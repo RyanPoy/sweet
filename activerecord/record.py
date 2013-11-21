@@ -21,7 +21,7 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from pyrails.activerecord.method_missing import FindMethodMissing, CreateOrBuildMethodMissing
-from pyrails.activerecord.collection import Collection
+from pyrails.activerecord.collection import Collection, HasManyCollection, HasAndBelongsToManyCollection
 from pyrails.activerecord.associations import Association
 from pyrails.activesupport import classproperty, Inflection
 from pyrails.db import get_database
@@ -134,20 +134,18 @@ class ActiveRecord(object):
                         # A.bs  => "SELECT B.* FROM B INNER JOIN C ON C.b_id = B.id AND C.a_id = A.id"
                         through_association = self.association_of(association.through)
                         if through_association.is_has_many():
-                            return association.target.joins(association.through) \
-                                        .where('%s.%s = %s' % (association.through, through_association.foreign_key, self.id)) \
-                                        ._set_fk_value_for_build_or_create({through_association.foreign_key: self.id})
+                            # fk_value={}, has_and_belongs_to_many_association=None):
+                            return HasManyCollection(association.target, fk_value={through_association.foreign_key: self.id}) \
+                                        .joins(association.through) \
+                                        .where('%s.%s = %s' % (association.through, through_association.foreign_key, self.id))
                     else:
                         # A has_many B
                         # A.bs => "SELECT B.* FROM B WHERE A_id = A.id"
-                        return association.target.where(**{association.foreign_key: self.id}) \
-                                        ._set_fk_value_for_build_or_create({association.foreign_key: self.id})
+                        return HasManyCollection(association.target, fk_value={association.foreign_key: self.id}).where(**{association.foreign_key: self.id})
                 else: # has_and_belongs_to_many
                     join_str = 'INNER JOIN %s ON %s.%s = %s.id' % (association.join_table, association.join_table, association.association_foreign_key, association.target.table_name)
-                    return association.target.joins(join_str) \
-                                      .where('%s.%s = %s' % (association.join_table, association.foreign_key, self.id)) \
-                                      ._set_fk_value_for_build_or_create({association.foreign_key: self.id}) \
-                                      ._set_has_and_belongs_to_many_association(association)
+                    return HasAndBelongsToManyCollection(association.target, fk_value={association.foreign_key: self.id}, has_and_belongs_to_many_association=association) \
+                                        .joins(join_str).where('%s.%s = %s' % (association.join_table, association.foreign_key, self.id))
             if CreateOrBuildMethodMissing.match(name):
                 return CreateOrBuildMethodMissing(self, name)
             raise
