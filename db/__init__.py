@@ -14,7 +14,7 @@ DATABASE = dict (
 )
 
 
-def get_database(db_settings = DATABASE, show_sql = DEBUG):
+def get_database(db_settings=DATABASE, show_sql=DEBUG):
     engine_name = db_settings.get('engine').lower()
     adapter_class = import_object('pyrails.db.%s.Adapter' % engine_name)
     settings = copy.copy(db_settings)
