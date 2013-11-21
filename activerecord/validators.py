@@ -27,11 +27,8 @@ import re
 class PresenceValidator(object):
     
     def validate(self, value, allow_blank=True):
-        if value is None:
-            return False
-        
-        if allow_blank:
-            return True
+        if value is None:   return False
+        if allow_blank:     return True
         
         if is_str(value) and is_blank_str(value): # 字符串要单独处理
             return allow_blank
@@ -49,6 +46,9 @@ class InclusionValidator(object):
             return allow_null
             
         if is_str(value) and is_blank_str(value):
+            return allow_blank
+
+        if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
             return allow_blank
 
         return value in in_values
@@ -73,17 +73,16 @@ class NumericalityValidator(object):
             (less_than_or_equal_to and value > less_than_or_equal_to):
             return False
         
-        if odd in (True, False):
-            if odd:
-                if value % 2 == 0: return False
-            else:
-                if value % 2 != 0: return False
+        if odd is True and value % 2 == 0:
+            return False
+        if odd is False and value % 2 != 0:
+            return False
 
-        if even in (True, False):
-            if even:
-                if value % 2 != 0: return False
-            else:
-                if value % 2 == 0: return False
+        if even is True and value % 2 != 0:
+            return False
+        if even is False and value % 2 == 0:
+            return False
+
         return True
         
 
