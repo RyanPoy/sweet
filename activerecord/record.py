@@ -108,6 +108,8 @@ class ActiveRecord(object):
         if association:
             if association.is_belongs_to():
                 setattr(self, association.foreign_key, value.id)
+            elif association.is_has_and_belongs_to_many():
+                setattr(self, association.association_foreign_key, value.id)
             # elif association.is_has_one():
             #     setattr(value, association.foreign_key, self.id)
         return relt
@@ -144,7 +146,8 @@ class ActiveRecord(object):
                     join_str = 'INNER JOIN %s ON %s.%s = %s.id' % (association.join_table, association.join_table, association.association_foreign_key, association.target.table_name)
                     return association.target.joins(join_str) \
                                       .where('%s.%s = %s' % (association.join_table, association.foreign_key, self.id)) \
-                                      ._set_fk_value_for_build_or_create({association.foreign_key: self.id})
+                                      ._set_fk_value_for_build_or_create({association.foreign_key: self.id}) \
+                                      ._set_has_and_belongs_to_many_association(association)
             if CreateOrBuildMethodMissing.match(name):
                 return CreateOrBuildMethodMissing(self, name)
             raise
@@ -354,9 +357,9 @@ class ActiveRecord(object):
         if not self.valid():
             raise False
 
-        if self.is_persisted():
+        if self.is_persisted:
             attrs_dict = dict([ (column_name, getattr(self, column_name)) for column_name in self.column_names if column_name != 'id'])
-            self.where(id = self.id).update_all(attrs_dict)
+            self.where(id = self.id).update_all(**attrs_dict)
             return self
         else:
             self.id = Collection(self.__class__).save(self)
@@ -374,7 +377,7 @@ class ActiveRecord(object):
         #             other[attr_name] = attr_value
         #     return other
 
-        # if not self.is_persisted():
+        # if not self.is_persisted:
         #     raise RecordHasNotBeenPersisted()
 
         if not self.valid():
@@ -417,5 +420,6 @@ class ActiveRecord(object):
             cls.__db__ = get_database()
         return cls.__db__
     
+    @property
     def is_persisted(self):
         return self.id is not None

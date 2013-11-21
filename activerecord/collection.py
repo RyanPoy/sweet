@@ -43,7 +43,9 @@ class Collection(object):
         self._model_class   = model_class
         self._table_name    = self._model_class.table_name
         self._db            = self._model_class._get_db()
+
         self.__fk_value     = {}
+        self.__has_and_belongs_to_many_association = None
 
     @property    
     def all(self):
@@ -218,9 +220,13 @@ class Collection(object):
             elif is_hash(condition): # 表示是 key:value 的方式, eg. where(name='abc').where(age=1)
                 for k, v in condition.iteritems():
                     if is_array(v):
-                        interrogations = ', '.join(['?'] * len(v))
-                        condition_sqls.append('%s.%s in (%s)' % (self._table_name, k, interrogations))
-                        params.extend(list(v)) # 如果是set，就必须转一下
+                        if len(v) == 1:
+                            condition_sqls.append('%s.%s = ?' % (self._table_name, k))
+                            params.extend(list(v)) # 如果是set，就必须转一下
+                        else:
+                            interrogations = ', '.join(['?'] * len(v))
+                            condition_sqls.append('%s.%s in (%s)' % (self._table_name, k, interrogations))
+                            params.extend(list(v)) # 如果是set，就必须转一下
                     else:
                         condition_sqls.append('%s.%s = ?' % (self._table_name, k))
                         params.append(v)
@@ -306,9 +312,19 @@ class Collection(object):
                 attributes[k] = v
         return self._model_class(**attributes)
 
+    def _set_has_and_belongs_to_many_association(self, association):
+        self.__has_and_belongs_to_many_association = association
+        return self
+
     def create(self, **attributes):
         record = self.build(**attributes)
         record.save()
+        if self.__has_and_belongs_to_many_association:
+            association = self.__has_and_belongs_to_many_association
+            sql = 'INSERT INTO %s (%s, %s) VALUES (%s, %s)' % ( association.join_table, association.foreign_key, association.association_foreign_key,
+                self.__fk_value.values()[0], record.id
+            )
+            self._db.execute_lastrowid(sql)
         return record
 
     def __iter__(self):

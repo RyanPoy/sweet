@@ -37,50 +37,49 @@ class HasAndBelongsToManyTest(unittest.TestCase):
         create_developers_projects()
 
     def tearDown(self):
-        # drop_developers_projects()
-        # drop_projects()
-        # drop_developers()
-        pass
+        drop_developers_projects()
+        drop_projects()
+        drop_developers()
         
-    # def test_has_and_belongs_to_many(self):
-    #     self.assertEqual(1, len(Developer.association_dict))
-    #     association = Developer.association_of('projects')
-    #     self.assertTrue(association.is_has_and_belongs_to_many())
-    #     self.assertEqual('projects', association.attr_name)
-    #     self.assertEqual('developer_id', association.foreign_key)
-    #     self.assertEqual('project_id', association.association_foreign_key)
-    #     self.assertEqual('developers_projects', association.join_table)
-    #     self.assertFalse(association.dependent)
+    def test_has_and_belongs_to_many(self):
+        self.assertEqual(1, len(Developer.association_dict))
+        association = Developer.association_of('projects')
+        self.assertTrue(association.is_has_and_belongs_to_many())
+        self.assertEqual('projects', association.attr_name)
+        self.assertEqual('developer_id', association.foreign_key)
+        self.assertEqual('project_id', association.association_foreign_key)
+        self.assertEqual('developers_projects', association.join_table)
+        self.assertFalse(association.dependent)
 
-    #     association = Project.association_of('developers')
-    #     self.assertTrue(association.is_has_and_belongs_to_many())
-    #     self.assertEqual('developers', association.attr_name)
-    #     self.assertEqual('project_id', association.foreign_key)
-    #     self.assertEqual('developer_id', association.association_foreign_key)
-    #     self.assertEqual('developers_projects', association.join_table)
-    #     self.assertFalse(association.dependent)
+        association = Project.association_of('developers')
+        self.assertTrue(association.is_has_and_belongs_to_many())
+        self.assertEqual('developers', association.attr_name)
+        self.assertEqual('project_id', association.foreign_key)
+        self.assertEqual('developer_id', association.association_foreign_key)
+        self.assertEqual('developers_projects', association.join_table)
+        self.assertFalse(association.dependent)
 
-    # def test_has_and_belongs_to_many_with_some_customer_init_args(self):
-    #     class Developer(ActiveRecord): has_and_belongs_to_many(Project, foreign_key='user_id')
-    #     self.assertEqual(1, len(Developer.association_dict))
-    #     association = Developer.association_of('projects')
-    #     self.assertTrue(association.is_has_and_belongs_to_many())
-    #     self.assertEqual('projects', association.attr_name)
-    #     self.assertEqual('user_id', association.foreign_key)
-    #     self.assertEqual('project_id', association.association_foreign_key)
-    #     self.assertEqual('developers_projects', association.join_table)
-    #     self.assertFalse(association.dependent)
+    def test_has_and_belongs_to_many_with_some_customer_init_args(self):
+        class Developer(ActiveRecord): has_and_belongs_to_many(Project, foreign_key='user_id')
+        self.assertEqual(1, len(Developer.association_dict))
+        association = Developer.association_of('projects')
+        self.assertTrue(association.is_has_and_belongs_to_many())
+        self.assertEqual('projects', association.attr_name)
+        self.assertEqual('user_id', association.foreign_key)
+        self.assertEqual('project_id', association.association_foreign_key)
+        self.assertEqual('developers_projects', association.join_table)
+        self.assertFalse(association.dependent)
 
-    # def test_has_and_belongs_to_many_with_more_customer_init_args(self):
-    #     class Developer(ActiveRecord): has_and_belongs_to_many(Project, attr_name='users', foreign_key='user_id', join_table='pro_dev')
-    #     self.assertEqual(1, len(Developer.association_dict))
-    #     association = Developer.association_of('users')
-    #     self.assertTrue(association.is_has_and_belongs_to_many())
-    #     self.assertEqual('users', association.attr_name)
-    #     self.assertEqual('user_id', association.foreign_key)
-    #     self.assertEqual('project_id', association.association_foreign_key)
-    #     self.assertEqual('pro_dev', association.join_table)
-    #     self.assertFalse(association.dependent)
+    def test_has_and_belongs_to_many_with_more_customer_init_args(self):
+        class Developer(ActiveRecord): has_and_belongs_to_many(Project, attr_name='users', foreign_key='user_id', join_table='pro_dev')
+        self.assertEqual(1, len(Developer.association_dict))
+        association = Developer.association_of('users')
+        self.assertTrue(association.is_has_and_belongs_to_many())
+        self.assertEqual('users', association.attr_name)
+        self.assertEqual('user_id', association.foreign_key)
+        self.assertEqual('project_id', association.association_foreign_key)
+        self.assertEqual('pro_dev', association.join_table)
+        self.assertFalse(association.dependent)
 
     def test_has_and_belongs_to_many_find(self):
         """ Developer#projects (similar to Project.joins('developers_projects').where(developer_id=id))
@@ -116,31 +115,40 @@ class HasAndBelongsToManyTest(unittest.TestCase):
         self.assertEqual('dev1', developers[0].name)
         self.assertEqual('dev2', developers[1].name)
 
-    # def test_has_and_belongs_to_many_build(self):
-    #     """ Firm#clients.build (similar to Client(firm_id=id))
-    #     """
-    #     firm = Firm(name="firm1").save()
-    #     client = firm.clients.build(name="client1")
-    #     self.assertEqual('client1', client.name)
-    #     self.assertEqual(1, client.firm_id)
-    #     self.assertIsNone(client.id)
-        
-    # def test_has_and_belongs_to_many_create(self):
-    #     """ Firm#clients.create (similar to c = Client(firm_id=id); c.save(); return c)
-    #     """
-    #     firm = Firm(name="firm1").save()
-    #     client = firm.clients.create(name="client1")
-    #     self.assertEqual('client1', client.name)
-    #     self.assertEqual(1, client.firm_id)
-    #     self.assertEqual(1, client.id)
+    def test_has_and_belongs_to_many_build(self):
+        """ Developer#projects.build ( similar to Project(developer_id=id) )
+        """
+        class DeveloperProject(ActiveRecord): __table_name__ = 'developers_projects'
+        dev = Developer(name="dev1").save()
+        pro = dev.projects.build(name="pro1")
+        self.assertEqual('pro1', pro.name)
+        self.assertIsNone(pro.id)
+        self.assertEqual(1, pro.developer_id)
+        self.assertEqual(0, DeveloperProject.count())
 
-    # def test_has_and_belongs_to_many_create(self):
-    #     fid = Father.create(name='Bob').id
-    #     cid = Child.create(created_at='2011-10-10 12:12:12', father_id=fid).id
-    #     c = Child.find(cid)
-    #     self.assertEqual(cid, c.id)
-    #     self.assertEqual(fid, c.father_id)
-    #     self.assertEqual('2011-10-10 12:12:12', c.created_at.strftime('%Y-%m-%d %H:%M:%S'))
+    def test_has_and_belongs_to_many_create(self):
+        """ Developer#projects.create (similar to p = Project.new(developer_id=id); p.save(); return p)
+        """
+        class DeveloperProject(ActiveRecord): __table_name__ = 'developers_projects'
+        dev1 = Developer(name="dev1").save()
+        dev2 = Developer(name="dev2").save()
+
+        pro1 = dev1.projects.create(name="pro1")
+        pro2 = dev1.projects.create(name="pro2")
+        pro3 = dev2.projects.create(name="pro3")
+
+        self.assertEqual('pro3', pro3.name)
+        self.assertEqual(3, pro3.id)
+        self.assertEqual(dev2.id, pro3.developer_id)
+
+        self.assertEqual(3, len(Project.all))
+        pro = Project.all[1]
+        self.assertEqual(2, pro.id)
+        self.assertEqual('pro2', pro.name)
+
+        self.assertEqual(3, len(DeveloperProject.all))
+        self.assertEqual(2, len(DeveloperProject.where(developer_id=1).all))
+        self.assertEqual(1, len(DeveloperProject.where(developer_id=2).all))
 
 
 if __name__ == '__main__':
