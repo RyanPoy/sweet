@@ -31,7 +31,8 @@ class Association(object):
     
     __associations = []
     
-    def __init__(self, target_class_or_classpath, _type, attr_name=None, foreign_key=None, dependent=False, through=None, join_table=None):
+    def __init__(self, target_class_or_classpath, _type, attr_name=None, foreign_key=None, 
+                    dependent=False, through=None, join_table=None):
         """
         attr_name 最终结果：自定义 或者 target_class_or_classpath的最后部分的小写的单数(has_one, belongs_to)或者复数(has_many)
         foreign_key   最终结果：自定义 或者 当belongs_to的时候为：attr_name的单数 + "_id"
@@ -46,7 +47,9 @@ class Association(object):
         self.dependent      = dependent
         self.through        = through
         self.join_table     = join_table
-        
+        self.owner          = None
+        self.association_foreign_key = None
+
         self.__class__.__associations.append(self)
 
     def is_belongs_to(self):
@@ -91,19 +94,22 @@ class Association(object):
         return 'attr_name[%s]; foreign_key[%s]; dependent[%s]; target[%s]' % (self.attr_name, self.foreign_key, self.dependent, self.target)
     
     def _register(self, owner_class):
+        self.owner = owner_class
         if not self.foreign_key:
-            if self.is_has_one() or self.is_has_many():
-                self.foreign_key = '%s_id' % Inflection.hungarian_of(owner_class.__name__)
-            else: # belongs_to or has_and_belongs_to_many
+            if self.is_belongs_to():
                 self.foreign_key = '%s_id' % Inflection.hungarian_of(self.__extract_target_name())
-        if not self.join_table:
-            if self.is_has_and_belongs_to_many():
+            else: # has_one has_many has_and_belongs_to_many:
+                self.foreign_key = '%s_id' % Inflection.hungarian_of(owner_class.__name__)
+        if self.is_has_and_belongs_to_many():
+            if not self.join_table:
                 target_name = Inflection.hungarian_of(Inflection.pluralize_of(self.__extract_target_name()))
                 owner_name = Inflection.hungarian_of(Inflection.pluralize_of(owner_class.__name__))
                 if owner_name > target_name:
                     self.join_table = '%s_%s' % (target_name, owner_name)
                 else:
                     self.join_table = '%s_%s' % (owner_name, target_name)
+            if not self.association_foreign_key:
+                self.association_foreign_key = '%s_id' % Inflection.hungarian_of(self.__extract_target_name())
         owner_class.association_dict[self.attr_name] = self
 
         
@@ -116,7 +122,7 @@ def has_one(target_class_or_classpath, attr_name=None, foreign_key=None, depende
 
 
 def has_many(target_class_or_classpath, attr_name=None, foreign_key=None, dependent=False, through=None):
-    return Association(target_class_or_classpath, Association.Type.has_many, attr_name, foreign_key, dependent, through)
+    return Association(target_class_or_classpath, Association.Type.has_many, attr_name, foreign_key, dependent, through=through)
 
 def has_and_belongs_to_many(target_class_or_classpath, attr_name=None, foreign_key=None, dependent=False, join_table=None):
-    return Association(target_class_or_classpath, Association.Type.has_and_belongs_to_many, attr_name, foreign_key, dependent, join_table)
+    return Association(target_class_or_classpath, Association.Type.has_and_belongs_to_many, attr_name, foreign_key, dependent, join_table=join_table)

@@ -129,18 +129,22 @@ class ActiveRecord(object):
                 elif association.is_has_many():
                     # A has_many B through C
                     if association.through:
-                        # A.Bs  => "SELECT B.* FROM B INNER JOIN C ON C.b_id = B.id AND C.a_id = A.id"
+                        # A.bs  => "SELECT B.* FROM B INNER JOIN C ON C.b_id = B.id AND C.a_id = A.id"
                         through_association = self.association_of(association.through)
                         if through_association.is_has_many():
                             return association.target.joins(association.through) \
                                         .where('%s.%s = %s' % (association.through, through_association.foreign_key, self.id)) \
                                         ._set_fk_value_for_build_or_create({through_association.foreign_key: self.id})
-
                     else:
                         # A has_many B
-                        # A.Bs => "SELECT B.* FROM B WHERE A_id = A.id"
+                        # A.bs => "SELECT B.* FROM B WHERE A_id = A.id"
                         return association.target.where(**{association.foreign_key: self.id}) \
                                         ._set_fk_value_for_build_or_create({association.foreign_key: self.id})
+                else: # has_and_belongs_to_many
+                    join_str = 'INNER JOIN %s ON %s.%s = %s.id' % (association.join_table, association.join_table, association.association_foreign_key, association.target.table_name)
+                    return association.target.joins(join_str) \
+                                      .where('%s.%s = %s' % (association.join_table, association.foreign_key, self.id)) \
+                                      ._set_fk_value_for_build_or_create({association.foreign_key: self.id})
             if CreateOrBuildMethodMissing.match(name):
                 return CreateOrBuildMethodMissing(self, name)
             raise

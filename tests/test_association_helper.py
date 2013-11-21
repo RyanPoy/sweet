@@ -97,7 +97,7 @@ create table if not exists clients (
 
 
 ################# has_and_belongs_to_many ####################
-class Project(ActiveRecord): has_and_belongs_to_many('pyrails.tests.test_assocation_has_and_belongs_to_many_helper.Developer')
+class Project(ActiveRecord): has_and_belongs_to_many('pyrails.tests.test_association_helper.Developer')
 class Developer(ActiveRecord): has_and_belongs_to_many(Project)
 
 drop_projects = lambda: drop_table('projects')

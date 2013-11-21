@@ -290,6 +290,8 @@ class Collection(object):
             _sql = 'INNER JOIN %s ON %s.id = %s.%s' % (target_class.table_name, target_class.table_name, this_class.table_name, association.foreign_key)
         elif association.is_has_one() or association.is_has_many():
             _sql = 'INNER JOIN %s ON %s.%s = %s.id' % (target_class.table_name, target_class.table_name, association.foreign_key, this_class.table_name)
+        else: # has_and_belongs_to_many
+            pass
         # self._join_table_list.append(target_class.table_name)
         if _sql:
             buff.append(_sql)
