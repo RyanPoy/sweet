@@ -27,8 +27,11 @@ import re
 class PresenceValidator(object):
     
     def validate(self, value, allow_blank=True):
-        if value is None:   return False
-        if allow_blank:     return True
+        if value is None:
+            return False
+
+        if allow_blank:
+            return True
         
         if is_str(value) and is_blank_str(value): # 字符串要单独处理
             return allow_blank
