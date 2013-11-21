@@ -20,11 +20,14 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-from pyrails.activerecord.method_missing import FindMethodMissing, CreateOrBuildMethodMissing
+from __future__ import with_statement
+from contextlib import contextmanager
 from pyrails.activerecord.collection import Collection, HasManyCollection, HasAndBelongsToManyCollection
+from pyrails.activerecord.method_missing import FindMethodMissing, CreateOrBuildMethodMissing
+from pyrails.activesupport import classproperty, Inflection, ValidationError
 from pyrails.activerecord.associations import Association
-from pyrails.activesupport import classproperty, Inflection
 from pyrails.db import get_database
+
 # from pyrails.activesupport import RecordValidateError, RecordHasNotBeenPersisted
 
 
@@ -93,6 +96,7 @@ class ActiveRecord(object):
                 raise
 
     def __init__(self, **attributes):
+        self.errors = {}
         self.id = None
         for k, v in attributes.iteritems():
             setattr(self, k, v)
@@ -420,4 +424,28 @@ class ActiveRecord(object):
     
     @property
     def is_persisted(self):
+        """ check an record had been persisted
+        """
+        # @TODO: fix me ! 
+        #       the check method is so simple.
+        #       should check it which is query from db
         return self.id is not None
+
+    @classmethod
+    @contextmanager
+    def transaction(cls):
+        try:
+            db = cls._get_db()
+            db.set_autocommit(False)
+            yield None
+            db.commit()
+        except ValidationError:
+            db.rollback()
+        except:
+            db.rollback()
+            raise
+        finally:
+            try:
+                db.set_autocommit(True)
+            except:
+                pass
