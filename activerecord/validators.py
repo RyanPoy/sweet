@@ -33,8 +33,9 @@ class PresenceValidator(object):
         if allow_blank:
             return True
         
-        if is_str(value): # 字符串要单独处理
-            value = value.strip()
+        if is_str(value) and is_blank_str(value): # 字符串要单独处理
+            return allow_blank
+
         if value != 0 and not value: # emplty list, tuple, set, dict, str, unicode:
             return False
 
@@ -100,17 +101,11 @@ class LengthValidator(object):
         if value is None:
             return allow_null
         
-        if allow_blank:
-            if is_str(value) and is_blank_str(value):
-                return True
+        if is_str(value) and is_blank_str(value):
+            return allow_blank
 
-            if not value:
-                return True
-        else:
-            if is_str(value) and is_blank_str(value):
-                return False
-            if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
-                return False
+        if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
+            return allow_blank
 
         if (_is and len(value) != _is) or \
             (minimum and len(value) < minimum) or \
@@ -133,7 +128,7 @@ class FormatValidator(object):
         
         if allow_blank:
             if is_str(value) and is_blank_str(value):
-                    return True
+                return True
             if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
                 return True
         return True if re.match(_with, value) else False
@@ -145,12 +140,11 @@ class ExclusionValidator(object):
         if value is None:
             return allow_null
             
-        if is_str(value):
-            value = value.strip()
-            
-        if (is_str(value) or isinstance(value, list) 
-                or isinstance(value, dict) or isinstance(value, tuple)) and not value: # 数字0不用做这个判断
+        if is_str(value) and is_blank_str(value):
             return allow_blank
-        
+            
+        if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
+            return allow_blank
+
         return value not in exclusion_values
 
