@@ -23,6 +23,7 @@
 import unittest
 from test_activerecord_group_and_having import ActiveRecordGroupAndHavingTest
 from test_activerecord_create_and_save import ActiveRecordCreateAndSaveTest
+from test_activerecord_transaction import ActiveRecordTransationTest
 from test_activerecord_delete import ActiveRecordDeleteTest
 from test_activerecord_update import ActiveRecordUpdateTest
 from test_activerecord_where import ActiveRecordWhereTest
@@ -59,6 +60,7 @@ tests = [
     NumericalityValidatorTest,
     PresenceValidatorTest,
 
+    ActiveRecordTransationTest,
     ActiveRecordInitTest,
     ActiveRecordCreateAndSaveTest,
     ActiveRecordDeleteTest,
@@ -70,6 +72,7 @@ tests = [
     ActiveRecordLimitTest,
     ActiveRecordFuncTest,
     ActiveRecordJoinsTest,
+    
 
     HasAndBelongsToManyTest,
     BelongsToTest,

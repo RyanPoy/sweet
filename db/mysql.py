@@ -150,6 +150,6 @@ class Adapter(object):
         self._conn.rollback()
         return self
 
-    def set_autocommit(auto=True):
+    def set_autocommit(self, auto=True):
         self._conn.autocommit(auto)
         return self

@@ -431,7 +431,7 @@ class ActiveRecord(object):
         #       should check it which is query from db
         return self.id is not None
 
-    @classmethod
+    @classproperty
     @contextmanager
     def transaction(cls):
         try:
