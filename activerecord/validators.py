@@ -107,13 +107,11 @@ class LengthValidator(object):
             if not value:
                 return True
         else:
-            if is_str(value):
-                if not value.strip():
-                    return False
-            if (is_str(value) or isinstance(value, list) 
-                or isinstance(value, dict) or isinstance(value, tuple)) and not value: # 数字0不用做这个判断
+            if is_str(value) and is_blank_str(value):
                 return False
-            
+            if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
+                return False
+
         if (_is and len(value) != _is) or \
             (minimum and len(value) < minimum) or \
             (maximum and len(value) > maximum):  
@@ -134,13 +132,10 @@ class FormatValidator(object):
             return allow_null
         
         if allow_blank:
-            if is_str(value) or isinstance(value, unicode):
-                if not value.strip():
+            if is_str(value) and is_blank_str(value):
                     return True
-            if (is_str(value) or isinstance(value, list) or isinstance(value, unicode)
-                or isinstance(value, dict) or isinstance(value, tuple)) and not value: # 数字0不用做这个判断
+            if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
                 return True
-        
         return True if re.match(_with, value) else False
 
     
