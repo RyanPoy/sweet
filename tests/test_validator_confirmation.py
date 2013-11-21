@@ -21,9 +21,18 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+from pyrails.activerecord import ConfirmationValidator
+import unittest
 
-from pyrails.activerecord.record import *
-from pyrails.activerecord.collection import *
-from pyrails.activerecord.associations import *
-from pyrails.activerecord.method_missing import *
-from pyrails.activerecord.validators import *
+
+class ConfirmationValidatorTest(unittest.TestCase):
+
+    def test_confirmation(self):
+        self.assertTrue(ConfirmationValidator().validate(10, 10))  
+
+    def test_disconfirmation(self):
+        self.assertFalse(ConfirmationValidator().validate(10, 100))
+
+
+if __name__ == '__main__':
+    unittest.main()

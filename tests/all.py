@@ -37,10 +37,27 @@ from test_association_belongs_to import BelongsToTest
 from test_association_has_many import HasManyTest
 from test_association_has_one import HasOneTest
 from test_collection import CollectionTest
+from test_validator_acceptance import AcceptanceValidatorTest
+from test_validator_confirmation import ConfirmationValidatorTest
+from test_validator_exclusion import ExclusionValidatorTest
+from test_validator_format import FormatValidatorTest
+from test_validator_inclusion import InclusionValidatorTest
+from test_validator_length import LengthValidatorTest
+from test_validator_numericality import NumericalityValidatorTest
+from test_validator_presence import PresenceValidatorTest
 
 
 tests = [
     CollectionTest,
+
+    AcceptanceValidatorTest,
+    ConfirmationValidatorTest,
+    ExclusionValidatorTest,
+    FormatValidatorTest,
+    InclusionValidatorTest,
+    LengthValidatorTest,
+    NumericalityValidatorTest,
+    PresenceValidatorTest,
 
     ActiveRecordInitTest,
     ActiveRecordCreateAndSaveTest,

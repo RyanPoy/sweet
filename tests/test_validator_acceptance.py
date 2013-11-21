@@ -21,9 +21,21 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+from pyrails.activerecord import AcceptanceValidator
+import unittest
 
-from pyrails.activerecord.record import *
-from pyrails.activerecord.collection import *
-from pyrails.activerecord.associations import *
-from pyrails.activerecord.method_missing import *
-from pyrails.activerecord.validators import *
+
+class AcceptanceValidatorTest(unittest.TestCase):
+    
+    def test_acceptance(self):
+        self.assertTrue(AcceptanceValidator().validate(10))  
+
+    def test_acceptance_should_return_false_if_disallow_null(self):
+        self.assertFalse(AcceptanceValidator().validate(None, allow_null = False))
+
+    def test_acceptance_should_return_true_if_allow_null(self):
+        self.assertTrue(AcceptanceValidator().validate(None))
+
+
+if __name__ == '__main__':
+    unittest.main()
