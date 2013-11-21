@@ -126,6 +126,8 @@ def __fallback_str2datetime(string):
     
 
 # check the object type functions
+is_num      = lambda obj: isinstance(obj, (int, long, float, Decimal))
+is_blank_str = lambda obj: obj.strip() == ''
 is_str      = lambda obj: isinstance(obj, (str, unicode))
 is_decimal  = lambda obj: isinstance(obj, Decimal)
 
