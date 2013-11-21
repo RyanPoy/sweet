@@ -1,8 +1,29 @@
-#coding: utf-8
+#coding: utf8
+
+# The MIT License (MIT)
+#
+# Copyright (c) 2013 PengYi
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import re
 
 class NoOptionError(Exception):
-    def __init__(self, options = []):
+    def __init__(self, options=[]):
         self.msg = 'should be in [%s], but noting' % ', '.join(options)
         
 
@@ -29,7 +50,7 @@ class Validator(object):
     
 class PresenceValidator(Validator):
     
-    def validate(self, value, allow_blank = True):
+    def validate(self, value, allow_blank=True):
         if value is None:
             return False
         
@@ -52,7 +73,7 @@ class PresenceValidator(Validator):
     
 class InclusionValidator(Validator):
     
-    def validate(self, value, in_values = [], allow_null = False, allow_blank = False):
+    def validate(self, value, in_values=[], allow_null=False, allow_blank=False):
         if value is None:
             return allow_null
             
@@ -84,7 +105,7 @@ class NumericalityValidator(Validator):
                     float(value)
                 else:
                     int(value)
-            except ValueError, err:
+            except ValueError, _:
                 return False
         if options.get('greater_than', False) and value <= options['greater_than']: 
             return False
@@ -113,7 +134,7 @@ class NumericalityValidator(Validator):
 
 class AcceptanceValidator(Validator):
     
-    def validate(self, value, allow_null = True ):
+    def validate(self, value, allow_null=True):
         if allow_null:
             return True
         return value is not None
@@ -161,7 +182,7 @@ class ConfirmationValidator(Validator):
 
 class FormatValidator(Validator):
     
-    def validate(self, value, _with = None, allow_null = True, allow_blank = True):
+    def validate(self, value, _with=None, allow_null=True, allow_blank=True):
         if value is None:
             return allow_null
         
@@ -178,7 +199,7 @@ class FormatValidator(Validator):
     
 class ExclusionValidator(Validator):
     
-    def validate(self, value, exclusion_values = [], allow_null = False, allow_blank = False):
+    def validate(self, value, exclusion_values=[], allow_null=False, allow_blank=False):
         if value is None:
             return allow_null
             
