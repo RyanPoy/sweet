@@ -106,13 +106,10 @@ class Adapter(object):
                 return column_type
         raise Exception('Can not support %s field type !' % db_field_type)
 
-    def commit(self):
-        self._conn.commit()
-
     def _reconnect(self):
         self.close()
         self._conn = MySQLdb.connect(**self._db_args)
-        self._conn.autocommit(True)
+        self.set_autocommit(True)
     
     def _cursor(self):
         return self._conn.cursor()
@@ -144,3 +141,15 @@ class Adapter(object):
                 formated_params.append(param)
             formated_params.append(';')
             return ''.join(flatten(izip(sql.split('?'), formated_params)))
+
+    def commit(self):
+        self._conn.commit()
+        return self
+
+    def rollback(self):
+        self._conn.rollback()
+        return self
+
+    def set_autocommit(auto=True):
+        self._conn.autocommit(auto)
+        return self
