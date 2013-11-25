@@ -26,4 +26,4 @@ from pyrails.activerecord.record import *
 from pyrails.activerecord.collection import *
 from pyrails.activerecord.associations import *
 from pyrails.activerecord.method_missing import *
-from pyrails.activerecord.validators import *
+from pyrails.activerecord.validation import *
