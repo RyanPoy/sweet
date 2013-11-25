@@ -136,7 +136,11 @@ class ExclusionValidator(object):
             return allow_blank
         return value not in exclusion_values
 
+
+
+#########################################
 ############# validations ###############
+#########################################
 class Validates(object):
 
     # store the validate partial function
@@ -167,6 +171,14 @@ class Validates(object):
         if on not in ('save', 'create', 'update'):
             raise Exception('argument on value must be in "save", "create" or "update"')
         return cls
+
+def validates(method_name, on='save'):
+
+    def _(record, method_name):
+        return getattr(record, method_name)()
+
+    p = partial(_, method_name=method_name)
+    Validates.add(p, on)
 
 
 def validates_percense_of(attr_names, allow_blank=True, on='save', msg='can not blank.'):

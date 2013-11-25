@@ -20,9 +20,9 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+from pyrails.tests import create_table, drop_table
 from pyrails.activerecord import ActiveRecord
 from pyrails.activerecord.validation import *
-from pyrails.tests import create_table, drop_table
 import unittest
 
 
@@ -117,7 +117,27 @@ create table if not exists %s (
         self.assertEqual(1, len(user.validate_func_dict))
         self.assertEqual(False, user.validate())
         self.assertEqual(1, len(user.errors))
-        self.assertEqual(u'用户名已经存在', user.errors['name'][0])        
+        self.assertEqual(u'用户名已经存在', user.errors['name'][0])
+
+    def test_customer_validates(self):
+
+        class User(ActiveRecord):
+            validates('my_validate')
+
+            def my_validate(self):
+                if self.name != 'pengyi':
+                    self.add_error('name', u'名字必须是pengyi')
+                    return False
+                return True
+
+        user = User(name='py')
+        self.assertEqual(1, len(user.validate_func_dict))
+        self.assertEqual(False, user.validate())
+        self.assertEqual(1, len(user.errors))
+        self.assertEqual(u'名字必须是pengyi', user.errors['name'][0])
+
+        user = User(name='pengyi')
+        self.assertTrue(user.validate())
 
 
 if __name__ == '__main__':
