@@ -29,16 +29,12 @@ class PresenceValidator(object):
     def validate(self, value, allow_blank=True):
         if value is None:
             return False
-
         if allow_blank:
             return True
-        
         if is_str(value) and is_blank_str(value): # 字符串要单独处理
             return allow_blank
-
         if value != 0 and not value: # emplty list, tuple, set, dict, str, unicode:
             return False
-
         return True
     
     
@@ -47,13 +43,10 @@ class InclusionValidator(object):
     def validate(self, value, in_values=[], allow_null=False, allow_blank=False):
         if value is None:
             return allow_null
-            
         if is_str(value) and is_blank_str(value):
             return allow_blank
-
         if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
             return allow_blank
-
         return value in in_values
 
 
@@ -63,7 +56,6 @@ class NumericalityValidator(object):
                     equal_to=None, less_than=None, less_than_or_equal_to=None, odd=None, even=None):
         if value is None:
             return allow_null
-
         if not is_num(value):
             try:
                 value = float(value) if '.' in value else int(value)
@@ -102,13 +94,10 @@ class LengthValidator(object):
     def validate(self, value, allow_null=True, allow_blank=True, _is=None, minimum=None, maximum=None):
         if value is None:
             return allow_null
-        
         if is_str(value) and is_blank_str(value):
             return allow_blank
-
         if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
             return allow_blank
-
         if (_is and len(value) != _is) or \
             (minimum and len(value) < minimum) or \
             (maximum and len(value) > maximum):  
@@ -127,13 +116,10 @@ class FormatValidator(object):
     def validate(self, value, _with, allow_null=True, allow_blank=True):
         if value is None:
             return allow_null
-        
         if is_str(value) and is_blank_str(value):
             return allow_blank
-
         if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
             return allow_blank
-
         return True if re.match(_with, value) else False
 
     
@@ -142,13 +128,8 @@ class ExclusionValidator(object):
     def validate(self, value, exclusion_values=[], allow_null=False, allow_blank=False):
         if value is None:
             return allow_null
-            
         if is_str(value) and is_blank_str(value):
             return allow_blank
-            
         if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
             return allow_blank
-
         return value not in exclusion_values
-
-
