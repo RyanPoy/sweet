@@ -86,14 +86,14 @@ class Association(object):
         return self.__target_class_or_classpath
 
     @classproperty
-    def _next(cls):
+    def next(cls):
         while cls.__associations:
             yield cls.__associations.pop()
 
     def __str__(self):
         return 'attr_name[%s]; foreign_key[%s]; dependent[%s]; target[%s]' % (self.attr_name, self.foreign_key, self.dependent, self.target)
     
-    def _register(self, owner_class):
+    def register(self, owner_class):
         self.owner = owner_class
         if not self.foreign_key:
             if self.is_belongs_to():
