@@ -26,6 +26,7 @@ from pyrails.activerecord.collection import Collection, HasManyCollection, HasAn
 from pyrails.activerecord.method_missing import FindMethodMissing, CreateOrBuildMethodMissing
 from pyrails.activesupport import classproperty, Inflection, ValidationError
 from pyrails.activerecord.associations import Association
+from pyrails.activerecord.validation import Validates
 from pyrails.db import get_database
 
 # from pyrails.activesupport import RecordValidateError, RecordHasNotBeenPersisted
@@ -83,8 +84,16 @@ class ActiveRecord(object):
         def __init__(cls, name, bases, attr):
             model_instance = type.__init__(cls, name, bases, attr)
             if name != 'ActiveRecord':
-                for assocation in Association._next:
-                    assocation._register(cls)
+                for assocation in Association.next:
+                    assocation.register(cls)
+                # set the validate function
+                for validate_partial in Validates.next():
+                    cls.validate_func_dict.setdefault('save', []).append(validate_partial)
+                for validate_partial in Validates.next('create'):
+                    cls.validate_func_dict.setdefault('create', []).append(validate_partial)
+                for validate_partial in Validates.next('update'):
+                    cls.validate_func_dict.setdefault('update', []).append(validate_partial)
+
             return model_instance
         
         def __getattribute__(self, name):
@@ -97,7 +106,6 @@ class ActiveRecord(object):
 
     def __init__(self, **attributes):
         self.errors = {}
-        self.id = None
         for k, v in attributes.iteritems():
             setattr(self, k, v)
 
@@ -122,6 +130,8 @@ class ActiveRecord(object):
         try:
             return super(ActiveRecord, self).__getattribute__(name)
         except AttributeError, _:
+            if name in self.column_name_set:
+                return None
             association = self.association_of(name)
             if association:
                 if association.is_belongs_to():
@@ -173,6 +183,12 @@ class ActiveRecord(object):
             cls.__column_names__ = [ x.name for x in cls._get_db().get_table_by(cls.table_name).columns ]
         return cls.__column_names__
 
+    @classproperty
+    def column_name_set(cls):
+        if not hasattr(cls, '__column_name_set__'):
+            cls.__column_name_set__ = set(cls.column_names)
+        return cls.__column_name_set__
+
     @classmethod
     def column_names_sql(cls, table_alias=None):
         if not hasattr(cls, '__column_names_sql__'):
@@ -198,6 +214,12 @@ class ActiveRecord(object):
     def association_of(cls, name):
         return cls.association_dict.get(name, None)
     
+    @classproperty
+    def validate_func_dict(cls):
+        if not hasattr(cls, '__validates_dict__'):
+            cls.__validates_dict__ = {}
+        return cls.__validates_dict__
+
     @classproperty
     def all(cls):
         """ find all records
@@ -449,3 +471,19 @@ class ActiveRecord(object):
                 db.set_autocommit(True)
             except:
                 pass
+
+    def add_error(self, attr_name, msg):
+        self.errors.setdefault(attr_name, []).append(msg)
+        return self
+
+    def validate(self, on=None):
+        cls = self.__class__
+        save_and_update_relt = all([ valid(record=self) for valid in cls.validate_func_dict.get('save') ])
+        if on == 'create':
+            save_relt = all([ valid(record=self) for valid in cls.validate_func_dict.get('create') ])
+            return save_and_update_relt and save_relt
+        elif on == 'update':
+            update_relt = all([ valid(record=self) for valid in cls.validate_func_dict.get('update') ])
+            return save_and_update_relt and update_relt
+        else:
+            return save_and_update_relt

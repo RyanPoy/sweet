@@ -46,10 +46,14 @@ from test_validator_inclusion import InclusionValidatorTest
 from test_validator_length import LengthValidatorTest
 from test_validator_numericality import NumericalityValidatorTest
 from test_validator_presence import PresenceValidatorTest
+from test_validates import ValidatesTest
+
 
 
 tests = [
     CollectionTest,
+    
+    ValidatesTest,
 
     AcceptanceValidatorTest,
     ConfirmationValidatorTest,

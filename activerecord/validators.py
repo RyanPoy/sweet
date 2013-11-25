@@ -23,7 +23,7 @@
 from pyrails.activesupport import is_str, is_num, is_blank_str
 import re
 
-    
+
 class PresenceValidator(object):
     
     def validate(self, value, allow_blank=True):
@@ -150,4 +150,5 @@ class ExclusionValidator(object):
             return allow_blank
 
         return value not in exclusion_values
+
 
