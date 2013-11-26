@@ -44,12 +44,11 @@ create table if not exists %s (
     def tearDown(self):
         drop_table(self.user_table_name)
 
-    def test_validates_percense_of(self):
+    def test_validates_presence_of(self):
         class User(ActiveRecord):
-            validates_percense_of(['name', 'password'], msg=u'不能为空')
-
+            validates_presence_of(['name', 'password'], msg=u'不能为空')
         user = User()
-        self.assertEqual(1, len(user.validate_func_dict))
+        self.assertEqual(1, len(user.validate_func_dict.get('save')))
         self.assertEqual(False, user.validate())
         self.assertEqual(2, len(user.errors))
         self.assertEqual(u'不能为空', user.errors['name'][0])
@@ -59,7 +58,7 @@ create table if not exists %s (
         class User(ActiveRecord):
             validates_length_of('name', _is=6, msg=u'长度必须是6')
         user = User()
-        self.assertEqual(1, len(user.validate_func_dict))
+        self.assertEqual(1, len(user.validate_func_dict.get('save')))
         self.assertEqual(False, user.validate())
         self.assertEqual(1, len(user.errors))
         self.assertEqual(u'长度必须是6', user.errors['name'][0])
@@ -68,7 +67,7 @@ create table if not exists %s (
         class User(ActiveRecord):
             validates_format_of('age', _with='^\d+$', msg=u'格式错误')
         user = User()
-        self.assertEqual(1, len(user.validate_func_dict))
+        self.assertEqual(1, len(user.validate_func_dict.get('save')))
         self.assertEqual(False, user.validate())
         self.assertEqual(1, len(user.errors))
         self.assertEqual(u'格式错误', user.errors['age'][0])
@@ -77,7 +76,7 @@ create table if not exists %s (
         class User(ActiveRecord):
             validates_inclusion_of('gender', in_values=[u'男', u'女'], msg=u'只能是男和女')
         user = User()
-        self.assertEqual(1, len(user.validate_func_dict))
+        self.assertEqual(1, len(user.validate_func_dict.get('save')))
         self.assertEqual(False, user.validate())
         self.assertEqual(1, len(user.errors))
         self.assertEqual(u'只能是男和女', user.errors['gender'][0])
@@ -86,7 +85,7 @@ create table if not exists %s (
         class User(ActiveRecord):
             validates_exclusion_of('gender', exclusion_values=[u'人妖', u'未知'], msg=u'不能是人妖和未知')
         user = User(gender=u'人妖')
-        self.assertEqual(1, len(user.validate_func_dict))
+        self.assertEqual(1, len(user.validate_func_dict.get('save')))
         self.assertEqual(False, user.validate())
         self.assertEqual(1, len(user.errors))
         self.assertEqual(u'不能是人妖和未知', user.errors['gender'][0])
@@ -95,7 +94,7 @@ create table if not exists %s (
         class User(ActiveRecord):
             validates_numericality_of('age', odd=True, msg=u'只能是奇数')
         user = User()
-        self.assertEqual(1, len(user.validate_func_dict))
+        self.assertEqual(1, len(user.validate_func_dict.get('save')))
         self.assertEqual(False, user.validate())
         self.assertEqual(1, len(user.errors))
         self.assertEqual(u'只能是奇数', user.errors['age'][0])
@@ -104,7 +103,7 @@ create table if not exists %s (
         class User(ActiveRecord):
             validates_confirmation_of(['confirm_password'], msg=u'密码必须一致')
         user = User(password="123", confirm_password="456")
-        self.assertEqual(1, len(user.validate_func_dict))
+        self.assertEqual(1, len(user.validate_func_dict.get('save')))
         self.assertEqual(False, user.validate())
         self.assertEqual(1, len(user.errors))
         self.assertEqual(u'密码必须一致', user.errors['confirm_password'][0])
@@ -114,7 +113,7 @@ create table if not exists %s (
             validates_uniqueness_of(['name'], msg=u'用户名已经存在')
         User.create(name='pengyi')
         user = User(name='pengyi')
-        self.assertEqual(1, len(user.validate_func_dict))
+        self.assertEqual(1, len(user.validate_func_dict.get('save')))
         self.assertEqual(False, user.validate())
         self.assertEqual(1, len(user.errors))
         self.assertEqual(u'用户名已经存在', user.errors['name'][0])
@@ -131,13 +130,25 @@ create table if not exists %s (
                 return True
 
         user = User(name='py')
-        self.assertEqual(1, len(user.validate_func_dict))
+        self.assertEqual(1, len(user.validate_func_dict.get('save')))
         self.assertEqual(False, user.validate())
         self.assertEqual(1, len(user.errors))
         self.assertEqual(u'名字必须是pengyi', user.errors['name'][0])
 
         user = User(name='pengyi')
         self.assertTrue(user.validate())
+
+    def test_many_validates_for_a_column(self):
+        class User(ActiveRecord):
+            validates_of('name', presence=dict(allow_blank=False, msg=u'不能为空'),
+                                 length=dict(minimum=4, maximum=8, msg=u'长度在4到8之间'))
+
+        user = User()
+        self.assertEqual(2, len(user.validate_func_dict.get('save')))
+        self.assertEqual(False, user.validate())
+        self.assertEqual(1, len(user.errors))
+        self.assertEqual(u'长度在4到8之间', user.errors['name'][0])
+        self.assertEqual(u'不能为空', user.errors['name'][1])
 
 
 if __name__ == '__main__':

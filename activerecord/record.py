@@ -87,13 +87,9 @@ class ActiveRecord(object):
                 for assocation in Association.next:
                     assocation.register(cls)
                 # set the validate function
-                for validate_partial in Validates.next():
-                    cls.validate_func_dict.setdefault('save', []).append(validate_partial)
-                for validate_partial in Validates.next('create'):
-                    cls.validate_func_dict.setdefault('create', []).append(validate_partial)
-                for validate_partial in Validates.next('update'):
-                    cls.validate_func_dict.setdefault('update', []).append(validate_partial)
-
+                for on in ('save', 'create', 'update'):
+                    for validate_partial in Validates.next(on):
+                        cls.validate_func_dict.setdefault(on, []).append(validate_partial)
             return model_instance
         
         def __getattribute__(self, name):

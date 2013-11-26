@@ -162,8 +162,9 @@ class Validates(object):
             yield cls.__validate_partials.get(on).pop()
 
     @classmethod
-    def add(cls, partail, on=None):
-        cls.__check(on).__validate_partials.setdefault(on, []).append(partail)
+    def add(cls, partail, on='save'):
+        cls.__check(on)
+        cls.__validate_partials.setdefault(on, []).append(partail)
         return cls
 
     @classmethod
@@ -171,6 +172,7 @@ class Validates(object):
         if on not in ('save', 'create', 'update'):
             raise Exception('argument on value must be in "save", "create" or "update"')
         return cls
+
 
 def validates(method_name, on='save'):
 
@@ -181,7 +183,17 @@ def validates(method_name, on='save'):
     Validates.add(p, on)
 
 
-def validates_percense_of(attr_names, allow_blank=True, on='save', msg='can not blank.'):
+def validates_of(attr_names, presence={}, uniqueness={}, format={}, length={}, inclusion={}, numericality={}, confirmation={}):
+    if presence:        validates_presence_of(attr_names, **presence)
+    if uniqueness:      validates_uniqueness_of(attr_names, **uniqueness)
+    if format:          validates_format_of(attr_names, **format)
+    if length:          validates_length_of(attr_names, **length)
+    if inclusion:       validates_inclusion_of(attr_names, **inclusion)
+    if numericality:    validates_numericality_of(attr_names, **numericality)
+    if confirmation:    validates_confirmation_of(attr_names, **confirmation)
+    
+
+def validates_presence_of(attr_names, allow_blank=True, on='save', msg='can not blank.'):
     p = partial(_validates_of, validator=PresenceValidator(), validate_attrs=_merge(attr_names), msg=msg, allow_blank=allow_blank)
     Validates.add(p, on)
 
