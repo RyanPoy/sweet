@@ -21,6 +21,8 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from pyrails.db import get_database
+import pyrails
+pyrails.get_database = get_database
 
 def create_table(sql):
     db = get_database(show_sql=False)
