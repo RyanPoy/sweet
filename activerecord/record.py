@@ -154,6 +154,7 @@ class ActiveRecord(object):
                         return HasManyCollection(association.target, fk_value={association.foreign_key: self.id}).where(**{association.foreign_key: self.id})
                 else: # has_and_belongs_to_many
                     join_str = 'INNER JOIN %s ON %s.%s = %s.id' % (association.join_table, association.join_table, association.association_foreign_key, association.target.table_name)
+                    # return association.target.joins(join_str).where('%s.%s = %s' % (association.join_table, association.foreign_key, self.id)
                     return HasAndBelongsToManyCollection(association.target, fk_value={association.foreign_key: self.id}, has_and_belongs_to_many_association=association) \
                                         .joins(join_str).where('%s.%s = %s' % (association.join_table, association.foreign_key, self.id))
             if CreateOrBuildMethodMissing.match(name):
@@ -255,6 +256,8 @@ class ActiveRecord(object):
             User.create(username='abc', password='123')
         """
         record = cls(**attributes)
+        if not record.validate('create'):
+            return False
         return record if record.save() else None
     
     @classmethod
@@ -374,7 +377,7 @@ class ActiveRecord(object):
         eg.
             u = User(username="abc", password="123456").save()
         """
-        if not self.valid():
+        if not self.validate('save'):
             raise False
 
         if self.is_persisted:
@@ -400,7 +403,7 @@ class ActiveRecord(object):
         # if not self.is_persisted:
         #     raise RecordHasNotBeenPersisted()
 
-        if not self.valid():
+        if not self.validate('update'):
             raise False
 
         # all_args_attributes = {}
@@ -473,4 +476,4 @@ class ActiveRecord(object):
         return self
 
     def validate(self, on='save'):
-        return all([ valid(record=self) for valid in self.__class__.validate_func_dict.get(on) ])
+        return all([ valid(record=self) for valid in self.__class__.validate_func_dict.get(on, {}) ])
