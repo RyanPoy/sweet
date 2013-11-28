@@ -162,6 +162,10 @@ class ActiveRecord(object):
             raise
 
     @classproperty
+    def singularize_name(cls):
+        return Inflection.hungarian_of(Inflection.singularize_of(cls.__name__))
+
+    @classproperty
     def table_name(cls):
         if not hasattr(cls, '__table_name__'):
             table_name = Inflection.pluralize_of(cls.__name__)
