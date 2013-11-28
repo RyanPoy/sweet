@@ -44,8 +44,6 @@ class Collection(object):
         self._table_name    = self._model_class.table_name
         self._db            = self._model_class._get_db()
 
-        self.__has_and_belongs_to_many_association = None
-
     @property    
     def all(self):
         sql, params = self.delete_or_update_or_find_sql()
@@ -69,15 +67,8 @@ class Collection(object):
         return self._model_class(**row) if row else None
     
     def create(self, **attributes):
-        print '*'*10, 'create', self.__class__.__name__
         record = self.build(**attributes)
         self.save(record)
-        if self.__has_and_belongs_to_many_association:
-            association = self.__has_and_belongs_to_many_association
-            sql = 'INSERT INTO %s (%s, %s) VALUES (%s, %s)' % ( association.join_table, association.foreign_key, association.association_foreign_key,
-                self.__fk_value.values()[0], record.id
-            )
-            self._db.execute_lastrowid(sql)
         return record
 
     def save(self, model):
@@ -317,10 +308,6 @@ class Collection(object):
         if _sql:
             buff.append(_sql)
 
-    def _set_has_and_belongs_to_many_association(self, association):
-        self.__has_and_belongs_to_many_association = association
-        return self
-
     def __iter__(self):
         return iter(self.all)
 
@@ -352,24 +339,8 @@ class HasManyCollection(Collection):
                 attributes[k] = v
         return self._model_class(**attributes)
 
-    def create(self, **attributes):
-        record = self.build(**attributes)
-        record.save()
-        return record
 
-
-class HasAndBelongsToManyCollection(Collection):
-
-    def __init__(self, model_class, fk_value={}, has_and_belongs_to_many_association=None):
-        super(HasAndBelongsToManyCollection, self).__init__(model_class)
-        self._fk_value = fk_value
-        self._has_and_belongs_to_many_association = has_and_belongs_to_many_association
-
-    def build(self, **attributes):
-        for k, v in self._fk_value.iteritems():
-            if k not in attributes:
-                attributes[k] = v
-        return self._model_class(**attributes)
+class HasAndBelongsToManyCollection(HasManyCollection):
 
     def _save_association(self, model):
         # @TODO: 如果这里有has_ans_belongs_to_many 的association，还要考虑建立关联表的数据
@@ -384,13 +355,3 @@ class HasAndBelongsToManyCollection(Collection):
                     sql = 'INSERT INTO %s (%s, %s) VALUES (?, ?)' % (association.join_table, association.foreign_key, association.association_foreign_key)
                     self._db.execute_lastrowid(sql, [model.id, assoication_id])
         return self
-
-    # def create(self, **attributes):
-    #     record = super(HasAndBelongsToManyCollection, self).create(**attributes)
-    #     #self.__create_join_table_record(record.id)
-    #     return record
-
-    # def __create_join_table_record(self, record_id):
-    #     association = self._has_and_belongs_to_many_association
-    #     sql = 'INSERT INTO %s (%s, %s) VALUES (?, ?)' % ( association.join_table, association.foreign_key, association.association_foreign_key)
-    #     self._db.execute_lastrowid(sql, [self._fk_value.values()[0], record_id])
