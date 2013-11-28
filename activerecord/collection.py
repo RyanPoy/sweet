@@ -79,7 +79,20 @@ class Collection(object):
         return model.id
 
     def _save_association(self, model):
-        pass
+        print model, model.__class__
+        # @TODO: 如果这里有has_ans_belongs_to_many 的association，还要考虑建立关联表的数据
+        for key, association in model.association_dict.iteritems():
+            if association.is_has_and_belongs_to_many():
+                if not getattr(model, association.association_foreign_key, None):
+                    association_target_attr_name = association.target.singularize_name
+                    assoication_target_instance = getattr(model, association_target_attr_name, None)
+                    if assoication_target_instance and assoication_target_instance.id:
+                        setattr(model, association.association_foreign_key, assoication_target_instance.id)
+                assoication_id = getattr(model, association.association_foreign_key, None)
+                if assoication_id:
+                    sql = 'INSERT INTO %s (%s, %s) VALUES (?, ?)' % (association.join_table, association.foreign_key, association.association_foreign_key)
+                    self._db.execute_lastrowid(sql, [model.id, assoication_id])
+        return self
 
     def delete_all(self):
         self._deleteall_or_updateall = self.DELETE_STR
@@ -342,16 +355,4 @@ class HasManyCollection(Collection):
 
 class HasAndBelongsToManyCollection(HasManyCollection):
 
-    def _save_association(self, model):
-        # @TODO: 如果这里有has_ans_belongs_to_many 的association，还要考虑建立关联表的数据
-        for key, association in model.association_dict.iteritems():
-            if association.is_has_and_belongs_to_many():
-                if not getattr(model, association.association_foreign_key, None):
-                    assoication_taget_instance = getattr(model, key)
-                    if assoication_taget_instance and assoication_taget_instance.id:
-                        setattr(model, association.association_foreign_key, assoication_taget_instance.id)
-                assoication_id = getattr(model, association.association_foreign_key, None)
-                if assoication_id:
-                    sql = 'INSERT INTO %s (%s, %s) VALUES (?, ?)' % (association.join_table, association.foreign_key, association.association_foreign_key)
-                    self._db.execute_lastrowid(sql, [model.id, assoication_id])
-        return self
+    pass
