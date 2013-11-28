@@ -155,7 +155,7 @@ class ActiveRecord(object):
                 else: # has_and_belongs_to_many
                     join_str = 'INNER JOIN %s ON %s.%s = %s.id' % (association.join_table, association.join_table, association.association_foreign_key, association.target.table_name)
                     # return association.target.joins(join_str).where('%s.%s = %s' % (association.join_table, association.foreign_key, self.id)
-                    return HasAndBelongsToManyCollection(association.target, fk_value={association.foreign_key: self.id}, has_and_belongs_to_many_association=association) \
+                    return HasAndBelongsToManyCollection(association.target, fk_value={association.foreign_key: self.id}) \
                                         .joins(join_str).where('%s.%s = %s' % (association.join_table, association.foreign_key, self.id))
             if CreateOrBuildMethodMissing.match(name):
                 return CreateOrBuildMethodMissing(self, name)
