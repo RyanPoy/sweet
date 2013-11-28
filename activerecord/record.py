@@ -382,7 +382,7 @@ class ActiveRecord(object):
             u = User(username="abc", password="123456").save()
         """
         if not self.validate('save'):
-            raise False
+            return False
 
         if self.is_persisted:
             attrs_dict = dict([ (column_name, getattr(self, column_name)) for column_name in self.column_names if column_name != 'id'])
@@ -408,7 +408,7 @@ class ActiveRecord(object):
         #     raise RecordHasNotBeenPersisted()
 
         if not self.validate('update'):
-            raise False
+            return False
 
         # all_args_attributes = {}
         # all_args_attributes.update(attributes)

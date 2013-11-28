@@ -22,7 +22,6 @@ pyrails.get_database = lambda db=DATABASE, debug=DEBUG: get_database(db, debug)
 
 
 from pyrails.activerecord import *
-from pprint import pprint
 
 
 # simple blog 
@@ -110,10 +109,10 @@ def example():
     print '\n***** create category which named: 数码'
     Category.create(name=u'数码')
 
-    # c = Category(name=u'体育')
-    # if not c:
-    #     print 'Error:'
-    #     pprint(c.errors)
+    print '\n***** should be a error create category which named 体育 again'
+    c = Category(name=u'体育')
+    if not c.save():
+        print 'errors:', c.errors
 
     print '\n***** find all categories'
     print [ str(c) for c in Category.all ]
