@@ -176,7 +176,6 @@ if __name__ == '__main__':
         prepare_db()
         example()
     finally:
-        # drop_db()
-        pass
+        drop_db()
 
     print 'done'
