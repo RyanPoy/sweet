@@ -27,7 +27,7 @@ from pyrails.activerecord.method_missing import FindMethodMissing, CreateOrBuild
 from pyrails.activesupport import classproperty, Inflection, ValidationError
 from pyrails.activerecord.associations import Association
 from pyrails.activerecord.validation import Validates
-from pyrails.db import get_database
+import pyrails
 
 # from pyrails.activesupport import RecordValidateError, RecordHasNotBeenPersisted
 
@@ -437,7 +437,7 @@ class ActiveRecord(object):
     @classmethod
     def _get_db(cls):
         if cls.__db__ is None:
-            cls.__db__ = get_database()
+            cls.__db__ = pyrails.get_database()
         return cls.__db__
     
     @property
@@ -472,14 +472,5 @@ class ActiveRecord(object):
         self.errors.setdefault(attr_name, []).append(msg)
         return self
 
-    def validate(self, on=None):
-        cls = self.__class__
-        save_and_update_relt = all([ valid(record=self) for valid in cls.validate_func_dict.get('save') ])
-        if on == 'create':
-            save_relt = all([ valid(record=self) for valid in cls.validate_func_dict.get('create') ])
-            return save_and_update_relt and save_relt
-        elif on == 'update':
-            update_relt = all([ valid(record=self) for valid in cls.validate_func_dict.get('update') ])
-            return save_and_update_relt and update_relt
-        else:
-            return save_and_update_relt
+    def validate(self, on='save'):
+        return all([ valid(record=self) for valid in self.__class__.validate_func_dict.get(on) ])
