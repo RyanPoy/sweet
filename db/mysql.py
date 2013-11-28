@@ -125,11 +125,15 @@ class Adapter(object):
         self.close()
 
     def __show_sql(self, sql, params):
+        if isinstance(sql, unicode):
+            sql = sql.encode('utf8')
         if not params:
             return sql
         else:
             formated_params = []
             for param in params:
+                if isinstance(param, unicode):
+                    param = param.encode('utf8')
                 if is_str(param):
                     param = "'%s'" % MySQLdb.escape_string(param)
                 elif is_date(param):
