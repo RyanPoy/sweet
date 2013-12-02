@@ -115,7 +115,7 @@ def example():
         print 'errors:', c.errors
 
     print '\n***** find all categories'
-    print [ str(c) for c in Category.all ]
+    print [ str(cate) for cate in Category.all ]
     print '\n***** find first category'
     print Category.first
     print '\n***** find last category'
