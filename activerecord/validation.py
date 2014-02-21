@@ -183,12 +183,14 @@ def validates(method_name, on='save'):
     Validates.add(p, on)
 
 
-def validates_of(attr_names, presence={}, uniqueness={}, format={}, length={}, inclusion={}, numericality={}, confirmation={}):
+def validates_of(attr_names, presence={}, uniqueness={}, format={}, length={}, 
+                    inclusion={}, exclusion={}, numericality={}, confirmation={}):
     if presence:        validates_presence_of(attr_names, **presence)
     if uniqueness:      validates_uniqueness_of(attr_names, **uniqueness)
     if format:          validates_format_of(attr_names, **format)
     if length:          validates_length_of(attr_names, **length)
     if inclusion:       validates_inclusion_of(attr_names, **inclusion)
+    if exclusion:       validates_exclusion_of(attr_names, **inclusion)
     if numericality:    validates_numericality_of(attr_names, **numericality)
     if confirmation:    validates_confirmation_of(attr_names, **confirmation)
     
