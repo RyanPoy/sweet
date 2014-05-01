@@ -90,6 +90,5 @@ class ActiveRoute(object):
         return ''.join(new_rule)
 
     def match(self, url):
-        if re.match(self.rule, url):
-            return True
-        return False
+        m = re.match(self.rule, url)
+        return m.groupdict() if m else False

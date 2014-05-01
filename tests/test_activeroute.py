@@ -18,7 +18,7 @@ class ActionRouteTest(unittest.TestCase):
 
     def test_match_root_path(self):
         route = ActiveRoute('/', None, None)
-        self.assertTrue(route.match('/') is True)
+        self.assertTrue(route.match('/') is not False)
 
     def test_int_rule(self):
         route = ActiveRoute('/<id:int>', None, None)
@@ -26,7 +26,7 @@ class ActionRouteTest(unittest.TestCase):
 
     def test_match_int(self):
         route = ActiveRoute('/<id:int>', None, None)
-        self.assertTrue(route.match('/123') is True)
+        self.assertTrue(route.match('/123') is not False)
 
     def test_float_rule(self):
         route = ActiveRoute('/<id:float>', None, None)
@@ -34,11 +34,11 @@ class ActionRouteTest(unittest.TestCase):
 
     def test_match_float1(self):
         route = ActiveRoute('/<id:float>', None, None)
-        self.assertTrue(route.match('/123') is True)
+        self.assertTrue(route.match('/123') is not False)
 
     def test_match_float2(self):
         route = ActiveRoute('/<id:float>', None, None)
-        self.assertTrue(route.match('/123.123') is True)
+        self.assertTrue(route.match('/123.123') is not False)
 
     def test_str_rule(self):
         route = ActiveRoute('/<name:str>', None, None)
@@ -50,7 +50,7 @@ class ActionRouteTest(unittest.TestCase):
 
     def test_match_str(self):
         route = ActiveRoute('/<name:str>', None, None)
-        self.assertTrue(route.match('/pengyi') is True)
+        self.assertTrue(route.match('/pengyi') is not False)
 
     def test_list_rule(self):
         route = ActiveRoute('/<ids:list>', None, None)
@@ -58,11 +58,11 @@ class ActionRouteTest(unittest.TestCase):
 
     def test_match_list1(self):
         route = ActiveRoute('/<ids:list>', None, None)
-        self.assertTrue(route.match('/1') is True)
+        self.assertTrue(route.match('/1') is not False)
 
     def test_match_list2(self):
         route = ActiveRoute('/<ids:list>', None, None)
-        self.assertTrue(route.match('/1,2,3') is True)
+        self.assertTrue(route.match('/1,2,3') is not False)
 
     def test_regex_rule(self):
         route = ActiveRoute('/<year:\d{1,4}>', None, None)
@@ -70,7 +70,7 @@ class ActionRouteTest(unittest.TestCase):
 
     def test_match_regex(self):
         route = ActiveRoute('/<year:\d{1,4}>', None, None)
-        self.assertTrue(route.match('/2012') is True)
+        self.assertTrue(route.match('/2012') is not False)
 
     def test_complex_rule(self):
         route = ActiveRoute('/post/<id>/datetime/<year:\d{1,4}>/<month:int>', None, None)
@@ -78,7 +78,7 @@ class ActionRouteTest(unittest.TestCase):
 
     def test_match_complex_rule(self):
         route = ActiveRoute('/post/<id>/datetime/<year:\d{1,4}>/<month:int>', None, None)
-        self.assertTrue(route.match('/post/123/datetime/2014/10') is True)
+        self.assertTrue(route.match('/post/123/datetime/2014/10') is not False)
 
 
 if __name__ == '__main__':
