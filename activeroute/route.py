@@ -78,17 +78,14 @@ class ActiveRoute(object):
         p = re.compile(r'<([a-zA-Z_][a-zA-Z_0-9]*)(:[^>]*)?>')
         offset = 0
         for match in p.finditer(rule):
-            """<id:int>  =>  (?P<name>\d+)
-            """
-            bpos, epos = match.start(), match.end()
-            new_rule.append(rule[offset:bpos])
+            new_rule.append(rule[offset:match.start()])
 
             name, _type = match.groups()
             _type = self.TYPES.get(_type, None) or _type[1:]
             
             pattern = '(?P<%s>%s)' % (name, _type)
             new_rule.append(pattern)
-            offset = epos
+            offset = match.end()
         new_rule.append(rule[offset:])
         return ''.join(new_rule)
 
