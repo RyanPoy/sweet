@@ -47,6 +47,7 @@ from test_validator_length import LengthValidatorTest
 from test_validator_numericality import NumericalityValidatorTest
 from test_validator_presence import PresenceValidatorTest
 from test_validates import ValidatesTest
+from test_activeroute import ActionRouteTest
 
 
 
@@ -76,12 +77,13 @@ tests = [
     ActiveRecordLimitTest,
     ActiveRecordFuncTest,
     ActiveRecordJoinsTest,
-    
 
     HasAndBelongsToManyTest,
     BelongsToTest,
     HasOneTest,
     HasManyTest,
+
+    ActionRouteTest,
 ]
 
 
