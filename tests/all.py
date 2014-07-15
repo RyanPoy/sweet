@@ -48,10 +48,14 @@ from test_validator_numericality import NumericalityValidatorTest
 from test_validator_presence import PresenceValidatorTest
 from test_validates import ValidatesTest
 from test_activeroute import ActionRouteTest
-
+from test_where_chain import WhereChainTest
+from test_having_chain import HavingChainTest
 
 
 tests = [
+    WhereChainTest,
+    HavingChainTest,
+    
     CollectionTest,
     
     ValidatesTest,

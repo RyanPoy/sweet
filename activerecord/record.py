@@ -46,7 +46,7 @@ class ActiveRecord(object):
          
         - group/order/having ....
           User.where(name='pengyi').order('name DESC').group('name').having(age = 10)
-         # => SELECT users.* FROM users WHERE users.name = 'pengyi' GROUP BY users.name HAVING users.age = 10 ORDER BY name DESC LIMIT 10 OFFSET 1
+         # => SELECT users.* FROM users WHERE `users`.`name` = 'pengyi' GROUP BY `users`.`name` HAVING `users`.`age` = 10 ORDER BY name DESC LIMIT 10 OFFSET 1
     
     - Query with method missing
       User.find_by_name('pengyi')
@@ -69,7 +69,7 @@ class ActiveRecord(object):
     
       User.where(age=20).update_all(name='poy', age='40)
      # => UPDATE users SET name = 'poy', age = 40 WHERE age = 20
-    
+
     - Delete
       u = User.find(1)
       u.delete()
