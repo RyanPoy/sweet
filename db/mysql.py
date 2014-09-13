@@ -101,7 +101,7 @@ class Adapter(object):
             'varchar': Column.Type.string, 'text': Column.Type.text, 'tinyint': Column.Type.boolean, 
             'float': Column.Type.float, 'decimal': Column.Type.decimal, 'datetime': Column.Type.datetime, 
             'date': Column.Type.date, 'timestamp': Column.Type.timestamp, 'blob': Column.Type.binary, 
-            'int':Column.Type.int }.iteritems():
+            'int':Column.Type.int, 'longtext': Column.Type.text, }.iteritems():
             if db_field_type == field_type:
                 return column_type
         raise Exception('Can not support %s field type !' % db_field_type)

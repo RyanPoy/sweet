@@ -252,6 +252,10 @@ class ActiveRecord(object):
         return Collection(cls).last
 
     @classmethod
+    def select(cls, *args):
+        return Collection(cls).select(*args)
+
+    @classmethod
     def create(cls, **attributes):
         """ persist a active record. 
         @return：record instace if successful, else return None. 
