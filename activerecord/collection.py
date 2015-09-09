@@ -41,7 +41,7 @@ class Collection(object):
         self._offset        = None
         self._orders        = []
         self._groups        = []
-        self._havings       = HavingChain(self._table_name)
+        self._having_chain  = HavingChain(self._table_name)
         self._joins         = []
         # self._join_table_list = []
         self._func          = None
@@ -153,7 +153,7 @@ class Collection(object):
         return self
 
     def having(self, *sql_and_params, **conditions):
-        self._havings.push(*sql_and_params, **conditions)
+        self._having_chain.push(*sql_and_params, **conditions)
         return self
 
     def joins(self, *joins):
@@ -168,7 +168,7 @@ class Collection(object):
         sql = self.__add_joins(sql, self._joins)
         sql = self.__add_wheres(sql, params, self._where_chain)
         
-        sql = self.__add_group_having(sql, self._groups, self._havings, params)
+        sql = self.__add_group_having(sql, self._groups, self._having_chain, params)
         sql = self.__add_order(sql, self._orders)
         sql = self.__add_limit_offset(sql, self._limit, self._offset)
         return sql, params
@@ -208,7 +208,7 @@ class Collection(object):
                         for group in new_groups if group and group.strip() ]
         if new_groups:
             sql = '%s GROUP BY %s' % (sql, ','.join(new_groups))
-            having_sql, having_params = self._havings.compile()
+            having_sql, having_params = self._having_chain.compile()
             if having_sql:
                 sql = '%s %s' % (sql, having_sql)
             if having_params:
