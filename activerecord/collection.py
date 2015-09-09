@@ -82,8 +82,7 @@ class Collection(object):
         return model.id
 
     def _save_association(self, model):
-        print model, model.__class__
-        # @TODO: 如果这里有has_ans_belongs_to_many 的association，还要考虑建立关联表的数据
+        # @TODO: 如果这里有has_and_belongs_to_many 的association，还要考虑建立关联表的数据
         for key, association in model.association_dict.iteritems():
             if association.is_has_and_belongs_to_many():
                 if not getattr(model, association.association_foreign_key, None):
