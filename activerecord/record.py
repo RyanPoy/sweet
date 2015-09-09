@@ -24,9 +24,10 @@ from __future__ import with_statement
 from contextlib import contextmanager
 from pyrails.activerecord.collection import Collection, HasManyCollection, HasAndBelongsToManyCollection
 from pyrails.activerecord.method_missing import FindMethodMissing, CreateOrBuildMethodMissing
-from pyrails.activesupport import classproperty, Inflection, ValidationError
+from pyrails.activesupport import classproperty, Inflection, ValidationError, is_hash
 from pyrails.activerecord.associations import Association
 from pyrails.activerecord.validation import Validates
+
 import pyrails
 
 # from pyrails.activesupport import RecordValidateError, RecordHasNotBeenPersisted
@@ -100,10 +101,19 @@ class ActiveRecord(object):
                     return FindMethodMissing(self, name)
                 raise
 
-    def __init__(self, **attributes):
+    def __init__(self, *arg_attrs, **dict_attrs):
+
+        def init_with(d):
+            for k, v in d.iteritems():
+                setattr(self, k, v)
+
         self.errors = {}
-        for k, v in attributes.iteritems():
-            setattr(self, k, v)
+        for attr in arg_attrs:
+            if is_hash(attr):
+                init_with(attr)
+        init_with(dict_attrs)
+
+    
 
     def __setattr__(self, name, value):
         relt = super(ActiveRecord, self).__setattr__(name, value)
@@ -433,6 +443,7 @@ class ActiveRecord(object):
             u = User.find(1)
             u.delete()
         """
+        # @TODO: 需要按照关系再次删除相关的数据
         return self.where(id=self.id).delete_all()
 
     @classmethod
@@ -485,3 +496,6 @@ class ActiveRecord(object):
 
     def validate(self, on='save'):
         return all([ valid(record=self) for valid in self.__class__.validate_func_dict.get(on, {}) ])
+
+    def to_dict(self):
+        return dict([ (c, getattr(self, c)) for c in self.column_names ])
