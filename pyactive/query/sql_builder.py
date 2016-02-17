@@ -4,11 +4,11 @@ from .join_clause import JoinClause
 import re
 
 
-class QueryBuilder(object):
+class SQLBuilder(object):
     
     POSITION_FLAG = '?'
     
-    def __init__(self):
+    def __init__(self, conn=None):
         self._selects = []
         self._wheres = []
         self._havings = []
@@ -17,12 +17,25 @@ class QueryBuilder(object):
         self._groups = []
         self._orders = []
         self._limit = None
-        self._offset = None
+        self._offset = 0
         self._joins = []
+        self.conn = conn
 
     def new_instance(self):
         return self.__class__()
+
+    def first(self):
+        tmp_limit, tmp_offset = self._limit, self._offset
+        self.limit(1).offset(0)
+        rows = self.all()
+        self._limit, self._offset = tmp_limit, tmp_offset
+        return rows[0] if rows else None
     
+    def all(self):
+        sql, params = self.to_sql()
+        rows = self.conn.fetch_all(sql, *params)
+        return rows
+
     def join(self, tablename, *args):
         if isinstance(tablename, JoinClause):
             self._joins.append(tablename)
@@ -198,7 +211,7 @@ class QueryBuilder(object):
         sqls = []
         if self._limit is not None:
             sqls.append('LIMIT %s' % self._limit)
-        if self._offset is not None:
+        if self._offset:
             sqls.append('OFFSET %s' % self._offset)
         return ' '.join(sqls)
     

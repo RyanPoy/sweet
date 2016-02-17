@@ -1,14 +1,14 @@
 #coding: utf8
-from ..query.query_builder import QueryBuilder
+from pyactive.query.sql_builder import SQLBuilder
+from pyactive.query.join_clause import JoinClause
 import unittest
 import fudge
-from pyactive.query.join_clause import JoinClause
 
 
-class QueryBuilderTestCase(unittest.TestCase):
+class SQLBuilderTestCase(unittest.TestCase):
     
-    def get_builder(self):
-        return QueryBuilder()
+    def get_builder(self, conn=None):
+        return SQLBuilder(conn)
 
     def test_basic_select(self):
         builder = self.get_builder()
@@ -216,7 +216,7 @@ class QueryBuilderTestCase(unittest.TestCase):
         self.assertEqual(
             'SELECT * FROM `users` '
             'INNER JOIN `contacts` ON users.id=contacts.id '
-            'ON users.name=?',
+            'AND users.name=?',
             sql
         )
         self.assertEqual(['contacts.name'], params)
@@ -226,36 +226,55 @@ class QueryBuilderTestCase(unittest.TestCase):
 #         builder.select(QueryExpression('substr(foo, 6)')).from_('users')
 #         self.assertEqual('SELECT substr(foo, 6) FROM "users"', builder.to_sql())
 # 
-#     def test_find_return_first_result_by_id(self):
-#         builder = self.get_builder()
-#         query = 'SELECT * FROM "users" WHERE "id" = ? LIMIT 1'
-#         results = [{
-#             'foo': 'bar'
-#         }]
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results)
-#         result = builder.from_('users').find(1)
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [1], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, results)
-#         self.assertEqual(result, results[0])
-# 
-#     def test_first_return_first_result(self):
-#         builder = self.get_builder()
-#         query = 'SELECT * FROM "users" WHERE "id" = ? LIMIT 1'
-#         results = [{
-#             'foo': 'bar'
-#         }]
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results)
-#         result = builder.from_('users').where('id', '=', 1).first()
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [1], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, results)
-#         self.assertEqual(result, results[0])
-# 
+    
+    @fudge.test
+    def test_first_return_none_result_if_can_not_found(self):
+        results = []
+        conn = fudge.Fake('conn')\
+                .expects('fetch_all')\
+                .with_args('SELECT * FROM `users` WHERE id = ? or email = ? LIMIT 1', 1, 'foo')\
+                .returns(results)
+        builder = self.get_builder(conn)
+        limit, offset = builder._limit, builder._offset
+        
+        builder.select('*').from_('users').where('id = ? or email = ?', 1, 'foo')
+        self.assertEqual(None, builder.first() )
+        self.assertEqual(limit, builder._limit)
+        self.assertEqual(offset, builder._offset)
+        
+    @fudge.test
+    def test_first_return_first_result(self):
+        results = [
+            {'id': 1, 'email': 'foo'}
+        ]
+        conn = fudge.Fake('conn')\
+                .expects('fetch_all')\
+                .with_args('SELECT * FROM `users` WHERE id = ? or email = ? LIMIT 1', 1, 'foo')\
+                .returns(results)
+        builder = self.get_builder(conn)
+        limit, offset = builder._limit, builder._offset
+        
+        builder.select('*').from_('users').where('id = ? or email = ?', 1, 'foo')
+        self.assertEqual(results[0], builder.first() )
+        self.assertEqual(limit, builder._limit)
+        self.assertEqual(offset, builder._offset)
+            
+    @fudge.test
+    def test_all_return_all_result(self):
+        results = [
+            {'id': 1, 'tag': 'foo'},
+            {'id': 2, 'tag': 'boom'},
+            {'id': 3, 'tag': 'boom'},
+            {'id': 4, 'tag': 'foo'},
+        ]
+        conn = fudge.Fake('conn')\
+                .expects('fetch_all')\
+                .with_args('SELECT * FROM `users` WHERE `users`.`tag` IN (?, ?)', 'boom', 'foo')\
+                .returns(results)
+        builder = self.get_builder(conn)
+        builder.select('*').from_('users').where(tag=['boom', 'foo'])
+        self.assertEqual(results, builder.all() )
+
 #     def test_list_methods_gets_list_of_colmun_values(self):
 #         builder = self.get_builder()
 #         results = [
