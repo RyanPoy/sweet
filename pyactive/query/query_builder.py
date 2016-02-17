@@ -1,6 +1,7 @@
 #coding:utf8
 from ..utils import is_array, is_hash
 import re
+from PIL.ImageChops import offset
 
 
 class QueryBuilder(object):
@@ -15,6 +16,21 @@ class QueryBuilder(object):
         self._from = None
         self._groups = []
         self._orders = []
+        self._limit = None
+        self._offset = None
+    
+    def page(self, page_num, limit):
+        self._limit = limit
+        self._offset = page_num * limit
+        return self
+
+    def limit(self, limit):
+        self._limit = limit
+        return self
+    
+    def offset(self, offset):
+        self._offset = offset
+        return self
 
     def group_by(self, *args):
         for arg in args:
@@ -79,6 +95,11 @@ class QueryBuilder(object):
         order_by_sql = self._compile_order()
         if order_by_sql:
             sqls.append('ORDER BY %s' % order_by_sql)
+            
+        limit_offset_sql = self._complie_limit_and_offset()
+        if limit_offset_sql:
+            sqls.append(limit_offset_sql)
+
         return ' '.join(sqls), params
 
     def _compile_select(self):
@@ -134,14 +155,6 @@ class QueryBuilder(object):
     def _compile_group(self):
         return ', '.join([ self._complie_fieldname(group) for group in self._groups ])
 
-#         if new_groups:
-#             sql = '%s GROUP BY %s' % (sql, ','.join(new_groups))
-#             having_sql, having_params = self._having_chain.compile()
-#             if having_sql:
-#                 sql = '%s %s' % (sql, having_sql)
-#             if having_params:
-#                 params.extend(having_params)
-
     def _compile_order(self):
         sqls = []
         for order in self._orders:
@@ -150,3 +163,11 @@ class QueryBuilder(object):
             elif ' ASC' in order: flag = ' ASC'
             sqls.append(flag.join([ self._complie_fieldname(o.strip()) for o in order.split(flag) ]))
         return ', '.join(sqls)
+    
+    def _complie_limit_and_offset(self):
+        sqls = []
+        if self._limit is not None:
+            sqls.append('LIMIT %s' % self._limit)
+        if self._offset is not None:
+            sqls.append('OFFSET %s' % self._offset)
+        return ' '.join(sqls)

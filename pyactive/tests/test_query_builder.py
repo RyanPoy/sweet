@@ -190,159 +190,21 @@ class QueryBuilderTestCase(unittest.TestCase):
         sql, params = builder.to_sql()
         self.assertEqual( 'SELECT * FROM `users` WHERE `users`.`id` = ? GROUP BY `users`.`name` HAVING email in (?, ?)', sql )
         self.assertEqual([1, 'foo', 'bar'], params)
+ 
+    def test_limits_and_offsets(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').offset(5).limit(10)
+        sql, params = builder.to_sql()
+        self.assertEqual('SELECT * FROM `users` LIMIT 10 OFFSET 5', sql)
+        self.assertEqual([], params)
 
-#     def test_havings(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').having('email', '>', 1)
-#         self.assertEqual(
-#             'SELECT * FROM "users" HAVING "email" > ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1], builder.get_bindings())
-#  
-#         builder = self.get_builder()
-#         builder.select('*').from_('users')\
-#             .or_having('email', '=', 'foo@bar.com')\
-#             .or_having('email', '=', 'foo2@bar.com')
-#         self.assertEqual(
-#             'SELECT * FROM "users" HAVING "email" = ? OR "email" = ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual(['foo@bar.com', 'foo2@bar.com'], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('*').from_('users')\
-#             .group_by('email')\
-#             .having('email', '>', 1)
-#         self.assertEqual(
-#             'SELECT * FROM "users" GROUP BY "email" HAVING "email" > ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('email as foo_mail').from_('users')\
-#             .having('foo_mail', '>', 1)
-#         self.assertEqual(
-#             'SELECT "email" AS "foo_mail" FROM "users" HAVING "foo_mail" > ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('category', QueryExpression('count(*) as "total"'))\
-#             .from_('item')\
-#             .where('department', '=', 'popular')\
-#             .group_by('category')\
-#             .having('total', '>', QueryExpression('3'))
-#         self.assertEqual(
-#             'SELECT "category", count(*) as "total" '
-#             'FROM "item" '
-#             'WHERE "department" = ? '
-#             'GROUP BY "category" '
-#             'HAVING "total" > 3',
-#             builder.to_sql()
-#         )
-#         self.assertEqual(['popular'], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('category', QueryExpression('count(*) as "total"'))\
-#             .from_('item')\
-#             .where('department', '=', 'popular')\
-#             .group_by('category')\
-#             .having('total', '>', 3)
-#         self.assertEqual(
-#             'SELECT "category", count(*) as "total" '
-#             'FROM "item" '
-#             'WHERE "department" = ? '
-#             'GROUP BY "category" '
-#             'HAVING "total" > ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual(['popular', 3], builder.get_bindings())
-# 
-#     def test_having_followed_by_select_get(self):
-#         builder = self.get_builder()
-#         query = 'SELECT "category", count(*) as "total" ' \
-#                 'FROM "item" ' \
-#                 'WHERE "department" = ? ' \
-#                 'GROUP BY "category" ' \
-#                 'HAVING "total" > ?'
-#         results = {
-#             'category': 'rock',
-#             'total': 5
-#         }
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results: results)
-#         result = builder.select('category', QueryExpression('count(*) as "total"'))\
-#             .from_('item')\
-#             .where('department', '=', 'popular')\
-#             .group_by('category')\
-#             .having('total', '>', 3)\
-#             .get()
-# 
-#         builder.get_connection().select.assert_called_once_with(
-#             query,
-#             ['popular', 3],
-#             True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(
-#             builder,
-#             results
-#         )
-#         self.assertEqual(results, result)
-#         self.assertEqual(['popular', 3], builder.get_bindings())
-# 
-#         # Using raw value
-#         builder = self.get_builder()
-#         query = 'SELECT "category", count(*) as "total" ' \
-#                 'FROM "item" ' \
-#                 'WHERE "department" = ? ' \
-#                 'GROUP BY "category" ' \
-#                 'HAVING "total" > 3'
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results: results)
-#         result = builder.select('category', QueryExpression('count(*) as "total"'))\
-#             .from_('item')\
-#             .where('department', '=', 'popular')\
-#             .group_by('category')\
-#             .having('total', '>', QueryExpression('3'))\
-#             .get()
-# 
-#         builder.get_connection().select.assert_called_once_with(
-#             query,
-#             ['popular'],
-#             True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(
-#             builder,
-#             results
-#         )
-#         self.assertEqual(results, result)
-#         self.assertEqual(['popular'], builder.get_bindings())
-# 
-#     def test_raw_havings(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').having_raw('user_foo < user_bar')
-#         self.assertEqual(
-#             'SELECT * FROM "users" HAVING user_foo < user_bar',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').having('foo', '=', 1).or_having_raw('user_foo < user_bar')
-#         self.assertEqual(
-#             'SELECT * FROM "users" HAVING "foo" = ? OR user_foo < user_bar',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1], builder.get_bindings())
-# 
-#     def test_limits_and_offsets(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').offset(5).limit(10)
-#         self.assertEqual('SELECT * FROM "users" LIMIT 10 OFFSET 5', builder.to_sql())
-# 
+    def test_page(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').page(5, 10)
+        sql, params = builder.to_sql()
+        self.assertEqual('SELECT * FROM `users` LIMIT 10 OFFSET 50', sql)
+        self.assertEqual([], params)
+
 #         builder = self.get_builder()
 #         builder.select('*').from_('users').skip(5).take(10)
 #         self.assertEqual('SELECT * FROM "users" LIMIT 10 OFFSET 5', builder.to_sql())
