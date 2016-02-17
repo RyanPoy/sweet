@@ -1,7 +1,7 @@
 #coding:utf8
 from ..utils import is_array, is_hash
+from .join_clause import JoinClause
 import re
-from PIL.ImageChops import offset
 
 
 class QueryBuilder(object):
@@ -18,6 +18,31 @@ class QueryBuilder(object):
         self._orders = []
         self._limit = None
         self._offset = None
+        self._joins = []
+
+    def new_instance(self):
+        return self.__class__()
+    
+    def join(self, tablename, *args):
+        if isinstance(tablename, JoinClause):
+            self._joins.append(tablename)
+        else:
+            self._joins.append(JoinClause(tablename).on(*args))
+        return self
+
+    def left_join(self, tablename, *args):
+        if isinstance(tablename, JoinClause):
+            self._joins.append(tablename)
+        else:
+            self._joins.append(JoinClause(tablename, 'LEFT').on(*args))
+        return self
+
+    def right_join(self, tablename, *args):
+        if isinstance(tablename, JoinClause):
+            self._joins.append(tablename)
+        else:
+            self._joins.append(JoinClause(tablename, 'RIGHT').on(*args))
+        return self
     
     def page(self, page_num, limit):
         self._limit = limit
@@ -78,6 +103,11 @@ class QueryBuilder(object):
         else:
             sqls.append( 'SELECT %s FROM `%s`' % (self._compile_select(), self._from) )
         
+        join_sql, join_params = self._compile_join()
+        if join_sql:
+            sqls.append(join_sql)
+            params += join_params
+
         where_sql, where_params = self._compile_where_or_having(self._wheres)
         if where_sql:
             sqls.append('WHERE %s' % where_sql)
@@ -96,7 +126,7 @@ class QueryBuilder(object):
         if order_by_sql:
             sqls.append('ORDER BY %s' % order_by_sql)
             
-        limit_offset_sql = self._complie_limit_and_offset()
+        limit_offset_sql = self._compile_limit_and_offset()
         if limit_offset_sql:
             sqls.append(limit_offset_sql)
 
@@ -120,10 +150,10 @@ class QueryBuilder(object):
                     ])
                 )
             else:
-                new_selects.append(self._complie_fieldname(select))
+                new_selects.append(self._compile_fieldname(select))
         return ', '.join(new_selects)
     
-    def _complie_fieldname(self, name):
+    def _compile_fieldname(self, name):
         return '`%s`.`%s`' % (self._from, name) if name else name
     
     def _postion_flag(self, list_or_set):
@@ -142,18 +172,18 @@ class QueryBuilder(object):
                 for k, v in condition.iteritems():
                     if is_array(v):
                         if v: # 数组里面有元素
-                            sqls.append('%s IN (%s)' % (self._complie_fieldname(k), self._postion_flag(v)))
+                            sqls.append('%s IN (%s)' % (self._compile_fieldname(k), self._postion_flag(v)))
                             params.extend(list(v)) # 如果是set，就必须转一下
                     elif v is None:
-                        sqls.append('%s IS NULL' % self._complie_fieldname(k))
+                        sqls.append('%s IS NULL' % self._compile_fieldname(k))
                     else:
-                        sqls.append('%s = %s' % (self._complie_fieldname(k), self.__class__.POSITION_FLAG))
+                        sqls.append('%s = %s' % (self._compile_fieldname(k), self.__class__.POSITION_FLAG))
                         params.append(v)
         sql = ' AND '.join(sqls)
         return sql, params
     
     def _compile_group(self):
-        return ', '.join([ self._complie_fieldname(group) for group in self._groups ])
+        return ', '.join([ self._compile_fieldname(group) for group in self._groups ])
 
     def _compile_order(self):
         sqls = []
@@ -161,13 +191,22 @@ class QueryBuilder(object):
             flag = ' '
             if ' DESC' in order: flag = ' DESC'
             elif ' ASC' in order: flag = ' ASC'
-            sqls.append(flag.join([ self._complie_fieldname(o.strip()) for o in order.split(flag) ]))
+            sqls.append(flag.join([ self._compile_fieldname(o.strip()) for o in order.split(flag) ]))
         return ', '.join(sqls)
     
-    def _complie_limit_and_offset(self):
+    def _compile_limit_and_offset(self):
         sqls = []
         if self._limit is not None:
             sqls.append('LIMIT %s' % self._limit)
         if self._offset is not None:
             sqls.append('OFFSET %s' % self._offset)
         return ' '.join(sqls)
+    
+    def _compile_join(self):
+        sqls, params = [], []
+        for join in self._joins:
+            join_sql, join_params = join.to_sql()
+            if join_sql:
+                sqls.append(join_sql)
+                params += join_params
+        return ' '.join(sqls), params

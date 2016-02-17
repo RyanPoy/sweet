@@ -32,6 +32,9 @@ ISO_DATE = r'^(\d{4})-(\d\d)-(\d\d)$'
 ISO_DATETIME = r'^(\d{4})-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)(\.\d+)?$'
 
 
+def backtick(s):
+    return '.'.join([ '`%s`' % x.strip() for x in s.split('.') if x and x.strip() ])
+    
 def to_bool(v):
     """ convert something to a boolean  """
     if not v:           return False

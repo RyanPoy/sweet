@@ -161,7 +161,7 @@ class QueryBuilder(object):
         for join in joins:
             self._joins.append(join)
         return self
-            
+
     def delete_or_update_or_find_sql(self):
         params  = []
 
