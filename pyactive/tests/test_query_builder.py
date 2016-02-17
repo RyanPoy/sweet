@@ -13,8 +13,10 @@ class QueryBuilderTestCase(unittest.TestCase):
     def test_basic_select(self):
         builder = self.get_builder()
         builder.select('*').from_('users')
-
-        self.assertEqual('SELECT * FROM `users`', builder.to_sql())
+        
+        sql, params = builder.to_sql()
+        self.assertEqual('SELECT * FROM `users`', sql)
+        self.assertEqual([], params)
         
 #     def test_basic_select_use_write_connection(self):
 #         builder = self.get_builder()
@@ -36,446 +38,107 @@ class QueryBuilderTestCase(unittest.TestCase):
     def test_alias_select(self):
         builder = self.get_builder()
         builder.select('foo as bar').from_('users')
-        self.assertEqual('SELECT `foo` AS `bar` FROM `users`', builder.to_sql() )
+        sql, params = builder.to_sql()
+        self.assertEqual('SELECT `foo` AS `bar` FROM `users`', sql )
+        self.assertEqual([], params)
 
         builder = self.get_builder()
         builder.select('x.y AS foo.bar').from_('baz')
-        self.assertEqual( 'SELECT `x`.`y` AS `foo`.`bar` FROM `baz`', builder.to_sql() )
- 
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT `x`.`y` AS `foo`.`bar` FROM `baz`', sql )
+        self.assertEqual([], params)
+
     def test_adding_selects(self):
         builder = self.get_builder()
         builder.select('foo').select('bar').select('baz', 'boom').select('x.y AS foo.bar').from_('users')
-
-        self.assertEqual(
-            'SELECT `foo`, `bar`, `baz`, `boom`, `x`.`y` AS `foo`.`bar` FROM `users`',
-            builder.to_sql()
-        )
+        
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT `users`.`foo`, `users`.`bar`, `users`.`baz`, `users`.`boom`, `x`.`y` AS `foo`.`bar` FROM `users`', sql )
+        self.assertEqual([], params)
 
     def test_basic_select_distinct(self):
         builder = self.get_builder()
         builder.distinct().select('foo', 'bar').from_('users')
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT DISTINCT `users`.`foo`, `users`.`bar` FROM `users`', sql )
+        self.assertEqual([], params) 
+
+    def test_basic_where(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').where(id=1)
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT * FROM `users` WHERE `users`.`id` = ?', sql )
+        self.assertEqual([1], params)
+        
+    def test_where_in(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').where(id=[1, 2])
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT * FROM `users` WHERE `users`.`id` IN (?, ?)', sql )
+        self.assertEqual([1, 2], params)
+        
+    def test_raw_where(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').where('id = ? or email = ?', 1, 'foo')
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT * FROM `users` WHERE id = ? or email = ?', sql )
+        self.assertEqual([1, 'foo'], params)
+         
+    def test_multi_contidions_where(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').where(id=1).where('email in (?, ?)', 'foo', 'bar')
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT * FROM `users` WHERE `users`.`id` = ? AND email in (?, ?)', sql )
+        self.assertEqual([1, 'foo', 'bar'], params)
+
+    def test_empty_where_in(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').where(id=[])
+        sql, params = builder.to_sql()
+        self.assertEqual('SELECT * FROM `users`', sql)
+        self.assertEqual([], params)
  
-        self.assertEqual(
-            'SELECT DISTINCT `foo`, `bar` FROM `users`',
-            builder.to_sql()
-        )
- 
-#     def test_mysql_wrapping_protects_qutotation_marks(self):
-#         builder = self.get_mysql_builder()
-#         builder.select('*').from_('some`table')
-# 
-#         self.assertEqual(
-#             'SELECT * FROM `some``table`',
-#             builder.to_sql()
-#         )
-# 
-#     def test_where_day_mysql(self):
-#         builder = self.get_mysql_builder()
-#         builder.select('*').from_('users').where_day('created_at', '=', 1)
-# 
-#         self.assertEqual(
-#             'SELECT * FROM `users` WHERE DAY(`created_at`) = %s',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1], builder.get_bindings())
-# 
-#     def test_where_month_mysql(self):
-#         builder = self.get_mysql_builder()
-#         builder.select('*').from_('users').where_month('created_at', '=', 5)
-# 
-#         self.assertEqual(
-#             'SELECT * FROM `users` WHERE MONTH(`created_at`) = %s',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([5], builder.get_bindings())
-# 
-#     def test_where_year_mysql(self):
-#         builder = self.get_mysql_builder()
-#         builder.select('*').from_('users').where_year('created_at', '=', 2014)
-# 
-#         self.assertEqual(
-#             'SELECT * FROM `users` WHERE YEAR(`created_at`) = %s',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([2014], builder.get_bindings())
-# 
-#     def test_where_day_postgres(self):
-#         builder = self.get_postgres_builder()
-#         builder.select('*').from_('users').where_day('created_at', '=', 1)
-# 
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE DAY("created_at") = %s',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1], builder.get_bindings())
-# 
-#     def test_where_month_postgres(self):
-#         builder = self.get_postgres_builder()
-#         builder.select('*').from_('users').where_month('created_at', '=', 5)
-# 
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE MONTH("created_at") = %s',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([5], builder.get_bindings())
-# 
-#     def test_where_year_postgres(self):
-#         builder = self.get_postgres_builder()
-#         builder.select('*').from_('users').where_year('created_at', '=', 2014)
-# 
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE YEAR("created_at") = %s',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([2014], builder.get_bindings())
-# 
-#     def test_where_day_sqlite(self):
-#         builder = self.get_sqlite_builder()
-#         builder.select('*').from_('users').where_day('created_at', '=', 1)
-# 
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE strftime(\'%d\', "created_at") = ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1], builder.get_bindings())
-# 
-#     def test_where_month_sqlite(self):
-#         builder = self.get_sqlite_builder()
-#         builder.select('*').from_('users').where_month('created_at', '=', 5)
-# 
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE strftime(\'%m\', "created_at") = ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([5], builder.get_bindings())
-# 
-#     def test_where_year_sqlite(self):
-#         builder = self.get_sqlite_builder()
-#         builder.select('*').from_('users').where_year('created_at', '=', 2014)
-# 
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE strftime(\'%Y\', "created_at") = ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([2014], builder.get_bindings())
-# 
-#     def test_where_between(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where_between('id', [1, 2])
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" BETWEEN ? AND ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where_not_between('id', [1, 2])
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" NOT BETWEEN ? AND ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2], builder.get_bindings())
-# 
-#     def test_basic_or_where(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1).or_where('email', '=', 'foo')
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? OR "email" = ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 'foo'], builder.get_bindings())
-# 
-#     def test_raw_wheres(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where_raw('id = ? or email = ?', [1, 'foo'])
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE id = ? OR email = ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 'foo'], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where_raw('id = ?', [1])
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE id = ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1], builder.get_bindings())
-# 
-#     def test_raw_or_wheres(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1).or_where_raw('email = ?', ['foo'])
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? OR email = ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 'foo'], builder.get_bindings())
-# 
-#     def test_basic_where_ins(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where_in('id', [1, 2, 3])
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" IN (?, ?, ?)',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2, 3], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1).or_where_in('id', [1, 2, 3])
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? OR "id" IN (?, ?, ?)',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 1, 2, 3], builder.get_bindings())
-# 
-#     def test_basic_where_not_ins(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where_not_in('id', [1, 2, 3])
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" NOT IN (?, ?, ?)',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2, 3], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1).or_where_not_in('id', [1, 2, 3])
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? OR "id" NOT IN (?, ?, ?)',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 1, 2, 3], builder.get_bindings())
-# 
-#     def test_empty_where_ins(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where_in('id', [])
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE 0 = 1',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1).or_where_in('id', [])
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? OR 0 = 1',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1], builder.get_bindings())
-# 
-#     def test_empty_where_not_ins(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where_not_in('id', [])
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE 1 = 1',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1).or_where_not_in('id', [])
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? OR 1 = 1',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1], builder.get_bindings())
-# 
-#     def test_where_in_accepts_collections(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where_in('id', Collection([1, 2, 3]))
-# 
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" IN (?, ?, ?)',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2, 3], builder.get_bindings())
-# 
-#     def test_unions(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1)
-#         builder.union(self.get_builder().select('*').from_('users').where('id', '=', 2))
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? UNION SELECT * FROM "users" WHERE "id" = ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2], builder.get_bindings())
-# 
-#         builder = self.get_mysql_builder()
-#         builder.select('*').from_('users').where('id', '=', 1)
-#         builder.union(self.get_mysql_builder().select('*').from_('users').where('id', '=', 2))
-#         self.assertEqual(
-#             '(SELECT * FROM `users` WHERE `id` = %s) UNION (SELECT * FROM `users` WHERE `id` = %s)',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2], builder.get_bindings())
-# 
-#     def test_union_alls(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1)
-#         builder.union_all(self.get_builder().select('*').from_('users').where('id', '=', 2))
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? UNION ALL SELECT * FROM "users" WHERE "id" = ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2], builder.get_bindings())
-# 
-#     def test_multiple_unions(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1)
-#         builder.union(self.get_builder().select('*').from_('users').where('id', '=', 2))
-#         builder.union(self.get_builder().select('*').from_('users').where('id', '=', 3))
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? '
-#             'UNION SELECT * FROM "users" WHERE "id" = ? '
-#             'UNION SELECT * FROM "users" WHERE "id" = ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2, 3], builder.get_bindings())
-# 
-#     def test_multiple_union_alls(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1)
-#         builder.union_all(self.get_builder().select('*').from_('users').where('id', '=', 2))
-#         builder.union_all(self.get_builder().select('*').from_('users').where('id', '=', 3))
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? '
-#             'UNION ALL SELECT * FROM "users" WHERE "id" = ? '
-#             'UNION ALL SELECT * FROM "users" WHERE "id" = ?',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2, 3], builder.get_bindings())
-# 
-#     def test_union_order_bys(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1)
-#         builder.union(self.get_builder().select('*').from_('users').where('id', '=', 2))
-#         builder.order_by('id', 'desc')
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? '
-#             'UNION SELECT * FROM "users" WHERE "id" = ? '
-#             'ORDER BY "id" DESC',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2], builder.get_bindings())
-# 
-#     def test_union_limits_and_offsets(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1)
-#         builder.union(self.get_builder().select('*').from_('users').where('id', '=', 2))
-#         builder.skip(5).take(10)
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? '
-#             'UNION SELECT * FROM "users" WHERE "id" = ? '
-#             'LIMIT 10 OFFSET 5',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2], builder.get_bindings())
-# 
-#     def test_mysql_union_order_bys(self):
-#         builder = self.get_mysql_builder()
-#         builder.select('*').from_('users').where('id', '=', 1)
-#         builder.union(self.get_mysql_builder().select('*').from_('users').where('id', '=', 2))
-#         builder.order_by('id', 'desc')
-#         self.assertEqual(
-#             '(SELECT * FROM `users` WHERE `id` = %s) '
-#             'UNION (SELECT * FROM `users` WHERE `id` = %s) '
-#             'ORDER BY `id` DESC',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2], builder.get_bindings())
-# 
-#     def test_mysql_union_limits_and_offsets(self):
-#         builder = self.get_mysql_builder()
-#         builder.select('*').from_('users').where('id', '=', 1)
-#         builder.union(self.get_mysql_builder().select('*').from_('users').where('id', '=', 2))
-#         builder.skip(5).take(10)
-#         self.assertEqual(
-#             '(SELECT * FROM `users` WHERE `id` = %s) '
-#             'UNION (SELECT * FROM `users` WHERE `id` = %s) '
-#             'LIMIT 10 OFFSET 5',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1, 2], builder.get_bindings())
-# 
-#     def test_sub_select_where_in(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where_in(
-#             'id',
-#             self.get_builder().select('id').from_('users').where('age', '>', 25).take(3)
-#         )
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" IN (SELECT "id" FROM "users" WHERE "age" > ? LIMIT 3)',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([25], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where_not_in(
-#             'id',
-#             self.get_builder().select('id').from_('users').where('age', '>', 25).take(3)
-#         )
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" NOT IN (SELECT "id" FROM "users" WHERE "age" > ? LIMIT 3)',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([25], builder.get_bindings())
-# 
-#     def test_basic_where_null(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where_null('id')
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" IS NULL',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1).or_where_null('id')
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? OR "id" IS NULL',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1], builder.get_bindings())
-# 
-#     def test_basic_where_not_null(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where_not_null('id')
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" IS NOT NULL',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([], builder.get_bindings())
-# 
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').where('id', '=', 1).or_where_not_null('id')
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" = ? OR "id" IS NOT NULL',
-#             builder.to_sql()
-#         )
-#         self.assertEqual([1], builder.get_bindings())
-# 
-#     def test_group_bys(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').group_by('id', 'email')
-#         self.assertEqual(
-#             'SELECT * FROM "users" GROUP BY "id", "email"',
-#             builder.to_sql()
-#         )
-# 
+        builder = self.get_builder()
+        builder.select('*').from_('users').where(id=[]).where('email in (?, ?)', 'foo', 'bar')
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT * FROM `users` WHERE email in (?, ?)', sql )
+        self.assertEqual(['foo', 'bar'], params)
+        
+    def test_basic_where_null(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').where(id=None)
+        sql, params = builder.to_sql()
+        self.assertEqual('SELECT * FROM `users` WHERE `users`.`id` IS NULL', sql)
+        self.assertEqual([], params)
+
+    def test_group_by(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').group_by('id', 'email').group_by('name')
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT * FROM `users` GROUP BY `users`.`id`, `users`.`email`, `users`.`name`', sql )
+        self.assertEqual( [], params )
+
+        builder = self.get_builder()
+        builder.select('*').from_('users').group_by('id, email').group_by('name')
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT * FROM `users` GROUP BY `users`.`id`, `users`.`email`, `users`.`name`', sql )
+        self.assertEqual( [], params )
+
 #     def test_order_bys(self):
 #         builder = self.get_builder()
-#         builder.select('*').from_('users').order_by('email').order_by('age', 'desc')
+#         builder.select('*').from_('users').order_by('email').order_by('age', 'desc').order_by('id')
 #         self.assertEqual(
 #             'SELECT * FROM "users" ORDER BY "email" ASC, "age" DESC',
 #             builder.to_sql()
 #         )
-# 
+#  
 #         builder = self.get_builder()
 #         builder.select('*').from_('users').order_by('email').order_by_raw('"age" ? desc', ['foo'])
 #         self.assertEqual(
 #             'SELECT * FROM "users" ORDER BY "email" ASC, "age" ? DESC',
 #             builder.to_sql()
 #         )
-# 
+ 
 #     def test_havings(self):
 #         builder = self.get_builder()
 #         builder.select('*').from_('users').having('email', '>', 1)
@@ -1575,3 +1238,135 @@ class QueryBuilderTestCase(unittest.TestCase):
 #         connection = MockConnection().prepare_mock()
 # 
 #         return QueryBuilder(connection, grammar, processor)
+
+ 
+#     def test_unions(self):
+#         builder = self.get_builder()
+#         builder.select('*').from_('users').where('id', '=', 1)
+#         builder.union(self.get_builder().select('*').from_('users').where('id', '=', 2))
+#         self.assertEqual(
+#             'SELECT * FROM "users" WHERE "id" = ? UNION SELECT * FROM "users" WHERE "id" = ?',
+#             builder.to_sql()
+#         )
+#         self.assertEqual([1, 2], builder.get_bindings())
+# 
+#         builder = self.get_mysql_builder()
+#         builder.select('*').from_('users').where('id', '=', 1)
+#         builder.union(self.get_mysql_builder().select('*').from_('users').where('id', '=', 2))
+#         self.assertEqual(
+#             '(SELECT * FROM `users` WHERE `id` = %s) UNION (SELECT * FROM `users` WHERE `id` = %s)',
+#             builder.to_sql()
+#         )
+#         self.assertEqual([1, 2], builder.get_bindings())
+# 
+#     def test_union_alls(self):
+#         builder = self.get_builder()
+#         builder.select('*').from_('users').where('id', '=', 1)
+#         builder.union_all(self.get_builder().select('*').from_('users').where('id', '=', 2))
+#         self.assertEqual(
+#             'SELECT * FROM "users" WHERE "id" = ? UNION ALL SELECT * FROM "users" WHERE "id" = ?',
+#             builder.to_sql()
+#         )
+#         self.assertEqual([1, 2], builder.get_bindings())
+# 
+#     def test_multiple_unions(self):
+#         builder = self.get_builder()
+#         builder.select('*').from_('users').where('id', '=', 1)
+#         builder.union(self.get_builder().select('*').from_('users').where('id', '=', 2))
+#         builder.union(self.get_builder().select('*').from_('users').where('id', '=', 3))
+#         self.assertEqual(
+#             'SELECT * FROM "users" WHERE "id" = ? '
+#             'UNION SELECT * FROM "users" WHERE "id" = ? '
+#             'UNION SELECT * FROM "users" WHERE "id" = ?',
+#             builder.to_sql()
+#         )
+#         self.assertEqual([1, 2, 3], builder.get_bindings())
+# 
+#     def test_multiple_union_alls(self):
+#         builder = self.get_builder()
+#         builder.select('*').from_('users').where('id', '=', 1)
+#         builder.union_all(self.get_builder().select('*').from_('users').where('id', '=', 2))
+#         builder.union_all(self.get_builder().select('*').from_('users').where('id', '=', 3))
+#         self.assertEqual(
+#             'SELECT * FROM "users" WHERE "id" = ? '
+#             'UNION ALL SELECT * FROM "users" WHERE "id" = ? '
+#             'UNION ALL SELECT * FROM "users" WHERE "id" = ?',
+#             builder.to_sql()
+#         )
+#         self.assertEqual([1, 2, 3], builder.get_bindings())
+# 
+#     def test_union_order_bys(self):
+#         builder = self.get_builder()
+#         builder.select('*').from_('users').where('id', '=', 1)
+#         builder.union(self.get_builder().select('*').from_('users').where('id', '=', 2))
+#         builder.order_by('id', 'desc')
+#         self.assertEqual(
+#             'SELECT * FROM "users" WHERE "id" = ? '
+#             'UNION SELECT * FROM "users" WHERE "id" = ? '
+#             'ORDER BY "id" DESC',
+#             builder.to_sql()
+#         )
+#         self.assertEqual([1, 2], builder.get_bindings())
+# 
+#     def test_union_limits_and_offsets(self):
+#         builder = self.get_builder()
+#         builder.select('*').from_('users').where('id', '=', 1)
+#         builder.union(self.get_builder().select('*').from_('users').where('id', '=', 2))
+#         builder.skip(5).take(10)
+#         self.assertEqual(
+#             'SELECT * FROM "users" WHERE "id" = ? '
+#             'UNION SELECT * FROM "users" WHERE "id" = ? '
+#             'LIMIT 10 OFFSET 5',
+#             builder.to_sql()
+#         )
+#         self.assertEqual([1, 2], builder.get_bindings())
+# 
+#     def test_mysql_union_order_bys(self):
+#         builder = self.get_mysql_builder()
+#         builder.select('*').from_('users').where('id', '=', 1)
+#         builder.union(self.get_mysql_builder().select('*').from_('users').where('id', '=', 2))
+#         builder.order_by('id', 'desc')
+#         self.assertEqual(
+#             '(SELECT * FROM `users` WHERE `id` = %s) '
+#             'UNION (SELECT * FROM `users` WHERE `id` = %s) '
+#             'ORDER BY `id` DESC',
+#             builder.to_sql()
+#         )
+#         self.assertEqual([1, 2], builder.get_bindings())
+# 
+#     def test_mysql_union_limits_and_offsets(self):
+#         builder = self.get_mysql_builder()
+#         builder.select('*').from_('users').where('id', '=', 1)
+#         builder.union(self.get_mysql_builder().select('*').from_('users').where('id', '=', 2))
+#         builder.skip(5).take(10)
+#         self.assertEqual(
+#             '(SELECT * FROM `users` WHERE `id` = %s) '
+#             'UNION (SELECT * FROM `users` WHERE `id` = %s) '
+#             'LIMIT 10 OFFSET 5',
+#             builder.to_sql()
+#         )
+#         self.assertEqual([1, 2], builder.get_bindings())
+# 
+#     def test_sub_select_where_in(self):
+#         builder = self.get_builder()
+#         builder.select('*').from_('users').where_in(
+#             'id',
+#             self.get_builder().select('id').from_('users').where('age', '>', 25).take(3)
+#         )
+#         self.assertEqual(
+#             'SELECT * FROM "users" WHERE "id" IN (SELECT "id" FROM "users" WHERE "age" > ? LIMIT 3)',
+#             builder.to_sql()
+#         )
+#         self.assertEqual([25], builder.get_bindings())
+# 
+#         builder = self.get_builder()
+#         builder.select('*').from_('users').where_not_in(
+#             'id',
+#             self.get_builder().select('id').from_('users').where('age', '>', 25).take(3)
+#         )
+#         self.assertEqual(
+#             'SELECT * FROM "users" WHERE "id" NOT IN (SELECT "id" FROM "users" WHERE "age" > ? LIMIT 3)',
+#             builder.to_sql()
+#         )
+#         self.assertEqual([25], builder.get_bindings())
+ 
