@@ -4,7 +4,7 @@ from .join_clause import JoinClause
 import re
 
 
-class SQLBuilder(object):
+class Criteria(object):
     
     POSITION_FLAG = '?'
     
