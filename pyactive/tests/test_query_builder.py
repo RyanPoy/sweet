@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
+#coding: utf8
 from ..query.query_builder import QueryBuilder
 import unittest
-import re
 import fudge
 
 
@@ -124,21 +123,67 @@ class QueryBuilderTestCase(unittest.TestCase):
         self.assertEqual( 'SELECT * FROM `users` GROUP BY `users`.`id`, `users`.`email`, `users`.`name`', sql )
         self.assertEqual( [], params )
 
-#     def test_order_bys(self):
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').order_by('email').order_by('age', 'desc').order_by('id')
-#         self.assertEqual(
-#             'SELECT * FROM "users" ORDER BY "email" ASC, "age" DESC',
-#             builder.to_sql()
-#         )
-#  
-#         builder = self.get_builder()
-#         builder.select('*').from_('users').order_by('email').order_by_raw('"age" ? desc', ['foo'])
-#         self.assertEqual(
-#             'SELECT * FROM "users" ORDER BY "email" ASC, "age" ? DESC',
-#             builder.to_sql()
-#         )
+    def test_order_by(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').order_by('email').order_by('age desc, id ASC')
+        sql, params = builder.to_sql()
+        self.assertEqual('SELECT * FROM `users` ORDER BY `users`.`email`, `users`.`age` DESC, `users`.`id` ASC', sql)
+        self.assertEqual( [], params )
+
+        builder = self.get_builder()
+        builder.select('*').from_('users').order_by('email').order_by('age DESC', 'id ASC')
+        sql, params = builder.to_sql()
+        self.assertEqual('SELECT * FROM `users` ORDER BY `users`.`email`, `users`.`age` DESC, `users`.`id` ASC', sql)
+        self.assertEqual( [], params )
  
+    def test_basic_having(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').having(id=1)
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT * FROM `users` HAVING `users`.`id` = ?', sql )
+        self.assertEqual([1], params)
+        
+    def test_having_in(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').having(id=[1, 2])
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT * FROM `users` HAVING `users`.`id` IN (?, ?)', sql )
+        self.assertEqual([1, 2], params)
+        
+    def test_raw_having(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').having('id = ? or email = ?', 1, 'foo')
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT * FROM `users` HAVING id = ? or email = ?', sql )
+        self.assertEqual([1, 'foo'], params)
+         
+    def test_multi_contidions_having(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').having(id=1).having('email in (?, ?)', 'foo', 'bar')
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT * FROM `users` HAVING `users`.`id` = ? AND email in (?, ?)', sql )
+        self.assertEqual([1, 'foo', 'bar'], params)
+
+    def test_empty_having_in(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').having(id=[])
+        sql, params = builder.to_sql()
+        self.assertEqual('SELECT * FROM `users`', sql)
+        self.assertEqual([], params)
+ 
+        builder = self.get_builder()
+        builder.select('*').from_('users').having(id=[]).having('email in (?, ?)', 'foo', 'bar')
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT * FROM `users` HAVING email in (?, ?)', sql )
+        self.assertEqual(['foo', 'bar'], params)
+        
+    def test_basic_having_null(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').having(id=None)
+        sql, params = builder.to_sql()
+        self.assertEqual('SELECT * FROM `users` HAVING `users`.`id` IS NULL', sql)
+        self.assertEqual([], params)
+
 #     def test_havings(self):
 #         builder = self.get_builder()
 #         builder.select('*').from_('users').having('email', '>', 1)
@@ -147,7 +192,7 @@ class QueryBuilderTestCase(unittest.TestCase):
 #             builder.to_sql()
 #         )
 #         self.assertEqual([1], builder.get_bindings())
-# 
+#  
 #         builder = self.get_builder()
 #         builder.select('*').from_('users')\
 #             .or_having('email', '=', 'foo@bar.com')\
