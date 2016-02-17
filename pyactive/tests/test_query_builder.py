@@ -156,7 +156,7 @@ class QueryBuilderTestCase(unittest.TestCase):
         sql, params = builder.to_sql()
         self.assertEqual( 'SELECT * FROM `users` HAVING id = ? or email = ?', sql )
         self.assertEqual([1, 'foo'], params)
-         
+
     def test_multi_contidions_having(self):
         builder = self.get_builder()
         builder.select('*').from_('users').having(id=1).having('email in (?, ?)', 'foo', 'bar')
@@ -183,6 +183,13 @@ class QueryBuilderTestCase(unittest.TestCase):
         sql, params = builder.to_sql()
         self.assertEqual('SELECT * FROM `users` HAVING `users`.`id` IS NULL', sql)
         self.assertEqual([], params)
+        
+    def test_multi_contidions_having_follow_group(self):
+        builder = self.get_builder()
+        builder.select('*').from_('users').where(id=1).having('email in (?, ?)', 'foo', 'bar').group_by('name')
+        sql, params = builder.to_sql()
+        self.assertEqual( 'SELECT * FROM `users` WHERE `users`.`id` = ? GROUP BY `users`.`name` HAVING email in (?, ?)', sql )
+        self.assertEqual([1, 'foo', 'bar'], params)
 
 #     def test_havings(self):
 #         builder = self.get_builder()
