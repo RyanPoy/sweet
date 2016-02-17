@@ -20,10 +20,11 @@ class SQLBuilder(object):
         self._offset = 0
         self._joins = []
         self.conn = conn
+        self._aggregate = None
 
     def new_instance(self):
         return self.__class__()
-
+    
     def first(self):
         tmp_limit, tmp_offset = self._limit, self._offset
         self.limit(1).offset(0)
@@ -108,13 +109,36 @@ class SQLBuilder(object):
     def distinct(self):
         self._distinct = True
         return self
+    
+    def count(self, column='*'):
+        return self._aggregate_func('COUNT(%s)' % column)
+        
+    def sum(self, column):
+        return self._aggregate_func('SUM(%s)' % column)
+    
+    def max(self, column):
+        return self._aggregate_func('MAX(%s)' % column)
+    
+    def min(self, column):
+        return self._aggregate_func('MIN(%s)' % column)
+    
+    def avg(self, column):
+        return self._aggregate_func('AVG(%s)' % column)
+
+    def _aggregate_func(self, aggeregate):
+        self._aggregate = aggeregate
+        row = self.first()
+        v = row['aggregate'] if row else 0
+        self._aggregate = None
+        return v
 
     def to_sql(self):
         sqls, params = [], []
+        aggregate_or_select_sql = self._compile_aggregate() or self._compile_select()
         if self._distinct:
-            sqls.append( 'SELECT DISTINCT %s FROM `%s`' % (self._compile_select(), self._from) )
+            sqls.append( 'SELECT DISTINCT %s FROM `%s`' % (aggregate_or_select_sql, self._from) )
         else:
-            sqls.append( 'SELECT %s FROM `%s`' % (self._compile_select(), self._from) )
+            sqls.append( 'SELECT %s FROM `%s`' % (aggregate_or_select_sql, self._from) )
         
         join_sql, join_params = self._compile_join()
         if join_sql:
@@ -143,7 +167,10 @@ class SQLBuilder(object):
         if limit_offset_sql:
             sqls.append(limit_offset_sql)
 
-        return ' '.join(sqls), params
+        return ' '.join(sqls), params 
+        
+    def _compile_aggregate(self):
+        return '%s AS aggregate' % self._aggregate if self._aggregate else ''
 
     def _compile_select(self):
         selects = self._selects
@@ -165,7 +192,7 @@ class SQLBuilder(object):
             else:
                 new_selects.append(self._compile_fieldname(select))
         return ', '.join(new_selects)
-    
+
     def _compile_fieldname(self, name):
         return '`%s`.`%s`' % (self._from, name) if name else name
     

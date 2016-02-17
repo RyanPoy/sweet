@@ -5,7 +5,7 @@ import unittest
 import fudge
 
 
-class SQLBuilderTestCase(unittest.TestCase):
+class SQLBuilderQueryTestCase(unittest.TestCase):
     
     def get_builder(self, conn=None):
         return SQLBuilder(conn)
@@ -226,8 +226,7 @@ class SQLBuilderTestCase(unittest.TestCase):
 #         builder.select(QueryExpression('substr(foo, 6)')).from_('users')
 #         self.assertEqual('SELECT substr(foo, 6) FROM "users"', builder.to_sql())
 # 
-    
-    @fudge.test
+
     def test_first_return_none_result_if_can_not_found(self):
         results = []
         conn = fudge.Fake('conn')\
@@ -242,7 +241,6 @@ class SQLBuilderTestCase(unittest.TestCase):
         self.assertEqual(limit, builder._limit)
         self.assertEqual(offset, builder._offset)
         
-    @fudge.test
     def test_first_return_first_result(self):
         results = [
             {'id': 1, 'email': 'foo'}
@@ -259,8 +257,7 @@ class SQLBuilderTestCase(unittest.TestCase):
         self.assertEqual(limit, builder._limit)
         self.assertEqual(offset, builder._offset)
             
-    @fudge.test
-    def test_all_return_all_result(self):
+    def test_all_return_all_results(self):
         results = [
             {'id': 1, 'tag': 'foo'},
             {'id': 2, 'tag': 'boom'},
@@ -274,214 +271,7 @@ class SQLBuilderTestCase(unittest.TestCase):
         builder = self.get_builder(conn)
         builder.select('*').from_('users').where(tag=['boom', 'foo'])
         self.assertEqual(results, builder.all() )
-
-#     def test_list_methods_gets_list_of_colmun_values(self):
-#         builder = self.get_builder()
-#         results = [
-#             {'foo': 'bar'}, {'foo': 'baz'}
-#         ]
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results)
-#         result = builder.from_('users').where('id', '=', 1).lists('foo')
-#         self.assertEqual(['bar', 'baz'], result)
-# 
-#         builder = self.get_builder()
-#         results = [
-#             {'id': 1, 'foo': 'bar'}, {'id': 10, 'foo': 'baz'}
-#         ]
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results)
-#         result = builder.from_('users').where('id', '=', 1).lists('foo', 'id')
-#         self.assertEqual({1: 'bar', 10: 'baz'}, result)
-# 
-#     def test_implode(self):
-#         builder = self.get_builder()
-#         results = [
-#             {'foo': 'bar'}, {'foo': 'baz'}
-#         ]
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results)
-#         result = builder.from_('users').where('id', '=', 1).implode('foo')
-#         self.assertEqual('barbaz', result)
-# 
-#         builder = self.get_builder()
-#         results = [
-#             {'foo': 'bar'}, {'foo': 'baz'}
-#         ]
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results)
-#         result = builder.from_('users').where('id', '=', 1).implode('foo', ',')
-#         self.assertEqual('bar,baz', result)
-# 
-#     def test_pluck_return_single_column(self):
-#         builder = self.get_builder()
-#         query = 'SELECT "foo" FROM "users" WHERE "id" = ? LIMIT 1'
-#         results = [{'foo': 'bar'}]
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results)
-#         result = builder.from_('users').where('id', '=', 1).pluck('foo')
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [1], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, results)
-#         self.assertEqual('bar', result)
-# 
-#     def test_aggegate_functions(self):
-#         builder = self.get_builder()
-#         query = 'SELECT COUNT(*) AS aggregate FROM "users"'
-#         results = [{'aggregate': 1}]
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results)
-#         result = builder.from_('users').count()
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, results)
-#         self.assertEqual(1, result)
-# 
-#         builder = self.get_builder()
-#         query = 'SELECT COUNT(*) AS aggregate FROM "users" LIMIT 1'
-#         results = [{'aggregate': 1}]
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results_)
-#         result = builder.from_('users').exists()
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, results)
-#         self.assertTrue(result)
-# 
-#         builder = self.get_builder()
-#         query = 'SELECT MAX("id") AS aggregate FROM "users"'
-#         results = [{'aggregate': 1}]
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results_)
-#         result = builder.from_('users').max('id')
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, results)
-#         self.assertEqual(1, result)
-# 
-#         builder = self.get_builder()
-#         query = 'SELECT MIN("id") AS aggregate FROM "users"'
-#         results = [{'aggregate': 1}]
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results_)
-#         result = builder.from_('users').min('id')
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, results)
-#         self.assertEqual(1, result)
-# 
-#         builder = self.get_builder()
-#         query = 'SELECT SUM("id") AS aggregate FROM "users"'
-#         results = [{'aggregate': 1}]
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results_)
-#         result = builder.from_('users').sum('id')
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, results)
-#         self.assertEqual(1, result)
-# 
-#         builder = self.get_builder()
-#         query = 'SELECT AVG("id") AS aggregate FROM "users"'
-#         results = [{'aggregate': 1}]
-#         builder.get_connection().select.return_value = results
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results_)
-#         result = builder.from_('users').avg('id')
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, results)
-#         self.assertEqual(1, result)
-# 
-#     def test_aggregate_reset_followed_by_get(self):
-#         builder = self.get_builder()
-#         query = 'SELECT COUNT(*) AS aggregate FROM "users"'
-#         builder.get_connection().select.return_value = [{'aggregate': 1}]
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results_)
-#         builder.from_('users').select('column1', 'column2')
-#         count = builder.count()
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, [{'aggregate': 1}])
-#         self.assertEqual(1, count)
-# 
-#         builder.get_connection().select.reset_mock()
-#         builder.get_processor().process_select.reset_mock()
-#         query = 'SELECT SUM("id") AS aggregate FROM "users"'
-#         builder.get_connection().select.return_value = [{'aggregate': 2}]
-#         sum_ = builder.sum('id')
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, [{'aggregate': 2}])
-#         self.assertEqual(2, sum_)
-# 
-#         builder.get_connection().select.reset_mock()
-#         builder.get_processor().process_select.reset_mock()
-#         query = 'SELECT "column1", "column2" FROM "users"'
-#         builder.get_connection().select.return_value = [{'column1': 'foo', 'column2': 'bar'}]
-#         result = builder.get()
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, [{'column1': 'foo', 'column2': 'bar'}])
-#         self.assertEqual([{'column1': 'foo', 'column2': 'bar'}], result)
-# 
-#     def test_aggregate_reset_followed_by_select_get(self):
-#         builder = self.get_builder()
-#         query = 'SELECT COUNT("column1") AS aggregate FROM "users"'
-#         builder.get_connection().select.return_value = [{'aggregate': 1}]
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results_)
-#         builder.from_('users')
-#         count = builder.count('column1')
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, [{'aggregate': 1}])
-#         self.assertEqual(1, count)
-# 
-#         builder.get_connection().select.reset_mock()
-#         builder.get_processor().process_select.reset_mock()
-#         query = 'SELECT "column2", "column3" FROM "users"'
-#         builder.get_connection().select.return_value = [{'column2': 'foo', 'column3': 'bar'}]
-#         result = builder.select('column2', 'column3').get()
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, [{'column2': 'foo', 'column3': 'bar'}])
-#         self.assertEqual([{'column2': 'foo', 'column3': 'bar'}], result)
-# 
-#     def test_aggregate_reset_followed_by_get_with_columns(self):
-#         builder = self.get_builder()
-#         query = 'SELECT COUNT("column1") AS aggregate FROM "users"'
-#         builder.get_connection().select.return_value = [{'aggregate': 1}]
-#         builder.get_processor().process_select = mock.MagicMock(side_effect=lambda builder_, results_: results_)
-#         builder.from_('users')
-#         count = builder.count('column1')
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, [{'aggregate': 1}])
-#         self.assertEqual(1, count)
-# 
-#         builder.get_connection().select.reset_mock()
-#         builder.get_processor().process_select.reset_mock()
-#         query = 'SELECT "column2", "column3" FROM "users"'
-#         builder.get_connection().select.return_value = [{'column2': 'foo', 'column3': 'bar'}]
-#         result = builder.get(['column2', 'column3'])
-#         builder.get_connection().select.assert_called_once_with(
-#             query, [], True
-#         )
-#         builder.get_processor().process_select.assert_called_once_with(builder, [{'column2': 'foo', 'column3': 'bar'}])
-#         self.assertEqual([{'column2': 'foo', 'column3': 'bar'}], result)
-# 
+    
 #     def test_insert_method(self):
 #         builder = self.get_builder()
 #         query = 'INSERT INTO "users" ("email") VALUES (?)'
@@ -1170,3 +960,6 @@ class SQLBuilderTestCase(unittest.TestCase):
 #             [],
 #             True
 #         )
+
+if __name__ == "__main__":
+    unittest.main()
