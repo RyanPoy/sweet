@@ -143,13 +143,20 @@ is_array    = lambda obj: isinstance(obj, (tuple, list, set))
 
 # other functions
 
-def flatten(sequnce):
+def xflatten(sequnce):
     for x in sequnce:
         if isinstance(x, (list, tuple)):
-            for y in flatten(x):
+            for y in xflatten(x):
                 yield y
         else:
             yield x
+
+
+def flatten(sequnce):
+    lst = []
+    for x in xflatten(sequnce):
+        lst.append(x)
+    return lst
 
 
 def import_object(name):

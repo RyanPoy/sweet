@@ -292,6 +292,18 @@ class CriteriaQueryTestCase(unittest.TestCase):
                 .returns(True)
         criteria = self.get_criteria(conn)
         self.assertTrue(criteria.from_('users').insert(id='foo', name='bar', age='boom') )
+        
+    def test_mysql_multiple_insert(self):
+        conn = fudge.Fake('conn')\
+                .expects('execute')\
+                .with_args('INSERT INTO `users` (`age`, `name`, `id`) VALUES (?, ?, ?), (?, ?, ?)', 'boom', 'bar', 'foo', 'boom2', 'bar2', 'foo2')\
+                .returns(True)
+        criteria = self.get_criteria(conn)
+        relt = criteria.from_('users').insert([ 
+            dict(id='foo', name='bar', age='boom'), 
+            dict(id='foo2', name='bar2', age='boom2'),
+        ])
+        self.assertTrue(relt)
 
 #     def test_sqlite_multiple_insert(self):
 #         criteria = self.get_sqlite_builder()
