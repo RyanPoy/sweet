@@ -284,132 +284,45 @@ class CriteriaQueryTestCase(unittest.TestCase):
         criteria = self.get_criteria(conn)
         criteria.select('*').from_('users').where(tag=['boom', 'foo'])
         self.assertEqual(results, criteria.all() )
-    
-    def test_insert(self):
-        lastrowid=199
-        conn = fudge.Fake('conn').has_attr(_cursor=fudge.Fake('cursor').has_attr(lastrowid=lastrowid))\
-                .expects('execute')\
-                .with_args('INSERT INTO `users` (`age`, `id`, `name`) VALUES (?, ?, ?)', 'boom', 'foo', 'bar')
-        criteria = self.get_criteria(conn)
-        relt = criteria.from_('users').insert(id='foo', name='bar', age='boom')
-        self.assertEqual(lastrowid, relt)
 
-    def test_mysql_batch_insert(self):
+    def test_update_with_kwargs(self):
         conn = fudge.Fake('conn')\
                 .expects('execute')\
-                .with_args('INSERT INTO `users` (`age`, `name`, `id`) VALUES (?, ?, ?), (?, ?, ?)', 'boom', 'bar', 'foo', 'boom2', 'bar2', 'foo2')\
-                .returns(True)\
-
+                .with_args('UPDATE `users` SET `users`.`email` = ?, `users`.`name` = ? WHERE `users`.`id` = ?', 'foo', 'bar', 1)\
+                .returns(True)
         criteria = self.get_criteria(conn)
-        relt = criteria.from_('users').insert([ 
-            dict(id='foo', name='bar', age='boom'), 
-            dict(id='foo2', name='bar2', age='boom2'),
-        ])
+        relt = criteria.from_('users').where(id=1).update(email='foo', name='bar')
         self.assertTrue(relt)
-
-#     def test_sqlite_multiple_insert(self):
-#         criteria = self.get_sqlite_builder()
-#         query = 'INSERT INTO "users" ("email", "name") ' \
-#                 'SELECT ? AS "email", ? AS "name" UNION ALL SELECT ? AS "email", ? AS "name"'
-#         criteria.get_connection().insert.return_value = True
-#         result = criteria.from_('users').insert([
-#             {'email': 'foo', 'name': 'john'},
-#             {'email': 'bar', 'name': 'jane'}
-#         ])
-#         criteria.get_connection().insert.assert_called_once_with(
-#             query, ['foo', 'john', 'bar', 'jane']
-#         )
-#         self.assertTrue(result)
-# 
-#     def test_insert_get_id_method(self):
-#         criteria = self.get_criteria()
-#         criteria.get_processor().process_insert_get_id.return_value = 1
-#         result = criteria.from_('users').insert_get_id({
-#             'email': 'foo',
-#             'bar': QueryExpression('bar')
-#         })
-#         criteria.get_processor().process_insert_get_id.assert_called_once_with(
-#             builder, 'INSERT INTO "users" ("bar", "email") VALUES (bar, ?)', ['foo'], None
-#         )
-#         self.assertEqual(1, result)
-# 
-#     def test_insert_get_id_with_sequence(self):
-#         criteria = self.get_criteria()
-#         criteria.get_processor().process_insert_get_id.return_value = 1
-#         result = criteria.from_('users').insert_get_id({
-#             'email': 'foo',
-#             'bar': QueryExpression('bar')
-#         }, 'id')
-#         criteria.get_processor().process_insert_get_id.assert_called_once_with(
-#             builder, 'INSERT INTO "users" ("bar", "email") VALUES (bar, ?)', ['foo'], 'id'
-#         )
-#         self.assertEqual(1, result)
-# 
-#     def test_insert_get_id_respects_raw_bindings(self):
-#         criteria = self.get_criteria()
-#         criteria.get_processor().process_insert_get_id.return_value = 1
-#         result = criteria.from_('users').insert_get_id({
-#             'email': QueryExpression('CURRENT_TIMESTAMP'),
-#         })
-#         criteria.get_processor().process_insert_get_id.assert_called_once_with(
-#             builder, 'INSERT INTO "users" ("email") VALUES (CURRENT_TIMESTAMP)', [], None
-#         )
-#         self.assertEqual(1, result)
-# 
-#     def test_update(self):
-#         criteria = self.get_criteria()
-#         query = 'UPDATE "users" SET "email" = ?, "name" = ? WHERE "id" = ?'
-#         criteria.get_connection().update.return_value = 1
-#         result = criteria.from_('users').where('id', '=', 1).update(email='foo', name='bar')
-#         criteria.get_connection().update.assert_called_with(
-#             query, ['foo', 'bar', 1]
-#         )
-#         self.assertEqual(1, result)
-#         
-#         criteria = self.get_mysql_builder()
-#         marker = criteria.get_grammar().get_marker()
-#         query = 'UPDATE `users` SET `email` = %s, `name` = %s WHERE `id` = %s' % (marker, marker, marker)
-#         criteria.get_connection().update.return_value = 1
-#         result = criteria.from_('users').where('id', '=', 1).update(email='foo', name='bar')
-#         criteria.get_connection().update.assert_called_with(
-#             query, ['foo', 'bar', 1]
-#         )
-#         self.assertEqual(1, result)
-# 
-#     def test_update_with_dictionaries(self):
-#         criteria = self.get_criteria()
-#         query = 'UPDATE "users" SET "email" = ?, "name" = ? WHERE "id" = ?'
-#         criteria.get_connection().update.return_value = 1
-#         result = criteria.from_('users').where('id', '=', 1).update({'email': 'foo', 'name': 'bar'})
-#         criteria.get_connection().update.assert_called_with(
-#             query, ['foo', 'bar', 1]
-#         )
-#         self.assertEqual(1, result)
-#         criteria = self.get_criteria()
-# 
-#         query = 'UPDATE "users" SET "email" = ?, "name" = ? WHERE "id" = ?'
-#         criteria.get_connection().update.return_value = 1
-#         result = criteria.from_('users').where('id', '=', 1).update({'email': 'foo'}, name='bar')
-#         criteria.get_connection().update.assert_called_with(
-#             query, ['foo', 'bar', 1]
-#         )
-#         self.assertEqual(1, result)
-# 
-#     def test_update_with_joins(self):
-#         criteria = self.get_criteria()
-#         query = 'UPDATE "users" ' \
-#                 'INNER JOIN "orders" ON "users"."id" = "orders"."user_id" ' \
-#                 'SET "email" = ?, "name" = ? WHERE "id" = ?'
-#         criteria.get_connection().update.return_value = 1
-#         result = criteria.from_('users')\
-#             .join('orders', 'users.id', '=', 'orders.user_id')\
-#             .where('id', '=', 1)\
-#             .update(email='foo', name='bar')
-#         criteria.get_connection().update.assert_called_with(
-#             query, ['foo', 'bar', 1]
-#         )
-#         self.assertEqual(1, result)
-# 
+ 
+    def test_update_with_dict(self):
+        conn = fudge.Fake('conn')\
+                    .expects('execute')\
+                    .with_args('UPDATE `users` SET `users`.`name` = ?, `users`.`email` = ? WHERE `users`.`id` = ?', 'bar', 'foo', 1)\
+                    .returns(True)
+        criteria = self.get_criteria(conn)
+        relt = criteria.from_('users').where(id=1).update(dict(email='foo', name='bar'))
+        self.assertTrue(relt)
+    
+    def test_update_with_dict_and_kwargs(self):
+        conn = fudge.Fake('conn')\
+                .expects('execute')\
+                .with_args('UPDATE `users` SET `users`.`email` = ?, `users`.`name` = ? WHERE `users`.`id` = ?', 'foo', 'bar', 1)\
+                .returns(True)
+        criteria = self.get_criteria(conn)
+        relt = criteria.from_('users').where(id=1).update({'email': 'foo'}, name='bar')
+        self.assertTrue(relt)
+  
+    def test_update_with_joins(self):
+        conn = fudge.Fake('conn')\
+                .expects('execute')\
+                .with_args('UPDATE `users` INNER JOIN `orders` ON users.id=orders.user_id '
+                           'SET `users`.`email` = ?, `users`.`name` = ? WHERE `users`.`id` = ?', 'foo', 'bar', 1)\
+                .returns(True)
+        criteria = self.get_criteria(conn)
+        criteria.from_('users').join('orders', 'users.id=orders.user_id').where(id=1)
+        relt = criteria.update({'email': 'foo'}, name='bar')
+        self.assertEqual(1, relt)
+ 
 #     def test_update_on_postgres(self):
 #         criteria = self.get_postgres_builder()
 #         marker = criteria.get_grammar().get_marker()

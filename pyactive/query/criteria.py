@@ -25,6 +25,29 @@ class Criteria(object):
     def new_instance(self):
         return self.__class__()
     
+    def update(self, dict_values={}, **kwargs):
+        field_value_dict = {}
+        field_value_dict.update(dict_values)
+        field_value_dict.update(kwargs)
+        sqls, params = [], []
+        sqls.append('UPDATE `%s`' % self._from)
+        join_sql, join_params = self._compile_join()
+        if join_sql:
+            sqls.append(' %s' % join_sql)
+            params += join_params
+            
+        fields_sql = []                                                                                                        
+        for k, v in field_value_dict.iteritems():
+            fields_sql.append('%s = ?' % self._compile_fieldname(k))
+            params.append(v)
+        sqls.append(' SET %s' % ', '.join(fields_sql))
+
+        where_sql, where_params = self._compile_where_or_having(self._wheres)
+        if where_sql:
+            sqls.append(' WHERE %s' % where_sql)
+            params += where_params
+        return self.conn.execute(''.join(sqls), *params)
+        
     def insert(self, multiple_value_list=None, **kwargs):
         if multiple_value_list:
             return self._batch_insert(multiple_value_list)    
