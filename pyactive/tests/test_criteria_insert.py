@@ -45,7 +45,18 @@ class CriteriaInsertTestCase(unittest.TestCase):
 #             query, ['foo', 'py', 'bar', 'ryan']
 #         )
 #         self.assertTrue(result)
-#
+# 
+#     def test_postgres_insert_get_id(self):
+#         criteria = self.get_postgres_builder()
+#         marker = criteria.get_grammar().get_marker()
+#         query = 'INSERT INTO "users" ("email") VALUES (%s) RETURNING "id"' % marker
+#         criteria.get_processor().process_insert_get_id.return_value = 1
+#         result = criteria.from_('users').insert_get_id({'email': 'foo'}, 'id')
+#         criteria.get_processor().process_insert_get_id.assert_called_once_with(
+#             builder, query, ['foo'], 'id'
+#         )
+#         self.assertEqual(1, result)
 
+ 
 if __name__ == "__main__":
     unittest.main()

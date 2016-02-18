@@ -13,7 +13,12 @@ class CriteriaQueryTestCase(unittest.TestCase):
     def test_basic_select(self):
         criteria = self.get_criteria()
         criteria.select('*').from_('users')
+        sql, params = criteria.to_sql()
+        self.assertEqual('SELECT * FROM `users`', sql)
+        self.assertEqual([], params)
         
+        criteria = self.get_criteria()
+        criteria.select('*').from_('users')
         sql, params = criteria.to_sql()
         self.assertEqual('SELECT * FROM `users`', sql)
         self.assertEqual([], params)
@@ -221,12 +226,6 @@ class CriteriaQueryTestCase(unittest.TestCase):
         )
         self.assertEqual(['contacts.name'], params)
 
-#     def test_raw_expression_in_select(self):
-#         criteria = self.get_criteria()
-#         criteria.select(QueryExpression('substr(foo, 6)')).from_('users')
-#         self.assertEqual('SELECT substr(foo, 6) FROM "users"', criteria.to_sql())
-# 
-
     def test_first_return_none_result_if_can_not_found(self):
         results = []
         conn = fudge.Fake('conn')\
@@ -284,55 +283,7 @@ class CriteriaQueryTestCase(unittest.TestCase):
         criteria = self.get_criteria(conn)
         criteria.select('*').from_('users').where(tag=['boom', 'foo'])
         self.assertEqual(results, criteria.all() )
-
     
-#     def test_delete(self):
-#         criteria = self.get_criteria()
-#         query = 'DELETE FROM "users" WHERE "email" = ?'
-#         criteria.get_connection().delete.return_value = 1
-#         result = criteria.from_('users').where('email', '=', 'foo').delete()
-#         criteria.get_connection().delete.assert_called_once_with(
-#             query, ['foo']
-#         )
-#         self.assertEqual(1, result)
-# 
-#         criteria = self.get_criteria()
-#         query = 'DELETE FROM "users" WHERE "id" = ?'
-#         criteria.get_connection().delete.return_value = 1
-#         result = criteria.from_('users').delete(1)
-#         criteria.get_connection().delete.assert_called_once_with(
-#             query, [1]
-#         )
-#         self.assertEqual(1, result)
-# 
-#     def test_delete_with_join(self):
-#         criteria = self.get_mysql_builder()
-#         marker = criteria.get_grammar().get_marker()
-#         query = 'DELETE `users` FROM `users` ' \
-#                 'INNER JOIN `contacts` ON `users`.`id` = `contacts`.`id` WHERE `email` = %s' % marker
-#         criteria.get_connection().delete.return_value = 1
-#         result = criteria.from_('users')\
-#             .join('contacts', 'users.id', '=', 'contacts.id')\
-#             .where('email', '=', 'foo')\
-#             .delete()
-#         criteria.get_connection().delete.assert_called_once_with(
-#             query, ['foo']
-#         )
-#         self.assertEqual(1, result)
-# 
-#         criteria = self.get_mysql_builder()
-#         marker = criteria.get_grammar().get_marker()
-#         query = 'DELETE `users` FROM `users` ' \
-#                 'INNER JOIN `contacts` ON `users`.`id` = `contacts`.`id` WHERE `id` = %s' % marker
-#         criteria.get_connection().delete.return_value = 1
-#         result = criteria.from_('users')\
-#             .join('contacts', 'users.id', '=', 'contacts.id')\
-#             .delete(1)
-#         criteria.get_connection().delete.assert_called_once_with(
-#             query, [1]
-#         )
-#         self.assertEqual(1, result)
-# 
 #     def test_truncate(self):
 #         criteria = self.get_criteria()
 #         query = 'TRUNCATE "users"'
@@ -347,40 +298,13 @@ class CriteriaQueryTestCase(unittest.TestCase):
 #             'DELETE FROM sqlite_sequence WHERE name = ?': ['users'],
 #             'DELETE FROM "users"': []
 #         }, criteria.get_grammar().compile_truncate(builder))
-# 
-#     def test_postgres_insert_get_id(self):
-#         criteria = self.get_postgres_builder()
-#         marker = criteria.get_grammar().get_marker()
-#         query = 'INSERT INTO "users" ("email") VALUES (%s) RETURNING "id"' % marker
-#         criteria.get_processor().process_insert_get_id.return_value = 1
-#         result = criteria.from_('users').insert_get_id({'email': 'foo'}, 'id')
-#         criteria.get_processor().process_insert_get_id.assert_called_once_with(
-#             builder, query, ['foo'], 'id'
-#         )
-#         self.assertEqual(1, result)
-# 
-#     def test_mysql_wrapping(self):
-#         criteria = self.get_mysql_builder()
-#         criteria.select('*').from_('users')
-#         self.assertEqual(
-#             'SELECT * FROM `users`',
-#             criteria.to_sql()
-#         )
-# 
+#
 #     def test_merge_wheres_can_merge_wheres_and_bindings(self):
 #         criteria = self.get_criteria()
 #         criteria.wheres = ['foo']
 #         criteria.merge_wheres(['wheres'], ['foo', 'bar'])
 #         self.assertEqual(['foo', 'wheres'], criteria.wheres)
 #         self.assertEqual(['foo', 'bar'], criteria.get_bindings())
-# 
-#     def test_where_with_null_second_parameter(self):
-#         criteria = self.get_criteria()
-#         criteria.select('*').from_('users').where('foo', None)
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "foo" IS NULL',
-#             criteria.to_sql()
-#         )
 # 
 #     def test_dynamic_where(self):
 #         method = 'where_foo_bar_and_baz_or_boom'
@@ -465,26 +389,6 @@ class CriteriaQueryTestCase(unittest.TestCase):
 #         )
 #         self.assertEqual(['baz'], criteria.get_bindings())
 # 
-#     def test_binding_order(self):
-#         expected_sql = 'SELECT * FROM "users" ' \
-#                        'INNER JOIN "othertable" ON "bar" = ? ' \
-#                        'WHERE "registered" = ? ' \
-#                        'GROUP BY "city" ' \
-#                        'HAVING "population" > ? ' \
-#                        'ORDER BY match ("foo") against(?)'
-#         expected_bindings = ['foo', True, 3, 'bar']
-# 
-#         criteria = self.get_criteria()
-#         criteria.select('*').from_('users')\
-#             .order_by_raw('match ("foo") against(?)', ['bar'])\
-#             .where('registered', True)\
-#             .group_by('city')\
-#             .having('population', '>', 3)\
-#             .join(JoinClause('othertable').where('bar', '=', 'foo'))
-# 
-#         self.assertEqual(expected_sql, criteria.to_sql())
-#         self.assertEqual(expected_bindings, criteria.get_bindings())
-# 
 #     def test_add_binding_with_list_merges_bindings(self):
 #         criteria = self.get_criteria()
 #         criteria.add_binding(['foo', 'bar'])
@@ -505,18 +409,6 @@ class CriteriaQueryTestCase(unittest.TestCase):
 #         other_criteria.add_binding('bar', 'where')
 #         criteria.merge_bindings(other_builder)
 #         self.assertEqual(['foo', 'bar', 'baz'], criteria.get_bindings())
-# 
-#     def test_sub_select(self):
-#         criteria = self.get_criteria()
-#         marker = criteria.get_grammar().get_marker()
-#         expected_sql = 'SELECT "foo", "bar", (SELECT "baz" FROM "two" WHERE "subkey" = %s) AS "sub" ' \
-#                        'FROM "one" WHERE "key" = %s' % (marker, marker)
-#         expected_bindings = ['subval', 'val']
-# 
-#         criteria.from_('one').select('foo', 'bar').where('key', '=', 'val')
-#         criteria.select_sub(criteria.new_query().from_('two').select('baz').where('subkey', '=', 'subval'), 'sub')
-#         self.assertEqual(expected_sql, criteria.to_sql())
-#         self.assertEqual(expected_bindings, criteria.get_bindings())
 # 
 #     def test_chunk(self):
 #         criteria = self.get_criteria()
@@ -561,44 +453,6 @@ class CriteriaQueryTestCase(unittest.TestCase):
 #         for users in criteria.from_('users').chunk(2):
 #             self.assertEqual(2, len(users))
 # 
-#     def test_not_specifying_columns_sects_all(self):
-#         criteria = self.get_criteria()
-#         criteria.from_('users')
-# 
-#         self.assertEqual(
-#             'SELECT * FROM "users"',
-#             criteria.to_sql()
-#         )
-# 
-#     def get_mysql_builder(self):
-#         grammar = MySQLQueryGrammar()
-#         processor = MockProcessor().prepare_mock()
-#         connection = MockConnection().prepare_mock()
-# 
-#         return QueryBuilder(connection, grammar, processor)
-# 
-#     def get_sqlite_builder(self):
-#         grammar = SQLiteQueryGrammar()
-#         processor = MockProcessor().prepare_mock()
-#         connection = MockConnection().prepare_mock()
-# 
-#         return QueryBuilder(connection, grammar, processor)
-# 
-#     def get_postgres_builder(self):
-#         grammar = PostgresQueryGrammar()
-#         processor = MockProcessor().prepare_mock()
-#         connection = MockConnection().prepare_mock()
-# 
-#         return QueryBuilder(connection, grammar, processor)
-# 
-#     def get_builder(self):
-#         grammar = QueryGrammar()
-#         processor = MockProcessor().prepare_mock()
-#         connection = MockConnection().prepare_mock()
-# 
-#         return QueryBuilder(connection, grammar, processor)
-#
-#
 #     def test_unions(self):
 #         criteria = self.get_criteria()
 #         criteria.select('*').from_('users').where('id', '=', 1)
@@ -705,7 +559,19 @@ class CriteriaQueryTestCase(unittest.TestCase):
 #             criteria.to_sql()
 #         )
 #         self.assertEqual([1, 2], criteria.get_bindings())
+#
+#     def test_sub_select(self):
+#         criteria = self.get_criteria()
+#         marker = criteria.get_grammar().get_marker()
+#         expected_sql = 'SELECT "foo", "bar", (SELECT "baz" FROM "two" WHERE "subkey" = %s) AS "sub" ' \
+#                        'FROM "one" WHERE "key" = %s' % (marker, marker)
+#         expected_bindings = ['subval', 'val']
 # 
+#         criteria.from_('one').select('foo', 'bar').where('key', '=', 'val')
+#         criteria.select_sub(criteria.new_query().from_('two').select('baz').where('subkey', '=', 'subval'), 'sub')
+#         self.assertEqual(expected_sql, criteria.to_sql())
+#         self.assertEqual(expected_bindings, criteria.get_bindings())
+#
 #     def test_sub_select_where_in(self):
 #         criteria = self.get_criteria()
 #         criteria.select('*').from_('users').where_in(
@@ -728,6 +594,7 @@ class CriteriaQueryTestCase(unittest.TestCase):
 #             criteria.to_sql()
 #         )
 #         self.assertEqual([25], criteria.get_bindings())
+#
 #     def test_nested_wheres(self):
 #         criteria = self.get_criteria()
 #         criteria.select('*').from_('users').where(email='foo').where(
@@ -750,68 +617,7 @@ class CriteriaQueryTestCase(unittest.TestCase):
 #             criteria.to_sql()
 #         )
 #         self.assertEqual(['foo', 'bar'], criteria.get_bindings())
-# 
-#     def test_where_exists(self):
-#         criteria = self.get_criteria()
-#         criteria.select('*').from_('orders').where_exists(
-#             self.get_criteria().select('*').from_('products').where('products.id', '=', QueryExpression('"orders"."id"'))
-#         )
-#         self.assertEqual(
-#             'SELECT * FROM "orders" '
-#             'WHERE EXISTS (SELECT * FROM "products" WHERE "products"."id" = "orders"."id")',
-#             criteria.to_sql()
-#         )
-#         self.assertEqual([], criteria.get_bindings())
-# 
-#         criteria = self.get_criteria()
-#         criteria.select('*').from_('orders').where_not_exists(
-#             self.get_criteria().select('*').from_('products').where('products.id', '=', QueryExpression('"orders"."id"'))
-#         )
-#         self.assertEqual(
-#             'SELECT * FROM "orders" '
-#             'WHERE NOT EXISTS (SELECT * FROM "products" WHERE "products"."id" = "orders"."id")',
-#             criteria.to_sql()
-#         )
-#         self.assertEqual([], criteria.get_bindings())
-# 
-#         criteria = self.get_criteria()
-#         criteria.select('*').from_('orders').where('id', '=', 1).or_where_exists(
-#             self.get_criteria().select('*').from_('products').where('products.id', '=', QueryExpression('"orders"."id"'))
-#         )
-#         self.assertEqual(
-#             'SELECT * FROM "orders" WHERE "id" = ? '
-#             'OR EXISTS (SELECT * FROM "products" WHERE "products"."id" = "orders"."id")',
-#             criteria.to_sql()
-#         )
-#         self.assertEqual([1], criteria.get_bindings())
-# 
-#         criteria = self.get_criteria()
-#         criteria.select('*').from_('orders').where('id', '=', 1).or_where_not_exists(
-#             self.get_criteria().select('*').from_('products').where('products.id', '=', QueryExpression('"orders"."id"'))
-#         )
-#         self.assertEqual(
-#             'SELECT * FROM "orders" WHERE "id" = ? '
-#             'OR NOT EXISTS (SELECT * FROM "products" WHERE "products"."id" = "orders"."id")',
-#             criteria.to_sql()
-#         )
-#         self.assertEqual([1], criteria.get_bindings())
-#
-#     def test_basic_select_use_write_connection(self):
-#         criteria = self.get_criteria()
-#         criteria.use_write_connection().select('*').from_('users').get()
-#         criteria.get_connection().select.assert_called_once_with(
-#             'SELECT * FROM "users"',
-#             [],
-#             False
-#         )
-#  
-#         criteria = self.get_criteria()
-#         criteria.select('*').from_('users').get()
-#         criteria.get_connection().select.assert_called_once_with(
-#             'SELECT * FROM "users"',
-#             [],
-#             True
-#         )
+
 
 if __name__ == "__main__":
     unittest.main()

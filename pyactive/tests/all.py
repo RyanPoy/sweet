@@ -21,16 +21,18 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import unittest
-from pyactive.tests.test_criteria_query import CriteriaQueryTestCase
 from pyactive.tests.test_criteria_insert import CriteriaInsertTestCase
+from pyactive.tests.test_criteria_delete import CriteriaDeleteTestCase
 from pyactive.tests.test_criteria_update import CriteriaUpdateTestCase
+from pyactive.tests.test_criteria_query import CriteriaQueryTestCase
 from pyactive.tests.test_criteria_aggregate_functions import CriteriaAggregateFunctionTestCase 
 
 tests = [
-    CriteriaQueryTestCase,
-    CriteriaInsertTestCase,
     CriteriaAggregateFunctionTestCase,
+    CriteriaInsertTestCase,
+    CriteriaDeleteTestCase,
     CriteriaUpdateTestCase,
+    CriteriaQueryTestCase,
 ]
 
 
