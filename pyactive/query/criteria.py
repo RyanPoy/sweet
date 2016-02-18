@@ -27,27 +27,32 @@ class Criteria(object):
     
     def insert(self, multiple_value_list=None, **kwargs):
         if multiple_value_list:
-            columns, values_list = [], []
-            set_columns = False
-            for values_dict in multiple_value_list:
-                values = [] 
-                for k, v in values_dict.iteritems():
-                    if set_columns is False:
-                        columns.append(self._compile_fieldname(k, False))
-                    values.append(v)
-                set_columns = True
-                values_list.append(values)
-            sql = 'INSERT INTO `%s` (%s) VALUES %s' % (self._from, ', '.join(columns), ', '.join([ '(%s)' % self._postion_flag(vs) for vs in values_list ]))
-            self.conn.execute(sql, *flatten(values_list))
-        else:
-            columns, values = [], []
-            for k, v in kwargs.iteritems():
-                columns.append(self._compile_fieldname(k, False))
+            return self._batch_insert(multiple_value_list)    
+        return self._single_insert(**kwargs)
+
+    def _single_insert(self, **kwargs):
+        columns, values = [], []
+        for k, v in kwargs.iteritems():
+            columns.append(self._compile_fieldname(k, False))
+            values.append(v)
+        sql = 'INSERT INTO `%s` (%s) VALUES (%s)' % (self._from, ', '.join(columns), self._postion_flag(values))
+        self.conn.execute(sql, *values)
+        return self.conn._cursor.lastrowid
+
+    def _batch_insert(self, multiple_value_list):
+        columns, values_list, set_columns = [], [], False
+        for values_dict in multiple_value_list:
+            values = [] 
+            for k, v in values_dict.iteritems():
+                if set_columns is False:
+                    columns.append(self._compile_fieldname(k, False))
                 values.append(v)
-            sql = 'INSERT INTO `%s` (%s) VALUES (%s)' % (self._from, ', '.join(columns), self._postion_flag(values))
-            self.conn.execute(sql, *values)
+            set_columns = True
+            values_list.append(values)
+        sql = 'INSERT INTO `%s` (%s) VALUES %s' % (self._from, ', '.join(columns), ', '.join([ '(%s)' % self._postion_flag(vs) for vs in values_list ]))
+        self.conn.execute(sql, *flatten(values_list))
         return True
-        
+
     def first(self):
         tmp_limit = self._limit
         self.limit(1)

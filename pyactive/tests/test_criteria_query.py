@@ -286,18 +286,20 @@ class CriteriaQueryTestCase(unittest.TestCase):
         self.assertEqual(results, criteria.all() )
     
     def test_insert(self):
-        conn = fudge.Fake('conn')\
+        lastrowid=199
+        conn = fudge.Fake('conn').has_attr(_cursor=fudge.Fake('cursor').has_attr(lastrowid=lastrowid))\
                 .expects('execute')\
-                .with_args('INSERT INTO `users` (`age`, `id`, `name`) VALUES (?, ?, ?)', 'boom', 'foo', 'bar')\
-                .returns(True)
+                .with_args('INSERT INTO `users` (`age`, `id`, `name`) VALUES (?, ?, ?)', 'boom', 'foo', 'bar')
         criteria = self.get_criteria(conn)
-        self.assertTrue(criteria.from_('users').insert(id='foo', name='bar', age='boom') )
-        
+        relt = criteria.from_('users').insert(id='foo', name='bar', age='boom')
+        self.assertEqual(lastrowid, relt)
+
     def test_mysql_batch_insert(self):
         conn = fudge.Fake('conn')\
                 .expects('execute')\
                 .with_args('INSERT INTO `users` (`age`, `name`, `id`) VALUES (?, ?, ?), (?, ?, ?)', 'boom', 'bar', 'foo', 'boom2', 'bar2', 'foo2')\
-                .returns(True)
+                .returns(True)\
+
         criteria = self.get_criteria(conn)
         relt = criteria.from_('users').insert([ 
             dict(id='foo', name='bar', age='boom'), 
