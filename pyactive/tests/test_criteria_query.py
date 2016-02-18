@@ -293,7 +293,7 @@ class CriteriaQueryTestCase(unittest.TestCase):
         criteria = self.get_criteria(conn)
         self.assertTrue(criteria.from_('users').insert(id='foo', name='bar', age='boom') )
         
-    def test_mysql_multiple_insert(self):
+    def test_mysql_batch_insert(self):
         conn = fudge.Fake('conn')\
                 .expects('execute')\
                 .with_args('INSERT INTO `users` (`age`, `name`, `id`) VALUES (?, ?, ?), (?, ?, ?)', 'boom', 'bar', 'foo', 'boom2', 'bar2', 'foo2')\
