@@ -25,13 +25,32 @@ class Criteria(object):
     def new_instance(self):
         return self.__class__()
     
+    def insert(self, **kwargs):
+        columns, values = [], []
+        for k, v in kwargs.iteritems():
+            columns.append(self._compile_fieldname(k, False))
+            values.append(v)
+        sql = 'INSERT INTO `%s` (%s) VALUES (%s)' % (self._from, ', '.join(columns), self._postion_flag(values))
+        self.conn.execute(sql, *values)
+        return True
+        
     def first(self):
+        tmp_limit = self._limit
+        self.limit(1)
+        rows = self.all()
+        self._limit = tmp_limit
+        return rows[0] if rows else None
+
+    def last(self):
+        cnt = self.count()
+        if not cnt: return None
+        
         tmp_limit, tmp_offset = self._limit, self._offset
-        self.limit(1).offset(0)
+        self.limit(1).offset(cnt - 1)
         rows = self.all()
         self._limit, self._offset = tmp_limit, tmp_offset
         return rows[0] if rows else None
-    
+
     def all(self):
         sql, params = self.to_sql()
         rows = self.conn.fetch_all(sql, *params)
@@ -193,8 +212,10 @@ class Criteria(object):
                 new_selects.append(self._compile_fieldname(select))
         return ', '.join(new_selects)
 
-    def _compile_fieldname(self, name):
-        return '`%s`.`%s`' % (self._from, name) if name else name
+    def _compile_fieldname(self, name, prefix_table=True):
+        if prefix_table:
+            return '`%s`.`%s`' % (self._from, name) if name else name
+        return '`%s`' % name if name else name
     
     def _postion_flag(self, list_or_set):
         return ', '.join(self.__class__.POSITION_FLAG * len(list_or_set))

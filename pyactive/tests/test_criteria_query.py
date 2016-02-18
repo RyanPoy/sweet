@@ -177,9 +177,9 @@ class CriteriaQueryTestCase(unittest.TestCase):
  
     def test_limits_and_offsets(self):
         criteria = self.get_criteria()
-        criteria.select('*').from_('users').offset(5).limit(10)
+        criteria.select('*').from_('users').offset(15).limit(10)
         sql, params = criteria.to_sql()
-        self.assertEqual('SELECT * FROM `users` LIMIT 10 OFFSET 5', sql)
+        self.assertEqual('SELECT * FROM `users` LIMIT 10 OFFSET 15', sql)
         self.assertEqual([], params)
 
     def test_page(self):
@@ -256,7 +256,20 @@ class CriteriaQueryTestCase(unittest.TestCase):
         self.assertEqual(results[0], criteria.first() )
         self.assertEqual(limit, criteria._limit)
         self.assertEqual(offset, criteria._offset)
-            
+        
+    def test_last_return_last_results(self):
+        results = [
+            {'id': 20, 'tag': 'foo'},
+        ]
+        conn = fudge.Fake('conn')\
+                .expects('fetch_all')\
+                .with_args('SELECT * FROM `users` WHERE `users`.`tag` IN (?, ?) LIMIT 1 OFFSET 19', 'boom', 'foo')\
+                .returns(results)
+        criteria = Criteria(conn)
+        criteria.count = lambda column='*': 20
+        criteria.select('*').from_('users').where(tag=['boom', 'foo'])
+        self.assertEqual(results[0], criteria.last())
+
     def test_all_return_all_results(self):
         results = [
             {'id': 1, 'tag': 'foo'},
@@ -272,26 +285,14 @@ class CriteriaQueryTestCase(unittest.TestCase):
         criteria.select('*').from_('users').where(tag=['boom', 'foo'])
         self.assertEqual(results, criteria.all() )
     
-#     def test_insert_method(self):
-#         criteria = self.get_criteria()
-#         query = 'INSERT INTO "users" ("email") VALUES (?)'
-#         criteria.get_connection().insert.return_value = True
-#         result = criteria.from_('users').insert({'email': 'foo'})
-#         criteria.get_connection().insert.assert_called_once_with(
-#             query, ['foo']
-#         )
-#         self.assertTrue(result)
-# 
-#     def test_insert_method_with_keyword_arguments(self):
-#         criteria = self.get_criteria()
-#         query = 'INSERT INTO "users" ("email") VALUES (?)'
-#         criteria.get_connection().insert.return_value = True
-#         result = criteria.from_('users').insert({'email': 'foo'})
-#         criteria.get_connection().insert.assert_called_once_with(
-#             query, ['foo']
-#         )
-#         self.assertTrue(result)
-# 
+    def test_insert(self):
+        conn = fudge.Fake('conn')\
+                .expects('execute')\
+                .with_args('INSERT INTO `users` (`age`, `id`, `name`) VALUES (?, ?, ?)', 'boom', 'foo', 'bar')\
+                .returns(True)
+        criteria = self.get_criteria(conn)
+        self.assertTrue(criteria.from_('users').insert(id='foo', name='bar', age='boom') )
+
 #     def test_sqlite_multiple_insert(self):
 #         criteria = self.get_sqlite_builder()
 #         query = 'INSERT INTO "users" ("email", "name") ' \
