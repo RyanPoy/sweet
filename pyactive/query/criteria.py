@@ -23,7 +23,9 @@ class Criteria(object):
         self._aggregate = None
 
     def new_instance(self):
-        return self.__class__()
+        instance = self.__class__()
+        instance.from_(self._from)
+        return instance
     
     def delete(self):
         sqls, params = [], []
@@ -281,19 +283,28 @@ class Criteria(object):
         sqls, params = [], []
         for condition in conditions:
             if is_array(condition):
-                if len(condition) == 1: # 只有一个，表示是一个不带参数的sql
+                condition_len = len(condition)
+                if condition_len == 1: # 只有一个，表示是一个不带参数的sql
                     sqls.append(condition[0])
+                elif condition_len == 2 and isinstance(condition[1], Criteria): # 又是一个criteria
+                    sub_criteria_sql, sub_criteria_params = condition[1].to_sql()
+                    sqls.append('%s (%s)' % (condition[0], sub_criteria_sql))
+                    params += sub_criteria_params
                 else:
                     sqls.append(condition[0])
                     params.extend(condition[1:])
             elif is_hash(condition): # 表示是 key:value 的方式, eg. where(name='abc').where(age=1)
                 for k, v in condition.iteritems():
-                    if is_array(v):
+                    if v is None:
+                        sqls.append('%s IS NULL' % self._compile_fieldname(k))
+                    elif isinstance(v, Criteria): # 又是一个criteria
+                        sub_criteria_sql, sub_criteria_params = v.to_sql()
+                        sqls.append('%s = (%s)' % (self._compile_fieldname(k), sub_criteria_sql))
+                        params += sub_criteria_params
+                    elif is_array(v):
                         if v: # 数组里面有元素
                             sqls.append('%s IN (%s)' % (self._compile_fieldname(k), self._postion_flag(v)))
                             params.extend(list(v)) # 如果是set，就必须转一下
-                    elif v is None:
-                        sqls.append('%s IS NULL' % self._compile_fieldname(k))
                     else:
                         sqls.append('%s = %s' % (self._compile_fieldname(k), self.__class__.POSITION_FLAG))
                         params.append(v)

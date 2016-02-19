@@ -226,6 +226,32 @@ class CriteriaQueryTestCase(unittest.TestCase):
         )
         self.assertEqual(['contacts.name'], params)
 
+    def test_sub_selects(self):
+        criteria = self.get_criteria()
+        criteria.select('*').from_('users').where(tag='foo').where('age < ', 
+            criteria.new_instance().from_('students').select('score').where('score > ?', 10)
+        )
+        sql, params = criteria.to_sql()
+        self.assertEqual(
+            'SELECT * FROM `users` WHERE `users`.`tag` = ? AND age < '
+                ' (SELECT `students`.`score` FROM `students` WHERE score > ?)',
+            sql
+        )
+        self.assertEqual(['foo', 10], params)
+        
+        criteria = self.get_criteria()
+        criteria.select('*').from_('users').where(tag='foo').where(age= 
+            criteria.new_instance().from_('students').select('score').where('score > ?', 10)
+        )
+        sql, params = criteria.to_sql()
+        self.assertEqual(
+            'SELECT * FROM `users` WHERE `users`.`tag` = ? AND `users`.`age` = '
+                '(SELECT `students`.`score` FROM `students` WHERE score > ?)',
+            sql
+        )
+        self.assertEqual(['foo', 10], params)
+        
+
     def test_first_return_none_result_if_can_not_found(self):
         results = []
         conn = fudge.Fake('conn')\
@@ -306,42 +332,6 @@ class CriteriaQueryTestCase(unittest.TestCase):
 #         self.assertEqual(['foo', 'wheres'], criteria.wheres)
 #         self.assertEqual(['foo', 'bar'], criteria.get_bindings())
 # 
-#     def test_dynamic_where(self):
-#         method = 'where_foo_bar_and_baz_or_boom'
-#         parameters = ['john', 'jane', 'bam']
-# 
-#         criteria = self.get_criteria()
-#         criteria.where = mock.MagicMock(return_value=builder)
-# 
-#         getattr(builder, method)(*parameters)
-# 
-#         criteria.where.assert_has_calls([
-#             mock.call('foo_bar', '=', parameters[0], 'and'),
-#             mock.call('baz', '=', parameters[1], 'and'),
-#             mock.call('boom', '=', parameters[2], 'or')
-#         ])
-# 
-#     def test_dynamic_where_is_not_greedy(self):
-#         method = 'where_ios_version_and_android_version_or_orientation'
-#         parameters = ['6.1', '4.2', 'Vertical']
-# 
-#         criteria = self.get_criteria()
-#         criteria.where = mock.MagicMock(return_value=builder)
-# 
-#         getattr(builder, method)(*parameters)
-# 
-#         criteria.where.assert_has_calls([
-#             mock.call('ios_version', '=', parameters[0], 'and'),
-#             mock.call('android_version', '=', parameters[1], 'and'),
-#             mock.call('orientation', '=', parameters[2], 'or')
-#         ])
-# 
-#     def test_call_triggers_dynamic_where(self):
-#         criteria = self.get_criteria()
-# 
-#         self.assertEqual(builder, criteria.where_foo_and_bar('baz', 'boom'))
-#         self.assertEqual(2, len(criteria.wheres))
-# 
 #     def test_builder_raises_exception_with_undefined_method(self):
 #         criteria = self.get_criteria()
 # 
@@ -388,27 +378,6 @@ class CriteriaQueryTestCase(unittest.TestCase):
 #             criteria.to_sql()
 #         )
 #         self.assertEqual(['baz'], criteria.get_bindings())
-# 
-#     def test_add_binding_with_list_merges_bindings(self):
-#         criteria = self.get_criteria()
-#         criteria.add_binding(['foo', 'bar'])
-#         criteria.add_binding(['baz'])
-#         self.assertEqual(['foo', 'bar', 'baz'], criteria.get_bindings())
-# 
-#     def test_add_binding_with_list_merges_bindings_in_correct_order(self):
-#         criteria = self.get_criteria()
-#         criteria.add_binding(['bar', 'baz'], 'having')
-#         criteria.add_binding(['foo'], 'where')
-#         self.assertEqual(['foo', 'bar', 'baz'], criteria.get_bindings())
-# 
-#     def test_merge_builders(self):
-#         criteria = self.get_criteria()
-#         criteria.add_binding('foo', 'where')
-#         criteria.add_binding('baz', 'having')
-#         other_criteria = self.get_criteria()
-#         other_criteria.add_binding('bar', 'where')
-#         criteria.merge_bindings(other_builder)
-#         self.assertEqual(['foo', 'bar', 'baz'], criteria.get_bindings())
 # 
 #     def test_chunk(self):
 #         criteria = self.get_criteria()
@@ -606,17 +575,7 @@ class CriteriaQueryTestCase(unittest.TestCase):
 #             criteria.to_sql()
 #         )
 #         self.assertEqual(['foo', 'bar', 25], criteria.get_bindings())
-#  
-#     def test_full_sub_selects(self):
-#         criteria = self.get_criteria()
-#         criteria.select('*').from_('users').where('email', '=', 'foo').or_where(
-#             'id', '=', criteria.new_query().select(QueryExpression('max(id)')).from_('users').where('email', '=', 'bar')
-#         )
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "email" = ? OR "id" = (SELECT max(id) FROM "users" WHERE "email" = ?)',
-#             criteria.to_sql()
-#         )
-#         self.assertEqual(['foo', 'bar'], criteria.get_bindings())
+#
 
 
 if __name__ == "__main__":
