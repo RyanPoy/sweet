@@ -325,13 +325,6 @@ class CriteriaQueryTestCase(unittest.TestCase):
 #             'DELETE FROM "users"': []
 #         }, criteria.get_grammar().compile_truncate(builder))
 #
-#     def test_merge_wheres_can_merge_wheres_and_bindings(self):
-#         criteria = self.get_criteria()
-#         criteria.wheres = ['foo']
-#         criteria.merge_wheres(['wheres'], ['foo', 'bar'])
-#         self.assertEqual(['foo', 'wheres'], criteria.wheres)
-#         self.assertEqual(['foo', 'bar'], criteria.get_bindings())
-# 
 #     def test_builder_raises_exception_with_undefined_method(self):
 #         criteria = self.get_criteria()
 # 
@@ -529,41 +522,6 @@ class CriteriaQueryTestCase(unittest.TestCase):
 #         )
 #         self.assertEqual([1, 2], criteria.get_bindings())
 #
-#     def test_sub_select(self):
-#         criteria = self.get_criteria()
-#         marker = criteria.get_grammar().get_marker()
-#         expected_sql = 'SELECT "foo", "bar", (SELECT "baz" FROM "two" WHERE "subkey" = %s) AS "sub" ' \
-#                        'FROM "one" WHERE "key" = %s' % (marker, marker)
-#         expected_bindings = ['subval', 'val']
-# 
-#         criteria.from_('one').select('foo', 'bar').where('key', '=', 'val')
-#         criteria.select_sub(criteria.new_query().from_('two').select('baz').where('subkey', '=', 'subval'), 'sub')
-#         self.assertEqual(expected_sql, criteria.to_sql())
-#         self.assertEqual(expected_bindings, criteria.get_bindings())
-#
-#     def test_sub_select_where_in(self):
-#         criteria = self.get_criteria()
-#         criteria.select('*').from_('users').where_in(
-#             'id',
-#             self.get_criteria().select('id').from_('users').where('age', '>', 25).take(3)
-#         )
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" IN (SELECT "id" FROM "users" WHERE "age" > ? LIMIT 3)',
-#             criteria.to_sql()
-#         )
-#         self.assertEqual([25], criteria.get_bindings())
-# 
-#         criteria = self.get_criteria()
-#         criteria.select('*').from_('users').where_not_in(
-#             'id',
-#             self.get_criteria().select('id').from_('users').where('age', '>', 25).take(3)
-#         )
-#         self.assertEqual(
-#             'SELECT * FROM "users" WHERE "id" NOT IN (SELECT "id" FROM "users" WHERE "age" > ? LIMIT 3)',
-#             criteria.to_sql()
-#         )
-#         self.assertEqual([25], criteria.get_bindings())
-#
 #     def test_nested_wheres(self):
 #         criteria = self.get_criteria()
 #         criteria.select('*').from_('users').where(email='foo').where(
@@ -575,7 +533,6 @@ class CriteriaQueryTestCase(unittest.TestCase):
 #             criteria.to_sql()
 #         )
 #         self.assertEqual(['foo', 'bar', 25], criteria.get_bindings())
-#
 
 
 if __name__ == "__main__":
