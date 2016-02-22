@@ -118,12 +118,17 @@ class ActiveRecord(object):
 
     def _set_attr(self, name, value):
         self.__attrs__[name] = value
+        if name not in self.__origin_attrs__:
+            self.__orgin_attr__[name] = value
+        return self
     
     def _get_attr(self, name, default=None):
         return self.__attrs__.get(name, default)
+    cur_value = _get_attr
     
     def _get_origin_attr(self, name, default=None):
         return self.__origin_attrs__.get(name, default)
+    last_value = _get_origin_attr
 
     def __setattr__(self, name, value):
         if name.startswith('__'):
@@ -185,7 +190,7 @@ class ActiveRecord(object):
             if name not in dirties:
                 return False
         return True 
-
+    
     @classproperty
     def table_name(cls):
         return cls.__table_name__
