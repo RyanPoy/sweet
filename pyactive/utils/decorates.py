@@ -20,27 +20,26 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-import unittest
-from pyactive.tests.test_criteria_insert import CriteriaInsertTestCase
-from pyactive.tests.test_criteria_delete import CriteriaDeleteTestCase
-from pyactive.tests.test_criteria_update import CriteriaUpdateTestCase
-from pyactive.tests.test_criteria_query import CriteriaQueryTestCase
-from pyactive.tests.test_criteria_aggregate_functions import CriteriaAggregateFunctionTestCase 
-
-from pyactive.tests.test_record import RecordTestCase
-
-tests = [
-    CriteriaAggregateFunctionTestCase,
-    CriteriaInsertTestCase,
-    CriteriaDeleteTestCase,
-    CriteriaUpdateTestCase,
-    CriteriaQueryTestCase,
-    RecordTestCase,
-]
 
 
-if __name__ == '__main__':
-    suite = unittest.TestSuite()
-    for t in tests:
-        suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(t))
-    unittest.TextTestRunner().run(suite)
+class classproperty(object):
+    """
+    A decorate for class method. Use it like this:
+    
+    class Foo(object):
+    
+        __value = 10
+        
+        @classproperty
+        def value(cls):
+            cls.__value += 1
+            return cls.__value
+    
+    for x in range(10):
+        print Foo.value
+    """
+    def __init__(self, fget):
+        self.fget = fget
+
+    def __get__(self, owner_self, owner_cls):
+        return self.fget(owner_cls)

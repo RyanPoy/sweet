@@ -20,10 +20,17 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+from .inflection import Inflection
 from datetime import datetime, date
 from decimal import Decimal
 import time
 import re
+
+
+camel_of = Inflection.hungarian_of
+python_of = Inflection.pascal_of
+singularize_of = Inflection.singularize_of
+pluralize_of = Inflection.pluralize_of
 
 
 # data type transfer variables and functions
@@ -60,6 +67,7 @@ def to_decimal(v):
     if is_decimal(v):   return v
     try:                return Decimal(v)
     except:             return Decimal(0)
+
 
 datetime2str    = lambda dt, format='%Y-%m-%d %H:%M:%S': dt.strftime(format)
 date2str        = lambda d, format='%Y-%m-%d': d.strftime(format)
