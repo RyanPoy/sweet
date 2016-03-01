@@ -35,8 +35,8 @@ pluralize_of = Inflection.pluralize_of
 
 # data type transfer variables and functions
 FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE')
-ISO_DATE = r'^(\d{4})-(\d\d)-(\d\d)$'
-ISO_DATETIME = r'^(\d{4})-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)(\.\d+)?$'
+ISO_DATE = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
+ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
 
 
 def backtick(s):
@@ -146,15 +146,20 @@ is_date     = lambda obj: isinstance(obj, date)
 is_datetime = lambda obj: isinstance(obj, datetime)
 
 is_hash     = lambda obj: isinstance(obj, dict)
-is_array    = lambda obj: isinstance(obj, (tuple, list, set))
+is_array    = lambda obj: isinstance(obj, (tuple, list))
+is_set      = lambda obj: isinstance(obj, set)
 
 
 # other functions
 
 def xflatten(sequnce):
+    from .collection import Collection
     for x in sequnce:
         if isinstance(x, (list, tuple)):
             for y in xflatten(x):
+                yield y
+        elif isinstance(x, Collection):
+            for y in xflatten(x.items):
                 yield y
         else:
             yield x
@@ -184,3 +189,16 @@ def import_object(name):
     parts = name.split('.')
     obj = __import__('.'.join(parts[:-1]), None, None, [parts[-1]], 0)
     return getattr(obj, parts[-1])
+
+
+class ValidationError(Exception): pass
+class RecordNotFound(Exception): pass
+class RecordHasNotBeenPersisted(Exception): pass
+class RecordValidateError(Exception): pass
+class ColumnExistError(Exception): pass
+class PKColumnNotInColumns(Exception): pass
+class UpdatedAtColumnNotInColumns(Exception): pass
+class CreatedAtColumnNotInColumns(Exception): pass
+class UpdatedOnColumnNotInColumns(Exception): pass
+class CreatedOnColumnNotInColumns(Exception): pass
+class ColumnNotInColumns(Exception): pass

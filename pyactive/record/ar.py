@@ -1,9 +1,10 @@
 #coding: utf8
 from __future__ import with_statement
-from ..utils import pluralize_of, camel_of, RecordHasNotBeenPersisted
 from ..utils.decorates import classproperty
 from ..query.criteria import Criteria
 from datetime import datetime
+from mock.mock import self
+from ..utils import *
 
 
 class ActiveRecordMetaClass(type):
@@ -15,6 +16,20 @@ class ActiveRecordMetaClass(type):
             if not hasattr(cls, '__table_name__'):
                 table_name = pluralize_of(cls.__name__)
                 setattr(cls, '__table_name__', camel_of(table_name))
+            
+            # id column must in columns validate
+            if cls.__pk__ not in cls.__columns__:
+                raise PKColumnNotInColumns()
+            for c, err in [
+                (cls.__pk__, PKColumnNotInColumns),
+                (cls.__created_at__, CreatedAtColumnNotInColumns), 
+                (cls.__updated_at__, UpdatedAtColumnNotInColumns),
+                (cls.__created_on__, CreatedOnColumnNotInColumns),
+                (cls.__updated_on__, UpdatedOnColumnNotInColumns),
+            ]:
+                if c and  c not in cls.__columns__:
+                    raise err()
+
         return model_instance
     
     def __getattribute__(self, name):
@@ -78,23 +93,75 @@ class ActiveRecord(object):
     __pk__ = 'id'
     __created_at__ = None
     __updated_at__ = None
-
+    __created_on__ = None
+    __updated_on__ = None
+    
     def __init__(self, dict_args={}, **kwargs):
         self.__dict__.update(dict_args)
         self.__dict__.update(kwargs)
         self.__is_persisted = False
+        self.__origin_attrs = {}
+
+    def _get_origin(self, attr):
+        return self.__origin_attrs.get(attr)
     
-    def __build_at_time(self, at):
-        if at in self.__columns__:
-            return datetime.now()
-        return False
-    _build_created_at = lambda self: self.__build_at_time(self.__created_at__)
-    _build_updated_at = lambda self: self.__build_at_time(self.__updated_at__)
-    
+    def is_dirty(self, *attrs):
+        dirty_attrs = {}
+        for k, v in self.__origin_attrs.iteritems():
+            dirty_v = getattr(self, k, v) 
+            if dirty_v != v:
+                dirty_attrs[k] = (dirty_v, v)
+        if not dirty_attrs:
+            return False
+        for a in attrs:
+            if a not in dirty_attrs:
+                return False
+        return True
+
+#     def __maybe_build_at_time(self, at, maybe_found_dict=None):
+#         if not maybe_found_dict: maybe_found_dict = {}
+#         if at in self.__columns__:
+#             at_time = maybe_found_dict.get(at, None)
+#             return str2datetime(at_time)
+#         return False
+# 
+#     def _build_created_at(self, maybe_found_dict=None):
+#         return self.__maybe_build_at_time(self.__created_at__)
+# 
+#     def _build_updated_at(self, maybe_found_dict=None):
+#         return self.__maybe_build_at_time(self.__updated_at__)
+#     
+#     def __mayby_build_creatd_at_and_updated_at(self, maybe_found_dict=None):
+#         created_at = maybe_found_dict.get(self.__created_at__, None)
+#         if created_at:
+#             created_at = str2datetime(created_at)
+#         elif self.__created_at__ not in self.__columns__:
+#             created_at = None
+#         elif self.is_persisted:
+#             created_at = getattr(self, self.__created_at__)
+#         else:
+#             created_at = datetime.now()
+#             
+#         updated_at = maybe_found_dict.get(self.__updated_at__, None)
+#         if updated_at:
+#             updated_at = str2datetime(updated_at)
+#         elif self.__created_at__ not in self.__columns__:
+#             updated_at = None
+#         elif self.is_persisted:
+#             updated_at = getattr(self, self.__updated_at__)
+#         else:
+#             updated_at = datetime.now()
+#         return updated_at, updated_at
+
     @property
     def is_persisted(self):
         return self.__is_persisted
-
+    
+    def _sync_attrs(self):
+        for col in self.__columns__:
+            self.__origin_attrs[col] = getattr(self, col, None)
+        return self
+    
     def __getattr__(self, name):
         try:
             return super(ActiveRecord, self).__getattribute__(name)
@@ -137,17 +204,13 @@ class ActiveRecord(object):
     @classproperty
     def table_name(cls):
         return cls.__table_name__
-    
-    @property
-    def persist_attrs(self):
-        return dict([ (c, getattr(self, c, None)) for c in self.__columns__ ])
 
-#     @classproperty
-#     def column_placeholder_sql(cls):
-#         if not hasattr(cls, '__column_placeholder_sql__'):
-#             cls.__column_placeholder_sql__ = ', '.join( ['?'] * len(cls.column_names) )
-#         return cls.__column_placeholder_sql__
-#     
+    def persist_attrs(self, contains_id=False):
+        relt = dict([ (c, getattr(self, c, None)) for c in self.__columns__ ])
+        if not contains_id:
+            relt.pop(self.__pk__)
+        return relt
+
 #     @classproperty
 #     def association_dict(cls):
 #         if not hasattr(cls, '__association_dict__'):
@@ -308,6 +371,9 @@ class ActiveRecord(object):
 #     
 #     def valid(self):
 #         return True
+    
+    def _get_attr(self, attrname, default=None):
+        return getattr(self, attrname, default)
 
     @classmethod
     def create(cls, attr_dict={}, **attributes):
@@ -319,7 +385,7 @@ class ActiveRecord(object):
         """
         record = cls(attr_dict, **attributes)
         return record if record.save() else None
-
+    
     def save(self):
         """ persist a record instance.
         @return：record instace if successful, else return None. 
@@ -327,29 +393,31 @@ class ActiveRecord(object):
         eg.
             u = User(username="abc", password="123456").save()
         """
+        def prepare_at_or_on(at_or_on_attrname, attrs_dict, is_at=True):
+            str_2_datetime_or_date = str2datetime if is_at else str2date
+            cur_datetime_or_date = datetime.now if is_at else datetime.today 
+            if at_or_on_attrname:
+                value = self._get_attr(at_or_on_attrname)
+                value = str_2_datetime_or_date(value)
+                if value is None:
+                    value = cur_datetime_or_date() 
+                setattr(self, at_or_on_attrname, value)
+                attrs_dict[at_or_on_attrname] = self._get_attr(at_or_on_attrname)
+            return attrs_dict
+
         criteria = self._new_criteria()
         if self.is_persisted: # update
-            updated_at = self._build_updated_at()
-            attrs = self.persist_attrs
-            if updated_at:
-                attrs[self.__updated_at__] = updated_at
+            attrs = self.persist_attrs()
             criteria.where(id=self.pk).update(**attrs)
-            if updated_at:
-                setattr(self, self.__updated_at__, updated_at)
         else: # insert
-            created_at = self._build_created_at()
-            updated_at = self._build_updated_at() 
-            attrs = self.persist_attrs
-            if created_at:
-                attrs[self.__created_at__] = created_at
-            if updated_at:
-                attrs[self.__updated_at__] = updated_at
-            self.id = criteria.insert(**attrs)
-            if created_at:
-                setattr(self, self.__created_at__, created_at)
-            if updated_at:
-                setattr(self, self.__updated_at__, updated_at)
+            attrs = self.persist_attrs()
+            for at in (self.__created_at__, self.__updated_at__):
+                prepare_at_or_on(at, attrs)
+            for on in (self.__created_on__, self.__updated_on__):
+                prepare_at_or_on(on, attrs, False)
+            setattr(self, self.__pk__, criteria.insert(**attrs))
             self.__is_persisted = True
+        self._sync_attrs()
         return self
     
     @classmethod
@@ -368,16 +436,17 @@ class ActiveRecord(object):
         """
         if not self.is_persisted:
             raise RecordHasNotBeenPersisted()
-        updated_at = self._build_updated_at()
-        if updated_at:
-            attributes[self.__updated_at__] = updated_at
+        if self.__updated_at__ not in attributes:
+            updated_at = self._build_updated_at()
+            if updated_at:
+                attributes[self.__updated_at__] = updated_at
         criteria = self._new_criteria().where(id=self.pk)
         criteria.update(attributes)
 
         for name, value in attributes.iteritems():
             setattr(self, name, value)
         return self
-    
+
     @classmethod
     def update_all(cls, **attributes):
         cls._new_criteria().update(**attributes)
