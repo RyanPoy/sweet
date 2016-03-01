@@ -8,7 +8,7 @@ import fudge
 
 class OrmRecord(ActiveRecord):
     __columns__ = ['id', 'name', 'age']
-
+    __created_at__ = __updated_at__ = None
 
 class RecordInsertTestCase(unittest.TestCase):
 

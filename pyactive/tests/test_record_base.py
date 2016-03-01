@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 from ..record import ActiveRecord
 from ..utils import PKColumnNotInColumns
+from datetime import datetime, date
 import unittest
 
 
 class OrmRecord(ActiveRecord):
     __columns__ = ['id', 'name', 'age']
+    __created_at__ = __updated_at__ = None
 
 
 class RecordBaseTestCase(unittest.TestCase):
     
     def setUp(self):
         self.tbname = OrmRecord.__table_name__
-    
+
     def tearDown(self):
         OrmRecord.__table_name__ = self.tbname 
         
@@ -59,6 +61,30 @@ class RecordBaseTestCase(unittest.TestCase):
         except PKColumnNotInColumns, ex:
             pass
         
+    def test_prepare_at(self):
+        r = OrmRecord(id=1)
+        r.__columns__ = ['name', 'age', 'created_at', 'updated_at']
+        r.__created_at__ = 'created_at'
+        r.__updated_at__ = 'updated_at'
+        attrs_dict = {}
+        r._prepare_at_or_on(attrs_dict)
+        self.assertTrue(isinstance(attrs_dict['created_at'], datetime))
+        self.assertTrue(isinstance(attrs_dict['updated_at'], datetime))
+        self.assertTrue('created_on' not in r.__dict__)
+        self.assertTrue('updated_on' not in r.__dict__)
         
+    def test_prepare_on(self):
+        r = OrmRecord(id=1)
+        r.__columns__ = ['name', 'age', 'created_on', 'updated_on']
+        r.__created_on__ = 'created_on'
+        r.__updated_on__ = 'updated_on'
+        attrs_dict = {}
+        r._prepare_at_or_on(attrs_dict)
+        self.assertTrue(isinstance(attrs_dict['created_on'], date))
+        self.assertTrue(isinstance(attrs_dict['updated_on'], date))
+        self.assertTrue('created_at' not in r.__dict__)
+        self.assertTrue('updated_at' not in r.__dict__)
+
+
 if __name__ == '__main__':
     unittest.main()
