@@ -84,6 +84,19 @@ class RecordBaseTestCase(unittest.TestCase):
         self.assertTrue(isinstance(attrs_dict['updated_on'], date))
         self.assertTrue('created_at' not in r.__dict__)
         self.assertTrue('updated_at' not in r.__dict__)
+        
+    def test_to_dict(self):
+        r = OrmRecord(id=1)
+        r.__columns__ = ['name', 'age', 'created_on', 'updated_at']
+        r.__created_on__ = 'created_on'
+        r.__updated_at__ = 'updated_at'
+        r.name = 'py'
+        r.age = 100
+        d = r.to_dict()
+        self.assertEquals('py', d.get('name'))
+        self.assertEquals(100, d.get('age'))
+        self.assertTrue(isinstance(d['created_on'], date))
+        self.assertTrue(isinstance(d['updated_at'], datetime))
 
 
 if __name__ == '__main__':
