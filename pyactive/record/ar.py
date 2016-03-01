@@ -480,8 +480,10 @@ class ActiveRecord(object):
 #     def validate(self, on='save'):
 #         return all([ valid(record=self) for valid in self.__class__.validate_func_dict.get(on, {}) ])
 # 
-    def to_dict(self):
+    def to_dict(self, contain_relations=False):
         d = dict([ (c, getattr(self, c)) for c in self.__columns__ ])
         self._prepare_at_or_on(d)
+        if contain_relations:
+            pass
         return d
 
