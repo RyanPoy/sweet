@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from ..record import ActiveRecord
-from ..query import Criteria
 from ..utils import RecordNotFound
 import unittest
 import fudge
@@ -157,21 +156,33 @@ class RecordQueryTestCase(unittest.TestCase):
                 .expects('all').returns([{"id":1, "name":'poy', 'age':10}, {"id":2, "name":'ryan', 'age':20}])
         self.assertEqual([{"id":1, "name":'poy', 'age':10}, {"id":2, "name":'ryan', 'age':20}], OrmRecord.find(1, 2))
 
-#     @classmethod
-#     def select(cls, *select_columns):
-#         return cls._new_criteria().select(*select_columns)
-#     
-#     @classmethod
-#     def join(cls, tablename, *args):
-#         return cls._new_criteria().join(tablename, *args)
-#     
-#     @classmethod
-#     def left_join(cls, tablename, *args):
-#         return cls._new_criteria().left_join(tablename, *args)
-#     
-#     @classmethod
-#     def right_join(cls, tablename, *args):
-#         return cls._new_criteria().right_join(tablename, *args)
+    @fudge.patch('pyactive.record.ar.Criteria')
+    def test_select(self, Criteria):
+        Criteria.is_callable().returns_fake()\
+                .expects('from_').returns_fake()\
+                .expects('select').with_args('id', 'name')
+        OrmRecord.select('id', 'name')
+
+    @fudge.patch('pyactive.record.ar.Criteria')
+    def test_join(self, Criteria):
+        Criteria.is_callable().returns_fake()\
+                .expects('from_').returns_fake()\
+                .expects('join').with_args('users', 'users.id = ?', 10)
+        OrmRecord.join('users', 'users.id = ?', 10)
+
+    @fudge.patch('pyactive.record.ar.Criteria')
+    def test_left_join(self, Criteria):
+        Criteria.is_callable().returns_fake()\
+                .expects('from_').returns_fake()\
+                .expects('left_join').with_args('users', 'users.id = ?', 10)
+        OrmRecord.left_join('users', 'users.id = ?', 10)
+
+    @fudge.patch('pyactive.record.ar.Criteria')
+    def test_right_join(self, Criteria):
+        Criteria.is_callable().returns_fake()\
+                .expects('from_').returns_fake()\
+                .expects('right_join').with_args('users', 'users.id = ?', 10)
+        OrmRecord.right_join('users', 'users.id = ?', 10)
 
 
 if __name__ == '__main__':
