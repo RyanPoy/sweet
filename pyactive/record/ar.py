@@ -191,151 +191,155 @@ class ActiveRecord(object):
 #             cls.__validates_dict__ = {}
 #         return cls.__validates_dict__
 # 
-#     @classproperty
-#     def all(cls):
-#         """ find all records
-#         @return a record array
-#         eg.
-#             User.all
-#             User.where(age=10).all
-#         """
-#         return Collection(cls).all
-#     
-#     @classproperty
-#     def first(cls):
-#         """ find the first record
-#         @return a record
-#         eg.
-#             User.first
-#             User.where(age=10).first
-#         """
-#         return Collection(cls).first
-#     
-#     @classproperty
-#     def last(cls):
-#         """ find the last record
-#         @return a record
-#         eg.
-#             User.last
-#             User.where(age=10).last
-#         """
-#         return Collection(cls).last
-# 
-#     @classmethod
-#     def select(cls, *args):
-#         return Collection(cls).select(*args)
-# 
-#     
-#     @classmethod
-#     def where(cls, *args, **kwargs):
-#         """ condition query
-#         eg.
-#             User.where(username="abc").where(password="123")
-#             User.where("username='abc' and password='123'")
-#             User.where("username=? and password=?", 'abc', '123')
-#         """
-#         return Collection(cls).where(*args, **kwargs)
-# 
-#     @classmethod
-#     def find(cls, *ids):
-#         """ find record by ids
-#         @return:    if there is a id and found it will return a record
-#                     if there are many ids and found them will return a record array
-#                     if any id not found, throw RecordNotFound exception
-#         """
-#         return Collection(cls).find(*ids)
-# 
-#     @classmethod
-#     def limit(cls, limit=0, offset=0):
-#         """ limit query
-#         eg. 
-#             User.limit(10)
-#             User.limit(10, 1)
-#         """
-#         return Collection(cls).limit(limit, offset)
-# 
-#     @classmethod
-#     def count(cls):
-#         """ get count number
-#         @return a number
-#         eg. 
-#             User.count()
-#             User.where('username=123').count()
-#         """
-#         return Collection(cls).count()
-#     
-#     @classmethod
-#     def sum(cls, attribute_name):
-#         """ get sum number
-#         @return number
-#         eg.
-#             User.sum(age)
-#             User.where(username=123).sum()
-#         """
-#         return Collection(cls).sum(attribute_name)
-# 
-#     @classmethod
-#     def order(cls, *args):
-#         """ order query
-#         eg.
-#             User.order('age')
-#             User.order('age ASC')
-#             User.order('age DESC')
-#         """
-#         if args:
-#             return Collection(cls).order(args[0]) 
-#         return Collection(cls)
-# 
-#     @classmethod
-#     def group(cls, group):
-#         """ group query
-#         eg. 
-#             User.group('username')
-#         """
-#         return Collection(cls).group(group)
-# 
-#     @classmethod
-#     def having(cls, *args, **kwargs):
-#         """ having query when group
-#         Note: if there is not use group, the having will be not useful
-#         eg.
-#             User.group('username').having(age=1)
-#         """
-#         return Collection(cls).having(*args, **kwargs)
-# 
-#     @classmethod
-#     def joins(cls, *joins):
-#         """
-#         Joining a Single Association
-#             Category.joins('posts')
-#         # => SELECT categories.* FROM categories
-#                INNER JOIN posts ON posts.category_id = categories.id
-# 
-#         Joining Multiple Associations
-#             Post.joins('category', 'comments')
-#         # => SELECT posts.* FROM posts
-#                INNER JOIN categories ON posts.category_id = categories.id
-#                INNER JOIN comments ON comments.post_id = posts.id
-#         
-#         Joining Nested Associations (Single Level)
-#             Post.joins({'comments': 'guest'})
-#         # => SELECT posts.* FROM posts
-#                INNER JOIN comments ON comments.post_id = posts.id
-#                INNER JOIN guests ON guests.comment_id = comments.id
-# 
-#         Joining Nested Associations (Multiple Level)
-#             Category.joins({ 'posts': [{'comments': 'guest'}, 'tags'])
-#         # => SELECT categories.* FROM categories
-#                INNER JOIN posts ON posts.category_id = categories.id
-#                INNER JOIN comments ON comments.post_id = posts.id
-#                INNER JOIN guests ON guests.comment_id = comments.id
-#                INNER JOIN tags ON tags.post_id = posts.id
-#         """
-#         return Collection(cls).joins(*joins)
-#     
-#     def valid(self):
-#         return True
+
+    @classmethod
+    def all(cls):
+        """ find all records
+        @return a record array
+        eg.
+            User.all
+            User.where(age=10).all
+        """
+        return cls._new_criteria().all()
+     
+    @classmethod
+    def first(cls):
+        """ find the first record
+        @return a record
+        eg.
+            User.first
+            User.where(age=10).first
+        """
+        return cls._new_criteria().first()
+
+    @classmethod
+    def last(cls):
+        """ find the last record
+        @return a record
+        eg.
+            User.last
+            User.where(age=10).last
+        """
+        return cls._new_criteria().last()
+ 
+    @classmethod
+    def count(cls, column='*'):
+        return cls._new_criteria().count(column) 
     
+    @classmethod
+    def sum(cls, column):
+        return cls._new_criteria().sum(column)
+    
+    @classmethod
+    def max(cls, column):
+        return cls._new_criteria().max(column)
+    
+    @classmethod
+    def min(cls, column):
+        return cls._new_criteria().min(column)
+    
+    @classmethod
+    def avg(cls, column):
+        return cls._new_criteria().avg(column)
+    
+    @classmethod  
+    def distinct(cls):
+        return cls._new_criteria().distinct()
+    
+    @classmethod
+    def where(cls, *args, **kwargs):
+        """ condition query
+        eg.
+            User.where(username="abc").where(password="123")
+            User.where("username='abc' and password='123'")
+            User.where("username=? and password=?", 'abc', '123')
+        """
+        return cls._new_criteria().where(*args, **kwargs)
+    
+    @classmethod
+    def find(cls, *ids):
+        """ find record by ids
+        @return:    if there is a id and found it will return a record
+                    if there are many ids and found them will return a record array
+                    if any id not found, throw RecordNotFound exception
+        """
+        c = cls._new_criteria().where(id=ids)
+        if len(ids) == 1:
+            relt = c.first()
+            if relt is None:
+                raise RecordNotFound()
+        else:
+            relt = c.all()
+        return relt
+ 
+    @classmethod
+    def limit(cls, limit):
+        """ limit query
+        eg. 
+            User.limit(10)
+            User.limit(10, 1)
+        """
+        return cls._new_criteria().limit(limit)
+    
+    @classmethod
+    def offset(cls, offset):
+        """ limit query
+        eg. 
+            User.limit(10)
+            User.limit(10, 1)
+        """
+        return cls._new_criteria().offset(offset)
+    
+    @classmethod
+    def page(cls, page_num, limit):
+        return cls._new_criteria().page(page_num, limit)
+    
+    @classmethod
+    def group_by(cls, *args):
+        """ group query
+        eg. 
+            User.group_by('username')
+        """
+        return cls._new_criteria().group_by(*args)
+    
+    @classmethod
+    def order_by(cls, *args):
+        """ order query
+        eg.
+            User.order_by('age')
+            User.order_by('age ASC')
+            User.order_by('age DESC')
+        """
+        return cls._new_criteria().order_by(*args)
+    
+    @classmethod
+    def having(cls, *args, **kwargs):
+        """ having query when group
+        Note: if there is not use group, the having will be not useful
+        eg.
+            User.group('username').having(age=1)
+        """
+        return cls._new_criteria().having(*args, **kwargs)
+    
+    @classmethod
+    def select(cls, *select_columns):
+        return cls._new_criteria().select(*select_columns)
+    
+    @classmethod
+    def join(cls, tablename, *args):
+        return cls._new_criteria().join(tablename, *args)
+    
+    @classmethod
+    def left_join(cls, tablename, *args):
+        return cls._new_criteria().left_join(tablename, *args)
+    
+    @classmethod
+    def right_join(cls, tablename, *args):
+        return cls._new_criteria().right_join(tablename, *args)
+
+    def valid(self):
+        return True
+
     def _get_attr(self, attrname, default=None):
         return getattr(self, attrname, default)
 
@@ -378,7 +382,7 @@ class ActiveRecord(object):
         if self.is_persisted: # update
             attrs = self.persist_attrs()
             self._prepare_at_or_on(attrs)
-            criteria.where(id=self.pk).update(**attrs)
+            criteria.where(**{self.__pk__:self.pk}).update(**attrs)
         else: # insert
             attrs = self.persist_attrs()
             self._prepare_at_or_on(attrs)
@@ -404,7 +408,7 @@ class ActiveRecord(object):
         if not self.is_persisted:
             raise RecordHasNotBeenPersisted()
         self._prepare_at_or_on(attributes)
-        criteria = self._new_criteria().where(id=self.pk)
+        criteria = self._new_criteria().where(**{self.__pk__:self.pk})
         criteria.update(attributes)
 
         for name, value in attributes.iteritems():
@@ -420,40 +424,34 @@ class ActiveRecord(object):
     def pk(self):
         return self.id
 
-#     def delete(self):
-#         """delete a record instance.
-#         eg.
-#             u = User.find(1)
-#             u.delete()
-#         """
-#         # @TODO: 需要按照关系再次删除相关的数据
-#         return self.where(id=self.id).delete_all()
-# 
-#     @classmethod
-#     def delete_all(cls):
-#         """ delete all records
-#         eg.
-#             User.delete_all()
-#             User.find(1, 2, 3).delete_all()
-#         """
-#         Collection(cls).delete_all()
-#         return True
-# 
+    def delete(self):
+        """delete a record instance.
+        eg.
+            u = User.find(1)
+            u.delete()
+        """
+        if not self.is_persisted:
+            raise RecordHasNotBeenPersisted()
+        # @TODO: 需要按照关系再次删除相关的数据
+        c = self._new_criteria()
+        return c.where(**{self.__pk__:self.pk}).delete()
+
+    @classmethod
+    def delete_all(cls):
+        """ delete all records
+        eg.
+            User.delete_all()
+            User.find(1, 2, 3).delete_all()
+        """
+        c = cls._new_criteria()
+        return c.delete()
+
 #     @classmethod
 #     def _get_db(cls):
 #         if cls.__db__ is None:
 #             cls.__db__ = pyrails.get_database()
 #         return cls.__db__
 #     
-#     @property
-#     def is_persisted(self):
-#         """ check an record had been persisted
-#         """
-#         # @TODO: fix me ! 
-#         #       the check method is so simple.
-#         #       should check it which is query from db
-#         return self.id is not None
-# 
 #     @classproperty
 #     @contextmanager
 #     def transaction(cls):
