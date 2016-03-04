@@ -33,6 +33,10 @@ from pyactive.tests.test_record_insert import RecordInsertTestCase
 from pyactive.tests.test_record_update import RecordUpdateTestCase
 from pyactive.tests.test_record_delete import RecordDeleteTestCase
 from pyactive.tests.test_record_query import RecordQueryTestCase
+from pyactive.tests.test_record_method_missing import RecordMethodMissingTestCase
+
+from pyactive.tests.test_relation_belongs_to import RelationBelongsToTestCase
+
 
 tests = [
     CriteriaAggregateFunctionTestCase,
@@ -46,6 +50,9 @@ tests = [
     RecordInsertTestCase,
     RecordDeleteTestCase,
     RecordQueryTestCase,
+    RecordMethodMissingTestCase,
+    
+    RelationBelongsToTestCase
 ]
 
 

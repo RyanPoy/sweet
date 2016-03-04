@@ -2,7 +2,8 @@
 from __future__ import with_statement
 from ..utils.decorates import classproperty
 from ..query.criteria import Criteria
-from mock.mock import self
+from ..relation import Relation
+from .method_missing import MethodMissing
 from ..utils import *
 
 
@@ -15,6 +16,10 @@ class ActiveRecordMetaClass(type):
             if not hasattr(cls, '__table_name__'):
                 table_name = pluralize_of(cls.__name__)
                 setattr(cls, '__table_name__', camel_of(table_name))
+
+            for relation in Relation.iter():
+                relation.owner = cls
+                cls.__relations__.append(relation)
             
             # id column must in columns validate
             if cls.__pk__ not in cls.__columns__:
@@ -35,8 +40,8 @@ class ActiveRecordMetaClass(type):
         try:
             return type.__getattribute__(self, name)
         except AttributeError, _:
-#             if FindMethodMissing.match(name):
-#                 return FindMethodMissing(self, name)
+            if MethodMissing.match(name):
+                return MethodMissing(self, name)
             raise
 
 
@@ -94,6 +99,7 @@ class ActiveRecord(object):
     __updated_at__ = 'updated_at'
     __created_on__ = None
     __updated_on__ = None
+    __relations__  = []
 
     def __init__(self, dict_args={}, **kwargs):
         self.__dict__.update(dict_args)
@@ -477,7 +483,16 @@ class ActiveRecord(object):
 # 
 #     def validate(self, on='save'):
 #         return all([ valid(record=self) for valid in self.__class__.validate_func_dict.get(on, {}) ])
-# 
+#
+    
+    @classproperty
+    def columns(cls):
+        return cls.__columns__
+
+    @classmethod
+    def has_column(cls, column_name):
+        return column_name in cls.__columns__
+
     def to_dict(self, contain_relations=False):
         d = dict([ (c, getattr(self, c)) for c in self.__columns__ ])
         self._prepare_at_or_on(d)

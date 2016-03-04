@@ -25,6 +25,7 @@ from datetime import datetime, date
 from decimal import Decimal
 import time
 import re
+from appnope._nope import msg
 
 
 camel_of = Inflection.hungarian_of
@@ -201,4 +202,13 @@ class UpdatedAtColumnNotInColumns(Exception): pass
 class CreatedAtColumnNotInColumns(Exception): pass
 class UpdatedOnColumnNotInColumns(Exception): pass
 class CreatedOnColumnNotInColumns(Exception): pass
-class ColumnNotInColumns(Exception): pass
+class ColumnNotInColumns(Exception):
+    def __init__(self, msg, *args, **kwargs):
+        super(ColumnNotInColumns, self).__init__(*args, **kwargs)
+        self.msg = msg
+    
+    def __unicode__(self):
+        return self.msg
+
+    __str__ = __unicode__
+
