@@ -29,15 +29,15 @@ class RecordQueryTestCase(unittest.TestCase):
     def test_first(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
-                .expects('first').returns([{'id': 1, 'name':'poy', 'age':100}])
-        self.assertEqual([{'id': 1, 'name':'poy', 'age':100}], OrmRecord.first())
+                .expects('first').returns({'id': 1, 'name':'poy', 'age':100})
+        self.assertEqual({'id': 1, 'name':'poy', 'age':100}, OrmRecord.first())
 
     @fudge.patch('pyactive.record.ar.Criteria')
     def test_last(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
-                .expects('last').returns([{'id': 1, 'name':'poy', 'age':100}])
-        self.assertEqual([{'id': 1, 'name':'poy', 'age':100}], OrmRecord.last())
+                .expects('last').returns({'id': 1, 'name':'poy', 'age':100})
+        self.assertEqual({'id': 1, 'name':'poy', 'age':100}, OrmRecord.last())
 
     @fudge.patch('pyactive.record.ar.Criteria')
     def test_count(self, Criteria):
