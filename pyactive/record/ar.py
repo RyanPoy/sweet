@@ -18,9 +18,8 @@ class ActiveRecordMetaClass(type):
                 setattr(cls, '__table_name__', camel_of(table_name))
 
             for relation in Relation.iter():
-                relation.owner = cls
-                cls.__relations__.append(relation)
-            
+                relation.inject(cls)
+
             # id column must in columns validate
             if cls.__pk__ not in cls.__columns__:
                 raise PKColumnNotInColumns()
