@@ -27,7 +27,7 @@ class RelationBelongsToTestCase(unittest.TestCase):
         self.assertEqual('id', r.target_pk_column)
         self.assertEqual('user', r.owner_attr)
     
-    def test_belogns_to_relation_init_without_owner_attr(self):
+    def test_belongs_to_relation_init_without_owner_attr(self):
         class User(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at']
    
@@ -100,3 +100,6 @@ class RelationBelongsToTestCase(unittest.TestCase):
         self.assertTrue(isinstance(u.created_at, datetime))
         self.assertTrue(isinstance(u.updated_at, datetime))
 
+        
+if __name__ == '__main__':
+    unittest.main()
