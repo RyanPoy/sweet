@@ -427,7 +427,7 @@ class ActiveRecord(object):
 
     @property
     def pk(self):
-        return self.id
+        return getattr(self, self.__pk__)
 
     def delete(self):
         """delete a record instance.

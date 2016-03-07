@@ -36,6 +36,7 @@ from pyactive.tests.test_record_query import RecordQueryTestCase
 from pyactive.tests.test_record_method_missing import RecordMethodMissingTestCase
 
 from pyactive.tests.test_relation_belongs_to import RelationBelongsToTestCase
+from pyactive.tests.test_relation_has_one import RelationHasOneTestCase
 
 
 tests = [
@@ -44,15 +45,16 @@ tests = [
     CriteriaDeleteTestCase,
     CriteriaUpdateTestCase,
     CriteriaQueryTestCase,
-    
+
     RecordBaseTestCase,
     RecordUpdateTestCase,
     RecordInsertTestCase,
     RecordDeleteTestCase,
     RecordQueryTestCase,
     RecordMethodMissingTestCase,
-    
-    RelationBelongsToTestCase
+
+    RelationBelongsToTestCase,
+    RelationHasOneTestCase,
 ]
 
 
