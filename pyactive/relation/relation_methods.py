@@ -3,7 +3,8 @@ from ..utils import singularize_of, pluralize_of, ColumnNotInColumns
 
 
 def owner_attr_for_has_one_and_has_belongs_to(self):
-    """ for has_one and belongs_to
+    """ User has one Phone, owner attr must be 'phone'
+    Phone belongs to User, owner attr must be 'user'
     """
     if self._owner_attr:
         return self._owner_attr
@@ -20,7 +21,7 @@ def owner_attr_for_has_one_and_has_belongs_to(self):
 
 
 def owner_attr_for_has_many(self):
-    """ for has_many
+    """ User has many Phone, owner attr must be 'phones'
     """
     if self._owner_attr:
         return self._owner_attr
@@ -37,8 +38,7 @@ def owner_attr_for_has_many(self):
 
 
 def foreign_key_for_belongs_to(self):
-    """Phone belongs to User
-    owner_column must be user_id
+    """ Phone belongs to User, foreign key must be user_id, and appear in Phone
     """
     if self._foreign_key:
         return self._foreign_key
@@ -57,10 +57,9 @@ def foreign_key_for_belongs_to(self):
     return self._foreign_key
 
 
-
 def foreign_key_for_has_one_and_has_many(self):
-    """Phone belongs to User
-    owner_column must be user_id
+    """ User has one Phone, foreign key must be user_id, and appear in Phone
+    User has many Phone, foreign key must be user_id, and appear in Phone
     """
     if self._foreign_key:
         return self._foreign_key
