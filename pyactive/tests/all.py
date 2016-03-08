@@ -38,6 +38,7 @@ from pyactive.tests.test_record_method_missing import RecordMethodMissingTestCas
 from pyactive.tests.test_relation_belongs_to import RelationBelongsToTestCase
 from pyactive.tests.test_relation_has_one import RelationHasOneTestCase
 from pyactive.tests.test_relation_has_many import RelationHasManyTestCase
+from pyactive.tests.test_relation_has_and_belongs_to_many import RelationHasAndBelongsToManyTestCase
 
 
 tests = [
@@ -57,6 +58,7 @@ tests = [
     RelationBelongsToTestCase,
     RelationHasOneTestCase,
     RelationHasManyTestCase,
+    RelationHasAndBelongsToManyTestCase,
 ]
 
 

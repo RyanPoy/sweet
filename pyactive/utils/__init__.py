@@ -28,10 +28,11 @@ import re
 from appnope._nope import msg
 
 
-camel_of = Inflection.hungarian_of
-python_of = Inflection.pascal_of
+camel_of = Inflection.pascal_of
+python_of = Inflection.hungarian_of
 singularize_of = Inflection.singularize_of
 pluralize_of = Inflection.pluralize_of
+tableize_of = lambda name: pluralize_of(python_of(name))
 
 
 # data type transfer variables and functions
