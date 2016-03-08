@@ -3,34 +3,7 @@ from .relation import Relation
 from ..utils import *
 
 
-class BelongsTo(object):
-    
-    def __init__(self, target_class, owner_class=None, owner_attr=None, foreign_key=None):
-        """
-        target_class: 目标的 class
-        owner_class: 拥有者的class
-        foreign_key: 目标的 class 所在table的字段名
-        """
-        self._owner = owner_class
-        self._target = target_class
-        self._foreign_key = foreign_key
-        self._owner_attr = owner_attr
-        
-    @property
-    def owner(self):
-        return self._owner
-
-    @property
-    def target(self):
-        """_target is None, should be return None
-           _target is a active record class path, should be parse it and set a active record class to _target, then return it
-           _target is a active record class, should be return it   
-        """
-        if self._target is None:
-            return None
-        if isinstance(self._target, str):
-            self._target = import_object(self._target)
-        return self._target
+class BelongsTo(Relation):
     
     @property
     def owner_attr(self):
@@ -46,11 +19,6 @@ class BelongsTo(object):
             return None
         self._owner_attr = singularize_of(target.table_name)
         return self._owner_attr
-
-    @property
-    def target_pk_column(self):
-        target = self.target
-        return target.__pk__ if target else None
 
     @property
     def foreign_key(self):
@@ -76,11 +44,6 @@ class BelongsTo(object):
     def __get__(self, instance, owner):
         foreign_key_value = getattr(instance, self.foreign_key)
         return self.target.where(**{self.target_pk_column: foreign_key_value}).first()
-
-    def inject(self, owner=None):
-        if owner: self._owner = owner
-        self._owner.__relations__.append(self)
-        setattr(self._owner, self.owner_attr, self)
     
     
 def belongs_to(target_class_or_classpath, foreign_key=None, owner_attr=""):

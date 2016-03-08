@@ -94,7 +94,7 @@ class RelationHasManyTestCase(unittest.TestCase):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
                 .expects('where').with_args(user_id=10).returns_fake()\
-                .expects('first').returns([
+                .expects('all').returns([
                     Phone(id=1, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
                     Phone(id=2, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
                     Phone(id=3, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
