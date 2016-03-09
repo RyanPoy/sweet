@@ -68,13 +68,13 @@ singularize_rules = [
     
 def singularize_of(word):
     '''Singularizes English nouns.'''
-    return singularize_or_pluralize_of(word, singularize_rules, singularize_irregular_words)
+    return singularize_or_pluralize(word, singularize_rules, singularize_irregular_words)
 
 def pluralize_of(word):
     '''Pluralizes English nouns.'''
-    return singularize_or_pluralize_of(word, pluralize_rules, pluralize_irregular_words)
+    return singularize_or_pluralize(word, pluralize_rules, pluralize_irregular_words)
     
-def singularize_or_pluralize_of(word, rules, irregular_words):
+def singularize_or_pluralize(word, rules, irregular_words):
     def is_uncountable(word):
         for uncountable_word in uncountable_words:
             lower_cased_word = word.lower()
