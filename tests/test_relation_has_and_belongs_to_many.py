@@ -117,7 +117,7 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
         self.assertEqual('categories_videos', r.association_table)
         self.assertEqual('category_id', r.target_foreign_key)
 
-    @fudge.patch('sweet.record.ar.Criteria',
+    @fudge.patch('sweet.record.Criteria',
                  'sweet.relations.JoinClause')
     def test_teacher_has_and_belongs_to_many_student_relation(self, Criteria, JoinClause):
         class Student(ActiveRecord):

@@ -76,7 +76,7 @@ class RelationBelongsToTestCase(unittest.TestCase):
         self.assertEqual('id', r.target_pk_column)
         self.assertEqual('user', r.owner_attr)
 
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_phone_belongs_to_user_relation(self, Criteria):
         class User(ActiveRecord):
             __columns__ = ['id', 'name', 'created_at', 'updated_at']

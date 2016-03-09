@@ -12,7 +12,7 @@ class OrmRecord(ActiveRecord):
 
 class RecordInsertTestCase(unittest.TestCase):
 
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_save_should_be_process_insert_if_record_has_not_been_persisted(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -27,7 +27,7 @@ class RecordInsertTestCase(unittest.TestCase):
         self.assertEqual('foo', r._get_origin('name'))
         self.assertEqual(1, r._get_origin('id'))
      
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_save_should_be_process_update_if_record_has_been_persisted(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -45,7 +45,7 @@ class RecordInsertTestCase(unittest.TestCase):
         self.assertEqual('foo', r._get_origin('name'))
         self.assertEqual(1, r._get_origin('id'))
   
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_create(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -58,7 +58,7 @@ class RecordInsertTestCase(unittest.TestCase):
         self.assertEqual('foo', r._get_origin('name'))
         self.assertEqual(1, r._get_origin('id'))
 
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_save_for_insert_should_auto_builder_created_at(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -73,7 +73,7 @@ class RecordInsertTestCase(unittest.TestCase):
         self.assertEqual(1, r.id)
         self.assertTrue(isinstance(r.created_at, datetime))
         
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_save_for_insert_should_auto_builder_updated_at(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -88,7 +88,7 @@ class RecordInsertTestCase(unittest.TestCase):
         self.assertEqual(1, r.id)
         self.assertTrue(isinstance(r.updated_at, datetime))
         
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_save_for_insert_should_auto_builder_created_at_and_updated_at(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -105,7 +105,7 @@ class RecordInsertTestCase(unittest.TestCase):
         self.assertTrue(isinstance(r.created_at, datetime))
         self.assertTrue(isinstance(r.updated_at, datetime))
         
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_save_for_insert_with_customized_created_at(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -121,7 +121,7 @@ class RecordInsertTestCase(unittest.TestCase):
         self.assertTrue(isinstance(r.created_at, datetime))
         self.assertEqual('2015-10-01 10:09:10', datetime2str(r.created_at))
 
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_save_for_insert_with_customized_updated_at(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -137,7 +137,7 @@ class RecordInsertTestCase(unittest.TestCase):
         self.assertTrue(isinstance(r.updated_at, datetime))
         self.assertEqual('2015-10-01 10:09:10', datetime2str(r.updated_at))
 
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_save_for_insert_with_customized_created_at_and_updated_at(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -156,7 +156,7 @@ class RecordInsertTestCase(unittest.TestCase):
         self.assertEqual('2015-10-01 10:09:10', datetime2str(r.created_at))
         self.assertEqual('2016-01-01 01:02:03', datetime2str(r.updated_at))
         
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_save_for_insert_should_auto_builder_created_on_and_updated_on(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -173,7 +173,7 @@ class RecordInsertTestCase(unittest.TestCase):
         self.assertTrue(isinstance(r.created_on, date))
         self.assertTrue(isinstance(r.updated_on, date))
 
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_save_for_insert_with_customized_created_on_and_updated_on(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\

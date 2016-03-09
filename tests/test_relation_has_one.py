@@ -76,7 +76,7 @@ class RelationHasOneTestCase(unittest.TestCase):
         self.assertEqual('id', r.target_pk_column)
         self.assertEqual('card', r.owner_attr)
  
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_user_has_one_phone_relation(self, Criteria):
         class Phone(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
@@ -102,7 +102,7 @@ class RelationHasOneTestCase(unittest.TestCase):
         self.assertEqual(10, p.user_id)
         
     
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_delete_user_should_be_delete_phone_of_user_when_user_has_one_phone_relation(self, Criteria):
         class Phone(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']

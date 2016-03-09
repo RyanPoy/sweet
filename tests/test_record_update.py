@@ -13,7 +13,7 @@ class OrmRecord(ActiveRecord):
 
 class RecordUpdateTestCase(unittest.TestCase):
 
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_update(self, Criteria):
         Criteria.is_callable().returns_fake()\
             .expects('from_').returns_fake()\
@@ -31,7 +31,7 @@ class RecordUpdateTestCase(unittest.TestCase):
         self.assertRaises(RecordHasNotBeenPersisted, r.update_attributes, name='foo')
         self.assertIsNone(r.name)
  
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_save_should_auto_builder_created_at_and_updated_at(self, Criteria):
         Criteria.is_callable().returns_fake()\
             .expects('from_').returns_fake()\
@@ -49,7 +49,7 @@ class RecordUpdateTestCase(unittest.TestCase):
         self.assertEqual(1, r.id)
         self.assertTrue(isinstance(r.updated_at, datetime))
     
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_save_with_customized_created_at_and_updated_at(self, Criteria):
         Criteria.is_callable().returns_fake()\
             .expects('from_').returns_fake()\
@@ -73,7 +73,7 @@ class RecordUpdateTestCase(unittest.TestCase):
         self.assertEqual('2010-10-10 10:01:01', datetime2str(r.updated_at))
         self.assertEqual('2010-01-01 02:03:04', datetime2str(r.created_at))
 
-    @fudge.patch('sweet.record.ar.Criteria')
+    @fudge.patch('sweet.record.Criteria')
     def test_update_created_at_and_updated_at_cusmer(self, Criteria):
         Criteria.is_callable().returns_fake()\
             .expects('from_').returns_fake()\
