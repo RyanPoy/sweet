@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..record import ActiveRecord
-from ..relation.has_and_belongs_to_many import has_and_belongs_to_many, HasAndBelongsToMany
-from pyactive.utils import ColumnNotInColumns
+from ..relation import has_and_belongs_to_many, HasAndBelongsToMany
 from datetime import datetime
 import unittest
 import fudge
@@ -119,7 +118,7 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
         self.assertEqual('category_id', r.target_foreign_key)
 
     @fudge.patch('pyactive.record.ar.Criteria',
-                 'pyactive.relation.has_and_belongs_to_many.JoinClause')
+                 'pyactive.relation.r_has_and_belongs_to_many.JoinClause')
     def test_phone_belongs_to_user_relation(self, Criteria, JoinClause):
         class Student(ActiveRecord):
             __columns__ = ['id', 'age', 'created_at', 'updated_at']

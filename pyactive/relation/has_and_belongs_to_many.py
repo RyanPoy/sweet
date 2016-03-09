@@ -30,7 +30,7 @@ class HasAndBelongsToMany(Relation):
 #             raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target.__name__))
         self._target_foreign_key = target_foreign_key
         return self._target_foreign_key
-            
+
     @property
     def foreign_key(self):
         """ User has one Phone, foreign key must be user_id, and appear in Phone
