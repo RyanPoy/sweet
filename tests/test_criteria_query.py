@@ -1,5 +1,5 @@
 #coding: utf8
-from sweet.query import Criteria, JoinClause
+from sweet.criteria import Criteria, JoinClause
 import unittest
 import fudge
 

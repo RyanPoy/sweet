@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from sweet.query import Criteria
+from sweet.criteria import Criteria
 import unittest
 import fudge
 

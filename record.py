@@ -1,6 +1,6 @@
 #coding: utf8
 from __future__ import with_statement
-from sweet.query.criteria import Criteria
+from sweet.criteria import Criteria
 from sweet.relation import Relation
 from sweet.utils import *
 

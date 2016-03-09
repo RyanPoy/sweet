@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from sweet.query import JoinClause
+from sweet.criteria import JoinClause
 from sweet.utils import *
 
 
