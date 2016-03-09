@@ -77,7 +77,7 @@ class RelationHasManyTestCase(unittest.TestCase):
         self.assertEqual('cards', r.owner_attr)
 
     @fudge.patch('pyactive.record.ar.Criteria')
-    def test_phone_belongs_to_user_relation(self, Criteria):
+    def test_user_has_many_phone_relation(self, Criteria):
         class Phone(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
  

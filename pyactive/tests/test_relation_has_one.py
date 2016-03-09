@@ -77,7 +77,7 @@ class RelationHasOneTestCase(unittest.TestCase):
         self.assertEqual('card', r.owner_attr)
  
     @fudge.patch('pyactive.record.ar.Criteria')
-    def test_phone_belongs_to_user_relation(self, Criteria):
+    def test_user_has_one_phone_relation(self, Criteria):
         class Phone(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
 
@@ -100,7 +100,7 @@ class RelationHasOneTestCase(unittest.TestCase):
         self.assertTrue(isinstance(p.created_at, datetime))
         self.assertTrue(isinstance(p.updated_at, datetime))
         self.assertEqual(10, p.user_id)
-
+        
 
 if __name__ == '__main__':
     unittest.main()

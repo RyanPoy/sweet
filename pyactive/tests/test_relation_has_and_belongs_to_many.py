@@ -119,10 +119,10 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
 
     @fudge.patch('pyactive.record.ar.Criteria',
                  'pyactive.relation.r_has_and_belongs_to_many.JoinClause')
-    def test_phone_belongs_to_user_relation(self, Criteria, JoinClause):
+    def test_teacher_has_and_belongs_to_many_student_relation(self, Criteria, JoinClause):
         class Student(ActiveRecord):
             __columns__ = ['id', 'age', 'created_at', 'updated_at']
-              
+
         class Teacher(ActiveRecord):
             __columns__ = ['id', 'name', 'created_at', 'updated_at']
             has_and_belongs_to_many(Student)
