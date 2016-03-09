@@ -76,8 +76,8 @@ def pluralize_of(word):
     
 def singularize_or_pluralize_of(word, rules, irregular_words):
     def is_uncountable(word):
-        lower_cased_word = word.lower()
         for uncountable_word in uncountable_words:
+            lower_cased_word = word.lower()
             if lower_cased_word.endswith(uncountable_word):
                 return True
         return False
@@ -125,18 +125,18 @@ def java_of(name):
             pos = i
             break
         
-    pascal_name = []
+    java_name = []
     upper_flag = True
     for ch in name[pos:]:
         if upper_flag:
-            pascal_name.append(ch.upper())
+            java_name.append(ch.upper())
             upper_flag = False
         elif is_char(ch):
-            pascal_name.append(ch)
+            java_name.append(ch)
         else:
             upper_flag = True
             
-    return ''.join(pascal_name)
+    return ''.join(java_name)
 
 def python_of(name):
     """
@@ -147,22 +147,22 @@ def python_of(name):
     User_address => user_address
     Useraddress  => useraddress
     """
-    def append_under_line_to(hungarian_name):
-        if hungarian_name[-1] != '_':
-            hungarian_name.append('_')
+    def append_under_line_to(python_name):
+        if python_name[-1] != '_':
+            python_name.append('_')
         
-    hungarian_name = [] # the first charactor
+    python_name = [] # the first charactor
     for i, ch in enumerate(name):
         if i == 0: # the first charactor
-            hungarian_name.append(ch.lower())
+            python_name.append(ch.lower())
         elif ch.isupper(): 
-            append_under_line_to(hungarian_name)
-            hungarian_name.append(ch.lower())
+            append_under_line_to(python_name)
+            python_name.append(ch.lower())
         elif ch == '_':
-            append_under_line_to(hungarian_name)
+            append_under_line_to(python_name)
         else:
-            hungarian_name.append(ch.lower())
+            python_name.append(ch.lower())
             
-    return ''.join(hungarian_name)
+    return ''.join(python_name)
 
 tableize_of = lambda name: pluralize_of(python_of(name))
