@@ -181,7 +181,7 @@ def foreign_key_for_has_one_and_has_many(self):
 
 ############# belongs_to #############
 class BelongsTo(Relation):
-    
+
     owner_attr = property(owner_attr_for_has_one_and_has_belongs_to)
     foreign_key = property(foreign_key_for_belongs_to)
     
@@ -189,7 +189,10 @@ class BelongsTo(Relation):
         foreign_key_value = getattr(instance, self.foreign_key)
         return self.target.where(**{self.target_pk_column: foreign_key_value}).first()
     
-    
+    def _delete(self):
+        pass
+
+        
 def belongs_to(target_class_or_classpath, foreign_key=None, owner_attr=""):
     relation = BelongsTo(target_class=target_class_or_classpath, foreign_key=foreign_key, owner_attr=owner_attr)
     Relation.push(relation)
@@ -203,8 +206,10 @@ class HasOne(Relation):
     foreign_key = property(foreign_key_for_has_one_and_has_many)
 
     def _get(self, instance, owner):
-        foreign_key_value = getattr(instance, instance.__pk__)
-        return self.target.where(**{self.foreign_key: foreign_key_value}).first()
+        return self.target.where(**{self.foreign_key: instance.pk}).first()
+
+    def _delete(self, owner_instance):
+        return self.target.where(**{self.foreign_key: owner_instance.pk}).delete()
 
 
 def has_one(target_class_or_classpath, foreign_key=None, owner_attr=""):

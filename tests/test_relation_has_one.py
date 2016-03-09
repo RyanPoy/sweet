@@ -100,7 +100,30 @@ class RelationHasOneTestCase(unittest.TestCase):
         self.assertTrue(isinstance(p.created_at, datetime))
         self.assertTrue(isinstance(p.updated_at, datetime))
         self.assertEqual(10, p.user_id)
+
+    @fudge.patch('sweet.record.Criteria')
+    def test_delete_user_should_delete_phone_because_user_has_one_phone_relation(self, Criteria):
+        class Phone(ActiveRecord):
+            __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
+
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+            has_one(Phone)
+  
+        u = User(id=10, created_at=datetime.now(), updated_at=datetime.now(), name='py')
+        u._ActiveRecord__is_persisted = True
         
+        Criteria.is_callable().returns_fake()\
+                .expects('from_').with_args('phones').returns_fake()\
+                .expects('where').with_args(user_id=10).returns_fake()\
+                .expects('delete').returns(1)
+        
+        c = fudge.Fake('criteria')
+        u._new_criteria = lambda: c
+        c.expects('where').with_args(id=10).returns_fake()\
+         .expects('delete').returns(True)   
+        self.assertTrue(u.delete())
+
 
 if __name__ == '__main__':
     unittest.main()
