@@ -68,47 +68,46 @@ singularize_rules = [
     
 def singularize_of(word):
     '''Singularizes English nouns.'''
-    return __singularize_or_pluralize_of(word, singularize_rules, singularize_irregular_words)
+    return singularize_or_pluralize_of(word, singularize_rules, singularize_irregular_words)
 
 def pluralize_of(word):
     '''Pluralizes English nouns.'''
-    return __singularize_or_pluralize_of(word, pluralize_rules, pluralize_irregular_words)
+    return singularize_or_pluralize_of(word, pluralize_rules, pluralize_irregular_words)
     
-def __singularize_or_pluralize_of(word, rules, irregular_words):
-    def __is_uncountable(word):
+def singularize_or_pluralize_of(word, rules, irregular_words):
+    def is_uncountable(word):
         lower_cased_word = word.lower()
         for uncountable_word in uncountable_words:
             if lower_cased_word.endswith(uncountable_word):
                 return True
         return False
-
-    if __is_uncountable(word):
+    
+    def irregular(word, irregular_words):
+        for irregular, dest in irregular_words:
+            match = re.search('(' + irregular + ')$', word, re.IGNORECASE)
+            if match:
+                return re.sub('(?i)' + irregular + '$', match.expand('\\1')[0] + dest[1:], word)
+        return None
+    
+    def core_deal(word, rules):
+        for patten, replacement in rules:
+            match = re.search(patten, word, re.IGNORECASE)
+            if match :
+                for k, group in enumerate(match.groups()):
+                    if group == None :
+                        replacement = replacement.replace('\\%s' % str(k + 1), '')
+                return re.sub(patten, replacement, word)
         return word
-    result = __irregular(word, irregular_words)
+
+    if is_uncountable(word):
+        return word
+    result = irregular(word, irregular_words)
     if result is not None:
         return result
-    return __core_deal(word, rules)
+    return core_deal(word, rules)
 
 
-    
-def __irregular(word, irregular_words):
-    for irregular, dest in irregular_words:
-        match = re.search('(' + irregular + ')$', word, re.IGNORECASE)
-        if match:
-            return re.sub('(?i)' + irregular + '$', match.expand('\\1')[0] + dest[1:], word)
-    return None
-
-def __core_deal(word, rules):
-    for patten, replacement in rules:
-        match = re.search(patten, word, re.IGNORECASE)
-        if match :
-            for k, group in enumerate(match.groups()):
-                if group == None :
-                    replacement = replacement.replace('\\%s' % str(k + 1), '')
-            return re.sub(patten, replacement, word)
-    return word
-
-def pascal_of(name):
+def java_of(name):
     """
     a_b_c       => ABC
     ab_ab_ab    => AbAbAb
@@ -119,7 +118,7 @@ def pascal_of(name):
     def is_char(ch):
         return 'a' <= ch <= 'z' or 'A' <= ch <= 'Z' or '0' <= ch <= '9'
         
-    name = hungarian_of(name)
+    name = python_of(name)
     pos = 0
     for i, ch in enumerate(name):
         if is_letter(ch):
@@ -139,7 +138,7 @@ def pascal_of(name):
             
     return ''.join(pascal_name)
 
-def hungarian_of(name):
+def python_of(name):
     """
     UserAddress  => user_address
     userAddress  => user_address
@@ -166,6 +165,4 @@ def hungarian_of(name):
             
     return ''.join(hungarian_name)
 
-camel_of = pascal_of
-python_of = hungarian_of
 tableize_of = lambda name: pluralize_of(python_of(name))
