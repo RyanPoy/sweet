@@ -66,7 +66,7 @@ class HasAndBelongsToMany(Relation):
         self._association_table = '_'.join(l) 
         return self._association_table
 
-    def __get__(self, instance, owner):
+    def _get(self, instance, owner):
         foreign_key_value = getattr(instance, instance.__pk__)
 
         return self.target.join(

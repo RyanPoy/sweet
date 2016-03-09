@@ -8,7 +8,7 @@ class BelongsTo(Relation):
     owner_attr = property(owner_attr_for_has_one_and_has_belongs_to)
     foreign_key = property(foreign_key_for_belongs_to)
     
-    def __get__(self, instance, owner):
+    def _get(self, instance, owner):
         foreign_key_value = getattr(instance, self.foreign_key)
         return self.target.where(**{self.target_pk_column: foreign_key_value}).first()
     

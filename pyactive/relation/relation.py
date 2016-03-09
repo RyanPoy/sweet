@@ -90,4 +90,15 @@ class Relation(object):
     def inject(self, owner=None):
         if owner: self._owner = owner
         self._owner.__relations__.append(self)
-        setattr(self._owner, self.owner_attr, self)
+        setattr(self._owner, self.owner_attr, relation(self))
+
+
+class relation(object):
+    
+    def __init__(self, r):
+        self.r = r
+        
+    def __get__(self, instance, owner):
+        return self.r._get(instance, owner)
+
+        

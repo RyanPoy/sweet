@@ -8,7 +8,7 @@ class HasOne(Relation):
     owner_attr = property(owner_attr_for_has_one_and_has_belongs_to)
     foreign_key = property(foreign_key_for_has_one_and_has_many)
 
-    def __get__(self, instance, owner):
+    def _get(self, instance, owner):
         foreign_key_value = getattr(instance, instance.__pk__)
         return self.target.where(**{self.foreign_key: foreign_key_value}).first()
 
