@@ -19,6 +19,15 @@ from pyactive.tests.test_relation_has_one import RelationHasOneTestCase
 from pyactive.tests.test_relation_has_many import RelationHasManyTestCase
 from pyactive.tests.test_relation_has_and_belongs_to_many import RelationHasAndBelongsToManyTestCase
 
+from pyactive.tests.test_validator_acceptance import AcceptanceValidatorTest
+from pyactive.tests.test_validator_confirmation import ConfirmationValidatorTest
+from pyactive.tests.test_validator_format import FormatValidatorTest
+from pyactive.tests.test_validator_inclusion import InclusionValidatorTest
+from pyactive.tests.test_validator_length import LengthValidatorTest
+from pyactive.tests.test_validator_exclusion import ExclusionValidatorTest
+from pyactive.tests.test_validator_numericality import NumericalityValidatorTest
+from pyactive.tests.test_validator_presence import PresenceValidatorTest
+
 
 tests = [
     CriteriaAggregateFunctionTestCase,
@@ -38,6 +47,15 @@ tests = [
     RelationHasOneTestCase,
     RelationHasManyTestCase,
     RelationHasAndBelongsToManyTestCase,
+    
+    AcceptanceValidatorTest,
+    ConfirmationValidatorTest,
+    FormatValidatorTest,
+    InclusionValidatorTest,
+    LengthValidatorTest,
+    ExclusionValidatorTest,
+    NumericalityValidatorTest,
+    PresenceValidatorTest,
 ]
 
 
