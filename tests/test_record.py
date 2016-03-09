@@ -754,7 +754,7 @@ class RecordTestCase(unittest.TestCase):
 #             name='foo', age='bar', foo='bar'
 #         )
 # 
-#     # TODO: test relations
+#     # TODO: test relation
 # 
 #     def test_models_assumes_their_name(self):
 #         model = OrmModelNoTableStub()

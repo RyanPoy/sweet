@@ -118,7 +118,7 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
         self.assertEqual('category_id', r.target_foreign_key)
 
     @fudge.patch('sweet.record.ar.Criteria',
-                 'sweet.relation.r_has_and_belongs_to_many.JoinClause')
+                 'sweet.relation.JoinClause')
     def test_teacher_has_and_belongs_to_many_student_relation(self, Criteria, JoinClause):
         class Student(ActiveRecord):
             __columns__ = ['id', 'age', 'created_at', 'updated_at']
