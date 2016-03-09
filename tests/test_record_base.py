@@ -21,8 +21,8 @@ class RecordBaseTestCase(unittest.TestCase):
     def test_table_name(self):
         self.assertEqual('orm_records', OrmRecord.table_name) 
         self.assertEqual('orm_records', OrmRecord.__table_name__)
-        OrmRecord.__table_name__ = 'records'
-        self.assertEqual('records', OrmRecord.table_name) 
+        OrmRecord.__table_name__ = 'record'
+        self.assertEqual('record', OrmRecord.table_name) 
         
     def test_init(self):
         r = OrmRecord({'name':'py', 'age':2}, age=3, d=4, b=5)

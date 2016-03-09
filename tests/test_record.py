@@ -19,8 +19,8 @@ class RecordTestCase(unittest.TestCase):
     def test_table_name(self):
         self.assertEqual('orm_records', OrmRecord.table_name) 
         self.assertEqual('orm_records', OrmRecord.__table_name__)
-        OrmRecord.__table_name__ = 'records'
-        self.assertEqual('records', OrmRecord.table_name) 
+        OrmRecord.__table_name__ = 'record'
+        self.assertEqual('record', OrmRecord.table_name) 
         
     def test_init(self):
         r = OrmRecord({'a':1, 'b':2}, c=3, d=4, b=5)
@@ -754,7 +754,7 @@ class RecordTestCase(unittest.TestCase):
 #             name='foo', age='bar', foo='bar'
 #         )
 # 
-#     # TODO: test relations
+#     # TODO: test relation
 # 
 #     def test_models_assumes_their_name(self):
 #         model = OrmModelNoTableStub()
@@ -798,7 +798,7 @@ class RecordTestCase(unittest.TestCase):
 #         r.last = 'doe'
 #         r.created_at = r.fresh_timestamp()
 #         r.updated_at = r.fresh_timestamp()
-#         # TODO: relations
+#         # TODO: relation
 # 
 #         clone = r.replicate()
 # 
@@ -808,7 +808,7 @@ class RecordTestCase(unittest.TestCase):
 #         self.assertEqual('doe', clone.last)
 #         self.assertFalse(hasattr(clone, 'created_at'))
 #         self.assertFalse(hasattr(clone, 'updated_at'))
-#         # TODO: relations
+#         # TODO: relation
 # 
 #         clone.first = 'jane'
 # 
@@ -819,7 +819,7 @@ class RecordTestCase(unittest.TestCase):
 #         model = OrmRecord()
 # 
 #         try:
-#             relations = r.incorrect_relation
+#             relation = r.incorrect_relation
 #             self.fail('AttributeError not raised')
 #         except AttributeError:
 #             pass

@@ -49,7 +49,7 @@ class Relation(object):
             return self._owner_attr
         if self.owner is None:
             return None
-        from ..record import ActiveRecord # lazy import
+        from record import ActiveRecord # lazy import
         if not issubclass(self.owner, ActiveRecord):
             return None
         target = self.target
@@ -72,7 +72,7 @@ class Relation(object):
             return self._foreign_key
         if self.owner is None:
             return None
-        from ..record import ActiveRecord # lazy import
+        from record import ActiveRecord # lazy import
         if not issubclass(self.owner, ActiveRecord):
             return None
         owner = self.owner

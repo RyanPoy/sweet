@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from sweet.record import ActiveRecord
-from sweet.relations import has_one, HasOne
+from sweet.relation import has_one, HasOne
 from sweet.utils import ColumnNotInColumns
 from datetime import datetime
 import unittest
