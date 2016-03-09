@@ -66,11 +66,11 @@ singularize_rules = [
     ['(?i)s$' , ''],
 ]
     
-def singularize_of(word):
+def singularize(word):
     '''Singularizes English nouns.'''
     return singularize_or_pluralize(word, singularize_rules, singularize_irregular_words)
 
-def pluralize_of(word):
+def pluralize(word):
     '''Pluralizes English nouns.'''
     return singularize_or_pluralize(word, pluralize_rules, pluralize_irregular_words)
     
@@ -107,7 +107,7 @@ def singularize_or_pluralize(word, rules, irregular_words):
     return core_deal(word, rules)
 
 
-def java_of(name):
+def javaize(name):
     """
     a_b_c       => ABC
     ab_ab_ab    => AbAbAb
@@ -118,7 +118,7 @@ def java_of(name):
     def is_char(ch):
         return 'a' <= ch <= 'z' or 'A' <= ch <= 'Z' or '0' <= ch <= '9'
         
-    name = python_of(name)
+    name = pythonize(name)
     pos = 0
     for i, ch in enumerate(name):
         if is_letter(ch):
@@ -138,7 +138,7 @@ def java_of(name):
             
     return ''.join(java_name)
 
-def python_of(name):
+def pythonize(name):
     """
     UserAddress  => user_address
     userAddress  => user_address
@@ -165,4 +165,4 @@ def python_of(name):
             
     return ''.join(python_name)
 
-tableize_of = lambda name: pluralize_of(python_of(name))
+tableize = lambda name: pluralize(pythonize(name))

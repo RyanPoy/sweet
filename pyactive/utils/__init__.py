@@ -20,7 +20,7 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-from .inflection import java_of, python_of, singularize_of, pluralize_of, tableize_of
+from .inflection import javaize, pythonize, singularize, pluralize, tableize
 from datetime import datetime, date
 from decimal import Decimal
 import time

@@ -2,7 +2,7 @@
 from ..query import JoinClause
 from .relation_methods import owner_attr_for_has_many
 from .relation import Relation
-from ..utils import singularize_of, python_of, tableize_of
+from ..utils import singularize, pythonize, tableize
 
 
 class HasAndBelongsToMany(Relation):
@@ -25,7 +25,7 @@ class HasAndBelongsToMany(Relation):
         from ..record import ActiveRecord # lazy import
         if not issubclass(target, ActiveRecord):
             return None
-        target_foreign_key = singularize_of(python_of(target.__name__)) + '_id'
+        target_foreign_key = singularize(pythonize(target.__name__)) + '_id'
 #         if not self.target.has_column(foreign_key):
 #             raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target.__name__))
         self._target_foreign_key = target_foreign_key
@@ -45,7 +45,7 @@ class HasAndBelongsToMany(Relation):
         if not issubclass(self.owner, ActiveRecord):
             return None
         
-        foreign_key = singularize_of(python_of(owner.__name__)) + '_id'
+        foreign_key = singularize(pythonize(owner.__name__)) + '_id'
 #         if not self.target.has_column(foreign_key):
 #             raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target.__name__))
         self._foreign_key = foreign_key
@@ -61,7 +61,7 @@ class HasAndBelongsToMany(Relation):
         from ..record import ActiveRecord # lazy import
         if not issubclass(self.owner, ActiveRecord) or not issubclass(self.target, ActiveRecord):
             return None
-        l = [ tableize_of(self.owner.__name__), tableize_of(self.target.__name__) ]
+        l = [ tableize(self.owner.__name__), tableize(self.target.__name__) ]
         l.sort()
         self._association_table = '_'.join(l) 
         return self._association_table

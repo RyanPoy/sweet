@@ -54,7 +54,7 @@ class Relation(object):
         target = self.target
         if target is None:
             return None
-        self._owner_attr = singularize_of(target.table_name)
+        self._owner_attr = singularize(target.table_name)
         return self._owner_attr
 
     @property
@@ -77,7 +77,7 @@ class Relation(object):
         owner = self.owner
         if owner is None:
             return None
-        foreign_key = singularize_of(owner.table_name) + '_id'
+        foreign_key = singularize(owner.table_name) + '_id'
         if not self.target.has_column(foreign_key):
             raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target.__name__))
         self._foreign_key = foreign_key

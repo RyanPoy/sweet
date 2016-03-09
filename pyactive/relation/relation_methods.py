@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from ..utils import singularize_of, pluralize_of, python_of, ColumnNotInColumns
+from ..utils import singularize, pluralize, pythonize, ColumnNotInColumns
 
 
 def owner_attr_for_has_one_and_has_belongs_to(self):
@@ -16,7 +16,7 @@ def owner_attr_for_has_one_and_has_belongs_to(self):
     target = self.target
     if target is None:
         return None
-    self._owner_attr = singularize_of(python_of(target.__name__))
+    self._owner_attr = singularize(pythonize(target.__name__))
     return self._owner_attr
 
 
@@ -33,7 +33,7 @@ def owner_attr_for_has_many(self):
     target = self.target
     if target is None:
         return None
-    self._owner_attr = pluralize_of(python_of(target.__name__))
+    self._owner_attr = pluralize(pythonize(target.__name__))
     return self._owner_attr
 
 
@@ -50,7 +50,7 @@ def foreign_key_for_belongs_to(self):
     target = self.target
     if target is None:
         return None
-    foreign_key = python_of(target.__name__) + '_id'
+    foreign_key = pythonize(target.__name__) + '_id'
     if not self.owner.has_column(foreign_key):
         raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.owner.__name__))
     self._foreign_key = foreign_key
@@ -69,7 +69,7 @@ def foreign_key_for_has_one_and_has_many(self):
     from ..record import ActiveRecord # lazy import
     if not issubclass(self.owner, ActiveRecord):
         return None
-    foreign_key = singularize_of(python_of(owner.__name__)) + '_id'
+    foreign_key = singularize(pythonize(owner.__name__)) + '_id'
     if not self.target.has_column(foreign_key):
         raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target.__name__))
     self._foreign_key = foreign_key

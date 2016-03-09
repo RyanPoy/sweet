@@ -14,7 +14,7 @@ class ActiveRecordMetaClass(type):
         if name != 'ActiveRecord':
             # set __table_name__ to Record Class
             if not hasattr(cls, '__table_name__'):
-                setattr(cls, '__table_name__', tableize_of(cls.__name__))
+                setattr(cls, '__table_name__', tableize(cls.__name__))
 
             for relation in Relation.iter():
                 relation.inject(cls)
