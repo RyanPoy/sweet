@@ -14,18 +14,16 @@ class HasAndBelongsToMany(Relation):
         self._target_foreign_key = target_foreign_key
 
     owner_attr = property(owner_attr_for_has_many)
-    
+
     @property
     def target_foreign_key(self):
         if self._target_foreign_key:
             return self._target_foreign_key
-        if self.target is None:
-            return None
-        from ..record import ActiveRecord # lazy import
-        if not issubclass(self.target, ActiveRecord):
-            return None
         target = self.target
         if target is None:
+            return None
+        from ..record import ActiveRecord # lazy import
+        if not issubclass(target, ActiveRecord):
             return None
         target_foreign_key = singularize_of(python_of(target.__name__)) + '_id'
 #         if not self.target.has_column(foreign_key):
@@ -40,20 +38,18 @@ class HasAndBelongsToMany(Relation):
         """
         if self._foreign_key:
             return self._foreign_key
-        if self.owner is None:
+        owner = self.owner
+        if owner is None:
             return None
         from ..record import ActiveRecord # lazy import
         if not issubclass(self.owner, ActiveRecord):
             return None
-        owner = self.owner
-        if owner is None:
-            return None
+        
         foreign_key = singularize_of(python_of(owner.__name__)) + '_id'
 #         if not self.target.has_column(foreign_key):
 #             raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target.__name__))
         self._foreign_key = foreign_key
         return self._foreign_key
-
     
     @property
     def association_table(self):
