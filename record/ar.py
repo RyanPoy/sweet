@@ -411,18 +411,18 @@ class ActiveRecord(object):
 #     @contextmanager
 #     def transaction(cls):
 #         try:
-#             db = cls._get_db()
-#             db.set_autocommit(False)
+#             database = cls._get_db()
+#             database.set_autocommit(False)
 #             yield None
-#             db.commit()
+#             database.commit()
 #         except ValidationError:
-#             db.rollback()
+#             database.rollback()
 #         except:
-#             db.rollback()
+#             database.rollback()
 #             raise
 #         finally:
 #             try:
-#                 db.set_autocommit(True)
+#                 database.set_autocommit(True)
 #             except:
 #                 pass
 # 
