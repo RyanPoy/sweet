@@ -63,13 +63,11 @@ def foreign_key_for_has_one_and_has_many(self):
     """
     if self._foreign_key:
         return self._foreign_key
-    if self.owner is None:
+    owner = self.owner
+    if owner is None:
         return None
     from ..record import ActiveRecord # lazy import
     if not issubclass(self.owner, ActiveRecord):
-        return None
-    owner = self.owner
-    if owner is None:
         return None
     foreign_key = singularize_of(python_of(owner.__name__)) + '_id'
     if not self.target.has_column(foreign_key):
