@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from sweet.record import ActiveRecord
 from sweet.utils import ColumnNotInColumns
-from sweet.relation import belongs_to, BelongsTo
+from sweet.relations import belongs_to, BelongsTo
 from datetime import datetime
 import unittest
 import fudge

@@ -754,7 +754,7 @@ class RecordTestCase(unittest.TestCase):
 #             name='foo', age='bar', foo='bar'
 #         )
 # 
-#     # TODO: test relation
+#     # TODO: test relations
 # 
 #     def test_models_assumes_their_name(self):
 #         model = OrmModelNoTableStub()
@@ -798,7 +798,7 @@ class RecordTestCase(unittest.TestCase):
 #         r.last = 'doe'
 #         r.created_at = r.fresh_timestamp()
 #         r.updated_at = r.fresh_timestamp()
-#         # TODO: relation
+#         # TODO: relations
 # 
 #         clone = r.replicate()
 # 
@@ -808,7 +808,7 @@ class RecordTestCase(unittest.TestCase):
 #         self.assertEqual('doe', clone.last)
 #         self.assertFalse(hasattr(clone, 'created_at'))
 #         self.assertFalse(hasattr(clone, 'updated_at'))
-#         # TODO: relation
+#         # TODO: relations
 # 
 #         clone.first = 'jane'
 # 
@@ -819,7 +819,7 @@ class RecordTestCase(unittest.TestCase):
 #         model = OrmRecord()
 # 
 #         try:
-#             relation = r.incorrect_relation
+#             relations = r.incorrect_relation
 #             self.fail('AttributeError not raised')
 #         except AttributeError:
 #             pass

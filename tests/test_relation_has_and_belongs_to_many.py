@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from sweet.record import ActiveRecord
-from sweet.relation import has_and_belongs_to_many, HasAndBelongsToMany
+from sweet.relations import has_and_belongs_to_many, HasAndBelongsToMany
 from datetime import datetime
 import unittest
 import fudge
@@ -118,7 +118,7 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
         self.assertEqual('category_id', r.target_foreign_key)
 
     @fudge.patch('sweet.record.ar.Criteria',
-                 'sweet.relation.JoinClause')
+                 'sweet.relations.JoinClause')
     def test_teacher_has_and_belongs_to_many_student_relation(self, Criteria, JoinClause):
         class Student(ActiveRecord):
             __columns__ = ['id', 'age', 'created_at', 'updated_at']

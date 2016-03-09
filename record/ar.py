@@ -2,7 +2,7 @@
 from __future__ import with_statement
 from sweet.query.criteria import Criteria
 from sweet.record.method_missing import MethodMissing
-from sweet.relation import Relation
+from sweet.relations import Relation
 from sweet.utils import *
 
 
