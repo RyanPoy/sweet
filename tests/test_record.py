@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from ..record import ActiveRecord
+from sweet.record import ActiveRecord
 import unittest
 import fudge
 
 
 class OrmRecord(ActiveRecord):
-    pass
+    __columns__ = ['id', 'created_at', 'updated_at']
 
 
 class RecordTestCase(unittest.TestCase):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from ..record import ActiveRecord
-from ..relation import has_many, HasMany
-from pyactive.utils import ColumnNotInColumns
+from sweet.record import ActiveRecord
+from sweet.relation import has_many, HasMany
+from sweet.utils import ColumnNotInColumns
 from datetime import datetime
 import unittest
 import fudge
@@ -69,14 +69,14 @@ class RelationHasManyTestCase(unittest.TestCase):
         class User(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at']
                
-        r = HasMany(target_class="pyactive.tests.test_relation_has_many.Card", owner_class=User)
+        r = HasMany(target_class="sweet.tests.test_relation_has_many.Card", owner_class=User)
         self.assertTrue(r.owner is User)
         self.assertEqual('user_id', r.foreign_key)
         self.assertTrue(r.target is Card)
         self.assertEqual('id', r.target_pk_column)
         self.assertEqual('cards', r.owner_attr)
 
-    @fudge.patch('pyactive.record.ar.Criteria')
+    @fudge.patch('sweet.record.ar.Criteria')
     def test_user_has_many_phone_relation(self, Criteria):
         class Phone(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']

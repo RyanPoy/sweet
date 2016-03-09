@@ -1,5 +1,5 @@
 #coding: utf8
-from ..validation import NumericalityValidator
+from sweet.validation import NumericalityValidator
 import unittest
 
 

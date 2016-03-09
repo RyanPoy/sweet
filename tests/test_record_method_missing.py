@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..record import ActiveRecord
+from sweet.record import ActiveRecord
 import unittest
 import fudge
 
@@ -17,7 +17,7 @@ class RecordMethodMissingTestCase(unittest.TestCase):
     def tearDown(self):
         OrmRecord.__table_name__ = self.tbname 
         
-    @fudge.patch('pyactive.record.ar.Criteria')
+    @fudge.patch('sweet.record.ar.Criteria')
     def test_find_by(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -26,7 +26,7 @@ class RecordMethodMissingTestCase(unittest.TestCase):
         relt = OrmRecord.find_by_age_and_name(10, 'poy')
         self.assertEqual({'id': 1, 'name':'poy', 'age':100}, relt)
         
-    @fudge.patch('pyactive.record.ar.Criteria')
+    @fudge.patch('sweet.record.ar.Criteria')
     def test_find_all_by(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -35,7 +35,7 @@ class RecordMethodMissingTestCase(unittest.TestCase):
         relt = OrmRecord.find_all_by_age_and_name(10, 'poy')
         self.assertEqual([{'id': 1, 'name':'poy', 'age':100}, {'id': 10, 'name':'poy', 'age':100}], relt)
         
-    @fudge.patch('pyactive.record.ar.Criteria')
+    @fudge.patch('sweet.record.ar.Criteria')
     def test_find_or_init_by_if_can_found_it(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -44,7 +44,7 @@ class RecordMethodMissingTestCase(unittest.TestCase):
         relt = OrmRecord.find_or_init_by_age_and_name(10, 'poy')
         self.assertEqual({'id': 1, 'name':'poy', 'age':100}, relt)
         
-    @fudge.patch('pyactive.record.ar.Criteria')
+    @fudge.patch('sweet.record.ar.Criteria')
     def test_find_or_init_by_should_be_call_init_if_can_not_found_it(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -56,7 +56,7 @@ class RecordMethodMissingTestCase(unittest.TestCase):
         self.assertEqual(10, relt.age)
         self.assertFalse(relt.is_persisted)
         
-    @fudge.patch('pyactive.record.ar.Criteria')
+    @fudge.patch('sweet.record.ar.Criteria')
     def test_find_or_create_by_should_be_call_create_if_can_not_found_it(self, Criteria):
         c = Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()
@@ -70,56 +70,56 @@ class RecordMethodMissingTestCase(unittest.TestCase):
         self.assertEqual(10, relt.age)
         self.assertTrue(relt.is_persisted)
  
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_last(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('last').returns([{'id': 1, 'name':'poy', 'age':100}])
 #         self.assertEqual([{'id': 1, 'name':'poy', 'age':100}], OrmRecord.last())
 # 
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_count(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('count').returns(10)
 #         self.assertEqual(10, OrmRecord.count())
 #      
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_sum(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('sum').with_args('age').returns(100)
 #         self.assertEqual(100, OrmRecord.sum('age'))
 # 
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_max(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('max').with_args('age').returns(50)
 #         self.assertEqual(50, OrmRecord.max('age'))
 #         
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_min(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('min').with_args('age').returns(10)
 #         self.assertEqual(10, OrmRecord.min('age'))
 # 
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_avg(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('avg').with_args('age').returns(20)
 #         self.assertEqual(20, OrmRecord.avg('age'))
 #     
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_distinct(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('distinct')
 #         OrmRecord.distinct()
 #         
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_where(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
@@ -127,7 +127,7 @@ class RecordMethodMissingTestCase(unittest.TestCase):
 #                 .expects('where').with_args('name = ?', 10)
 #         OrmRecord.where(age=100).where('name = ?', 10)
 #     
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_having(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
@@ -135,42 +135,42 @@ class RecordMethodMissingTestCase(unittest.TestCase):
 #                 .expects('having').with_args('name = ?', 10)
 #         OrmRecord.where(age=100).having('name = ?', 10)
 #         
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_limit(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('limit').with_args(10)
 #         OrmRecord.limit(10)
 #      
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_offset(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('offset').with_args(20)
 #         OrmRecord.offset(20)
 #     
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_page(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('page').with_args(20, 50)
 #         OrmRecord.page(20, 50)
 #     
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_group_by(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('group_by').with_args('age')
 #         OrmRecord.group_by('age')
 #     
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_order_by(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('order_by').with_args('age DESC')
 #         OrmRecord.order_by('age DESC')
 # 
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_find_by_id_should_raise_exception_if_id_does_not_found(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
@@ -178,7 +178,7 @@ class RecordMethodMissingTestCase(unittest.TestCase):
 #                 .expects('first').returns(None)
 #         self.assertRaises(RecordNotFound, OrmRecord.find, 1)
 #         
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_find_by_id_should_one(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
@@ -186,7 +186,7 @@ class RecordMethodMissingTestCase(unittest.TestCase):
 #                 .expects('first').returns({"id":1, "name":'poy', 'age':10})
 #         self.assertEqual({"id":1, "name":'poy', 'age':10}, OrmRecord.find(1))
 #         
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_find_by_ids_should_one(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
@@ -194,28 +194,28 @@ class RecordMethodMissingTestCase(unittest.TestCase):
 #                 .expects('all').returns([{"id":1, "name":'poy', 'age':10}, {"id":2, "name":'ryan', 'age':20}])
 #         self.assertEqual([{"id":1, "name":'poy', 'age':10}, {"id":2, "name":'ryan', 'age':20}], OrmRecord.find(1, 2))
 # 
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_select(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('select').with_args('id', 'name')
 #         OrmRecord.select('id', 'name')
 # 
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_join(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('join').with_args('users', 'users.id = ?', 10)
 #         OrmRecord.join('users', 'users.id = ?', 10)
 # 
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_left_join(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\
 #                 .expects('left_join').with_args('users', 'users.id = ?', 10)
 #         OrmRecord.left_join('users', 'users.id = ?', 10)
 # 
-#     @fudge.patch('pyactive.record.ar.Criteria')
+#     @fudge.patch('sweet.record.ar.Criteria')
 #     def test_right_join(self, Criteria):
 #         Criteria.is_callable().returns_fake()\
 #                 .expects('from_').returns_fake()\

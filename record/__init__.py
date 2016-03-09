@@ -1,2 +1,2 @@
 #coding: UTF8
-from ar import ActiveRecord
+from sweet.record.ar import ActiveRecord

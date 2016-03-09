@@ -1,4 +1,3 @@
 #coding: utf8
-from ..utils import is_array, is_hash
-from .criteria import Criteria
-from .join_clause import JoinClause
+from sweet.query.criteria import Criteria
+from sweet.query.join_clause import JoinClause

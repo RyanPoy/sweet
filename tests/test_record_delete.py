@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from ..record import ActiveRecord
-from ..utils import RecordHasNotBeenPersisted
+from sweet.record import ActiveRecord
+from sweet.utils import RecordHasNotBeenPersisted
 import unittest
 import fudge
 
@@ -22,7 +22,7 @@ class RecordDeleteTestCase(unittest.TestCase):
         r = OrmRecord()
         self.assertRaises(RecordHasNotBeenPersisted, r.delete)
         
-    @fudge.patch('pyactive.record.ar.Criteria')
+    @fudge.patch('sweet.record.ar.Criteria')
     def test_delete(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\
@@ -32,7 +32,7 @@ class RecordDeleteTestCase(unittest.TestCase):
         r._ActiveRecord__is_persisted = True # 设置r是持久化状态
         self.assertEqual(1, r.delete())
 
-    @fudge.patch('pyactive.record.ar.Criteria')
+    @fudge.patch('sweet.record.ar.Criteria')
     def test_delete_all(self, Criteria):
         Criteria.is_callable().returns_fake()\
                 .expects('from_').returns_fake()\

@@ -1,10 +1,9 @@
 #coding: utf8
 from __future__ import with_statement
-from ..utils.decorates import classproperty
-from ..query.criteria import Criteria
-from .method_missing import MethodMissing
-from ..relation import Relation
-from ..utils import *
+from sweet.query.criteria import Criteria
+from sweet.record.method_missing import MethodMissing
+from sweet.relation import Relation
+from sweet.utils import *
 
 
 class ActiveRecordMetaClass(type):
@@ -136,37 +135,6 @@ class ActiveRecord(object):
         except AttributeError, _:
             if name in self.__columns__:
                 return None
-#             association = self.association_of(name)
-#             if association:
-#                 if association.is_belongs_to():
-#                     # A belongs_to B
-#                     # A.B  => "SEELCT B.* FROM B WHERE id = A.B_id"
-#                     return association.target.find(getattr(self, association.foreign_key))
-#                 elif association.is_has_one():
-#                     # A has_one B
-#                     # A.B => "SELECT B.* FROM B WHERE A_id = A.id"
-#                     return association.target.where(**{association.foreign_key: self.id}).first
-#                 elif association.is_has_many():
-#                     # A has_many B through C
-#                     if association.through:
-#                         # A.bs  => "SELECT B.* FROM B INNER JOIN C ON C.b_id = B.id AND C.a_id = A.id"
-#                         through_association = self.association_of(association.through)
-#                         if through_association.is_has_many():
-#                             # fk_value={}, has_and_belongs_to_many_association=None):
-#                             return HasManyCollection(association.target, fk_value={through_association.foreign_key: self.id}) \
-#                                         .joins(association.through) \
-#                                         .where('%s.%s = %s' % (association.through, through_association.foreign_key, self.id))
-#                     else:
-#                         # A has_many B
-#                         # A.bs => "SELECT B.* FROM B WHERE A_id = A.id"
-#                         return HasManyCollection(association.target, fk_value={association.foreign_key: self.id}).where(**{association.foreign_key: self.id})
-#                 else: # has_and_belongs_to_many
-#                     join_str = 'INNER JOIN %s ON %s.%s = %s.id' % (association.join_table, association.join_table, association.association_foreign_key, association.target.table_name)
-#                     # return association.target.joins(join_str).where('%s.%s = %s' % (association.join_table, association.foreign_key, self.id)
-#                     return HasAndBelongsToManyCollection(association.target, fk_value={association.foreign_key: self.id}) \
-#                                         .joins(join_str).where('%s.%s = %s' % (association.join_table, association.foreign_key, self.id))
-#             if CreateOrBuildMethodMissing.match(name):
-#                 return CreateOrBuildMethodMissing(self, name)
             raise
 
     @classproperty
@@ -178,23 +146,6 @@ class ActiveRecord(object):
         if not contains_id:
             relt.pop(self.__pk__)
         return relt
-
-#     @classproperty
-#     def association_dict(cls):
-#         if not hasattr(cls, '__association_dict__'):
-#             cls.__association_dict__ = {}
-#         return cls.__association_dict__
-# 
-#     @classmethod
-#     def association_of(cls, name):
-#         return cls.association_dict.get(name, None)
-#     
-#     @classproperty
-#     def validate_func_dict(cls):
-#         if not hasattr(cls, '__validates_dict__'):
-#             cls.__validates_dict__ = {}
-#         return cls.__validates_dict__
-# 
 
     @classmethod
     def all(cls):

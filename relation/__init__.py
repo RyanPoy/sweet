@@ -4,9 +4,9 @@ import has_one as r_has_one
 import has_many as r_has_many
 import has_and_belongs_to_many as r_has_and_belongs_to_many
 
-from .relation import Relation
-from .belongs_to import belongs_to, BelongsTo
-from .has_one import has_one, HasOne
-from .has_many import has_many, HasMany
-from .has_and_belongs_to_many import has_and_belongs_to_many, HasAndBelongsToMany, JoinClause
+from sweet.relation.relation import Relation
+from sweet.relation.belongs_to import belongs_to, BelongsTo
+from sweet.relation.has_one import has_one, HasOne
+from sweet.relation.has_many import has_many, HasMany
+from sweet.relation.has_and_belongs_to_many import has_and_belongs_to_many, HasAndBelongsToMany, JoinClause
 

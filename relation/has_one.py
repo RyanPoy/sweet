@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
-from .relation_methods import owner_attr_for_has_one_and_has_belongs_to, foreign_key_for_has_one_and_has_many
-from .relation import Relation
+from sweet.relation.relation_methods import owner_attr_for_has_one_and_has_belongs_to, foreign_key_for_has_one_and_has_many
+from sweet.relation.relation import Relation
 
 
 class HasOne(Relation):

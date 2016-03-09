@@ -1,5 +1,5 @@
 #coding: utf8
-from ..utils import is_hash, is_array
+from sweet.utils import is_hash, is_array
 
 class JoinClause(object):
     

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from ..record import ActiveRecord
-from ..relation import belongs_to, BelongsTo
-from pyactive.utils import ColumnNotInColumns
+from sweet.record import ActiveRecord
+from sweet.utils import ColumnNotInColumns
+from sweet.relation import belongs_to, BelongsTo
 from datetime import datetime
 import unittest
 import fudge
@@ -69,14 +69,14 @@ class RelationBelongsToTestCase(unittest.TestCase):
         class Phone(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at', 'person_id']
              
-        r = BelongsTo(target_class="pyactive.tests.test_relation_belongs_to.Person", owner_class=Phone, owner_attr='user')
+        r = BelongsTo(target_class="sweet.tests.test_relation_belongs_to.Person", owner_class=Phone, owner_attr='user')
         self.assertTrue(r.owner is Phone)
         self.assertEqual('person_id', r.foreign_key)
         self.assertTrue(r.target is Person)
         self.assertEqual('id', r.target_pk_column)
         self.assertEqual('user', r.owner_attr)
 
-    @fudge.patch('pyactive.record.ar.Criteria')
+    @fudge.patch('sweet.record.ar.Criteria')
     def test_phone_belongs_to_user_relation(self, Criteria):
         class User(ActiveRecord):
             __columns__ = ['id', 'name', 'created_at', 'updated_at']

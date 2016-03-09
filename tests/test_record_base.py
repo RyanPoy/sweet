@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from ..record import ActiveRecord
-from ..utils import PKColumnNotInColumns
+from sweet.record import ActiveRecord
+from sweet.utils import PKColumnNotInColumns
 from datetime import datetime, date
 import unittest
 

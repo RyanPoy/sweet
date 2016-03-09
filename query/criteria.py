@@ -1,6 +1,6 @@
 #coding:utf8
-from ..utils import is_array, is_hash, flatten
-from .join_clause import JoinClause
+from sweet.utils import is_array, is_hash, flatten
+from sweet.query.join_clause import JoinClause
 import re
 
 

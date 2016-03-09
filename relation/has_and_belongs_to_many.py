@@ -1,8 +1,8 @@
 # -*- coding:utf-8 -*-
-from ..query import JoinClause
-from .relation_methods import owner_attr_for_has_many
-from .relation import Relation
-from ..utils import singularize, pythonize, tableize
+from sweet.query.join_clause import JoinClause
+from sweet.relation.relation_methods import owner_attr_for_has_many
+from sweet.relation.relation import Relation
+from sweet.utils import singularize, pythonize, tableize
 
 
 class HasAndBelongsToMany(Relation):

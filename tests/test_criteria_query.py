@@ -1,6 +1,5 @@
 #coding: utf8
-from pyactive.query.criteria import Criteria
-from pyactive.query.join_clause import JoinClause
+from sweet.query import Criteria, JoinClause
 import unittest
 import fudge
 

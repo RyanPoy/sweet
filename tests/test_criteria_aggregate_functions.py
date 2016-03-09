@@ -1,5 +1,5 @@
 #coding: utf8
-from pyactive.query.criteria import Criteria
+from sweet.query import Criteria
 import unittest
 import fudge
 

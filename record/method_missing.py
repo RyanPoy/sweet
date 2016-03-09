@@ -1,5 +1,4 @@
 #coding: utf8
-
 import re
 
 class MethodMissing(object):

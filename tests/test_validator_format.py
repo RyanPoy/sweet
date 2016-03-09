@@ -1,6 +1,5 @@
 #coding: utf8
-
-from ..validation import FormatValidator
+from sweet.validation import FormatValidator
 import unittest
 
 

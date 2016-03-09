@@ -1,26 +1,5 @@
 #coding: utf8
-
-# The MIT License (MIT)
-#
-# Copyright (c) 2013 PengYi
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy of
-# this software and associated documentation files (the "Software"), to deal in
-# the Software without restriction, including without limitation the rights to
-# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-# the Software, and to permit persons to whom the Software is furnished to do so,
-# subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-from .inflection import javaize, pythonize, singularize, pluralize, tableize
+from sweet.utils.inflection import javaize, pythonize, singularize, pluralize, tableize
 from datetime import datetime, date
 from decimal import Decimal
 import time
@@ -74,12 +53,52 @@ microseconds    = lambda t: to_i((to_f(t) % 1) * 1000000) # '0.123456' -> 123456
     
 
 def str2datetime(s):
+    def __fast_str2datetime(string):
+        """ Doesn't handle time zones. """
+        if re.match(ISO_DATETIME, string):
+            subs = re.split(ISO_DATETIME, string)
+            microsec = to_i((to_f(subs[7]) * 1000000))
+            return datetime(to_i(subs[1]), to_i(subs[2]), to_i(subs[3]), 
+                            to_i(subs[4]), to_i(subs[5]), to_i(subs[6]), 
+                            microsec)
+        return None
+
+    def __fallback_str2datetime(string):
+        try:
+            d = str2date(string)
+            return datetime(d.year, d.month, d.day)
+        except:
+            iso_string = string.strip()
+            pos = iso_string.rfind('.')
+            if pos != -1:
+                iso_string[:pos]
+                microsec = microseconds(iso_string[pos:])
+            else:
+                microsec = 0
+    
+            tm_struct = time.strptime(string, '%Y-%m-%d %H:%M:%S')
+            return datetime(tm_struct.tm_year, tm_struct.tm_mon, tm_struct.tm_mday, tm_struct.tm_hour, tm_struct.tm_min, tm_struct.tm_sec, microsec)
+    
     if s is None:     return None
     if not is_str(s): return s
     if not s.strip(): return None
     return __fast_str2datetime(s) or __fallback_str2datetime(s)
 
+
 def str2date(s):
+    def __fast_str2date(string):
+        if re.match(ISO_DATE, string):
+            subs = re.split(ISO_DATE, string)
+            return date(to_i(subs[1]), to_i(subs[2]), to_i(subs[3]))
+        return None
+
+    def __fallback_str2date(string):
+        string = string.strip()
+        string = string.split()[0]
+        tm_struct = time.strptime(string, '%Y-%m-%d')
+        return date(tm_struct.tm_year, tm_struct.tm_mon, tm_struct.tm_mday)
+    
+
     if s is None:           return None
     if is_datetime(s):      return datetime2date(s)
     if is_date(s):          return s
@@ -87,48 +106,6 @@ def str2date(s):
     if not s.strip():       return None    
     return __fast_str2date(s) or __fallback_str2date(s)
 
-
-def __fast_str2datetime(string):
-    """ Doesn't handle time zones. """
-    if re.match(ISO_DATETIME, string):
-        subs = re.split(ISO_DATETIME, string)
-        microsec = to_i((to_f(subs[7]) * 1000000))
-        return datetime(to_i(subs[1]), to_i(subs[2]), to_i(subs[3]), 
-                        to_i(subs[4]), to_i(subs[5]), to_i(subs[6]), 
-                        microsec)
-    return None
-
-
-def __fast_str2date(string):
-    if re.match(ISO_DATE, string):
-        subs = re.split(ISO_DATE, string)
-        return date(to_i(subs[1]), to_i(subs[2]), to_i(subs[3]))
-    return None
-
-
-def __fallback_str2date(string):
-    string = string.strip()
-    string = string.split()[0]
-    tm_struct = time.strptime(string, '%Y-%m-%d')
-    return date(tm_struct.tm_year, tm_struct.tm_mon, tm_struct.tm_mday)
-
-
-def __fallback_str2datetime(string):
-    try:
-        d = str2date(string)
-        return datetime(d.year, d.month, d.day)
-    except:
-        iso_string = string.strip()
-        pos = iso_string.rfind('.')
-        if pos != -1:
-            iso_string[:pos]
-            microsec = microseconds(iso_string[pos:])
-        else:
-            microsec = 0
-
-        tm_struct = time.strptime(string, '%Y-%m-%d %H:%M:%S')
-        return datetime(tm_struct.tm_year, tm_struct.tm_mon, tm_struct.tm_mday, tm_struct.tm_hour, tm_struct.tm_min, tm_struct.tm_sec, microsec)
-    
 
 # check the object type functions
 is_num      = lambda obj: isinstance(obj, (int, long, float, Decimal))
@@ -147,14 +124,14 @@ is_set      = lambda obj: isinstance(obj, set)
 # other functions
 
 def xflatten(sequnce):
-    from .collection import Collection
+#     from .collection import Collection
     for x in sequnce:
         if isinstance(x, (list, tuple)):
             for y in xflatten(x):
                 yield y
-        elif isinstance(x, Collection):
-            for y in xflatten(x.items):
-                yield y
+#         elif isinstance(x, Collection):
+#             for y in xflatten(x.items):
+#                 yield y
         else:
             yield x
 
@@ -183,6 +160,27 @@ def import_object(name):
     parts = name.split('.')
     obj = __import__('.'.join(parts[:-1]), None, None, [parts[-1]], 0)
     return getattr(obj, parts[-1])
+
+
+
+class classproperty(object):
+    """
+    A decorate for class method. Use it like this:
+    
+    class Foo(object):
+    
+        __value = 10
+
+        @classproperty
+        def value(cls):
+            cls.__value += 1
+            return cls.__value
+    
+    for x in range(10):
+        print Foo.value
+    """
+    def __init__(self, fget): self.fget = fget
+    def __get__(self, owner_self, owner_cls): return self.fget(owner_cls)
 
 
 class ValidationError(Exception): pass

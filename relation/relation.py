@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from ..utils import *
+from sweet.utils import *
 
 
 class Relation(object):

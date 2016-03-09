@@ -1,5 +1,5 @@
 #coding: utf8
-from ..validation import PresenceValidator
+from sweet.validation import PresenceValidator
 import unittest
 
 
