@@ -6,7 +6,7 @@ from sweet.tests.test_criteria_update import CriteriaUpdateTestCase
 from sweet.tests.test_criteria_query import CriteriaQueryTestCase
 from sweet.tests.test_criteria_aggregate_functions import CriteriaAggregateFunctionTestCase 
 
-from sweet.tests.test_record import RecordTestCase
+# from sweet.tests.test_record import RecordTestCase
 from sweet.tests.test_record_base import RecordBaseTestCase
 from sweet.tests.test_record_insert import RecordInsertTestCase
 from sweet.tests.test_record_update import RecordUpdateTestCase
