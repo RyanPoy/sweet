@@ -101,6 +101,33 @@ class RelationHasOneTestCase(unittest.TestCase):
         self.assertTrue(isinstance(p.updated_at, datetime))
         self.assertEqual(10, p.user_id)
         
+    
+    @fudge.patch('pyactive.record.ar.Criteria')
+    def test_delete_user_should_be_delete_phone_of_user_when_user_has_one_phone_relation(self, Criteria):
+        class Phone(ActiveRecord):
+            __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
+
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+            has_one(Phone)
+
+        Criteria.is_callable().returns_fake()\
+                .expects('from_').returns_fake()\
+                .expects('where').with_args(id=10).returns_fake()\
+                .expects('delete').returns(User(id=10, created_at=datetime.now(), updated_at=datetime.now(), name='py'))
+        u = User.where(id=10).delete()
+
+#         self.assertEqual('py', u.name)
+#         Criteria.is_callable().returns_fake()\
+#                 .expects('from_').returns_fake()\
+#                 .expects('where').with_args(user_id=10).returns_fake()\
+#                 .expects('first').returns(Phone(id=1, created_at=datetime.now(), updated_at=datetime.now(), user_id=10))
+#         p = u.phone
+#         self.assertEqual(1, p.id)
+#         self.assertTrue(isinstance(p.created_at, datetime))
+#         self.assertTrue(isinstance(p.updated_at, datetime))
+#         self.assertEqual(10, p.user_id)
+        
 
 if __name__ == '__main__':
     unittest.main()

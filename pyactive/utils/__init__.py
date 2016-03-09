@@ -20,19 +20,11 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-from .inflection import Inflection
+from .inflection import camel_of, python_of, singularize_of, pluralize_of, tableize_of
 from datetime import datetime, date
 from decimal import Decimal
 import time
 import re
-from appnope._nope import msg
-
-
-camel_of = Inflection.pascal_of
-python_of = Inflection.hungarian_of
-singularize_of = Inflection.singularize_of
-pluralize_of = Inflection.pluralize_of
-tableize_of = lambda name: pluralize_of(python_of(name))
 
 
 # data type transfer variables and functions

@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from ..utils import singularize_of, pluralize_of, python_of, ColumnNotInColumns, tableize_of
+from ..utils import singularize_of, pluralize_of, python_of, ColumnNotInColumns
 
 
 def owner_attr_for_has_one_and_has_belongs_to(self):
