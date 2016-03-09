@@ -1,5 +1,5 @@
 #coding: utf8
-from sweet.utils.inflection import javaize, pythonize, singularize, pluralize, tableize
+from sweet.inflection import *
 from datetime import datetime, date
 from decimal import Decimal
 import time
@@ -14,7 +14,8 @@ ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d
 
 def backtick(s):
     return '.'.join([ '`%s`' % x.strip() for x in s.split('.') if x and x.strip() ])
-    
+
+
 def to_bool(v):
     """ convert something to a boolean  """
     if not v:           return False
@@ -50,7 +51,7 @@ str2binary      = lambda v: v # Used to convert from Strings to BLOBs
 binary2str      = lambda v: v # Used to convert from BLOBs to Strings
 
 microseconds    = lambda t: to_i((to_f(t) % 1) * 1000000) # '0.123456' -> 123456; '1.123456' -> 123456
-    
+
 
 def str2datetime(s):
     def __fast_str2datetime(string):
