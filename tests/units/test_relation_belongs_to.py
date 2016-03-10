@@ -69,7 +69,7 @@ class RelationBelongsToTestCase(unittest.TestCase):
         class Phone(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at', 'person_id']
              
-        r = BelongsTo(target_class="sweet.tests.test_relation_belongs_to.Person", owner_class=Phone, owner_attr='user')
+        r = BelongsTo(target_class="sweet.tests.units.test_relation_belongs_to.Person", owner_class=Phone, owner_attr='user')
         self.assertTrue(r.owner is Phone)
         self.assertEqual('person_id', r.foreign_key)
         self.assertTrue(r.target is Person)

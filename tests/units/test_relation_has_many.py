@@ -69,7 +69,7 @@ class RelationHasManyTestCase(unittest.TestCase):
         class User(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at']
                
-        r = HasMany(target_class="sweet.tests.test_relation_has_many.Card", owner_class=User)
+        r = HasMany(target_class="sweet.tests.units.test_relation_has_many.Card", owner_class=User)
         self.assertTrue(r.owner is User)
         self.assertEqual('user_id', r.foreign_key)
         self.assertTrue(r.target is Card)

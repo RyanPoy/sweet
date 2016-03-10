@@ -189,7 +189,7 @@ class BelongsTo(Relation):
         foreign_key_value = getattr(instance, self.foreign_key)
         return self.target.where(**{self.target_pk_column: foreign_key_value}).first()
     
-    def _delete(self):
+    def _delete(self, owner_instance):
         pass
 
         

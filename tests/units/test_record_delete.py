@@ -31,6 +31,15 @@ class RecordDeleteTestCase(unittest.TestCase):
         r = OrmRecord(name='foo', id=10)
         r._ActiveRecord__is_persisted = True # 设置r是持久化状态
         self.assertEqual(1, r.delete())
+        
+    @fudge.patch('sweet.record.Criteria')
+    def test_batch_delete(self, Criteria):
+        Criteria.is_callable().returns_fake()\
+                .expects('from_').returns_fake()\
+                .expects('where').with_args(name='foo').returns_fake()\
+                .expects('delete').returns(21)
+        r = OrmRecord.where(name='foo').delete()
+        self.assertEqual(21, r)
 
     @fudge.patch('sweet.record.Criteria')
     def test_delete_all(self, Criteria):

@@ -108,7 +108,7 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
         class Video(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at', 'name']
  
-        r = HasAndBelongsToMany(target_class="sweet.tests.test_relation_has_and_belongs_to_many.Category", owner_class=Video)
+        r = HasAndBelongsToMany(target_class="sweet.tests.units.test_relation_has_and_belongs_to_many.Category", owner_class=Video)
         self.assertTrue(r.owner is Video)
         self.assertEqual('video_id', r.foreign_key)
         self.assertTrue(r.target is Category)

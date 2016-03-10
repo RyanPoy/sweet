@@ -69,7 +69,7 @@ class RelationHasOneTestCase(unittest.TestCase):
         class User(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at']
               
-        r = HasOne(target_class="sweet.tests.test_relation_has_one.Card", owner_class=User)
+        r = HasOne(target_class="sweet.tests.units.test_relation_has_one.Card", owner_class=User)
         self.assertTrue(r.owner is User)
         self.assertEqual('user_id', r.foreign_key)
         self.assertTrue(r.target is Card)
@@ -122,7 +122,7 @@ class RelationHasOneTestCase(unittest.TestCase):
         u._new_criteria = lambda: c
         c.expects('where').with_args(id=10).returns_fake()\
          .expects('delete').returns(True)   
-        self.assertTrue(u.delete())
+        u.delete()
 
 
 if __name__ == '__main__':
