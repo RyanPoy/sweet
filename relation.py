@@ -116,10 +116,16 @@ def owner_attr_for_has_one_and_has_belongs_to(self):
     from sweet.record import ActiveRecord # lazy import
     if not issubclass(self.owner, ActiveRecord):
         return None
-    target = self.target
-    if target is None:
+#     target = self.target
+#     if target is None:
+#         return None
+    if isinstance(self._target, str):
+        name = self._target.split('.')[-1]
+    elif issubclass(self._target, ActiveRecord):
+        name = self._target.__name__
+    else:
         return None
-    self._owner_attr = singularize(pythonize(target.__name__))
+    self._owner_attr = singularize(pythonize(name))
     return self._owner_attr
 
 
@@ -133,10 +139,17 @@ def owner_attr_for_has_many(self):
     from sweet.record import ActiveRecord # lazy import
     if not issubclass(self.owner, ActiveRecord):
         return None
-    target = self.target
-    if target is None:
+#     target = self.target
+#     if target is None:
+#         return None
+#     self._owner_attr = pluralize(pythonize(target.__name__))
+    if isinstance(self._target, str):
+        name = self._target.split('.')[-1]
+    elif issubclass(self._target, ActiveRecord):
+        name = self._target.__name__
+    else:
         return None
-    self._owner_attr = pluralize(pythonize(target.__name__))
+    self._owner_attr = pluralize(pythonize(name))
     return self._owner_attr
 
 

@@ -1,27 +1,6 @@
 #coding: utf8
-
-# The MIT License (MIT)
-#
-# Copyright (c) 2013 PengYi
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy of
-# this software and associated documentation files (the "Software"), to deal in
-# the Software without restriction, including without limitation the rights to
-# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-# the Software, and to permit persons to whom the Software is furnished to do so,
-# subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from collections import namedtuple
-from pyrails.activesupport import ColumnExistError, to_bool, to_i, to_f, to_decimal, str2datetime, str2date, binary2str
+from sweet.utils import *
 
 
 column_types = [
@@ -146,7 +125,7 @@ class Column(object):
         elif self.type == Column.Type.timestamp:    return str2datetime(value)
         elif self.type == Column.Type.date:         return str2date(value)
         elif self.type == Column.Type.binary:       return binary2str(value)
-        elif self.type == Column.Type.boolean:      return to_int(to_bool(value))
+        elif self.type == Column.Type.boolean:      return to_i(to_bool(value))
         else: return value
     
     def db_field_type(self, column_type):
