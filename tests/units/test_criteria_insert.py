@@ -6,30 +6,30 @@ import fudge
 
 class CriteriaInsertTestCase(unittest.TestCase):
 
-    def get_criteria(self, conn=None):
-        return Criteria(conn)
+    def get_criteria(self, db=None):
+        return Criteria(db)
     
     def test_insert(self):
-        lastrowid=199
-        conn = fudge.Fake('conn').has_attr(_cursor=fudge.Fake('cursor').has_attr(lastrowid=lastrowid))\
-                .expects('execute')\
-                .with_args('INSERT INTO `users` (`age`, `id`, `name`) VALUES (?, ?, ?)', 'boom', 'foo', 'bar')
-        criteria = self.get_criteria(conn)
+        db = fudge.Fake('db')\
+                .expects('execute_lastrowid')\
+                .with_args('INSERT INTO `users` (`age`, `id`, `name`) VALUES (?, ?, ?)', 'boom', 'foo', 'bar')\
+                .returns(199)
+        criteria = self.get_criteria(db)
         relt = criteria.from_('users').insert(id='foo', name='bar', age='boom')
-        self.assertEqual(lastrowid, relt)
+        self.assertEqual(199, relt)
 
     def test_mysql_batch_insert(self):
-        conn = fudge.Fake('conn')\
-                .expects('execute')\
+        db = fudge.Fake('db')\
+                .expects('execute_rowcount')\
                 .with_args('INSERT INTO `users` (`age`, `name`, `id`) VALUES (?, ?, ?), (?, ?, ?)', 'boom', 'bar', 'foo', 'boom2', 'bar2', 'foo2')\
-                .returns(True)\
+                .returns(2)\
 
-        criteria = self.get_criteria(conn)
+        criteria = self.get_criteria(db)
         relt = criteria.from_('users').insert([ 
             dict(id='foo', name='bar', age='boom'), 
             dict(id='foo2', name='bar2', age='boom2'),
         ])
-        self.assertTrue(relt)
+        self.assertEqual(2, relt)
 
 #     def test_sqlite_batch_insert(self):
 #         criteria = self.get_sqlite_builder()
