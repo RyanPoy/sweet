@@ -26,7 +26,7 @@ class RecordDeleteTestCase(unittest.TestCase):
     @fudge.patch('sweet.record.Criteria')
     def test_delete(self, Criteria):
         Criteria.is_callable().returns_fake()\
-                .expects('from_').returns_fake()\
+                .expects('set_record_class').with_args(OrmRecord).returns_fake()\
                 .expects('where').with_args(**{'id': 10}).returns_fake()\
                 .expects('delete').returns(1)
         r = OrmRecord(name='foo', id=10)
@@ -36,7 +36,7 @@ class RecordDeleteTestCase(unittest.TestCase):
     @fudge.patch('sweet.record.Criteria')
     def test_batch_delete(self, Criteria):
         Criteria.is_callable().returns_fake()\
-                .expects('from_').returns_fake()\
+                .expects('set_record_class').with_args(OrmRecord).returns_fake()\
                 .expects('where').with_args(name='foo').returns_fake()\
                 .expects('delete').returns(21)
         r = OrmRecord.where(name='foo').delete()
@@ -45,7 +45,7 @@ class RecordDeleteTestCase(unittest.TestCase):
     @fudge.patch('sweet.record.Criteria')
     def test_delete_all(self, Criteria):
         Criteria.is_callable().returns_fake()\
-                .expects('from_').returns_fake()\
+                .expects('set_record_class').with_args(OrmRecord).returns_fake()\
                 .expects('delete').returns(10)
         self.assertEqual(10, OrmRecord.delete_all())
 

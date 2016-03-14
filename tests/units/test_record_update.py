@@ -17,7 +17,7 @@ class RecordUpdateTestCase(unittest.TestCase):
     @fudge.patch('sweet.record.Criteria')
     def test_update(self, Criteria):
         Criteria.is_callable().returns_fake()\
-            .expects('from_').returns_fake()\
+            .expects('set_record_class').with_args(OrmRecord).returns_fake()\
             .expects('where').returns_fake()\
             .expects('update').with_args({'name': 'foo'}).returns(2)
         r = OrmRecord(id=1)
@@ -35,7 +35,7 @@ class RecordUpdateTestCase(unittest.TestCase):
     @fudge.patch('sweet.record.Criteria')
     def test_save_should_auto_builder_created_at_and_updated_at(self, Criteria):
         Criteria.is_callable().returns_fake()\
-            .expects('from_').returns_fake()\
+            .expects('set_record_class').with_args(OrmRecord).returns_fake()\
             .expects('where').returns_fake()\
             .expects('update').returns(2)
         r = OrmRecord(id=1)
@@ -53,7 +53,7 @@ class RecordUpdateTestCase(unittest.TestCase):
     @fudge.patch('sweet.record.Criteria')
     def test_save_with_customized_created_at_and_updated_at(self, Criteria):
         Criteria.is_callable().returns_fake()\
-            .expects('from_').returns_fake()\
+            .expects('set_record_class').with_args(OrmRecord).returns_fake()\
             .expects('where').returns_fake()\
             .expects('update').returns(2)
         r = OrmRecord(id=1)
@@ -77,7 +77,7 @@ class RecordUpdateTestCase(unittest.TestCase):
     @fudge.patch('sweet.record.Criteria')
     def test_update_created_at_and_updated_at_cusmer(self, Criteria):
         Criteria.is_callable().returns_fake()\
-            .expects('from_').returns_fake()\
+            .expects('set_record_class').with_args(OrmRecord).returns_fake()\
             .expects('where').returns_fake()\
             .expects('update').returns(2)
         r = OrmRecord(id=1)

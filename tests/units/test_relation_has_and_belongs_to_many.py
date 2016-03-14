@@ -129,7 +129,7 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
             has_and_belongs_to_many(Student)
     
         Criteria.is_callable().returns_fake()\
-                .expects('from_').with_args('teachers').returns_fake()\
+                .expects('set_record_class').with_args(Teacher).returns_fake()\
                 .expects('where').with_args(id=(1, )).returns_fake()\
                 .expects('first').returns(Teacher(id=1, name="poy", created_at=datetime.now(), updated_at=datetime.now()))
         t = Teacher.find(1)
@@ -139,7 +139,7 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
                   .expects('on').with_args('`students_teachers`.`student_id` = `students`.`id`').returns_fake()
  
         Criteria.is_callable().returns_fake()\
-                .expects('from_').with_args('students').returns_fake()\
+                .expects('set_record_class').with_args(Student).returns_fake()\
                 .expects('join').returns_fake()\
                 .expects('all').returns([
                     Student(id=11, age=10, created_at=datetime.now(), updated_at=datetime.now()),

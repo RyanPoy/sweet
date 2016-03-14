@@ -87,12 +87,12 @@ class RelationBelongsToTestCase(unittest.TestCase):
             belongs_to(User)
  
         Criteria.is_callable().returns_fake()\
-                .expects('from_').returns_fake()\
+                .expects('set_record_class').with_args(Phone).returns_fake()\
                 .expects('where').with_args(id=(1, )).returns_fake()\
                 .expects('first').returns(Phone(id=1, created_at=datetime.now(), updated_at=datetime.now(), user_id=10))
         p = Phone.find(1)
         Criteria.is_callable().returns_fake()\
-                .expects('from_').returns_fake()\
+                .expects('set_record_class').with_args(User).returns_fake()\
                 .expects('where').with_args(id=10).returns_fake()\
                 .expects('first').returns(User(id=10, name='py', created_at=datetime.now(), updated_at=datetime.now()))
         u = p.user

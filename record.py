@@ -349,7 +349,7 @@ class ActiveRecord(object):
 
     @classmethod
     def _new_criteria(cls):
-        return Criteria(cls.__dbmanager__.get_connection()).from_(cls.table_name)
+        return Criteria(cls.__dbmanager__.get_connection()).set_record_class(cls)
 
 #     def relate(self, *models):
 #         Collection(self.__class__).save(self)

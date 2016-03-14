@@ -87,13 +87,13 @@ class RelationHasManyTestCase(unittest.TestCase):
             has_many(Phone)
 
         Criteria.is_callable().returns_fake()\
-                .expects('from_').returns_fake()\
+                .expects('set_record_class').with_args(User).returns_fake()\
                 .expects('where').with_args(id=(10, )).returns_fake()\
                 .expects('first').returns(User(id=10, created_at=datetime.now(), updated_at=datetime.now(), name='py'))
         u = User.find(10)
         self.assertEqual('py', u.name)
         Criteria.is_callable().returns_fake()\
-                .expects('from_').returns_fake()\
+                .expects('set_record_class').with_args(Phone).returns_fake()\
                 .expects('where').with_args(user_id=10).returns_fake()\
                 .expects('all').returns([
                     Phone(id=1, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),

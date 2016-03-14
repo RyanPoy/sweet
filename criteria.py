@@ -20,6 +20,7 @@ class Criteria(object):
         self._joins = []
         self.conn = conn
         self._aggregate = None
+        self.__record_class = None
 
     def new_instance(self):
         instance = self.__class__()
@@ -180,7 +181,16 @@ class Criteria(object):
     def from_(self, tablename):
         self._from = tablename
         return self
-    
+
+    @property
+    def record_class(self):
+        return self.__record_class
+
+    def set_record_class(self, record_class):
+        self.__record_class = record_class
+        self.from_(self.__record_class.tablename)
+        return self
+
     def distinct(self):
         self._distinct = True
         return self
