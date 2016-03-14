@@ -188,7 +188,7 @@ class Criteria(object):
 
     def set_record_class(self, record_class):
         self.__record_class = record_class
-        self.from_(self.__record_class.tablename)
+        self.from_(self.__record_class.table_name)
         return self
 
     def distinct(self):
