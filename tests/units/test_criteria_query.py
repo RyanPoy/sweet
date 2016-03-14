@@ -9,6 +9,15 @@ class CriteriaQueryTestCase(unittest.TestCase):
     def get_criteria(self, conn=None):
         return Criteria(conn)
 
+    def test_critera_basic(self):
+        from sweet.record import ActiveRecord
+        class User(ActiveRecord): __columns__ = ['id', 'created_at', 'updated_at']
+        criteria = self.get_criteria()
+        self.assertIsNone(criteria.record_class)
+        criteria.set_record_class(User)
+        self.assertEqual(User, criteria.record_class)
+        self.assertEqual('users', criteria._from)
+
     def test_basic_select(self):
         criteria = self.get_criteria()
         criteria.select('*').from_('users')
