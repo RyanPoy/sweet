@@ -7,7 +7,7 @@ class Criteria(object):
     
     POSITION_FLAG = '?'
     
-    def __init__(self, db=None):
+    def __init__(self, conn=None):
         self._selects = []
         self._wheres = []
         self._havings = []
@@ -18,7 +18,7 @@ class Criteria(object):
         self._limit = None
         self._offset = 0
         self._joins = []
-        self.db = db
+        self.conn = conn
         self._aggregate = None
 
     def new_instance(self):
@@ -39,7 +39,7 @@ class Criteria(object):
         if where_sql:
             sqls.append(' WHERE %s' % where_sql)
             params += where_params
-        return self.db.execute(''.join(sqls), *params)
+        return self.conn.execute(''.join(sqls), *params)
 
     def update(self, dict_values={}, **kwargs):
         field_value_dict = {}
@@ -63,7 +63,7 @@ class Criteria(object):
         if where_sql:
             sqls.append(' WHERE %s' % where_sql)
             params += where_params
-        return self.db.execute(''.join(sqls), *params)
+        return self.conn.execute(''.join(sqls), *params)
         
     def insert(self, multiple_value_list=None, **kwargs):
         if multiple_value_list:
@@ -76,7 +76,7 @@ class Criteria(object):
             columns.append(self._compile_fieldname(k, False))
             values.append(v)
         sql = 'INSERT INTO `%s` (%s) VALUES (%s)' % (self._from, ', '.join(columns), self._postion_flag(values))
-        return self.db.execute_lastrowid(sql, *values)
+        return self.conn.execute_lastrowid(sql, *values)
 
     def _batch_insert(self, multiple_value_list):
         columns, values_list, set_columns = [], [], False
@@ -89,7 +89,7 @@ class Criteria(object):
             set_columns = True
             values_list.append(values)
         sql = 'INSERT INTO `%s` (%s) VALUES %s' % (self._from, ', '.join(columns), ', '.join([ '(%s)' % self._postion_flag(vs) for vs in values_list ]))
-        return self.db.execute_rowcount(sql, *flatten(values_list))
+        return self.conn.execute_rowcount(sql, *flatten(values_list))
 
     def first(self):
         tmp_limit = self._limit
@@ -109,7 +109,7 @@ class Criteria(object):
 
     def all(self):
         sql, params = self.to_sql()
-        rows = self.db.fetch_all(sql, *params)
+        rows = self.conn.fetch_all(sql, *params)
         return rows
 
     def join(self, tablename, *args):

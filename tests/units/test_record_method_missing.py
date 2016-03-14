@@ -7,6 +7,7 @@ import fudge
 class OrmRecord(ActiveRecord):
     __columns__ = ['id', 'name', 'age']
     __created_at__ = __updated_at__ = None
+    __dbmanager__ = fudge.Fake('dbmanager').provides('get_connection').returns(None)
 
 
 class RecordMethodMissingTestCase(unittest.TestCase):

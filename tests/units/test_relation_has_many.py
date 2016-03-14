@@ -78,6 +78,7 @@ class RelationHasManyTestCase(unittest.TestCase):
 
     @fudge.patch('sweet.record.Criteria')
     def test_user_has_many_phone_relation(self, Criteria):
+        ActiveRecord.__dbmanager__ = fudge.Fake('dbmanager').provides('get_connection').returns(None)
         class Phone(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
  

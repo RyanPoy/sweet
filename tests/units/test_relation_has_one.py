@@ -78,6 +78,7 @@ class RelationHasOneTestCase(unittest.TestCase):
  
     @fudge.patch('sweet.record.Criteria')
     def test_user_has_one_phone_relation(self, Criteria):
+        ActiveRecord.__dbmanager__ = fudge.Fake('dbmanager').provides('get_connection').returns(None)
         class Phone(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
 
@@ -103,6 +104,7 @@ class RelationHasOneTestCase(unittest.TestCase):
 
     @fudge.patch('sweet.record.Criteria')
     def test_delete_user_should_delete_phone_because_user_has_one_phone_relation(self, Criteria):
+        ActiveRecord.__dbmanager__ = fudge.Fake('dbmanager').provides('get_connection').returns(None)
         class Phone(ActiveRecord):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
 

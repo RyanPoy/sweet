@@ -96,6 +96,7 @@ class ActiveRecord(object):
     __created_on__ = None
     __updated_on__ = None
     __relations__  = []
+    __dbmanager__  = None
 
     def __init__(self, dict_args={}, **kwargs):
         self.__dict__.update(dict_args)
@@ -347,7 +348,7 @@ class ActiveRecord(object):
 
     @classmethod
     def _new_criteria(cls):
-        return Criteria().from_(cls.table_name)
+        return Criteria(cls.__dbmanager__.get_connection()).from_(cls.table_name)
 
 #     def relate(self, *models):
 #         Collection(self.__class__).save(self)
