@@ -249,12 +249,11 @@ class CriteriaQueryTestCase(unittest.TestCase):
             sql
         )
         self.assertEqual(['foo', 10], params)
-        
 
     def test_first_return_none_result_if_can_not_found(self):
         results = []
         conn = fudge.Fake('conn')\
-                .expects('fetch_all')\
+                .expects('fetchall')\
                 .with_args('SELECT * FROM `users` WHERE id = ? or email = ? LIMIT 1', 1, 'foo')\
                 .returns(results)
         criteria = self.get_criteria(conn)
@@ -270,7 +269,7 @@ class CriteriaQueryTestCase(unittest.TestCase):
             {'id': 1, 'email': 'foo'}
         ]
         conn = fudge.Fake('conn')\
-                .expects('fetch_all')\
+                .expects('fetchall')\
                 .with_args('SELECT * FROM `users` WHERE id = ? or email = ? LIMIT 1', 1, 'foo')\
                 .returns(results)
         criteria = self.get_criteria(conn)
@@ -286,7 +285,7 @@ class CriteriaQueryTestCase(unittest.TestCase):
             {'id': 20, 'tag': 'foo'},
         ]
         conn = fudge.Fake('conn')\
-                .expects('fetch_all')\
+                .expects('fetchall')\
                 .with_args('SELECT * FROM `users` WHERE `users`.`tag` IN (?, ?) LIMIT 1 OFFSET 19', 'boom', 'foo')\
                 .returns(results)
         criteria = Criteria(conn)
@@ -302,7 +301,7 @@ class CriteriaQueryTestCase(unittest.TestCase):
             {'id': 4, 'tag': 'foo'},
         ]
         conn = fudge.Fake('conn')\
-                .expects('fetch_all')\
+                .expects('fetchall')\
                 .with_args('SELECT * FROM `users` WHERE `users`.`tag` IN (?, ?)', 'boom', 'foo')\
                 .returns(results)
         criteria = self.get_criteria(conn)

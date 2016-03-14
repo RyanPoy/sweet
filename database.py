@@ -16,50 +16,50 @@ class MySQL(object):
         self.show_sql = show_sql
         self._reconnect()
 
-    def fetchone(self, sql, params=[]):
+    def fetchone(self, sql, *params):
         """Returns the first row returned for the given query."""
         rows = self.fetchall(sql, params)
         return rows[0] if rows else None
     
-    def fetchall(self, sql, params=[]):
+    def fetchall(self, sql, *params):
         """Returns a row list for the given query and parameters."""
         cursor = self._cursor()
         try:
-            self._execute(cursor, sql, params)
+            self._execute(cursor, sql, *params)
             column_names = [d[0] for d in cursor.description]
             return [ dict(itertools.izip(column_names, row)) for row in cursor ]
         finally:
             cursor.close()
             
-        return self._execute(sql, params).cursor.fetchall()
+        return self._execute(sql, *params).cursor.fetchall()
 
-    def execute_lastrowid(self, sql, params=[]):
+    def execute_lastrowid(self, sql, *params):
         """Executes the given query, returning the lastrowid from the query."""
         cursor = self._cursor()
         try:
-            self._execute(cursor, sql, params)
+            self._execute(cursor, sql, *params)
             return cursor.lastrowid
         finally:
             cursor.close()
     
-    def execute_rowcount(self, sql, params = []):
+    def execute_rowcount(self, sql, *params):
         """Executes the given query, returning the rowcount from the query."""
         cursor = self._cursor()
         try:
-            self._execute(cursor, sql, params)
+            self._execute(cursor, sql, *params)
             return cursor.rowcount
         finally:
             cursor.close()
             
-    def execute(self, sql, params=[]):
+    def execute(self, sql, *params):
         cursor = self._cursor()
         try:
-            self._execute(cursor, sql, params)
+            self._execute(cursor, sql, *params)
             return self
         finally:
             cursor.close()
 
-    def _execute(self, cursor, sql, params=[]):
+    def _execute(self, cursor, sql, *params):
         try:
             btime = time.time()
             raw_sql = ''
@@ -67,7 +67,11 @@ class MySQL(object):
                 raw_sql = self.__show_sql(sql, params)
             sql = sql.replace('?', '%s') # @TODO: should fix a bug if query like this: 
                                          # select users.* from users where users.name like "?abc"
-            cursor.execute(sql, params)
+            if params:
+                print '*'*10, params
+                cursor.execute(sql, params)
+            else:
+                cursor.execute(sql)
         finally:
             if self.show_sql:
                 print (time.time() - btime), '\t|', raw_sql
@@ -125,10 +129,10 @@ class MySQL(object):
                     param = param.encode('utf8')
                 if is_str(param):
                     param = "'%s'" % MySQLdb.escape_string(param)
-                elif is_date(param):
-                    param = "'%s'" % str2date(param)
                 elif is_datetime(param):
                     param = "'%s'" % str2datetime(param)
+                elif is_date(param):
+                    param = "'%s'" % str2date(param)
                 else:
                     param = str(param)
                 formated_params.append(param)

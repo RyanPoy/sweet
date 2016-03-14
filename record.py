@@ -311,6 +311,7 @@ class ActiveRecord(object):
     
     def  _prepare_at_or_on(self, attrs_dict):
         def _build_at_or_on(at_or_on_attrname, attrs_dict, is_at=True):
+            if not at_or_on_attrname: return
             str_2_datetime_or_date = str2datetime if is_at else str2date
             cur_datetime_or_date = datetime.now if is_at else datetime.today
             if at_or_on_attrname:

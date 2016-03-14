@@ -109,7 +109,7 @@ class Criteria(object):
 
     def all(self):
         sql, params = self.to_sql()
-        rows = self.conn.fetch_all(sql, *params)
+        rows = self.conn.fetchall(sql, *params)
         return rows
 
     def join(self, tablename, *args):
@@ -248,7 +248,7 @@ class Criteria(object):
         return '%s AS aggregate' % self._aggregate if self._aggregate else ''
 
     def _compile_select(self):
-        selects = self._selects
+        selects = self._selects or ['*']
         new_selects = []
         for select in selects:
             select_lower = select.lower()

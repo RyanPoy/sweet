@@ -12,7 +12,7 @@ class CriteriaAggregateFunctionTestCase(unittest.TestCase):
     def test_count_aggegate_function(self):
         results = [{'aggregate': 20}]
         conn = fudge.Fake('conn')\
-                .expects('fetch_all')\
+                .expects('fetchall')\
                 .with_args('SELECT COUNT(*) AS aggregate FROM `users` WHERE `users`.`tag` IN (?, ?) LIMIT 1', 'boom', 'foo')\
                 .returns(results)
         criteria = self.get_criteria(conn)
@@ -23,7 +23,7 @@ class CriteriaAggregateFunctionTestCase(unittest.TestCase):
     def test_sum_aggegate_function(self):
         results = [{'aggregate': 20}]
         conn = fudge.Fake('conn')\
-                .expects('fetch_all')\
+                .expects('fetchall')\
                 .with_args('SELECT SUM(age) AS aggregate FROM `users` WHERE `users`.`tag` IN (?, ?) LIMIT 1', 'boom', 'foo')\
                 .returns(results)
         criteria = self.get_criteria(conn)
@@ -34,7 +34,7 @@ class CriteriaAggregateFunctionTestCase(unittest.TestCase):
     def test_avg_aggegate_function(self):
         results = [{'aggregate': 20}]
         conn = fudge.Fake('conn')\
-                .expects('fetch_all')\
+                .expects('fetchall')\
                 .with_args('SELECT AVG(age) AS aggregate FROM `users` WHERE `users`.`tag` IN (?, ?) LIMIT 1', 'boom', 'foo')\
                 .returns(results)
         criteria = self.get_criteria(conn)
@@ -45,7 +45,7 @@ class CriteriaAggregateFunctionTestCase(unittest.TestCase):
     def test_min_aggegate_function(self):
         results = [{'aggregate': 20}]
         conn = fudge.Fake('conn')\
-                .expects('fetch_all')\
+                .expects('fetchall')\
                 .with_args('SELECT MIN(age) AS aggregate FROM `users` WHERE `users`.`tag` IN (?, ?) LIMIT 1', 'boom', 'foo')\
                 .returns(results)
         criteria = self.get_criteria(conn)
@@ -56,7 +56,7 @@ class CriteriaAggregateFunctionTestCase(unittest.TestCase):
     def test_max_aggegate_function(self):
         results = [{'aggregate': 20}]
         conn = fudge.Fake('conn')\
-                .expects('fetch_all')\
+                .expects('fetchall')\
                 .with_args('SELECT MAX(age) AS aggregate FROM `users` WHERE `users`.`tag` IN (?, ?) LIMIT 1', 'boom', 'foo')\
                 .returns(results)
         criteria = self.get_criteria(conn)
