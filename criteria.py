@@ -110,8 +110,10 @@ class Criteria(object):
 
     def all(self):
         sql, params = self.to_sql()
-        rows = self.conn.fetchall(sql, *params)
-        return rows
+        records = self.conn.fetchall(sql, *params)
+        if self.record_class:
+            return [ self.record_class(r) for r in records ]
+        return records
 
     def join(self, tablename, *args):
         if isinstance(tablename, JoinClause):
