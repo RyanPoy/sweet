@@ -1,6 +1,5 @@
 #coding: utf8
 from sweet.relation.base import Relation
-from sweet.record import ActiveRecord
 from sweet.utils import *
 
 
@@ -14,6 +13,7 @@ class BelongsTo(Relation):
             return self._foreign_key
         if self.owner is None:
             return None
+        from sweet.record import ActiveRecord # lazy import
         if not issubclass(self.owner, ActiveRecord):
             return None
         target = self.target
@@ -33,6 +33,7 @@ class BelongsTo(Relation):
             return self._owner_attr
         if self.owner is None:
             return None
+        from sweet.record import ActiveRecord # lazy import
         if not issubclass(self.owner, ActiveRecord):
             return None
 #         target = self.target

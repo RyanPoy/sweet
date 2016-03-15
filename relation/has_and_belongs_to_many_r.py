@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 from sweet.relation.base import Relation
-from sweet.record import ActiveRecord
 from sweet.criteria import JoinClause
 from sweet.utils import *
 
@@ -21,6 +20,7 @@ class HasAndBelongsToMany(Relation):
             return self._owner_attr
         if self.owner is None:
             return None
+        from sweet.record import ActiveRecord # lazy import
         if not issubclass(self.owner, ActiveRecord):
             return None
 #         target = self.target
@@ -44,6 +44,7 @@ class HasAndBelongsToMany(Relation):
         target = self.target
         if target is None:
             return None
+        from sweet.record import ActiveRecord # lazy import
         if not issubclass(target, ActiveRecord):
             return None
         target_foreign_key = singularize(pythonize(target.__name__)) + '_id'

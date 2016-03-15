@@ -1,6 +1,7 @@
 #coding: utf8
 from __future__ import with_statement
 from sweet.criteria import Criteria
+from sweet.relation import Relation
 from sweet.utils import *
 
 
@@ -13,7 +14,6 @@ class ActiveRecordMetaClass(type):
             if not hasattr(cls, '__table_name__'):
                 setattr(cls, '__table_name__', tableize(cls.__name__))
 
-            from sweet.relation import Relation
             for relation in Relation.iter():
                 relation.inject(cls)
 
