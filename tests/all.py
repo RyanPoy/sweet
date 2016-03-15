@@ -73,11 +73,12 @@ if __name__ == '__main__':
         sys.exit(-1)
 
     suite = unittest.TestSuite()
-    if cmd == 'all' or cmd == 'unit':
-        for t in unit_tests:
-            suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(t))
     if cmd == 'all' or cmd == 'integration':
         for t in integration_tests:
+            suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(t))
+
+    if cmd == 'all' or cmd == 'unit':
+        for t in unit_tests:
             suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(t))
 
     unittest.TextTestRunner().run(suite)
