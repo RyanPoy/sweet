@@ -91,17 +91,7 @@ class Relation(object):
     def inject(self, owner=None):
         if owner: self._owner = owner
         self._owner.__relations__.append(self)
-        setattr(self._owner, self.owner_attr, relation(self))
-
-
-class relation(object):
-    """ decorator
-    """
-    def __init__(self, r):
-        self.r = r
-        
-    def __get__(self, instance, owner):
-        return self.r._get(instance, owner)
+        setattr(self._owner, self.owner_attr, self)
 
 
 ############# shared methods ############
@@ -198,7 +188,7 @@ class BelongsTo(Relation):
     owner_attr = property(owner_attr_for_has_one_and_has_belongs_to)
     foreign_key = property(foreign_key_for_belongs_to)
     
-    def _get(self, instance, owner):
+    def __get__(self, instance, owner):
         foreign_key_value = getattr(instance, self.foreign_key)
         return self.target.where(**{self.target_pk_column: foreign_key_value}).first()
     
@@ -218,7 +208,7 @@ class HasOne(Relation):
     owner_attr = property(owner_attr_for_has_one_and_has_belongs_to)
     foreign_key = property(foreign_key_for_has_one_and_has_many)
 
-    def _get(self, instance, owner):
+    def __get__(self, instance, owner):
         return self.target.where(**{self.foreign_key: instance.pk}).first()
 
     def _delete(self, owner_instance):
@@ -236,9 +226,12 @@ class HasMany(Relation):
     owner_attr = property(owner_attr_for_has_many)
     foreign_key = property(foreign_key_for_has_one_and_has_many)
 
-    def _get(self, instance, owner):
-        foreign_key_value = getattr(instance, instance.__pk__)
-        return self.target.where(**{self.foreign_key: foreign_key_value}).all()
+    def __get__(self, instance, owner):
+        return self._get(instance)
+
+    def _get(self, instance):
+        foreign_key_value = int(getattr(instance, instance.__pk__))
+        return self.target.where(**{self.foreign_key: foreign_key_value})
 
 
 def has_many(target_class_or_classpath, foreign_key=None, owner_attr=""):
@@ -309,7 +302,10 @@ class HasAndBelongsToMany(Relation):
         self._association_table = '_'.join(l) 
         return self._association_table
 
-    def _get(self, instance, owner):
+    def __get__(self, instance, owner):
+        return self._get(instance)
+
+    def _get(self, instance):
         foreign_key_value = getattr(instance, instance.__pk__)
 
         return self.target.join(

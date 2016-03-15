@@ -94,8 +94,7 @@ class RelationHasManyTestCase(unittest.TestCase):
         self.assertEqual('py', u.name)
         Criteria.is_callable().returns_fake()\
                 .expects('set_record_class').with_args(Phone).returns_fake()\
-                .expects('where').with_args(user_id=10).returns_fake()\
-                .expects('all').returns([
+                .expects('where').with_args(user_id=10).returns([
                     Phone(id=1, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
                     Phone(id=2, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
                     Phone(id=3, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),

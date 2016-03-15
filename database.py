@@ -18,7 +18,7 @@ class MySQL(object):
 
     def fetchone(self, sql, *params):
         """Returns the first row returned for the given query."""
-        rows = self.fetchall(sql, params)
+        rows = self.fetchall(sql, *params)
         return rows[0] if rows else None
     
     def fetchall(self, sql, *params):
@@ -62,16 +62,11 @@ class MySQL(object):
     def _execute(self, cursor, sql, *params):
         try:
             btime = time.time()
-            raw_sql = ''
             if self.show_sql:
                 raw_sql = self.__show_sql(sql, params)
-            sql = sql.replace('?', '%s') # @TODO: should fix a bug if query like this: 
-                                         # select users.* from users where users.name like "?abc"
-            if params:
-                print '*'*10, params
-                cursor.execute(sql, params)
-            else:
-                cursor.execute(sql)
+            sql = sql.replace('?', '%s')    # @TODO: should fix a bug if query like this: 
+                                            # select users.* from users where users.name like "?abc"
+            cursor.execute(sql, params)
         finally:
             if self.show_sql:
                 print (time.time() - btime), '\t|', raw_sql
@@ -187,6 +182,12 @@ class DatabaseManager(object):
                 host=self.host, port=self.port, charset='utf8', show_sql=self.show_sql
             )
         return self.__class__.__connections__[self.driver]
+
+    def new_connection(self):
+        return self.db_class(
+                self.database, user=self.user, password=self.password, 
+                host=self.host, port=self.port, charset='utf8', show_sql=self.show_sql
+            )
 
     def close_all_connection(self):
         for driver, conn in self.__connections__.iteritems():
