@@ -1,5 +1,6 @@
 #coding: utf8
 from sweet.relation.base import Relation
+from sweet.record import ActiveRecord
 from sweet.utils import *
 
 
@@ -13,7 +14,6 @@ class HasMany(Relation):
             return self._foreign_key
         if self.owner is None:
             return None
-        from sweet.record import ActiveRecord # lazy import
         if not issubclass(self.owner, ActiveRecord):
             return None
         foreign_key = singularize(pythonize(self.owner.__name__)) + '_id'
@@ -30,7 +30,6 @@ class HasMany(Relation):
             return self._owner_attr
         if self.owner is None:
             return None
-        from sweet.record import ActiveRecord # lazy import
         if not issubclass(self.owner, ActiveRecord):
             return None
 #         target = self.target
