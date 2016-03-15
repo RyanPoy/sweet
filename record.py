@@ -389,8 +389,8 @@ class ActiveRecord(object):
         if not self.is_persisted:
             raise RecordHasNotBeenPersisted()
         
-        for r in self.__relations__:
-            r._delete(self)
+#         for r in self.__relations__:
+#             r._delete(self)
 
         # @TODO: 需要按照关系再次删除相关的数据
         c = self._new_criteria()

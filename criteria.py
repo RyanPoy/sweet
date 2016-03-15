@@ -113,7 +113,7 @@ class Criteria(object):
         sql, params = self.to_sql()
         records = self.conn.fetchall(sql, *params)
         if self.record_class and self._aggregate is None: # 表示是需要转化为对象返回的，而不是一个list（list的元素是dict）
-            return [ self.record_class(r) for r in records ]
+            return [ self.record_class(r)._sync_attrs() for r in records ] # 需要同步内容，方便以后做update
         return records
 
     def join(self, tablename, *args):
@@ -385,11 +385,10 @@ class Criteria(object):
 
     def __getitem__(self, item):
         new_criteria = copy.deepcopy(self)
-#         new_criteria = self
         cnt = new_criteria.count()
-        if cnt > item + 1:
+        if cnt < item + 1:
             return None
-        return new_criteria.limit(1).offset(item+1)
+        return new_criteria.limit(1).offset(item).first()
 
 
 ########## join clause ##########

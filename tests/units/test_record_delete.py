@@ -22,7 +22,7 @@ class RecordDeleteTestCase(unittest.TestCase):
     def test_delete_should_raise_exception_if_record_has_not_been_persisted(self):
         r = OrmRecord()
         self.assertRaises(RecordHasNotBeenPersisted, r.delete)
-        
+
     @fudge.patch('sweet.record.Criteria')
     def test_delete(self, Criteria):
         Criteria.is_callable().returns_fake()\

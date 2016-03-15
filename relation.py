@@ -13,7 +13,7 @@ class Relation(object):
         owner_class: 拥有者的class
         foreign_key: 目标的 class 所在table的字段名
         """
-        self._owner = owner_class
+        self.owner = owner_class
         self._target = target_class
         self._foreign_key = foreign_key
         self._owner_attr = owner_attr
@@ -28,10 +28,6 @@ class Relation(object):
             yield cls.__relations__.pop()
 
     @property
-    def owner(self):
-        return self._owner
-
-    @property
     def target(self):
         """_target is None, should be return None
            _target is a active record class path, should be parse it and set a active record class to _target, then return it
@@ -44,54 +40,14 @@ class Relation(object):
         return self._target
     
     @property
-    def owner_attr(self):
-        if self._owner_attr:
-            return self._owner_attr
-        if self.owner is None:
-            return None
-        from record import ActiveRecord # lazy import
-        if not issubclass(self.owner, ActiveRecord):
-            return None
-        target = self.target
-        if target is None:
-            return None
-        self._owner_attr = singularize(target.table_name)
-        return self._owner_attr
-
-    @property
     def target_pk_column(self):
         target = self.target
         return target.__pk__ if target else None
 
-    @property
-    def foreign_key(self):
-        """Phone belongs to User
-        owner_column must be user_id
-        """
-        if self._foreign_key:
-            return self._foreign_key
-        if self.owner is None:
-            return None
-        from record import ActiveRecord # lazy import
-        if not issubclass(self.owner, ActiveRecord):
-            return None
-        owner = self.owner
-        if owner is None:
-            return None
-        foreign_key = singularize(owner.table_name) + '_id'
-        if not self.target.has_column(foreign_key):
-            raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target.__name__))
-        self._foreign_key = foreign_key
-        return self._foreign_key
-
-    def __get__(self, instance, owner):
-        foreign_key_value = getattr(instance, instance.__pk__)
-        return self.target.where(**{self.foreign_key: foreign_key_value}).first()
-
     def inject(self, owner=None):
-        if owner: self._owner = owner
-        self._owner.__relations__.append(self)
-        setattr(self._owner, self.owner_attr, self)
+        if owner: self.owner = owner
+        self.owner.__relations__.append(self)
+        setattr(self.owner, self.owner_attr, self)
 
 
 ############# shared methods ############
