@@ -145,9 +145,6 @@ class BelongsTo(Relation):
         foreign_key_value = getattr(instance, self.foreign_key)
         return self.target_class.where(**{self.target_pk_column: foreign_key_value}).first()
     
-    def _delete(self, owner_instance):
-        pass
-
         
 def belongs_to(target_class_or_classpath, foreign_key=None, owner_attr=""):
     relation = BelongsTo(target_class=target_class_or_classpath, foreign_key=foreign_key, owner_attr=owner_attr)
@@ -180,9 +177,15 @@ class HasMany(Relation):
     foreign_key = property(foreign_key_for_has_one_and_has_many)
 
     def __get__(self, instance, owner):
+        c = Collection(instance, self)
+        setattr(instance, self.owner_attr, c)
+        return getattr(instance, self.owner_att)
+
+    def prefetch(self, instance):
         foreign_key_value = int(getattr(instance, instance.__pk__))
         return self.target_class.where(**{self.foreign_key: foreign_key_value})
-    
+
+
 def has_many(target_class_or_classpath, foreign_key=None, owner_attr=""):
     relation = HasMany(target_class=target_class_or_classpath, foreign_key=foreign_key, owner_attr=owner_attr)
     Relation.push(relation)

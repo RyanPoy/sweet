@@ -9,201 +9,194 @@ from datetime import datetime
 
 
 class CollectionTest(unittest.TestCase):
-    pass
-#     def setUp(self):
-#         self._origin_new_criteria = ActiveRecord._new_criteria
-#         ActiveRecord._new_criteria = lambda cls: Criteria(None).set_record_class(cls)
-#         
-#     def tearDown(self):
-#         ActiveRecord._new_criteria = self._origin_new_criteria
-#         
-#     def test_all_from_cache(self):
-#         c = Collection(relation=None, owner_instance=None)
-#         c._cache = [ {'name': 'py', 'age': 35}, {'name': 'ryan', 'age': 34} ]
-#         self.assertEqual([ {'name': 'py', 'age': 35}, {'name': 'ryan', 'age': 34} ], c.all())
-# 
-#     @fudge.patch('sweet.record.Criteria')
-#     def test_all_from_db_of_has_many_relation(self, Criteria):
-#         class Phone(ActiveRecord):
-#             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
-# 
-#         class User(ActiveRecord):
-#             __columns__ = ['id', 'name', 'created_at', 'updated_at']
-#             has_many(Phone)
-# 
-#         u = User(id=10, name='py', age=35)
-#         u._ActiveRecord__is_persisted = True
-#         self.assertTrue(isinstance(u.phones, Collection))
-# 
-#         Criteria.is_callable().returns_fake()\
-#                 .expects('set_record_class').with_args(Phone).returns_fake()\
-#                 .expects('where').with_args(user_id=10).returns([
-#                      Phone(id=1, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
-#                      Phone(id=2, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
-#                      Phone(id=3, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
-#                  ])
-#         u.phones.all()
 
-#         ps = u.phones
-#         self.assertEqual(3, len(ps))
-#         p = ps[0]
-#         self.assertEqual(1, p.id)
-#         self.assertTrue(isinstance(p.created_at, datetime))
-#         self.assertTrue(isinstance(p.updated_at, datetime))
-#         self.assertEqual(10, p.user_id)
+    def test_all_from_cache(self):
+        c = Collection(relation=None, owner_instance=None)
+        c._cache = [ {'name': 'py', 'age': 35}, {'name': 'ryan', 'age': 34} ]
+        self.assertEqual([ {'name': 'py', 'age': 35}, {'name': 'ryan', 'age': 34} ], c.all())
+ 
+    @fudge.patch('sweet.record.Criteria')
+    def test_all_from_db_of_has_many_relation(self, Criteria):
+        class Phone(ActiveRecord):
+            __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
+            __dbmanager__ = fudge.Fake('dbmanager').provides('get_connection').returns(None)
+ 
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+            has_many(Phone)
+ 
+        u = User(id=10, name='py', age=35)
+        u._ActiveRecord__is_persisted = True
+        
+        Criteria.is_callable().returns_fake()\
+                .expects('set_record_class').with_args(Phone).returns_fake()\
+                .expects('where').with_args(user_id=10).returns_fake()\
+                .expects('all').returns([
+                     Phone(id=1, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
+                     Phone(id=2, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
+                     Phone(id=3, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
+                 ])
+        self.assertTrue(isinstance(u.phones, Collection))
+        phones = u.phones.all()
+        self.assertEqual(3, len(phones))
+        self.assertEqual(1, phones[0].id)
+        self.assertEqual(2, phones[1].id)
+        self.assertEqual(3, phones[2].id)
+        self.assertEqual(phones, u.phones._cache)
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_first_from_cache(self):
+        c = Collection(relation=None, owner_instance=None)
+        c._cache = [ {'name': 'py', 'age': 35}, {'name': 'ryan', 'age': 34} ]
+        self.assertEqual({'name': 'py', 'age': 35}, c.first())
 
+    @fudge.patch('sweet.record.Criteria')
+    def test_first_from_db_of_has_many_relation(self, Criteria):
+        class Phone(ActiveRecord):
+            __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
+            __dbmanager__ = fudge.Fake('dbmanager').provides('get_connection').returns(None)
+ 
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+            has_many(Phone)
+ 
+        u = User(id=10, name='py', age=35)
+        u._ActiveRecord__is_persisted = True
+        
+        Criteria.is_callable().returns_fake()\
+                .expects('set_record_class').with_args(Phone).returns_fake()\
+                .expects('where').with_args(user_id=10).returns_fake()\
+                .expects('first').returns(
+                    Phone(id=1, created_at=datetime.now(), updated_at=datetime.now(), user_id=10)
+                )
+        self.assertTrue(isinstance(u.phones, Collection))
+        phone = u.phones.first()
+        self.assertEqual(1, phone.id)
+        self.assertEqual(10, phone.user_id)
+        
+    def test_last_from_cache(self):
+        c = Collection(relation=None, owner_instance=None)
+        c._cache = [ {'name': 'py', 'age': 35}, {'name': 'ryan', 'age': 34} ]
+        self.assertEqual({'name': 'ryan', 'age': 34}, c.last())
 
- # 	  def test_first_returns_first_item_in_collection(self):
- #        c = Collection(['foo', 'bar'])
- #        self.assertEqual('foo', c.first())
+    @fudge.patch('sweet.record.Criteria')
+    def test_last_from_db_of_has_many_relation(self, Criteria):
+        class Phone(ActiveRecord):
+            __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
+            __dbmanager__ = fudge.Fake('dbmanager').provides('get_connection').returns(None)
+ 
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+            has_many(Phone)
+ 
+        u = User(id=10, name='py', age=35)
+        u._ActiveRecord__is_persisted = True
+        
+        Criteria.is_callable().returns_fake()\
+                .expects('set_record_class').with_args(Phone).returns_fake()\
+                .expects('where').with_args(user_id=10).returns_fake()\
+                .expects('last').returns(
+                    Phone(id=3, created_at=datetime.now(), updated_at=datetime.now(), user_id=10)
+                )
+        self.assertTrue(isinstance(u.phones, Collection))
+        phone = u.phones.last()
+        self.assertEqual(3, phone.id)
+        self.assertEqual(10, phone.user_id)
 
- #    def test_last_returns_last_item_in_collection(self):
- #        c = Collection(['foo', 'bar'])
+    def test_empty_collection_is_empty(self):
+        c = Collection(None, None)
+        c._cache = []
+        self.assertTrue(c.is_empty())
 
- #        self.assertEqual('bar', c.last())
+    def test_offset_access_from_cache(self):
+        c = Collection(relation=None, owner_instance=None)
+        c._cache = [ {'name': 'py', 'age': 35}, {'name': 'ryan', 'age': 34},  {'name': 'poy', 'age': 36} ]
+        self.assertEqual({'name': 'ryan', 'age': 34}, c[1])
 
- #    def test_pop_removes_and_returns_last_item_or_specified_index(self):
- #        c = Collection(['foo', 'bar'])
+    @fudge.patch('sweet.record.Criteria')
+    def test_offset_access_from_db_of_has_many_relation(self, Criteria):
+        class Phone(ActiveRecord):
+            __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
+            __dbmanager__ = fudge.Fake('dbmanager').provides('get_connection').returns(None)
+ 
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+            has_many(Phone)
+ 
+        u = User(id=10, name='py', age=35)
+        u._ActiveRecord__is_persisted = True
+        
+        Criteria.is_callable().returns_fake()\
+                .expects('set_record_class').with_args(Phone).returns_fake()\
+                .expects('where').with_args(user_id=10).returns_fake()\
+                .expects('limit').with_args(1).returns_fake()\
+                .expects('offset').with_args(1).returns_fake()\
+                .expects('first').returns(
+                     Phone(id=2, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
+                 )
+        self.assertTrue(isinstance(u.phones, Collection))
+        phones = u.phones
+        self.assertEqual(2, phones[1].id)
+        self.assertIsNone(u.phones._cache)
 
- #        self.assertEqual('bar', c.pop())
- #        self.assertEqual('foo', c.last())
+    def test_avg_from_cache(self):
+        c = Collection(relation=None, owner_instance=None)
+        c._cache = [ {'name': 'py', 'age': 35}, {'name': 'ryan', 'age': 34},  {'name': 'poy', 'age': 37} ]
+        self.assertEqual(35.333333333333336, c.avg('age'))
 
- #        c = Collection(['foo', 'bar'])
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+        c._cache = [ User({'name': 'py', 'age': 35}), {'name': 'ryan', 'age': 34}]
+        self.assertEqual(34.5, c.avg('age'))
 
- #        self.assertEqual('foo', c.pop(0))
- #        self.assertEqual('bar', c.first())
+    @fudge.patch('sweet.record.Criteria')
+    def test_avg_from_db_of_has_many_relation(self, Criteria):
+        class Phone(ActiveRecord):
+            __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
+            __dbmanager__ = fudge.Fake('dbmanager').provides('get_connection').returns(None)
+ 
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+            has_many(Phone)
+ 
+        u = User(id=10, name='py', age=35)
+        u._ActiveRecord__is_persisted = True
+        
+        Criteria.is_callable().returns_fake()\
+                .expects('set_record_class').with_args(Phone).returns_fake()\
+                .expects('where').with_args(user_id=10).returns_fake()\
+                .expects('avg').with_args('age').returns(24.75)
+        self.assertEqual(24.75, u.phones.avg('age'))
 
- #        c = Collection({'foo': 'bar', 'baz': 'boom'})
+    def test_count_from_cache(self):
+        c = Collection(relation=None, owner_instance=None)
+        c._cache = [ {'name': 'py', 'age': 35}, {'name': 'ryan', 'age': 34},  {'name': 'poy', 'age': 37} ]
+        self.assertEqual(3, c.count())
 
- #        self.assertEqual('boom', c.pop('baz'))
- #        self.assertIsNone(c.get('baz'))
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+        c._cache = [ User({'name': 'py', 'age': 35}), {'name': 'ryan', 'age': 34}]
+        self.assertEqual(2, c.count())
 
- #    def test_shift_removes_and_returns_first_item(self):
- #        c = Collection(['foo', 'bar'])
+    @fudge.patch('sweet.record.Criteria')
+    def test_count_from_db_of_has_many_relation(self, Criteria):
+        class Phone(ActiveRecord):
+            __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
+            __dbmanager__ = fudge.Fake('dbmanager').provides('get_connection').returns(None)
+ 
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+            has_many(Phone)
+ 
+        u = User(id=10, name='py', age=35)
+        u._ActiveRecord__is_persisted = True
+        
+        Criteria.is_callable().returns_fake()\
+                .expects('set_record_class').with_args(Phone).returns_fake()\
+                .expects('where').with_args(user_id=10).returns_fake()\
+                .expects('count').with_args('*').returns(10)
+        self.assertEqual(10, u.phones.count())
 
- #        self.assertEqual('foo', c.shift())
- #        self.assertEqual('bar', c.first())
-
- #    def test_empty_collection_is_empty(self):
- #        c = Collection()
- #        c2 = Collection([])
- #        c3 = Collection({})
-
- #        self.assertTrue(c.is_empty())
- #        self.assertTrue(c2.is_empty())
- #        self.assertTrue(c3.is_empty())
-
- #    def test_collection_is_constructed(self):
- #        c = Collection('foo')
- #        self.assertEqual(['foo'], c.all())
-
- #        c = Collection(2)
- #        self.assertEqual([2], c.all())
-
- #        c = Collection(False)
- #        self.assertEqual([False], c.all())
-
- #        c = Collection(None)
- #        self.assertEqual([], c.all())
-
- #        c = Collection()
- #        self.assertEqual([], c.all())
-
- #    def test_offset_access(self):
- #        c = Collection({'name': 'john'})
- #        self.assertEqual('john', c['name'])
-
- #        c['name'] = 'david'
- #        self.assertEqual('david', c['name'])
-
- #        del c['name']
-
- #        self.assertIsNone(c.get('name'))
-
- #        c = Collection(['foo', 'bar'])
- #        self.assertEqual('bar', c[1])
-
- #        c[1] = 'baz'
- #        self.assertEqual('baz', c[1])
-
- #        del c[0]
- #        self.assertEqual('baz', c[0])
-
- #    def test_forget(self):
- #        c = Collection(['foo', 'bar', 'boom'])
- #        c.forget(0)
- #        self.assertEqual('bar', c[0])
- #        c.forget(0, 1)
- #        self.assertTrue(c.is_empty())
-
- #        c = Collection({'foo': 'bar', 'baz': 'boom'})
- #        c.forget('foo')
- #        self.assertIsNone(c.get('foo'))
-
- #    def test_get_avg_items_from_collection(self):
- #        c = Collection([{'foo': 10}, {'foo': 20}])
- #        self.assertEqual(15, c.avg('foo'))
-
- #        c = Collection([1, 2, 3, 4, 5])
- #        self.assertEqual(3, c.avg())
-
- #        c = Collection()
- #        self.assertIsNone(c.avg())
-
- #    def test_collapse(self):
- #        obj1 = object()
- #        obj2 = object()
-
- #        c = Collection([[obj1], [obj2]])
- #        self.assertEqual([obj1, obj2], c.collapse().all())
-
- #    def test_collapse_with_nested_collection(self):
- #        c = Collection([Collection([1, 2, 3]), Collection([4, 5, 6])])
- #        self.assertEqual([1, 2, 3, 4, 5, 6], c.collapse().all())
-
- #    def test_contains(self):
- #        c = Collection([1, 3, 5])
-
- #        self.assertTrue(c.contains(1))
- #        self.assertFalse(c.contains(2))
- #        self.assertTrue(c.contains(lambda x: x < 5))
- #        self.assertFalse(c.contains(lambda x: x > 5))
- #        self.assertIn(3, c)
-
- #        c = Collection([{'v': 1}, {'v': 3}, {'v': 5}])
- #        self.assertTrue(c.contains('v', 1))
- #        self.assertFalse(c.contains('v', 2))
-
- #        obj1 = type('lamdbaobject', (object,), {})()
- #        obj1.v = 1
- #        obj2 = type('lamdbaobject', (object,), {})()
- #        obj2.v = 3
- #        obj3 = type('lamdbaobject', (object,), {})()
- #        obj3.v = 5
- #        c = Collection([{'v': 1}, {'v': 3}, {'v': 5}])
- #        self.assertTrue(c.contains('v', 1))
- #        self.assertFalse(c.contains('v', 2))
-
- #        c = Collection({'foo': 'bar', 'baz': 'boom'})
- #        self.assertTrue(c.contains('foo'))
- #        self.assertIn('baz', c)
-
- #    def test_countable(self):
- #        c = Collection(['foo', 'bar'])
- #        self.assertEqual(2, c.count())
- #        self.assertEqual(2, len(c))
-
- #    def test_diff(self):
- #        c = Collection(['foo', 'bar'])
- #        self.assertEqual(['foo'], c.diff(Collection(['bar', 'baz'])).all())
-
- #        c = Collection({'id': 1, 'first_word': 'hello'})
- #        items = {'first_word': 'hello', 'last_word': 'world'}
- #        self.assertEqual({'id': 1}, c.diff(items).all())
-
+ 
  #    def test_each(self):
  #        original = ['foo', 'bar', 'baz']
  #        c = Collection(original)
@@ -357,3 +350,7 @@ if __name__ == '__main__':
 
  #        c = Collection([1, [2, 3], 4])
  #        self.assertEqual([1, 2, 3, 4], c.flatten().all())
+
+
+if __name__ == '__main__':
+    unittest.main()

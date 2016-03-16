@@ -44,7 +44,6 @@ class BlogMySQLTest(unittest.TestCase):
         User.create(name='admin', password="123123") # register ok
         self.assertEquals(None, User.where(name="admin", password="err_password").first()) # login with err password should be return None
         admin = User.where(name="admin", password="123123").first() # login ok
-        print '*'*10, admin, type(admin)
         self.assertTrue(isinstance(admin, User))
 
         # initial articles 

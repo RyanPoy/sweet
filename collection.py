@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
 from copy import copy
+from sweet.record import ActiveRecord
 import json
 
 
@@ -13,28 +13,31 @@ class Collection(object):
 
     def all(self):
         if self._cache is None:
-            self._cache = self.relation.all(self.owner_instance)
+            self._cache = self.relation.prefetch(self.owner_instance).all()
         return self._cache
 
     def first(self):
         if self._cache is None:
-            return self.relation.first(self.owner_instance)
+            return self.relation.prefetch(self.owner_instance).first()
         return self._cache[0] if self._cache else None
 
     def last(self):
         if self._cache is None:
-            return self.relation.first(self.owner_instance)
+            return self.relation.prefetch(self.owner_instance).last()
         return self._cache[-1] if self._cache else None
  
     def count(self, column='*'):
         if self._cache is None:
-            return self.relation.count(self.owner_instance)
+            return self.relation.prefetch(self.owner_instance).count(column)
         return len(self._cache)
 
-    def sum(self, column):
-        if self._cache is None:
-            return self.relation.count(self.owner_instance)
-        return len(self._cache)
+    # def sum(self, column):
+    #     if self._cache is None:
+    #         return self.relation.count(self.owner_instance)
+    #     return len(self._cache)
+    
+    def is_empty(self):
+        return len(self.all()) == 0
 
 #     @classmethod
 #     def max(cls, column):
@@ -44,9 +47,24 @@ class Collection(object):
 #     def min(cls, column):
 #         return cls._new_criteria().min(column)
     
-#     @classmethod
-#     def avg(cls, column):
-#         return cls._new_criteria().avg(column)
+    def avg(self, column):
+        if self._cache is None:
+            return self.relation.prefetch(self.owner_instance).avg(column)
+        total, cnt = 0, 0
+        for item in self._cache:
+            tp = type(item)
+            if tp == dict:
+                v = item.get(column, None)
+            elif issubclass(tp, ActiveRecord):
+                v = getattr(item, column, None)
+            else:
+                raise Exception('Collection#avg can not support %s type item' % tp)
+            if v is not None:
+                total += long(v)
+                cnt += 1
+        if cnt == 0:
+            return 0
+        return total*1.0 / cnt
     
 #     @classmethod  
 #     def distinct(cls):
@@ -351,7 +369,7 @@ class Collection(object):
     #     :return: The items in the collections
     #     :type: mixed
     #     """
-    #     return self.items
+    #     return self._cache
 
     # def avg(self, key=None):
     #     """
@@ -379,22 +397,22 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     if isinstance(self.items, dict):
+    #     if isinstance(self._cache, dict):
     #         if not preserve_keys:
-    #             items = list(self.items.values())
+    #             items = list(self._cache.values())
     #         else:
     #             chunks = []
     #             chunk = {}
-    #             for i, key in enumerate(self.items.keys()):
+    #             for i, key in enumerate(self._cache.keys()):
     #                 if i != 0 and i % size == 0:
     #                     chunks.append(chunk)
     #                     chunk = {}
 
-    #                 chunk[key] = self.items[key]
+    #                 chunk[key] = self._cache[key]
 
     #             return self.__class__(list(map(Collection, chunks)))
     #     else:
-    #         items = self.items
+    #         items = self._cache
 
     #     chunks = [items[i:i + size] for i in range(0, len(items), size)]
 
@@ -410,9 +428,9 @@ class Collection(object):
     #     results = []
 
     #     if isinstance(self._items, dict):
-    #         items = self.items.values()
+    #         items = self._cache.values()
     #     else:
-    #         items = self.items
+    #         items = self._cache
 
     #     for values in items:
     #         if isinstance(values, Collection):
@@ -441,13 +459,13 @@ class Collection(object):
     #     if self._use_as_callable(key):
     #         return self.first(key) is not None
 
-    #     return key in self.items
+    #     return key in self._cache
 
     # def __contains__(self, item):
     #     return self.contains(item)
 
     # def count(self):
-    #     return len(self.items)
+    #     return len(self._cache)
 
     # def diff(self, items):
     #     """
@@ -459,9 +477,9 @@ class Collection(object):
     #     :return: A Collection instance
     #     :rtype: Collection
     #     """
-    #     if isinstance(self.items, dict):
+    #     if isinstance(self._cache, dict):
     #         elements = {}
-    #         for key, val in self.items.items():
+    #         for key, val in self._cache.items():
     #             if key not in items:
     #                 elements[key] = val
     #             elif items[key] != val:
@@ -469,7 +487,7 @@ class Collection(object):
 
     #         return self.__class__(elements)
     #     else:
-    #         return self.__class__([i for i in self.items if i not in items])
+    #         return self.__class__([i for i in self._cache if i not in items])
 
     # def each(self, callback):
     #     """
@@ -491,10 +509,10 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     if isinstance(self.items, dict):
-    #         items = self.items.values()
+    #     if isinstance(self._cache, dict):
+    #         items = self._cache.values()
     #     else:
-    #         items = self.items
+    #         items = self._cache
 
     #     for item in items:
     #         if callback(item) is False:
@@ -516,7 +534,7 @@ class Collection(object):
     #     """
     #     new = []
 
-    #     for position, item in enumerate(self.items):
+    #     for position, item in enumerate(self._cache):
     #         if position % step == offset:
     #             new.append(item)
 
@@ -531,7 +549,7 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     items = copy(self.items)
+    #     items = copy(self._cache)
 
     #     if not isinstance(items, dict):
     #         keys = reversed(sorted(keys))
@@ -550,16 +568,16 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     if isinstance(self.items, dict):
+    #     if isinstance(self._cache, dict):
     #         items = {}
 
-    #         for key, value in self.items.items():
+    #         for key, value in self._cache.items():
     #             if key in keys:
     #                 items[key] = value
     #     else:
     #         items = []
 
-    #         for key, value in enumerate(self.items):
+    #         for key, value in enumerate(self._cache):
     #             if key in keys:
     #                 items.append(value)
 
@@ -575,9 +593,9 @@ class Collection(object):
     #     :rtype: Collection
     #     """
     #     if callback:
-    #         return self.__class__(list(filter(callback, self.items)))
+    #         return self.__class__(list(filter(callback, self._cache)))
 
-    #     return self.__class__(list(filter(None, self.items)))
+    #     return self.__class__(list(filter(None, self._cache)))
 
     # def where(self, key, value):
     #     """
@@ -600,18 +618,18 @@ class Collection(object):
     #     :param default: The default value
     #     :type default: mixed
     #     """
-    #     if isinstance(self.items, dict):
+    #     if isinstance(self._cache, dict):
     #         raise CollectionError('first() method cannot be used on dictionary items')
 
     #     if callback is not None:
-    #         for val in self.items:
+    #         for val in self._cache:
     #             if callback(val):
     #                 return val
 
     #         return value(default)
 
-    #     if len(self.items) > 0:
-    #         return self.items[0]
+    #     if len(self._cache) > 0:
+    #         return self._cache[0]
     #     else:
     #         return default
 
@@ -633,7 +651,7 @@ class Collection(object):
     #         else:
     #             yield d
 
-    #     return Collection(list(_flatten(self.items)))
+    #     return Collection(list(_flatten(self._cache)))
 
     # def flip(self):
     #     """
@@ -641,10 +659,10 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     if isinstance(self.items, dict):
-    #         items = dict(zip(self.items.values(), self.items.keys()))
+    #     if isinstance(self._cache, dict):
+    #         items = dict(zip(self._cache.values(), self._cache.keys()))
     #     else:
-    #         items = self.items
+    #         items = self._cache
 
     #     return self.__class__(items)
 
@@ -657,7 +675,7 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     if not isinstance(self.items, dict):
+    #     if not isinstance(self._cache, dict):
     #         keys = reversed(sorted(keys))
 
     #     for key in keys:
@@ -677,14 +695,14 @@ class Collection(object):
 
     #     :rtype: mixed
     #     """
-    #     if isinstance(self.items, dict):
+    #     if isinstance(self._cache, dict):
     #         if key in self:
     #             return self[key]
 
     #         return value(default)
 
     #     try:
-    #         return self.items[key]
+    #         return self._cache[key]
     #     except IndexError:
     #         return value(default)
 
@@ -705,7 +723,7 @@ class Collection(object):
     #     if not isinstance(first, (basestring)):
     #         return glue.join(self.pluck(value).all())
 
-    #     return value.join(self.items)
+    #     return value.join(self._cache)
 
     # def last(self, callback=None, default=None):
     #     """
@@ -714,18 +732,18 @@ class Collection(object):
     #     :param default: The default value
     #     :type default: mixed
     #     """
-    #     if isinstance(self.items, dict):
+    #     if isinstance(self._cache, dict):
     #         raise CollectionError('last() method cannot be used on dictionary items')
 
     #     if callback is not None:
-    #         for val in reversed(self.items):
+    #         for val in reversed(self._cache):
     #             if callback(val):
     #                 return val
 
     #         return value(default)
 
-    #     if len(self.items) > 0:
-    #         return self.items[-1]
+    #     if len(self._cache) > 0:
+    #         return self._cache[-1]
     #     else:
     #         return default
 
@@ -736,9 +754,9 @@ class Collection(object):
     #     :rtype: Collection
     #     """
     #     if key:
-    #         results = dict(map(lambda x: (data_get(x, key), data_get(x, value)), self.items))
+    #         results = dict(map(lambda x: (data_get(x, key), data_get(x, value)), self._cache))
     #     else:
-    #         results = list(map(lambda x: data_get(x, value), self.items))
+    #         results = list(map(lambda x: data_get(x, value), self._cache))
 
     #     return self.__class__(results)
 
@@ -759,10 +777,10 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     if isinstance(self.items, dict):
-    #         return self.__class__(list(map(callback, self.items.values())))
+    #     if isinstance(self._cache, dict):
+    #         return self.__class__(list(map(callback, self._cache.values())))
 
-    #     return self.__class__(list(map(callback, self.items)))
+    #     return self.__class__(list(map(callback, self._cache)))
 
     # def max(self, key=None):
     #     """
@@ -814,12 +832,12 @@ class Collection(object):
     #     if isinstance(items, Collection):
     #         items = items.all()
 
-    #     if isinstance(self.items, dict) and not isinstance(items, dict) \
-    #             or isinstance(self.items, list) and not isinstance(items, list):
+    #     if isinstance(self._cache, dict) and not isinstance(items, dict) \
+    #             or isinstance(self._cache, list) and not isinstance(items, list):
     #         raise CollectionError('Unable to merge uncompatible types')
 
-    #     if isinstance(self.items, dict):
-    #         self.items.update(items)
+    #     if isinstance(self._cache, dict):
+    #         self._cache.update(items)
     #     else:
     #         self._items += items
 
@@ -850,17 +868,17 @@ class Collection(object):
 
     #     :rtype: mixed
     #     """
-    #     if isinstance(self.items, dict):
-    #         value = self.items[key]
+    #     if isinstance(self._cache, dict):
+    #         value = self._cache[key]
 
-    #         del self.items[key]
+    #         del self._cache[key]
 
     #         return value
 
     #     if key is None:
     #         key = -1
 
-    #     return self.items.pop(key)
+    #     return self._cache.pop(key)
 
     # def prepend(self, value):
     #     """
@@ -871,10 +889,10 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     if isinstance(self.items, dict):
+    #     if isinstance(self._cache, dict):
     #         return self
 
-    #     self.items.insert(0, value)
+    #     self._cache.insert(0, value)
 
     #     return self
 
@@ -887,10 +905,10 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     if isinstance(self.items, dict):
+    #     if isinstance(self._cache, dict):
     #         return self
 
-    #     self.items.append(value)
+    #     self._cache.append(value)
 
     #     return self
 
@@ -951,7 +969,7 @@ class Collection(object):
 
     #     :rtype: mixed
     #     """
-    #     return reduce(callback, self.items, initial)
+    #     return reduce(callback, self._cache, initial)
 
     # def reject(self, callback):
     #     """
@@ -973,10 +991,10 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     if isinstance(self.items, dict):
+    #     if isinstance(self._cache, dict):
     #         return self
 
-    #     return self.__class__(list(reversed(self.items)))
+    #     return self.__class__(list(reversed(self._cache)))
 
     # def shift(self):
     #     """
@@ -995,7 +1013,7 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     items = self.items
+    #     items = self._cache
 
     #     if callback:
     #         return self.__class__(sorted(items, key=callback))
@@ -1012,7 +1030,7 @@ class Collection(object):
     #     :rtype: mixed
     #     """
     #     if callback is None:
-    #         return sum(self.items)
+    #         return sum(self._cache)
 
     #     callback = self._value_retriever(callback)
 
@@ -1058,7 +1076,7 @@ class Collection(object):
     #         seen = set()
     #         seen_add = seen.add
 
-    #         return self.__class__([x for x in self.items if not (x in seen or seen_add(x))])
+    #         return self.__class__([x for x in self._cache if not (x in seen or seen_add(x))])
 
     #     key = self._value_retriever(key)
 
@@ -1079,10 +1097,10 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     if not isinstance(self.items, dict):
+    #     if not isinstance(self._cache, dict):
     #         return self
 
-    #     return self.__class__(list(self.items.values()))
+    #     return self.__class__(list(self._cache.values()))
 
     # def keys(self):
     #     """
@@ -1090,10 +1108,10 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     if not isinstance(self.items, dict):
+    #     if not isinstance(self._cache, dict):
     #         return self
 
-    #     return self.__class__(list(self.items.keys()))
+    #     return self.__class__(list(self._cache.keys()))
 
     # def zip(self, *items):
     #     """
@@ -1104,7 +1122,7 @@ class Collection(object):
 
     #     :rtype: Collection
     #     """
-    #     return self.__class__(list(zip(self.items, *items)))
+    #     return self.__class__(list(zip(self._cache, *items)))
 
     # def is_empty(self):
     #     return len(self) == 0
@@ -1160,11 +1178,11 @@ class Collection(object):
     #         else:
     #             return value
 
-    #     if not isinstance(self.items, dict):
-    #         return list(map(_serialize, self.items))
+    #     if not isinstance(self._cache, dict):
+    #         return list(map(_serialize, self._cache))
 
     #     items = {}
-    #     for key, value in self.items.items():
+    #     for key, value in self._cache.items():
     #         items[key] = _serialize(value)
 
     #     return items
@@ -1179,22 +1197,23 @@ class Collection(object):
     #     :rtype: str
     #     """
     #     return json.dumps(self.serialize(), **options)
-
-    # def __len__(self):
-    #     return len(self.items)
+ 
+    def __len__(self):
+        return len(self.all())
 
     # def __iter__(self):
-    #     for item in self.items:
+    #     if self._cache is None:
+    #         for item in self._cache
+    #     for item in self._cache:
     #         yield item
 
-    # def __getitem__(self, item):
-    #     if isinstance(item, slice):
-    #         return self.__class__.make(self.items[item])
+    def __getitem__(self, item):
+        if self._cache is None:
+            return self.relation.prefetch(self.owner_instance).limit(1).offset(item).first()
+        return self._cache[item]
 
-    #     return self.items[item]
-
-    # def __setitem__(self, key, value):
-    #     self.items[key] = value
-
-    # def __delitem__(self, key):
-    #     del self.items[key]
+#     def __setitem__(self, key, value):
+#         self._cache[key] = value
+# 
+#     def __delitem__(self, key):
+#         del self._cache[key]

@@ -2,6 +2,7 @@
 from sweet.record import ActiveRecord
 from sweet.relation import has_many, HasMany
 from sweet.utils import ColumnNotInColumns
+from sweet.collection import Collection
 from datetime import datetime
 import unittest
 import fudge
@@ -92,13 +93,16 @@ class RelationHasManyTestCase(unittest.TestCase):
                 .expects('first').returns(User(id=10, created_at=datetime.now(), updated_at=datetime.now(), name='py'))
         u = User.find(10)
         self.assertEqual('py', u.name)
+
+        c = Collection(None, None)
+        c._cache = [
+            Phone(id=1, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
+            Phone(id=2, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
+            Phone(id=3, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
+        ]
         Criteria.is_callable().returns_fake()\
                 .expects('set_record_class').with_args(Phone).returns_fake()\
-                .expects('where').with_args(user_id=10).returns([
-                    Phone(id=1, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
-                    Phone(id=2, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
-                    Phone(id=3, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
-                ])
+                .expects('where').with_args(user_id=10).returns(c)
         ps = u.phones
         self.assertEqual(3, len(ps))
         p = ps[0]
