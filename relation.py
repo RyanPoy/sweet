@@ -15,7 +15,7 @@ class Relation(object):
         foreign_key: 目标的 class 所在table的字段名
         """
         self.owner_class = owner_class
-        self._target = target_class
+        self._target_class_or_cpath = target_class
         self._foreign_key = foreign_key
         self._owner_attr = owner_attr
     
@@ -29,20 +29,20 @@ class Relation(object):
             yield cls.__relations__.pop()
 
     @property
-    def target(self):
+    def target_class(self):
         """_target is None, should be return None
            _target is a active record class path, should be parse it and set a active record class to _target, then return it
            _target is a active record class, should be return it   
         """
-        if self._target is None:
+        if self._target_class_or_cpath is None:
             return None
-        if isinstance(self._target, str):
-            self._target = import_object(self._target)
-        return self._target
+        if isinstance(self._target_class_or_cpath, str):
+            self._target_class_or_cpath = import_object(self._target_class_or_cpath)
+        return self._target_class_or_cpath
     
     @property
     def target_pk_column(self):
-        target = self.target
+        target = self.target_class
         return target.__pk__ if target else None
 
     def inject(self, owner=None):
@@ -62,13 +62,13 @@ def owner_attr_for_has_one_and_has_belongs_to(self):
         return None
     if not issubclass(self.owner_class, ActiveRecord):
         return None
-#     target = self.target
+#     target = self.target_class
 #     if target is None:
 #         return None
-    if isinstance(self._target, str):
-        name = self._target.split('.')[-1]
-    elif issubclass(self._target, ActiveRecord):
-        name = self._target.__name__
+    if isinstance(self._target_class_or_cpath, str):
+        name = self._target_class_or_cpath.split('.')[-1]
+    elif issubclass(self._target_class_or_cpath, ActiveRecord):
+        name = self._target_class_or_cpath.__name__
     else:
         return None
     self._owner_attr = singularize(pythonize(name))
@@ -84,14 +84,14 @@ def owner_attr_for_has_many(self):
         return None
     if not issubclass(self.owner_class, ActiveRecord):
         return None
-#     target = self.target
+#     target = self.target_class
 #     if target is None:
 #         return None
 #     self._owner_attr = pluralize(pythonize(target.__name__))
-    if isinstance(self._target, str):
-        name = self._target.split('.')[-1]
-    elif issubclass(self._target, ActiveRecord):
-        name = self._target.__name__
+    if isinstance(self._target_class_or_cpath, str):
+        name = self._target_class_or_cpath.split('.')[-1]
+    elif issubclass(self._target_class_or_cpath, ActiveRecord):
+        name = self._target_class_or_cpath.__name__
     else:
         return None
     self._owner_attr = pluralize(pythonize(name))
@@ -107,7 +107,7 @@ def foreign_key_for_belongs_to(self):
         return None
     if not issubclass(self.owner_class, ActiveRecord):
         return None
-    target = self.target
+    target = self.target_class
     if target is None:
         return None
     foreign_key = pythonize(target.__name__) + '_id'
@@ -129,8 +129,8 @@ def foreign_key_for_has_one_and_has_many(self):
     if not issubclass(self.owner_class, ActiveRecord):
         return None
     foreign_key = singularize(pythonize(owner.__name__)) + '_id'
-    if not self.target.has_column(foreign_key):
-        raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target.__name__))
+    if not self.target_class.has_column(foreign_key):
+        raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target_class.__name__))
     self._foreign_key = foreign_key
     return self._foreign_key
 
@@ -143,7 +143,7 @@ class BelongsTo(Relation):
     
     def __get__(self, instance, owner):
         foreign_key_value = getattr(instance, self.foreign_key)
-        return self.target.where(**{self.target_pk_column: foreign_key_value}).first()
+        return self.target_class.where(**{self.target_pk_column: foreign_key_value}).first()
     
     def _delete(self, owner_instance):
         pass
@@ -162,10 +162,10 @@ class HasOne(Relation):
     foreign_key = property(foreign_key_for_has_one_and_has_many)
 
     def __get__(self, instance, owner):
-        return self.target.where(**{self.foreign_key: instance.pk}).first()
+        return self.target_class.where(**{self.foreign_key: instance.pk}).first()
 
     def _delete(self, owner_instance):
-        return self.target.where(**{self.foreign_key: owner_instance.pk}).delete()
+        return self.target_class.where(**{self.foreign_key: owner_instance.pk}).delete()
 
 
 def has_one(target_class_or_classpath, foreign_key=None, owner_attr=""):
@@ -181,7 +181,7 @@ class HasMany(Relation):
 
     def __get__(self, instance, owner):
         foreign_key_value = int(getattr(instance, instance.__pk__))
-        return self.target.where(**{self.foreign_key: foreign_key_value})
+        return self.target_class.where(**{self.foreign_key: foreign_key_value})
     
 def has_many(target_class_or_classpath, foreign_key=None, owner_attr=""):
     relation = HasMany(target_class=target_class_or_classpath, foreign_key=foreign_key, owner_attr=owner_attr)
@@ -196,24 +196,24 @@ class HasAndBelongsToMany(Relation):
                  foreign_key=None, target_foreign_key=None, association_table=None):
         super(HasAndBelongsToMany, self).__init__(target_class, owner_class, owner_attr, foreign_key)
         self._association_table = association_table
-        self._target_foreign_key = target_foreign_key
+        self._target_class_or_cpath_foreign_key = target_foreign_key
 
     owner_attr = property(owner_attr_for_has_many)
 
     @property
     def target_foreign_key(self):
-        if self._target_foreign_key:
-            return self._target_foreign_key
-        target = self.target
+        if self._target_class_or_cpath_foreign_key:
+            return self._target_class_or_cpath_foreign_key
+        target = self.target_class
         if target is None:
             return None
         if not issubclass(target, ActiveRecord):
             return None
         target_foreign_key = singularize(pythonize(target.__name__)) + '_id'
-#         if not self.target.has_column(foreign_key):
-#             raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target.__name__))
-        self._target_foreign_key = target_foreign_key
-        return self._target_foreign_key
+#         if not self.target_class.has_column(foreign_key):
+#             raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target_class.__name__))
+        self._target_class_or_cpath_foreign_key = target_foreign_key
+        return self._target_class_or_cpath_foreign_key
 
     @property
     def foreign_key(self):
@@ -229,8 +229,8 @@ class HasAndBelongsToMany(Relation):
             return None
         
         foreign_key = singularize(pythonize(owner.__name__)) + '_id'
-#         if not self.target.has_column(foreign_key):
-#             raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target.__name__))
+#         if not self.target_class.has_column(foreign_key):
+#             raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target_class.__name__))
         self._foreign_key = foreign_key
         return self._foreign_key
     
@@ -238,12 +238,12 @@ class HasAndBelongsToMany(Relation):
     def association_table(self):
         if self._association_table:
             return self._association_table
-        owner, target = self.owner_class, self.target
+        owner, target = self.owner_class, self.target_class
         if owner is None or target is None:
             return None
-        if not issubclass(self.owner_class, ActiveRecord) or not issubclass(self.target, ActiveRecord):
+        if not issubclass(self.owner_class, ActiveRecord) or not issubclass(self.target_class, ActiveRecord):
             return None
-        l = [ tableize(self.owner_class.__name__), tableize(self.target.__name__) ]
+        l = [ tableize(self.owner_class.__name__), tableize(self.target_class.__name__) ]
         l.sort()
         self._association_table = '_'.join(l) 
         return self._association_table
@@ -254,10 +254,10 @@ class HasAndBelongsToMany(Relation):
     def _get(self, instance):
         foreign_key_value = getattr(instance, instance.__pk__)
 
-        return self.target.join(
+        return self.target_class.join(
             JoinClause(self.association_table)\
                 .on('`%s`.`%s` = ?' % (self.association_table, self.foreign_key), foreign_key_value)\
-                .on('`%s`.`%s` = `%s`.`%s`' % (self.association_table, self.target_foreign_key, self.target.table_name, self.target.__pk__))
+                .on('`%s`.`%s` = `%s`.`%s`' % (self.association_table, self.target_foreign_key, self.target_class.table_name, self.target_class.__pk__))
         ).all()
 
 
