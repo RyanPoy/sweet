@@ -21,7 +21,7 @@ class RelationHasOneTestCase(unittest.TestCase):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
 
         r = HasOne(target_class=Phone, owner_class=User, foreign_key='user_id', owner_attr='phone')
-        self.assertTrue(r.owner is User)
+        self.assertTrue(r.owner_class is User)
         self.assertEqual('user_id', r.foreign_key)
         self.assertTrue(r.target is Phone)
         self.assertEqual('id', r.target_pk_column)
@@ -35,7 +35,7 @@ class RelationHasOneTestCase(unittest.TestCase):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
                 
         r = HasOne(target_class=CardPhone, owner_class=User, foreign_key='user_id')
-        self.assertTrue(r.owner is User)
+        self.assertTrue(r.owner_class is User)
         self.assertEqual('user_id', r.foreign_key)
         self.assertTrue(r.target is CardPhone)
         self.assertEqual('id', r.target_pk_column)
@@ -49,7 +49,7 @@ class RelationHasOneTestCase(unittest.TestCase):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
         
         r = HasOne(target_class=CardPhone, owner_class=User, owner_attr='card_phone')
-        self.assertTrue(r.owner is User)
+        self.assertTrue(r.owner_class is User)
         self.assertEqual('user_id', r.foreign_key)
         self.assertTrue(r.target is CardPhone)
         self.assertEqual('id', r.target_pk_column)
@@ -70,7 +70,7 @@ class RelationHasOneTestCase(unittest.TestCase):
             __columns__ = ['id', 'created_at', 'updated_at']
               
         r = HasOne(target_class="sweet.tests.units.test_relation_has_one.Card", owner_class=User)
-        self.assertTrue(r.owner is User)
+        self.assertTrue(r.owner_class is User)
         self.assertEqual('user_id', r.foreign_key)
         self.assertTrue(r.target is Card)
         self.assertEqual('id', r.target_pk_column)

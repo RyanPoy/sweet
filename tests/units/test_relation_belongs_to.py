@@ -21,7 +21,7 @@ class RelationBelongsToTestCase(unittest.TestCase):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
                
         r = BelongsTo(target_class=User, owner_class=Phone, foreign_key='user_id', owner_attr='user')
-        self.assertTrue(r.owner is Phone)
+        self.assertTrue(r.owner_class is Phone)
         self.assertEqual('user_id', r.foreign_key)
         self.assertTrue(r.target is User)
         self.assertEqual('id', r.target_pk_column)
@@ -35,7 +35,7 @@ class RelationBelongsToTestCase(unittest.TestCase):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
                
         r = BelongsTo(target_class=User, owner_class=Phone, foreign_key='user_id')
-        self.assertTrue(r.owner is Phone)
+        self.assertTrue(r.owner_class is Phone)
         self.assertEqual('user_id', r.foreign_key)
         self.assertTrue(r.target is User)
         self.assertEqual('id', r.target_pk_column)
@@ -49,7 +49,7 @@ class RelationBelongsToTestCase(unittest.TestCase):
             __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
               
         r = BelongsTo(target_class=User, owner_class=Phone, owner_attr='user')
-        self.assertTrue(r.owner is Phone)
+        self.assertTrue(r.owner_class is Phone)
         self.assertEqual('user_id', r.foreign_key)
         self.assertTrue(r.target is User)
         self.assertEqual('id', r.target_pk_column)
@@ -70,7 +70,7 @@ class RelationBelongsToTestCase(unittest.TestCase):
             __columns__ = ['id', 'created_at', 'updated_at', 'person_id']
              
         r = BelongsTo(target_class="sweet.tests.units.test_relation_belongs_to.Person", owner_class=Phone, owner_attr='user')
-        self.assertTrue(r.owner is Phone)
+        self.assertTrue(r.owner_class is Phone)
         self.assertEqual('person_id', r.foreign_key)
         self.assertTrue(r.target is Person)
         self.assertEqual('id', r.target_pk_column)

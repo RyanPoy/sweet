@@ -21,7 +21,7 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
   
         r = HasAndBelongsToMany(target_class=Student, owner_class=Teacher, foreign_key='teacher_id', 
                                 owner_attr='students', target_foreign_key='student_id', association_table='teachers_students')
-        self.assertTrue(r.owner is Teacher)
+        self.assertTrue(r.owner_class is Teacher)
         self.assertEqual('teacher_id', r.foreign_key)
         self.assertTrue(r.target is Student)
         self.assertEqual('id', r.target_pk_column)
@@ -38,7 +38,7 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
   
         r = HasAndBelongsToMany(target_class=Student, owner_class=Teacher, foreign_key='teacher_id', 
                                 owner_attr='students', association_table='teachers_students')
-        self.assertTrue(r.owner is Teacher)
+        self.assertTrue(r.owner_class is Teacher)
         self.assertEqual('teacher_id', r.foreign_key)
         self.assertTrue(r.target is Student)
         self.assertEqual('id', r.target_pk_column)
@@ -54,7 +54,7 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
             __columns__ = ['id', 'age', 'created_at', 'updated_at']
   
         r = HasAndBelongsToMany(target_class=Student, owner_class=Teacher, foreign_key='teacher_id', owner_attr='students')
-        self.assertTrue(r.owner is Teacher)
+        self.assertTrue(r.owner_class is Teacher)
         self.assertEqual('teacher_id', r.foreign_key)
         self.assertTrue(r.target is Student)
         self.assertEqual('id', r.target_pk_column)
@@ -70,7 +70,7 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
             __columns__ = ['id', 'age', 'created_at', 'updated_at']
   
         r = HasAndBelongsToMany(target_class=Student, owner_class=Teacher, foreign_key='teacher_id')
-        self.assertTrue(r.owner is Teacher)
+        self.assertTrue(r.owner_class is Teacher)
         self.assertEqual('teacher_id', r.foreign_key)
         self.assertTrue(r.target is Student)
         self.assertEqual('id', r.target_pk_column)
@@ -86,7 +86,7 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
             __columns__ = ['id', 'age', 'created_at', 'updated_at']
   
         r = HasAndBelongsToMany(target_class=Student, owner_class=Teacher, owner_attr='students')
-        self.assertTrue(r.owner is Teacher)
+        self.assertTrue(r.owner_class is Teacher)
         self.assertEqual('teacher_id', r.foreign_key)
         self.assertTrue(r.target is Student)
         self.assertEqual('id', r.target_pk_column)
@@ -109,7 +109,7 @@ class RelationHasAndBelongsToManyTestCase(unittest.TestCase):
             __columns__ = ['id', 'created_at', 'updated_at', 'name']
  
         r = HasAndBelongsToMany(target_class="sweet.tests.units.test_relation_has_and_belongs_to_many.Category", owner_class=Video)
-        self.assertTrue(r.owner is Video)
+        self.assertTrue(r.owner_class is Video)
         self.assertEqual('video_id', r.foreign_key)
         self.assertTrue(r.target is Category)
         self.assertEqual('id', r.target_pk_column)

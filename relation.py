@@ -1,10 +1,11 @@
 # -*- coding:utf-8 -*-
 from sweet.criteria import JoinClause
 from sweet.utils import *
-
+from sweet.collection import Collection
+from sweet.record import ActiveRecord
 
 class Relation(object):
-    
+
     __relations__ = []
     
     def __init__(self, target_class, owner_class=None, owner_attr=None, foreign_key=None):
@@ -13,7 +14,7 @@ class Relation(object):
         owner_class: 拥有者的class
         foreign_key: 目标的 class 所在table的字段名
         """
-        self.owner = owner_class
+        self.owner_class = owner_class
         self._target = target_class
         self._foreign_key = foreign_key
         self._owner_attr = owner_attr
@@ -45,9 +46,9 @@ class Relation(object):
         return target.__pk__ if target else None
 
     def inject(self, owner=None):
-        if owner: self.owner = owner
-        self.owner.__relations__.append(self)
-        setattr(self.owner, self.owner_attr, self)
+        if owner: self.owner_class = owner
+        self.owner_class.__relations__.append(self)
+        setattr(self.owner_class, self.owner_attr, self)
 
 
 ############# shared methods ############
@@ -57,10 +58,9 @@ def owner_attr_for_has_one_and_has_belongs_to(self):
     """
     if self._owner_attr:
         return self._owner_attr
-    if self.owner is None:
+    if self.owner_class is None:
         return None
-    from sweet.record import ActiveRecord # lazy import
-    if not issubclass(self.owner, ActiveRecord):
+    if not issubclass(self.owner_class, ActiveRecord):
         return None
 #     target = self.target
 #     if target is None:
@@ -80,10 +80,9 @@ def owner_attr_for_has_many(self):
     """
     if self._owner_attr:
         return self._owner_attr
-    if self.owner is None:
+    if self.owner_class is None:
         return None
-    from sweet.record import ActiveRecord # lazy import
-    if not issubclass(self.owner, ActiveRecord):
+    if not issubclass(self.owner_class, ActiveRecord):
         return None
 #     target = self.target
 #     if target is None:
@@ -104,17 +103,16 @@ def foreign_key_for_belongs_to(self):
     """
     if self._foreign_key:
         return self._foreign_key
-    if self.owner is None:
+    if self.owner_class is None:
         return None
-    from sweet.record import ActiveRecord # lazy import
-    if not issubclass(self.owner, ActiveRecord):
+    if not issubclass(self.owner_class, ActiveRecord):
         return None
     target = self.target
     if target is None:
         return None
     foreign_key = pythonize(target.__name__) + '_id'
-    if not self.owner.has_column(foreign_key):
-        raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.owner.__name__))
+    if not self.owner_class.has_column(foreign_key):
+        raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.owner_class.__name__))
     self._foreign_key = foreign_key
     return self._foreign_key
 
@@ -125,11 +123,10 @@ def foreign_key_for_has_one_and_has_many(self):
     """
     if self._foreign_key:
         return self._foreign_key
-    owner = self.owner
+    owner = self.owner_class
     if owner is None:
         return None
-    from sweet.record import ActiveRecord # lazy import
-    if not issubclass(self.owner, ActiveRecord):
+    if not issubclass(self.owner_class, ActiveRecord):
         return None
     foreign_key = singularize(pythonize(owner.__name__)) + '_id'
     if not self.target.has_column(foreign_key):
@@ -183,13 +180,9 @@ class HasMany(Relation):
     foreign_key = property(foreign_key_for_has_one_and_has_many)
 
     def __get__(self, instance, owner):
-        return self._get(instance)
-
-    def _get(self, instance):
         foreign_key_value = int(getattr(instance, instance.__pk__))
         return self.target.where(**{self.foreign_key: foreign_key_value})
-
-
+    
 def has_many(target_class_or_classpath, foreign_key=None, owner_attr=""):
     relation = HasMany(target_class=target_class_or_classpath, foreign_key=foreign_key, owner_attr=owner_attr)
     Relation.push(relation)
@@ -214,7 +207,6 @@ class HasAndBelongsToMany(Relation):
         target = self.target
         if target is None:
             return None
-        from sweet.record import ActiveRecord # lazy import
         if not issubclass(target, ActiveRecord):
             return None
         target_foreign_key = singularize(pythonize(target.__name__)) + '_id'
@@ -230,11 +222,10 @@ class HasAndBelongsToMany(Relation):
         """
         if self._foreign_key:
             return self._foreign_key
-        owner = self.owner
+        owner = self.owner_class
         if owner is None:
             return None
-        from sweet.record import ActiveRecord # lazy import
-        if not issubclass(self.owner, ActiveRecord):
+        if not issubclass(self.owner_class, ActiveRecord):
             return None
         
         foreign_key = singularize(pythonize(owner.__name__)) + '_id'
@@ -247,13 +238,12 @@ class HasAndBelongsToMany(Relation):
     def association_table(self):
         if self._association_table:
             return self._association_table
-        owner, target = self.owner, self.target
+        owner, target = self.owner_class, self.target
         if owner is None or target is None:
             return None
-        from sweet.record import ActiveRecord # lazy import
-        if not issubclass(self.owner, ActiveRecord) or not issubclass(self.target, ActiveRecord):
+        if not issubclass(self.owner_class, ActiveRecord) or not issubclass(self.target, ActiveRecord):
             return None
-        l = [ tableize(self.owner.__name__), tableize(self.target.__name__) ]
+        l = [ tableize(self.owner_class.__name__), tableize(self.target.__name__) ]
         l.sort()
         self._association_table = '_'.join(l) 
         return self._association_table

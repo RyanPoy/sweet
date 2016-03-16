@@ -28,6 +28,9 @@ from sweet.tests.units.test_validator_length import LengthValidatorTest
 from sweet.tests.units.test_validator_exclusion import ExclusionValidatorTest
 from sweet.tests.units.test_validator_numericality import NumericalityValidatorTest
 from sweet.tests.units.test_validator_presence import PresenceValidatorTest
+
+from sweet.tests.units.test_collection import CollectionTest
+
 from sweet.tests.integrations.test_blog_mysql import BlogMySQLTest
 
 
@@ -58,6 +61,8 @@ unit_tests = [
     ExclusionValidatorTest,
     NumericalityValidatorTest,
     PresenceValidatorTest,
+
+    CollectionTest,
 ]
 
 
