@@ -204,12 +204,11 @@ class HasAndBelongsToMany(Relation):
     def target_foreign_key(self):
         if self._target_class_or_cpath_foreign_key:
             return self._target_class_or_cpath_foreign_key
-        target = self.target_class
-        if target is None:
+        if self.target_class is None:
             return None
-        if not issubclass(target, ActiveRecord):
+        if not issubclass(self.target_class, ActiveRecord):
             return None
-        target_foreign_key = singularize(pythonize(target.__name__)) + '_id'
+        target_foreign_key = singularize(pythonize(self.target_class.__name__)) + '_id'
 #         if not self.target_class.has_column(foreign_key):
 #             raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target_class.__name__))
         self._target_class_or_cpath_foreign_key = target_foreign_key
@@ -222,13 +221,12 @@ class HasAndBelongsToMany(Relation):
         """
         if self._foreign_key:
             return self._foreign_key
-        owner = self.owner_class
-        if owner is None:
+        if self.owner_class is None:
             return None
         if not issubclass(self.owner_class, ActiveRecord):
             return None
-        
-        foreign_key = singularize(pythonize(owner.__name__)) + '_id'
+
+        foreign_key = singularize(pythonize(self.owner_class.__name__)) + '_id'
 #         if not self.target_class.has_column(foreign_key):
 #             raise ColumnNotInColumns('"%s" not in %s columns' % (foreign_key, self.target_class.__name__))
         self._foreign_key = foreign_key
@@ -238,8 +236,7 @@ class HasAndBelongsToMany(Relation):
     def association_table(self):
         if self._association_table:
             return self._association_table
-        owner, target = self.owner_class, self.target_class
-        if owner is None or target is None:
+        if self.owner_class is None or self.target_class is None:
             return None
         if not issubclass(self.owner_class, ActiveRecord) or not issubclass(self.target_class, ActiveRecord):
             return None
