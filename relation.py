@@ -47,7 +47,7 @@ class Relation(object):
 
     def inject(self, owner=None):
         if owner: self.owner_class = owner
-        self.owner_class.__relations__.append(self)
+        self.owner_class.__relations__[self.owner_class] = self
         setattr(self.owner_class, self.owner_attr, self)
 
 

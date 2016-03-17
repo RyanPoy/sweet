@@ -95,7 +95,7 @@ class ActiveRecord(object):
     __updated_at__ = 'updated_at'
     __created_on__ = None
     __updated_on__ = None
-    __relations__  = []
+    __relations__  = {}
     __dbmanager__  = None
 
     def __init__(self, dict_args={}, **kwargs):

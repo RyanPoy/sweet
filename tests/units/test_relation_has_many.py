@@ -94,16 +94,12 @@ class RelationHasManyTestCase(unittest.TestCase):
         u = User.find(10)
         self.assertEqual('py', u.name)
 
-        c = Collection(None, None)
-        c._cache = [
+        ps = u.phones
+        ps._cache = [
             Phone(id=1, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
             Phone(id=2, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
             Phone(id=3, created_at=datetime.now(), updated_at=datetime.now(), user_id=10),
-        ]
-        Criteria.is_callable().returns_fake()\
-                .expects('set_record_class').with_args(Phone).returns_fake()\
-                .expects('where').with_args(user_id=10).returns(c)
-        ps = u.phones
+        ] 
         self.assertEqual(3, len(ps))
         p = ps[0]
         self.assertEqual(1, p.id)

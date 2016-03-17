@@ -31,25 +31,19 @@ class Collection(object):
             return self.relation.prefetch(self.owner_instance).count(column)
         return len(self._cache)
 
-    # def sum(self, column):
-    #     if self._cache is None:
-    #         return self.relation.count(self.owner_instance)
-    #     return len(self._cache)
-    
-    def is_empty(self):
-        return len(self.all()) == 0
+    def sum(self, column):
+        if self._cache is None:
+            return self.relation.prefetch(self.owner_instance).sum(column)
+        total, cnt = self._total_and_cnt_of_cache(column)
+        return total
 
-#     @classmethod
-#     def max(cls, column):
-#         return cls._new_criteria().max(column)
-    
-#     @classmethod
-#     def min(cls, column):
-#         return cls._new_criteria().min(column)
-    
     def avg(self, column):
         if self._cache is None:
             return self.relation.prefetch(self.owner_instance).avg(column)
+        total, cnt = self._total_and_cnt_of_cache(column)
+        return 0 if cnt == 0 else total*1.0 / cnt
+
+    def _total_and_cnt_of_cache(self, column):
         total, cnt = 0, 0
         for item in self._cache:
             tp = type(item)
@@ -59,12 +53,46 @@ class Collection(object):
                 v = getattr(item, column, None)
             else:
                 raise Exception('Collection#avg can not support %s type item' % tp)
-            if v is not None:
+            if v is not None: 
                 total += long(v)
                 cnt += 1
-        if cnt == 0:
-            return 0
-        return total*1.0 / cnt
+        return total, cnt
+
+    def max(self, column):
+        if self._cache is None:
+            return self.relation.prefetch(self.owner_instance).max(column)
+        _min, _max = self._min_and_max_of_cache(column)
+        return _max
+
+    def min(self, column):
+        if self._cache is None:
+            return self.relation.prefetch(self.owner_instance).min(column)
+        _min, _max = self._min_and_max_of_cache(column)
+        return _min
+
+    def _min_and_max_of_cache(self, column):
+        set_v, _min, _max = False, 0, 0
+        for item in self._cache:
+            tp = type(item)
+            if tp == dict:
+                v = item.get(column, None)
+            elif issubclass(tp, ActiveRecord):
+                v = getattr(item, column, None)
+            else:
+                raise Exception('Collection#avg can not support %s type item' % tp)
+            if v is not None:
+                v = long(v)
+                if not set_v:
+                    _min = _max = v
+                    set_v = True
+                else:
+                    if _min > v: _min = v
+                    if _max < v: _max = v
+        return _min, _max
+
+#     @classmethod
+#     def min(cls, column):
+#         return cls._new_criteria().min(column)
     
 #     @classmethod  
 #     def distinct(cls):
@@ -1196,10 +1224,13 @@ class Collection(object):
 
     #     :rtype: str
     #     """
-    #     return json.dumps(self.serialize(), **options)
+    #     return json.dumps(self.serialize(), **options)    
+
+    def is_empty(self):
+        return len(self.all()) == 0
  
     def __len__(self):
-        return len(self.all())
+        return self.count()
 
     # def __iter__(self):
     #     if self._cache is None:
@@ -1209,6 +1240,8 @@ class Collection(object):
 
     def __getitem__(self, item):
         if self._cache is None:
+            print '*'*10, self.relation, self.owner_instance
+            print '*'*10, self.relation.prefetch(self.owner_instance)
             return self.relation.prefetch(self.owner_instance).limit(1).offset(item).first()
         return self._cache[item]
 

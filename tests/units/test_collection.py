@@ -196,7 +196,93 @@ class CollectionTest(unittest.TestCase):
                 .expects('count').with_args('*').returns(10)
         self.assertEqual(10, u.phones.count())
 
+    def test_sum_from_cache(self):
+        c = Collection(relation=None, owner_instance=None)
+        c._cache = [ {'name': 'py', 'age': 35}, {'name': 'ryan', 'age': 34},  {'name': 'poy', 'age': 37} ]
+        self.assertEqual(106, c.sum('age'))
+
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+        c._cache = [ User({'name': 'py', 'age': 35}), {'name': 'ryan', 'age': 34}]
+        self.assertEqual(69, c.sum('age'))
+
+    @fudge.patch('sweet.record.Criteria')
+    def test_sum_from_db_of_has_many_relation(self, Criteria):
+        class Phone(ActiveRecord):
+            __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
+            __dbmanager__ = fudge.Fake('dbmanager').provides('get_connection').returns(None)
  
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+            has_many(Phone)
+ 
+        u = User(id=10, name='py', age=35)
+        u._ActiveRecord__is_persisted = True
+        
+        Criteria.is_callable().returns_fake()\
+                .expects('set_record_class').with_args(Phone).returns_fake()\
+                .expects('where').with_args(user_id=10).returns_fake()\
+                .expects('sum').with_args('age').returns(69)
+        self.assertEqual(69, u.phones.sum('age'))
+
+    def test_min_from_cache(self):
+        c = Collection(relation=None, owner_instance=None)
+        c._cache = [ {'name': 'py', 'age': 35}, {'name': 'ryan', 'age': 34},  {'name': 'poy', 'age': 37} ]
+        self.assertEqual(34, c.min('age'))
+
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+        c._cache = [ User({'name': 'py', 'age': 35}), {'name': 'ryan', 'age': 34}]
+        self.assertEqual(34, c.min('age'))
+
+    @fudge.patch('sweet.record.Criteria')
+    def test_min_from_db_of_has_many_relation(self, Criteria):
+        class Phone(ActiveRecord):
+            __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
+            __dbmanager__ = fudge.Fake('dbmanager').provides('get_connection').returns(None)
+ 
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+            has_many(Phone)
+ 
+        u = User(id=10, name='py', age=35)
+        u._ActiveRecord__is_persisted = True
+        
+        Criteria.is_callable().returns_fake()\
+                .expects('set_record_class').with_args(Phone).returns_fake()\
+                .expects('where').with_args(user_id=10).returns_fake()\
+                .expects('min').with_args('age').returns(34)
+        self.assertEqual(34, u.phones.min('age'))
+
+    def test_max_from_cache(self):
+        c = Collection(relation=None, owner_instance=None)
+        c._cache = [ {'name': 'py', 'age': 35}, {'name': 'ryan', 'age': 34},  {'name': 'poy', 'age': 37} ]
+        self.assertEqual(37, c.max('age'))
+
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+        c._cache = [ User({'name': 'py', 'age': 35}), {'name': 'ryan', 'age': 34}]
+        self.assertEqual(35, c.max('age'))
+
+    @fudge.patch('sweet.record.Criteria')
+    def test_max_from_db_of_has_many_relation(self, Criteria):
+        class Phone(ActiveRecord):
+            __columns__ = ['id', 'created_at', 'updated_at', 'user_id']
+            __dbmanager__ = fudge.Fake('dbmanager').provides('get_connection').returns(None)
+ 
+        class User(ActiveRecord):
+            __columns__ = ['id', 'name', 'created_at', 'updated_at']
+            has_many(Phone)
+ 
+        u = User(id=10, name='py', age=35)
+        u._ActiveRecord__is_persisted = True
+        
+        Criteria.is_callable().returns_fake()\
+                .expects('set_record_class').with_args(Phone).returns_fake()\
+                .expects('where').with_args(user_id=10).returns_fake()\
+                .expects('max').with_args('age').returns(37)
+        self.assertEqual(37, u.phones.max('age'))
+
  #    def test_each(self):
  #        original = ['foo', 'bar', 'baz']
  #        c = Collection(original)
