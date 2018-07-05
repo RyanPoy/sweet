@@ -89,80 +89,28 @@ class Collection(object):
                     if _min > v: _min = v
                     if _max < v: _max = v
         return _min, _max
-
-#     @classmethod
-#     def min(cls, column):
-#         return cls._new_criteria().min(column)
     
-#     @classmethod  
+#     @classmethod
 #     def distinct(cls):
 #         return cls._new_criteria().distinct()
     
-#     @classmethod
-#     def where(cls, *args, **kwargs):
-#         """ condition query
-#         eg.
-#             User.where(username="abc").where(password="123")
-#             User.where("username='abc' and password='123'")
-#             User.where("username=? and password=?", 'abc', '123')
-#         """
-#         return cls._new_criteria().where(*args, **kwargs)
+    def where(self, *args, **kwargs):
+        return self.relation.prefetch(self.owner_instance).where(*args, **kwargs)
+
+    def limit(self, limit):
+        return self.relation.prefetch(self.owner_instance).limit(limit)
     
-#     @classmethod
-#     def find(cls, *ids):
-#         """ find record by ids
-#         @return:    if there is a id and found it will return a record
-#                     if there are many ids and found them will return a record array
-#                     if any id not found, throw RecordNotFound exception
-#         """
-#         c = cls._new_criteria().where(id=ids)
-#         if len(ids) == 1:
-#             relt = c.first()
-#             if relt is None:
-#                 raise RecordNotFound()
-#         else:
-#             relt = c.all()
-#         return relt
- 
-#     @classmethod
-#     def limit(cls, limit):
-#         """ limit query
-#         eg. 
-#             User.limit(10)
-#             User.limit(10, 1)
-#         """
-#         return cls._new_criteria().limit(limit)
+    def offset(self, offset):
+        return self.relation.prefetch(self.owner_instance).offset(offset)
+
+    def page(self, page_num, limit):
+        return self.relation.prefetch(self.owner_instance).page(page_num, limit)
     
-#     @classmethod
-#     def offset(cls, offset):
-#         """ limit query
-#         eg. 
-#             User.limit(10)
-#             User.limit(10, 1)
-#         """
-#         return cls._new_criteria().offset(offset)
+    def group_by(self, *args):
+        return self.relation.prefetch(self.owner_instance).group_by(*args)
     
-#     @classmethod
-#     def page(cls, page_num, limit):
-#         return cls._new_criteria().page(page_num, limit)
-    
-#     @classmethod
-#     def group_by(cls, *args):
-#         """ group query
-#         eg. 
-#             User.group_by('username')
-#         """
-#         return cls._new_criteria().group_by(*args)
-    
-#     @classmethod
-#     def order_by(cls, *args):
-#         """ order query
-#         eg.
-#             User.order_by('age')
-#             User.order_by('age ASC')
-#             User.order_by('age DESC')
-#         """
-#         return cls._new_criteria().order_by(*args)
+    def order_by(self, *args):
+        return self.relation.prefetch(self.owner_instance).order_by(*args)
     
 #     @classmethod
 #     def having(cls, *args, **kwargs):

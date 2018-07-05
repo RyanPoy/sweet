@@ -7,29 +7,28 @@ python web framework looks like rails
 
 =============== database ===========
 articles
-    id
-    title
-    content
-    category_id
+	id
+	title
+	content
+	category_id
 
 
 categories
-    id
-    name
+	id
+	name
 
 
 tags
-    id
-    name
+	id
+	name
 
 
 article_tags
-    id
-    article_id
-    tag_id
+	id
+	article_id
+	tag_id
 
 
-==========================================
 
 Artcile.all()   ==> Collection (element type is Article)
 > SELECT * FROM `articles`
@@ -63,34 +62,34 @@ Article.first().tags ==> Collection (element type is Tag)
 > a = Article.first()  ==> SELECT * FROM `articles` LIMIT 1
 >
 > a.tags  ==> 
->       SELECT 
->           `app_tag`.*, 
->           `article_tags`.`article_id` AS `pivot_article_id`, 
->           `article_tags`.`tag_id` AS `pivot_tag_id` 
->       FROM 
->           `app_tag` 
->       INNER JOIN 
->           `article_tags` 
->       ON 
->           `app_tag`.`id` = `article_tags`.`tag_id` 
->       WHERE 
->           `article_tags`.`article_id` = 1
+> 		SELECT 
+>			`app_tag`.*, 
+>			`article_tags`.`article_id` AS `pivot_article_id`, 
+>			`article_tags`.`tag_id` AS `pivot_tag_id` 
+>		FROM 
+>			`app_tag` 
+>		INNER JOIN 
+>			`article_tags` 
+>		ON 
+>			`app_tag`.`id` = `article_tags`.`tag_id` 
+>		WHERE 
+>			`article_tags`.`article_id` = 1
 
 
 Article.with_('tags').first().tags ==> Collection (element type is Tag)
->   SELECT * FROM `articles` LIMIT 1
+> 	SELECT * FROM `articles` LIMIT 1
 >
->   SELECT 
->       `app_tag`.*, 
->       `article_tags`.`article_id` AS `pivot_article_id`, 
->       `article_tags`.`tag_id` AS `pivot_tag_id` 
->   FROM 
->       `app_tag` 
->   INNER JOIN 
->       `article_tags` 
->   ON 
->       `app_tag`.`id` = `article_tags`.`tag_id` 
->   WHERE 
->       `article_tags`.`article_id` IN (1)'
+> 	SELECT 
+>		`app_tag`.*, 
+>		`article_tags`.`article_id` AS `pivot_article_id`, 
+>		`article_tags`.`tag_id` AS `pivot_tag_id` 
+>	FROM 
+>		`app_tag` 
+>	INNER JOIN 
+>		`article_tags` 
+>	ON 
+>		`app_tag`.`id` = `article_tags`.`tag_id` 
+>	WHERE 
+>		`article_tags`.`article_id` IN (1)'
 >
 

@@ -283,6 +283,18 @@ class CollectionTest(unittest.TestCase):
                 .expects('max').with_args('age').returns(37)
         self.assertEqual(37, u.phones.max('age'))
 
+    # def test_limit_from_cache(self):
+    #     c = Collection(relation=None, owner_instance=None)
+    #     c._cache = [ 
+    #         {'name': 'py', 'age': 35}, {'name': 'ryan', 'age': 34},  {'name': 'poy', 'age': 37},
+    #         {'name': 'tin', 'age': 32}, {'name': 'zerg', 'age': 30},  {'name': 'ann', 'age': 37},
+    #         {'name': 'foo', 'age': 35}, {'name': 'bar', 'age': 34},  {'name': 'boom', 'age': 37},
+    #     ]
+    #     self.assertEqual()
+    #     self.assertEqual(37, c.max('age'))
+
+
+
  #    def test_each(self):
  #        original = ['foo', 'bar', 'baz']
  #        c = Collection(original)
