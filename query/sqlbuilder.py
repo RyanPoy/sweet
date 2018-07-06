@@ -127,13 +127,15 @@ class SQLBuilder(object):
         where_sqls = []
         if self._where:
             for i, w in enumerate(self._where):
-                k, op = w.column, w.operator
+                k, op, logic = w.column, w.operator, w.logic
                 v = self._where_bindings[i]
                 if is_array(v):
-                    where_sqls.append('%s IN (%s)' % (self.__aqm(k), ', '.join(['%s']*len(v))))
+                    _in = 'NOT IN' if logic == 'not' else 'IN'
+                    where_sqls.append('%s %s (%s)' % (self.__aqm(k), _in, ', '.join(['%s']*len(v))))
                     self._bindings.extend(v)
                 elif v is None:
-                    where_sqls.append('%s IS NULL' % self.__aqm(k) )
+                    _is = 'IS NOT NULL' if logic == 'not' else 'IS NULL'
+                    where_sqls.append('%s %s' % (self.__aqm(k), _is) )
                 else:
                     where_sqls.append('%s %s %%s' % (self.__aqm(k), op) )
                     self._bindings.append(v)

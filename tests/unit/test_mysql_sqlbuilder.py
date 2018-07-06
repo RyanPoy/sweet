@@ -76,17 +76,17 @@ class MysqlSQLBuilderTest(TestCase):
         self.assertEqual('SELECT * FROM `users` WHERE `id` != %s AND `name` != %s', sb.sql)
         self.assertEqual([1, 'ryanpoy'], sb.bindings)
 
-    # def test_where_not_null(self):
-    #     sb = self.get_builder()
-    #     sb.select('*').from_('users').where(id=[1, 2, 3]).where_not(name=None)
-    #     self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` IS NOT NULL', sb.sql)
-    #     self.assertEqual([1, 2, 3], sb.bindings)
+    def test_where_not_null(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').where(id=[1, 2, 3]).where(name__not=None)
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` IS NOT NULL', sb.sql)
+        self.assertEqual([1, 2, 3], sb.bindings)
 
-    # def test_where_not_in(self):
-    #     sb = self.get_builder()
-    #     sb.select('*').from_('users').where_not(id=[1, 2, 3], name='ryanpoy')
-    #     self.assertEqual('SELECT * FROM `users` WHERE `id` NOT IN (%s, %s, %s) AND `name` != %s', sb.sql)
-    #     self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
+    def test_where_not_in(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').where(id__not=[1, 2, 3], name__not='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` NOT IN (%s, %s, %s) AND `name` != %s', sb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
 
     # def test_or_(self):
     #     sb = self.get_builder()
