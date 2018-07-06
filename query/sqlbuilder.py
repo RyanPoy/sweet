@@ -33,6 +33,8 @@ class SQLBuilder(object):
             if is_array(v):
                 self._where.append('%s IN (%s)' % (self.__aqm(k), ', '.join(['%s']*len(v))))
                 self._where_bindings.extend(v)
+            elif v is None:
+                self._where.append('%s IS NULL' % self.__aqm(k) )
             else:
                 self._where.append('%s = %%s' % self.__aqm(k) )
                 self._where_bindings.append(v)
@@ -43,6 +45,8 @@ class SQLBuilder(object):
             if is_array(v):
                 self._where.append('%s NOT IN (%s)' % (self.__aqm(k), ', '.join(['%s']*len(v))))
                 self._where_bindings.extend(v)
+            elif v is None:
+                self._where.append('%s IS NOT NULL' % self.__aqm(k) )
             else:
                 self._where.append('%s != %%s' % self.__aqm(k) )
                 self._where_bindings.append(v)
