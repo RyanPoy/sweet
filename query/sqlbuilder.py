@@ -29,28 +29,25 @@ class SQLBuilder(object):
         return self
 
     def where(self, **kwargs):
-        for k, v in kwargs.items():
-            if is_array(v):
-                self._where.append('%s IN (%s)' % (self.__aqm(k), ', '.join(['%s']*len(v))))
-                self._where_bindings.extend(v)
-            elif v is None:
-                self._where.append('%s IS NULL' % self.__aqm(k) )
-            else:
-                self._where.append('%s = %%s' % self.__aqm(k) )
-                self._where_bindings.append(v)
-        return self
+        return self.__where_or_where_not(False, **kwargs)
 
     def where_not(self, **kwargs):
+        return self.__where_or_where_not(True, **kwargs)
+
+    def __where_or_where_not(self, _not, **kwargs):
+        _in, _is, eq = 'IN', 'IS', '='
+        if _not:
+            _in, _is, eq = 'NOT IN', 'IS NOT', '!='
         for k, v in kwargs.items():
             if is_array(v):
-                self._where.append('%s NOT IN (%s)' % (self.__aqm(k), ', '.join(['%s']*len(v))))
+                self._where.append('%s %s (%s)' % (self.__aqm(k), _in, ', '.join(['%s']*len(v))))
                 self._where_bindings.extend(v)
             elif v is None:
-                self._where.append('%s IS NOT NULL' % self.__aqm(k) )
+                self._where.append('%s %s NULL' % (self.__aqm(k), _is) )
             else:
-                self._where.append('%s != %%s' % self.__aqm(k) )
+                self._where.append('%s %s %%s' % (self.__aqm(k), eq) )
                 self._where_bindings.append(v)
-        return self
+        return self        
 
     def __add_quotation_marks(self, s):
         if s == '*':
