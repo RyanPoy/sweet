@@ -64,6 +64,41 @@ class MysqlSQLBuilderTest(TestCase):
         self.assertEqual('SELECT * FROM `users` WHERE `id` NOT IN (%s, %s, %s) AND `name` != %s', sb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
 
+    def test_or_(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').or_(id=1, name='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` = %s OR `name` = %s', sb.sql)
+        self.assertEqual([1, 'ryanpoy'], sb.bindings)
+
+    def test_or_in(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').or_(id=[1, 2, 3], name='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` = %s', sb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
+
+    def test_or_null(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').or_(id=[1, 2, 3], name=None)
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` IS NULL', sb.sql)
+        self.assertEqual([1, 2, 3], sb.bindings)
+
+    def test_or_not(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').or_not(id=1, name='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` != %s OR `name` != %s', sb.sql)
+        self.assertEqual([1, 'ryanpoy'], sb.bindings)
+
+    def test_or_not_null(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').or_(id=[1, 2, 3]).or_not(name=None)
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` IS NOT NULL', sb.sql)
+        self.assertEqual([1, 2, 3], sb.bindings)
+
+    def test_or_not_in(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').or_not(id=[1, 2, 3], name='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` NOT IN (%s, %s, %s) OR `name` != %s', sb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
 
 if __name__ == '__main__':
     import unittest

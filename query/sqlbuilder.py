@@ -9,6 +9,7 @@ class SQLBuilder(object):
         self._select = []
         self._distinct = False
         self._where = []
+        self._or = []
         self._where_bindings = []
 
     def distinct(self):
@@ -34,6 +35,12 @@ class SQLBuilder(object):
     def where_not(self, **kwargs):
         return self.__where_or_where_not(True, **kwargs)
 
+    def or_(self, **kwargs):
+        return self.__or_or_or_not(False, **kwargs)
+
+    def or_not(self, **kwargs):
+        return self.__or_or_or_not(True, **kwargs)
+
     def __where_or_where_not(self, _not, **kwargs):
         _in, _is, eq = 'IN', 'IS', '='
         if _not:
@@ -47,7 +54,22 @@ class SQLBuilder(object):
             else:
                 self._where.append('%s %s %%s' % (self.__aqm(k), eq) )
                 self._where_bindings.append(v)
-        return self        
+        return self
+
+    def __or_or_or_not(self, _not, **kwargs):
+        _in, _is, eq = 'IN', 'IS', '='
+        if _not:
+            _in, _is, eq = 'NOT IN', 'IS NOT', '!='
+        for k, v in kwargs.items():
+            if is_array(v):
+                self._or.append('%s %s (%s)' % (self.__aqm(k), _in, ', '.join(['%s']*len(v))))
+                self._where_bindings.extend(v)
+            elif v is None:
+                self._or.append('%s %s NULL' % (self.__aqm(k), _is) )
+            else:
+                self._or.append('%s %s %%s' % (self.__aqm(k), eq) )
+                self._where_bindings.append(v)
+        return self
 
     def __add_quotation_marks(self, s):
         if s == '*':
@@ -61,7 +83,14 @@ class SQLBuilder(object):
             columns = ', '.join(map(self.__aqm, self._select)) if self._select else '*',
             tablename = self.__aqm(self.tbname)
         )
+        has_where = False
         if self._where:
+            has_where = True
             sql = '%s WHERE %s' % (sql, ' AND '.join(self._where))
-
+        if self._or:
+            if not has_where:
+                sql = '%s WHERE %s' % (sql, ' OR '.join(self._or))
+            else:
+                sql = '%s %s' % (sql, ' OR '.join(self._or))
+ 
         return sql
