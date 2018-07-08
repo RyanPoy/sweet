@@ -118,6 +118,10 @@ class SQLBuilder(object):
         if self._group_by:
             sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_by))
 
+        having_sql = self.having_sql
+        if having_sql:
+            sql = '%s HAVING %s' % (sql, having_sql)
+
         if self._order_by:
             sql = '%s ORDER BY %s' % (sql, ', '.join(self._order_by))
 
@@ -126,6 +130,10 @@ class SQLBuilder(object):
     @property
     def where_sql(self):
         return self.__where_having_sql(self._where, self._where_bindings)
+
+    @property
+    def having_sql(self):
+        return self.__where_having_sql(self._having, self._having_bindings)
 
     def __where_having_sql(self, collection, bindings):
         sqls = []

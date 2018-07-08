@@ -164,6 +164,132 @@ class MysqlSQLBuilderTest(TestCase):
         sb.select('*').from_('users').group_by('id', 'email')
         self.assertEqual('SELECT * FROM `users` GROUP BY `id`, `email`', sb.sql )
 
+    def test_having(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(id=1, name='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` HAVING `id` = %s AND `name` = %s', sb.sql)
+        self.assertEqual([1, 'ryanpoy'], sb.bindings)
+
+    def test_having_in(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(id=[1, 2, 3], name='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) AND `name` = %s', sb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
+
+    def test_having_null(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(id=[1, 2, 3], name=None)
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) AND `name` IS NULL', sb.sql)
+        self.assertEqual([1, 2, 3], sb.bindings)
+
+    def test_having_gt(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(id=[1, 2, 3], age__gt=30)
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) AND `age` > %s', sb.sql)
+        self.assertEqual([1, 2, 3, 30], sb.bindings)
+
+    def test_having_gte(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(id=[1, 2, 3], age__gte=30)
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) AND `age` >= %s', sb.sql)
+        self.assertEqual([1, 2, 3, 30], sb.bindings)
+
+    def test_having_lt(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(id=[1, 2, 3], age__lt=30)
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) AND `age` < %s', sb.sql)
+        self.assertEqual([1, 2, 3, 30], sb.bindings)
+
+    def test_having_lte(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(id=[1, 2, 3], age__lte=30)
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) AND `age` <= %s', sb.sql)
+        self.assertEqual([1, 2, 3, 30], sb.bindings)
+
+    def test_having_between(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(id__bt=[1, 2])
+        self.assertEqual('SELECT * FROM `users` HAVING `id` BETWEEN %s AND %s', sb.sql)
+        self.assertEqual([1, 2], sb.bindings)
+
+    def test_having_between_should_give_me_error(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(id__bt=[1, 2, 3])
+        with self.assertRaises(TypeError):
+            sb.sql
+
+    def test_having_not(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(id__not=1, name__not='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` HAVING `id` != %s AND `name` != %s', sb.sql)
+        self.assertEqual([1, 'ryanpoy'], sb.bindings)
+
+    def test_having_not_null(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(id=[1, 2, 3]).having(name__not=None)
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) AND `name` IS NOT NULL', sb.sql)
+        self.assertEqual([1, 2, 3], sb.bindings)
+
+    def test_having_not_in(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(id__not=[1, 2, 3], name__not='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` HAVING `id` NOT IN (%s, %s, %s) AND `name` != %s', sb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
+
+    def test_having_not_between(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(id__not_bt=[1, 2])
+        self.assertEqual('SELECT * FROM `users` HAVING `id` NOT BETWEEN %s AND %s', sb.sql)
+        self.assertEqual([1, 2], sb.bindings)
+
+    def test_or_having(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').or_having(id=1, name='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` HAVING `id` = %s OR `name` = %s', sb.sql)
+        self.assertEqual([1, 'ryanpoy'], sb.bindings)
+
+    def test_or_having_between(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(name='ryanpoy').or_having(id__bt=[1, 2])
+        self.assertEqual('SELECT * FROM `users` HAVING `name` = %s OR `id` BETWEEN %s AND %s', sb.sql)
+        self.assertEqual(['ryanpoy', 1, 2], sb.bindings)
+
+    def test_or_having_in(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').or_having(id=[1, 2, 3], name='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) OR `name` = %s', sb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
+
+    def test_or_having_null(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').or_having(id=[1, 2, 3], name=None)
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) OR `name` IS NULL', sb.sql)
+        self.assertEqual([1, 2, 3], sb.bindings)
+
+    def test_or_having_not_between(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').having(name='ryanpoy').or_having(id__not_bt=[1, 2])
+        self.assertEqual('SELECT * FROM `users` HAVING `name` = %s OR `id` NOT BETWEEN %s AND %s', sb.sql)
+        self.assertEqual(['ryanpoy', 1, 2], sb.bindings)
+
+    def test_or_having_not(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').or_having(id__not=1, name__not='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` HAVING `id` != %s OR `name` != %s', sb.sql)
+        self.assertEqual([1, 'ryanpoy'], sb.bindings)
+
+    def test_or_having_not_null(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').or_having(id=[1, 2, 3]).or_having(name__not=None)
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) OR `name` IS NOT NULL', sb.sql)
+        self.assertEqual([1, 2, 3], sb.bindings)
+
+    def test_or_having_not_in(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').or_having(id__not=[1, 2, 3], name__not='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` HAVING `id` NOT IN (%s, %s, %s) OR `name` != %s', sb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
+
 
 if __name__ == '__main__':
     import unittest
