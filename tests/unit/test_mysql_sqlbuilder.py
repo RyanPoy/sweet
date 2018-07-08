@@ -164,6 +164,7 @@ class MysqlSQLBuilderTest(TestCase):
         sb.select('*').from_('users').group_by('id', 'email')
         self.assertEqual('SELECT * FROM `users` GROUP BY `id`, `email`', sb.sql )
 
+
 if __name__ == '__main__':
     import unittest
     unitest.testmain()
