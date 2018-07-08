@@ -12,7 +12,7 @@ class mydict(dict):
 
 class where_expr(object):
 
-    # logic, operator, 
+    # is_or_not, operator, 
     ops = {
         'gt': ('', '>'), 
         'not_gt': ('not', '>'), 
@@ -28,23 +28,16 @@ class where_expr(object):
     def __init__(self, s):
         vs = s.split('__')
         if len(vs) == 1: # 没有找到 "__"
-            self.logic, self.column, self.operator = '', s, '='
+            self.is_or_not, self.column, self.operator = '', s, '='
         elif vs[-1] in self.ops: # 后缀在 ops里面
-            self.logic, self.operator = self.ops[vs[-1]]
+            self.is_or_not, self.operator = self.ops[vs[-1]]
             self.column = s[:-len(vs[-1])-2]
         else:
-            self.logic, self.column, self.operator = '', s, '='
+            self.is_or_not, self.column, self.operator = '', s, '='
 
 
 
 class SQLBuilder(object):
-
-    operators = {
-        'gt': '>',
-        'gte': '>=',
-        'lt': '<',
-        'lte': '<=',
-    }
 
     def __init__(self):
         self.tbname = ''
@@ -73,44 +66,22 @@ class SQLBuilder(object):
         return self
 
     def where(self, **kwargs):
+        return self.__where_or('AND', **kwargs)
+
+    def or_(self, **kwargs):
+        return self.__where_or('OR', **kwargs)
+
+    def __where_or(self, and_or, **kwargs):
         for k, v in kwargs.items():
             expr = where_expr(k)
             self._where.append(mydict(
-                logic = expr.logic,
+                and_or = and_or,
+                is_or_not = expr.is_or_not,
                 column = expr.column,
                 operator = expr.operator
             ))
             self._where_bindings.append(v)
         return self
-        # return self.__where(False, True, **kwargs)
-
-    # def where_not(self, **kwargs):
-    #     return self.__where(True, True, **kwargs)
-
-    # def or_(self, **kwargs):
-    #     return self.__where(False, False, **kwargs)
-
-    # def or_not(self, **kwargs):
-    #     return self.__where(True, False, **kwargs)
-
-    # def __where(self, logic, **kwargs):
-    #     pass
-        # _in, _is, eq = 'IN', 'IS', '='
-        # if _not:
-        #     _in, _is, eq = 'NOT IN', 'IS NOT', '!='
-        # where_list = self._where if _and else self._or
-
-        # for k, v in kwargs.items():
-        #     if is_array(v):
-        #         where_sqls.append('%s %s (%s)' % (self.__aqm(k), _in, ', '.join(['%s']*len(v))))
-        #         self._where_bindings.extend(v)
-        #     elif v is None:
-        #         where_sqls.append('%s %s NULL' % (self.__aqm(k), _is) )
-        #     else:
-        #         where_sqls.append('%s %s %%s' % (self.__aqm(k), eq) )
-        #         self._where_bindings.append(v)
-
-        # return self
 
     def __add_quotation_marks(self, s):
         if s == '*':
@@ -127,23 +98,25 @@ class SQLBuilder(object):
         where_sqls = []
         if self._where:
             for i, w in enumerate(self._where):
-                k, op, logic = w.column, w.operator, w.logic
+                k, op, is_or_not, and_or = w.column, w.operator, w.is_or_not, w.and_or
                 v = self._where_bindings[i]
                 if is_array(v):
-                    _in = 'NOT IN' if logic == 'not' else 'IN'
-                    where_sqls.append('%s %s (%s)' % (self.__aqm(k), _in, ', '.join(['%s']*len(v))))
+                    _in = 'NOT IN' if is_or_not == 'not' else 'IN'
+                    where_sqls.append('%s %s %s (%s)' % (and_or, self.__aqm(k), _in, ', '.join(['%s']*len(v))) )
                     self._bindings.extend(v)
                 elif v is None:
-                    _is = 'IS NOT NULL' if logic == 'not' else 'IS NULL'
-                    where_sqls.append('%s %s' % (self.__aqm(k), _is) )
+                    _is = 'IS NOT NULL' if is_or_not == 'not' else 'IS NULL'
+                    where_sqls.append('%s %s %s' % (and_or, self.__aqm(k), _is) )
                 else:
-                    where_sqls.append('%s %s %%s' % (self.__aqm(k), op) )
+                    where_sqls.append('%s %s %s %%s' % (and_or, self.__aqm(k), op) )
                     self._bindings.append(v)
-            sql = '%s WHERE %s' % (sql, ' AND '.join(where_sqls))
-        # if self._or:
-        #     if not has_where:
-        #         sql = '%s WHERE %s' % (sql, ' OR '.join(self._or))
-        #     else:
-        #         sql = '%s %s' % (sql, ' OR '.join(self._or))
- 
+        
+        if where_sqls:
+            s = ' '.join(where_sqls)
+            if s.startswith('AND '):
+                s = s[4:]
+            elif s.startswith('OR '):
+                s = s[3:]
+            sql = '%s WHERE %s' % (sql, s)
+
         return sql
