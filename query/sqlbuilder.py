@@ -14,7 +14,8 @@ class where_expr(object):
         'lte': ('', '<='), 
         'not_lte': ('not', '<='),
         'not': ('not', '!='),
-        'bt': ('', 'between') # between
+        'bt': ('', 'between'), # between
+        'not_bt': ('not', 'between') # not between
     }
 
     def __init__(self, s):
@@ -94,7 +95,8 @@ class SQLBuilder(object):
                     # between 要做特殊处理
                     if not is_array(v) or len(v) != 2:
                         raise TypeError('Should give between 2 params, but %s' % v)
-                    where_sqls.append('%s %s BETWEEN %%s AND %%s' % (and_or, self.__aqm(k)))
+                    bt = 'NOT BETWEEN' if is_or_not == 'not' else 'BETWEEN'
+                    where_sqls.append('%s %s %s %%s AND %%s' % (and_or, self.__aqm(k), bt))
                     self._bindings.extend(v)
                 else:
                     if is_array(v):

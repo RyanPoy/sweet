@@ -100,11 +100,23 @@ class MysqlSQLBuilderTest(TestCase):
         self.assertEqual('SELECT * FROM `users` WHERE `id` NOT IN (%s, %s, %s) AND `name` != %s', sb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
 
+    def test_where_not_between(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').where(id__not_bt=[1, 2])
+        self.assertEqual('SELECT * FROM `users` WHERE `id` NOT BETWEEN %s AND %s', sb.sql)
+        self.assertEqual([1, 2], sb.bindings)
+
     def test_or(self):
         sb = self.get_builder()
         sb.select('*').from_('users').or_(id=1, name='ryanpoy')
         self.assertEqual('SELECT * FROM `users` WHERE `id` = %s OR `name` = %s', sb.sql)
         self.assertEqual([1, 'ryanpoy'], sb.bindings)
+
+    def test_or_between(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').where(name='ryanpoy').or_(id__bt=[1, 2])
+        self.assertEqual('SELECT * FROM `users` WHERE `name` = %s OR `id` BETWEEN %s AND %s', sb.sql)
+        self.assertEqual(['ryanpoy', 1, 2], sb.bindings)
 
     def test_or_in(self):
         sb = self.get_builder()
@@ -117,6 +129,12 @@ class MysqlSQLBuilderTest(TestCase):
         sb.select('*').from_('users').or_(id=[1, 2, 3], name=None)
         self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` IS NULL', sb.sql)
         self.assertEqual([1, 2, 3], sb.bindings)
+
+    def test_or_not_between(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').where(name='ryanpoy').or_(id__not_bt=[1, 2])
+        self.assertEqual('SELECT * FROM `users` WHERE `name` = %s OR `id` NOT BETWEEN %s AND %s', sb.sql)
+        self.assertEqual(['ryanpoy', 1, 2], sb.bindings)
 
     def test_or_not(self):
         sb = self.get_builder()
