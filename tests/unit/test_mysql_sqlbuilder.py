@@ -159,6 +159,10 @@ class MysqlSQLBuilderTest(TestCase):
         sb.select('*').from_('users').order_by('email').order_by('age', 'desc')
         self.assertEqual('SELECT * FROM `users` ORDER BY `email`, `age` DESC', sb.sql)
 
+    def test_group_bys(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').group_by('id', 'email')
+        self.assertEqual('SELECT * FROM `users` GROUP BY `id`, `email`', sb.sql )
 
 if __name__ == '__main__':
     import unittest

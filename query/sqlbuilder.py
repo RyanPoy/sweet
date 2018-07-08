@@ -38,6 +38,7 @@ class SQLBuilder(object):
         self._or = []
         self._where_bindings = []
         self._bindings = []
+        self._group_by = []
         self._order_by = []
 
     def distinct(self):
@@ -59,6 +60,11 @@ class SQLBuilder(object):
 
     def where(self, **kwargs):
         return self.__where_or('AND', **kwargs)
+
+    def group_by(self, *columns):
+        for c in columns:
+            self._group_by.append(self.__aqm(c))
+        return self
 
     def order_by(self, column, desc=False):
         c = self.__aqm(column)
@@ -129,6 +135,11 @@ class SQLBuilder(object):
                 s = s[3:]
             sql = '%s WHERE %s' % (sql, s)
 
+        if self._group_by:
+            sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_by))
+
         if self._order_by:
             sql = '%s ORDER BY %s' % (sql, ', '.join(self._order_by))
+
+
         return sql
