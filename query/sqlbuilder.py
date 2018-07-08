@@ -34,15 +34,15 @@ class SQLBuilder(object):
         self.tbname = ''
         self._select = []
         self._distinct = False
-        self._where = []
+        self._wheres = []
         self._or = []
         self._where_bindings = []
-        self._having = []
+        self._havings = []
         self._or_having = []
         self._having_bindings = []
         self._bindings = []
-        self._group_by = []
-        self._order_by = []
+        self._group_bys = []
+        self._order_bys = []
 
     def distinct(self):
         self._distinct = True
@@ -62,41 +62,41 @@ class SQLBuilder(object):
         return self
 
     def where(self, **kwargs):
-        return self.__where_or_having_or(self._where, self._where_bindings, 'AND', **kwargs)
+        return self.__where_or_having_or(self._wheres, self._where_bindings, 'AND', **kwargs)
 
     def or_(self, **kwargs):
-        return self.__where_or_having_or(self._where, self._where_bindings, 'OR', **kwargs)
+        return self.__where_or_having_or(self._wheres, self._where_bindings, 'OR', **kwargs)
 
     def having(self, **kwargs):
-        return self.__where_or_having_or(self._having, self._having_bindings, 'AND', **kwargs)
+        return self.__where_or_having_or(self._havings, self._having_bindings, 'AND', **kwargs)
 
     def or_having(self, **kwargs):
-        return self.__where_or_having_or(self._having, self._having_bindings, 'OR', **kwargs)
+        return self.__where_or_having_or(self._havings, self._having_bindings, 'OR', **kwargs)
 
-    def __where_or_having_or(self, collection, bindings, and_or, **kwargs):
+    def __where_or_having_or(self, wheres_or_havings, where_or_having_bindings, and_or, **kwargs):
         for k, v in kwargs.items():
             expr = where_expr(k)
-            collection.append(mydict(
+            wheres_or_havings.append(mydict(
                 and_or = and_or,
                 is_or_not = expr.is_or_not,
                 column = expr.column,
                 operator = expr.operator
             ))
-            bindings.append(v)
+            where_or_having_bindings.append(v)
 
         return self
 
     def group_by(self, *columns):
         for c in columns:
-            self._group_by.append(self.__aqm(c))
+            self._group_bys.append(self.__aqm(c))
         return self
 
     def order_by(self, column, desc=False):
         c = self.__aqm(column)
         if not desc:
-            self._order_by.append(c)
+            self._order_bys.append(c)
         else:
-            self._order_by.append('%s DESC' % c)
+            self._order_bys.append('%s DESC' % c)
         return self
 
     def __add_quotation_marks(self, s):
@@ -115,34 +115,34 @@ class SQLBuilder(object):
         if where_sql:
             sql = '%s WHERE %s' % (sql, where_sql)
 
-        if self._group_by:
-            sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_by))
+        if self._group_bys:
+            sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_bys))
 
         having_sql = self.having_sql
         if having_sql:
             sql = '%s HAVING %s' % (sql, having_sql)
 
-        if self._order_by:
-            sql = '%s ORDER BY %s' % (sql, ', '.join(self._order_by))
+        if self._order_bys:
+            sql = '%s ORDER BY %s' % (sql, ', '.join(self._order_bys))
 
         return sql
 
     @property
     def where_sql(self):
-        return self.__where_having_sql(self._where, self._where_bindings)
+        return self.__where_having_sql(self._wheres, self._where_bindings)
 
     @property
     def having_sql(self):
-        return self.__where_having_sql(self._having, self._having_bindings)
+        return self.__where_having_sql(self._havings, self._having_bindings)
 
-    def __where_having_sql(self, collection, bindings):
+    def __where_having_sql(self, wheres_or_havings, where_or_having_bindings):
         sqls = []
-        if collection:
-            for i, w in enumerate(collection):
+        if wheres_or_havings:
+            for i, w in enumerate(wheres_or_havings):
                 k, op = self.__aqm(w.column), w.operator
                 is_or_not, and_or = w.is_or_not, w.and_or
 
-                v = bindings[i]
+                v = where_or_having_bindings[i]
                 if op == 'between':
                     # between 要做特殊处理
                     if not is_array(v) or len(v) != 2:
