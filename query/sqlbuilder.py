@@ -38,6 +38,7 @@ class SQLBuilder(object):
         self._or = []
         self._where_bindings = []
         self._bindings = []
+        self._order_by = []
 
     def distinct(self):
         self._distinct = True
@@ -58,6 +59,14 @@ class SQLBuilder(object):
 
     def where(self, **kwargs):
         return self.__where_or('AND', **kwargs)
+
+    def order_by(self, column, desc=False):
+        c = self.__aqm(column)
+        if not desc:
+            self._order_by.append(c)
+        else:
+            self._order_by.append('%s DESC' % c)
+        return self
 
     def or_(self, **kwargs):
         return self.__where_or('OR', **kwargs)
@@ -89,25 +98,27 @@ class SQLBuilder(object):
         where_sqls = []
         if self._where:
             for i, w in enumerate(self._where):
-                k, op, is_or_not, and_or = w.column, w.operator, w.is_or_not, w.and_or
+                k, op = self.__aqm(w.column), w.operator
+                is_or_not, and_or = w.is_or_not, w.and_or
+
                 v = self._where_bindings[i]
                 if op == 'between':
                     # between 要做特殊处理
                     if not is_array(v) or len(v) != 2:
                         raise TypeError('Should give between 2 params, but %s' % v)
                     bt = 'NOT BETWEEN' if is_or_not == 'not' else 'BETWEEN'
-                    where_sqls.append('%s %s %s %%s AND %%s' % (and_or, self.__aqm(k), bt))
+                    where_sqls.append('%s %s %s %%s AND %%s' % (and_or, k, bt))
                     self._bindings.extend(v)
                 else:
                     if is_array(v):
                         _in = 'NOT IN' if is_or_not == 'not' else 'IN'
-                        where_sqls.append('%s %s %s (%s)' % (and_or, self.__aqm(k), _in, ', '.join(['%s']*len(v))) )
+                        where_sqls.append('%s %s %s (%s)' % (and_or, k, _in, ', '.join(['%s']*len(v))) )
                         self._bindings.extend(v)
                     elif v is None:
                         _is = 'IS NOT NULL' if is_or_not == 'not' else 'IS NULL'
-                        where_sqls.append('%s %s %s' % (and_or, self.__aqm(k), _is) )
+                        where_sqls.append('%s %s %s' % (and_or, k, _is) )
                     else:
-                        where_sqls.append('%s %s %s %%s' % (and_or, self.__aqm(k), op) )
+                        where_sqls.append('%s %s %s %%s' % (and_or, k, op) )
                         self._bindings.append(v)
         
         if where_sqls:
@@ -118,4 +129,6 @@ class SQLBuilder(object):
                 s = s[3:]
             sql = '%s WHERE %s' % (sql, s)
 
+        if self._order_by:
+            sql = '%s ORDER BY %s' % (sql, ', '.join(self._order_by))
         return sql

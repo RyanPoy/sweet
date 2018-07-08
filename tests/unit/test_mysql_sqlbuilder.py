@@ -154,6 +154,10 @@ class MysqlSQLBuilderTest(TestCase):
         self.assertEqual('SELECT * FROM `users` WHERE `id` NOT IN (%s, %s, %s) OR `name` != %s', sb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
         
+    def test_order_by(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').order_by('email').order_by('age', 'desc')
+        self.assertEqual('SELECT * FROM `users` ORDER BY `email`, `age` DESC', sb.sql)
 
 
 if __name__ == '__main__':
