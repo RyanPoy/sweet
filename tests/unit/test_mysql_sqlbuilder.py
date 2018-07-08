@@ -70,6 +70,18 @@ class MysqlSQLBuilderTest(TestCase):
         self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `age` <= %s', sb.sql)
         self.assertEqual([1, 2, 3, 30], sb.bindings)
 
+    def test_where_between(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').where(id__bt=[1, 2])
+        self.assertEqual('SELECT * FROM `users` WHERE `id` BETWEEN %s AND %s', sb.sql)
+        self.assertEqual([1, 2], sb.bindings)
+
+    def test_where_between_should_give_me_error(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').where(id__bt=[1, 2, 3])
+        with self.assertRaises(TypeError):
+            sb.sql
+
     def test_where_not(self):
         sb = self.get_builder()
         sb.select('*').from_('users').where(id__not=1, name__not='ryanpoy')
@@ -123,6 +135,7 @@ class MysqlSQLBuilderTest(TestCase):
         sb.select('*').from_('users').or_(id__not=[1, 2, 3], name__not='ryanpoy')
         self.assertEqual('SELECT * FROM `users` WHERE `id` NOT IN (%s, %s, %s) OR `name` != %s', sb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
+        
 
 
 if __name__ == '__main__':

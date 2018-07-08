@@ -2,17 +2,8 @@
 from sweet.utils import *
 
 
-class mydict(dict):
-
-    def __getattr__(self, k):
-        if k in self:
-            return self[k]
-        return super(__getattr__, k)
-
-
 class where_expr(object):
 
-    # is_or_not, operator, 
     ops = {
         'gt': ('', '>'), 
         'not_gt': ('not', '>'), 
@@ -22,14 +13,13 @@ class where_expr(object):
         'not_lt': ('not', '<'), 
         'lte': ('', '<='), 
         'not_lte': ('not', '<='),
-        'not': ('not', '!=')
+        'not': ('not', '!='),
+        'bt': ('', 'between') # between
     }
 
     def __init__(self, s):
         vs = s.split('__')
-        if len(vs) == 1: # 没有找到 "__"
-            self.is_or_not, self.column, self.operator = '', s, '='
-        elif vs[-1] in self.ops: # 后缀在 ops里面
+        if vs[-1] in self.ops: # 后缀在 ops里面
             self.is_or_not, self.operator = self.ops[vs[-1]]
             self.column = s[:-len(vs[-1])-2]
         else:
@@ -100,16 +90,23 @@ class SQLBuilder(object):
             for i, w in enumerate(self._where):
                 k, op, is_or_not, and_or = w.column, w.operator, w.is_or_not, w.and_or
                 v = self._where_bindings[i]
-                if is_array(v):
-                    _in = 'NOT IN' if is_or_not == 'not' else 'IN'
-                    where_sqls.append('%s %s %s (%s)' % (and_or, self.__aqm(k), _in, ', '.join(['%s']*len(v))) )
+                if op == 'between':
+                    # between 要做特殊处理
+                    if not is_array(v) or len(v) != 2:
+                        raise TypeError('Should give between 2 params, but %s' % v)
+                    where_sqls.append('%s %s BETWEEN %%s AND %%s' % (and_or, self.__aqm(k)))
                     self._bindings.extend(v)
-                elif v is None:
-                    _is = 'IS NOT NULL' if is_or_not == 'not' else 'IS NULL'
-                    where_sqls.append('%s %s %s' % (and_or, self.__aqm(k), _is) )
                 else:
-                    where_sqls.append('%s %s %s %%s' % (and_or, self.__aqm(k), op) )
-                    self._bindings.append(v)
+                    if is_array(v):
+                        _in = 'NOT IN' if is_or_not == 'not' else 'IN'
+                        where_sqls.append('%s %s %s (%s)' % (and_or, self.__aqm(k), _in, ', '.join(['%s']*len(v))) )
+                        self._bindings.extend(v)
+                    elif v is None:
+                        _is = 'IS NOT NULL' if is_or_not == 'not' else 'IS NULL'
+                        where_sqls.append('%s %s %s' % (and_or, self.__aqm(k), _is) )
+                    else:
+                        where_sqls.append('%s %s %s %%s' % (and_or, self.__aqm(k), op) )
+                        self._bindings.append(v)
         
         if where_sqls:
             s = ' '.join(where_sqls)

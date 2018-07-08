@@ -204,3 +204,11 @@ is_set      = lambda obj: isinstance(obj, set)
 
 #     __str__ = __unicode__
 
+
+class mydict(dict):
+
+    def __getattr__(self, k):
+        if k in self:
+            return self[k]
+        return super(__getattr__, k)
+
