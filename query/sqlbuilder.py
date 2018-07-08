@@ -43,6 +43,8 @@ class SQLBuilder(object):
         self._bindings = []
         self._group_bys = []
         self._order_bys = []
+        self._limit = None
+        self._offset = None
 
     def distinct(self):
         self._distinct = True
@@ -99,6 +101,19 @@ class SQLBuilder(object):
             self._order_bys.append('%s DESC' % c)
         return self
 
+    def limit(self, limit):
+        self._limit = limit
+        return self
+
+    def offset(self, offset):
+        self._offset = offset
+        return self
+
+    def page(self, page_num, page_size):
+        page_num = 1 if page_num < 0 else page_num
+        self.limit((page_num-1) * page_size).offset(page_size)
+        return self
+
     def __add_quotation_marks(self, s):
         if s == '*':
             return s
@@ -124,6 +139,10 @@ class SQLBuilder(object):
 
         if self._order_bys:
             sql = '%s ORDER BY %s' % (sql, ', '.join(self._order_bys))
+
+        limit_and_offset_sql = self.__limit_and_offset_sql()
+        if limit_and_offset_sql:
+            sql = '%s %s' % (sql, limit_and_offset_sql)
 
         return sql
 
@@ -170,3 +189,11 @@ class SQLBuilder(object):
                 s = s[3:]
             return s
         return ''
+
+    def __limit_and_offset_sql(self):
+        sqls = []
+        if self._limit is not None:
+            sqls.append('LIMIT %s' % self._limit)
+        if self._offset:
+            sqls.append('OFFSET %s' % self._offset)
+        return ' '.join(sqls)

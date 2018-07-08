@@ -290,6 +290,16 @@ class MysqlSQLBuilderTest(TestCase):
         self.assertEqual('SELECT * FROM `users` HAVING `id` NOT IN (%s, %s, %s) OR `name` != %s', sb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
 
+    def test_limits_and_offsets(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').offset(5).limit(10)
+        self.assertEqual('SELECT * FROM `users` LIMIT 10 OFFSET 5', sb.sql)
+
+    def test_page(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').page(2, 15)
+        self.assertEqual('SELECT * FROM `users` LIMIT 15 OFFSET 15', sb.sql)
+
 
 if __name__ == '__main__':
     import unittest
