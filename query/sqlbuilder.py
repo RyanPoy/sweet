@@ -43,6 +43,7 @@ class SQLBuilder(object):
         self._bindings = []
         self._group_bys = []
         self._order_bys = []
+        self._joins = []
         self._limit = None
         self._offset = None
 
@@ -114,10 +115,28 @@ class SQLBuilder(object):
         self.limit((page_num-1) * page_size).offset(page_size)
         return self
 
+    def join(self, tbname, on):
+        return self.__join('INNER JOIN', tbname, on)
+
+    def left_join(self, tbname, on):
+        return self.__join('LEFT JOIN', tbname, on)
+
+    def right_join(self, tbname, on):
+        return self.__join('RIGHT JOIN', tbname, on)
+
+    def __join(self, join_type, tbname, on):
+        self._joins.append(mydict(
+            join_type = join_type,
+            tbname = tbname,
+            on = on
+        ))
+        return self
+
     def __add_quotation_marks(self, s):
         if s == '*':
             return s
-        return '%s%s%s' % (self.qutotation_marks, s, self.qutotation_marks)
+        return '.'.join([ '%s%s%s' % (self.qutotation_marks, x, self.qutotation_marks) for x in s.split('.') ])
+
     __aqm = __add_quotation_marks
 
     @property
@@ -126,9 +145,16 @@ class SQLBuilder(object):
             columns = ', '.join(map(self.__aqm, self._select)) if self._select else '*',
             tablename = self.__aqm(self.tbname)
         )
+        join_sql = self.join_sql
+        if join_sql:
+            sql = '%s %s' % (sql, join_sql)
+
         where_sql = self.where_sql
         if where_sql:
-            sql = '%s WHERE %s' % (sql, where_sql)
+            if join_sql:
+                sql = '%s AND %s' % (sql, where_sql)
+            else:
+                sql = '%s WHERE %s' % (sql, where_sql)
 
         if self._group_bys:
             sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_bys))
@@ -145,6 +171,14 @@ class SQLBuilder(object):
             sql = '%s %s' % (sql, limit_and_offset_sql)
 
         return sql
+
+    @property
+    def join_sql(self):
+        sqls = []
+        for j in self._joins:
+            on = ' = '.join([ self.__aqm(x.strip()) for x in j.on.split('=') ])
+            sqls.append('%s %s ON %s' % (j.join_type, self.__aqm(j.tbname), on))
+        return ' '.join(sqls)
 
     @property
     def where_sql(self):

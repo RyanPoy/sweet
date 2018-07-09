@@ -300,6 +300,24 @@ class MysqlSQLBuilderTest(TestCase):
         sb.select('*').from_('users').page(2, 15)
         self.assertEqual('SELECT * FROM `users` LIMIT 15 OFFSET 15', sb.sql)
 
+    def test_join(self):
+        sb = self.get_builder()
+        sb.select('users.id').select('users.name').select('cars.name').from_('users').where(id=[1,2,3]).or_(name="ryanpoy").join('cars', on="users.id=cars.user_id")
+        self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` AND `id` IN (%s, %s, %s) OR `name` = %s', sb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
+
+    def test_left_join(self):
+        sb = self.get_builder()
+        sb.select('users.id').select('users.name').select('cars.name').from_('users').where(id=[1,2,3]).or_(name="ryanpoy").left_join('cars', on="users.id=cars.user_id")
+        self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` AND `id` IN (%s, %s, %s) OR `name` = %s', sb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
+
+    def test_right_join(self):
+        sb = self.get_builder()
+        sb.select('users.id').select('users.name').select('cars.name').from_('users').where(id=[1,2,3]).or_(name="ryanpoy").right_join('cars', on="users.id=cars.user_id")
+        self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` RIGHT JOIN `cars` ON `users`.`id` = `cars`.`user_id` AND `id` IN (%s, %s, %s) OR `name` = %s', sb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
+
 
 if __name__ == '__main__':
     import unittest
