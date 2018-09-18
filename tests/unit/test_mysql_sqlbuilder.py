@@ -40,6 +40,18 @@ class MysqlSQLBuilderTest(TestCase):
         self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` = %s', sb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], sb.bindings)
 
+    def test_where_in_empty(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').where(id=[], name='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN () AND `name` = %s', sb.sql)
+        self.assertEqual(['ryanpoy'], sb.bindings)
+
+    def test_where_in_none(self):
+        sb = self.get_builder()
+        sb.select('*').from_('users').where(id=[None, None], name='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s) AND `name` = %s', sb.sql)
+        self.assertEqual([None, None, 'ryanpoy'], sb.bindings)
+
     def test_where_null(self):
         sb = self.get_builder()
         sb.select('*').from_('users').where(id=[1, 2, 3], name=None)

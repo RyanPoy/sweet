@@ -2,7 +2,7 @@
 from sweet.utils import *
 
 
-class where_expr(object):
+class WhereExpr(object):
 
     ops = {
         'gt': ('', '>'), 
@@ -78,7 +78,7 @@ class SQLBuilder(object):
 
     def __where_or_having_or(self, wheres_or_havings, where_or_having_bindings, and_or, **kwargs):
         for k, v in kwargs.items():
-            expr = where_expr(k)
+            expr = WhereExpr(k)
             wheres_or_havings.append(mydict(
                 and_or = and_or,
                 is_or_not = expr.is_or_not,

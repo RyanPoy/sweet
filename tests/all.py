@@ -1,10 +1,26 @@
 # coding: utf8
 import sys, unittest
 from sweet.tests.unit.test_mysql_sqlbuilder import MysqlSQLBuilderTest
+from sweet.tests.unit.validation.test_validator_acceptance import AcceptanceValidatorTest
+from sweet.tests.unit.validation.test_validator_confirmation import ConfirmationValidatorTest
+from sweet.tests.unit.validation.test_validator_exclusion import ExclusionValidatorTest
+from sweet.tests.unit.validation.test_validator_format import FormatValidatorTest
+from sweet.tests.unit.validation.test_validator_inclusion import InclusionValidatorTest
+from sweet.tests.unit.validation.test_validator_length import LengthValidatorTest
+from sweet.tests.unit.validation.test_validator_numericality import NumericalityValidatorTest
+from sweet.tests.unit.validation.test_validator_presence import PresenceValidatorTest
 
 
 unit_tests = [
-    MysqlSQLBuilderTest
+    MysqlSQLBuilderTest,
+    AcceptanceValidatorTest,
+    ConfirmationValidatorTest,
+    ExclusionValidatorTest,
+    FormatValidatorTest,
+    InclusionValidatorTest,
+    LengthValidatorTest,
+    NumericalityValidatorTest,
+    PresenceValidatorTest,
 ]
 
 
