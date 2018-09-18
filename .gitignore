@@ -4,3 +4,5 @@ temp/
 .project
 .pydevproject
 .settings/
+tests/unit/test_sql_builder的副本.py
+tests/unit/tmp_test_sql_builder.py
