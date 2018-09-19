@@ -1,5 +1,5 @@
 #coding: utf8
-from sweet.db.conn.mysql_conn import MySQLConn
+from sweet.database import MySQL
 
 
 class DBManager(object):
@@ -15,7 +15,7 @@ class DBManager(object):
     }
     """
     DRIVER_DB_MAPPING = {
-        'mysql': MySQLConn,
+        'mysql': MySQL,
     }
 
     __connections__ = {}

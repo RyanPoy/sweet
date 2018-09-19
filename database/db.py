@@ -2,14 +2,14 @@
 from sweet.utils import is_str, is_datetime, is_date, \
                         flatten, str2date, str2datetime
 from contextlib import contextmanager
-from sweet.query.mysql_sqlbuilder import MysqlSQLBuilder
+from sweet.database.table import MySQLTable
 import MySQLdb
 import time
 
 
-class MySQLConn(object):
+class MySQL(object):
     
-    sql_builder = MysqlSQLBuilder
+    table_class = MySQLTable
 
     def __init__(self, dbname, user='root', password='', host='localhost', port=3306, charset='utf8', show_sql=False):
         self._db_args = dict(db=dbname, user=user, passwd=password, host=host, port=port, charset=charset,
@@ -167,4 +167,4 @@ class MySQLConn(object):
         return self
 
     def table(self, tbname):
-        return self.sql_builder().from_(tbname)
+        return self.table_class().from_(tbname)
