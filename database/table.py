@@ -28,7 +28,7 @@ class WhereExpr(object):
 
 
 
-class SQLBuilder(object):
+class Table(object):
 
     def __init__(self):
         self.tbname = ''
@@ -233,7 +233,7 @@ class SQLBuilder(object):
         return ' '.join(sqls)
 
 
-class MySQLTable(SQLBuilder):
+class MySQLTable(Table):
 
     qutotation_marks = '`'
 
