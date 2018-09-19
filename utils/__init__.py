@@ -1,4 +1,5 @@
 #coding: utf8
+from backpack import Collection as BaseCollection
 from sweet.utils.inflection import *
 from datetime import datetime, date
 from decimal import Decimal
@@ -206,3 +207,10 @@ class mydict(dict):
         if k in self:
             return self[k]
         return super(__getattr__, k)
+
+
+class Collection(BaseCollection):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+

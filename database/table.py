@@ -1,7 +1,6 @@
 #coding: utf8
 from sweet.utils import *
 
-
 class WhereExpr(object):
 
     ops = {
@@ -30,8 +29,9 @@ class WhereExpr(object):
 
 class Table(object):
 
-    def __init__(self):
-        self.tbname = ''
+    def __init__(self, db, tbname):
+        self.db = db
+        self.tbname = tbname
         self._select = []
         self._distinct = False
         self._wheres = []
@@ -59,10 +59,6 @@ class Table(object):
     @property
     def bindings(self):
         return self._bindings
-
-    def from_(self, tbname):
-        self.tbname = tbname
-        return self
 
     def where(self, **kwargs):
         return self.__where_or_having_or(self._wheres, self._where_bindings, 'AND', **kwargs)
@@ -231,6 +227,15 @@ class Table(object):
         if self._offset:
             sqls.append('OFFSET %s' % self._offset)
         return ' '.join(sqls)
+
+    def first(self):
+        return self.db.fetchone(self.sql, *self.bindings)
+
+    def last(self):
+        return self.db.fetchlastone(self.sql, *self.bindings)
+
+    def all(self):
+        return self.db.fetchall(self.sql, *self.bindings)
 
 
 class MySQLTable(Table):

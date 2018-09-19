@@ -1,10 +1,15 @@
 #coding: utf8
 from sweet.utils import is_str, is_datetime, is_date, \
-                        flatten, str2date, str2datetime
+                        flatten, str2date, str2datetime, \
+                        mydict, Collection
 from contextlib import contextmanager
 from sweet.database.table import MySQLTable
 import MySQLdb
 import time
+
+
+class Record(mydict):
+    pass
 
 
 class MySQL(object):
@@ -20,8 +25,11 @@ class MySQL(object):
 
     def fetchone(self, sql, *params):
         """Returns the first row returned for the given query."""
-        rows = self.fetchall(sql, *params)
-        return rows[0] if rows else None
+        return self.fetchall(sql, *params).first()
+
+    def fetchlastone(self, sql, *params):
+        """Returns the first row returned for the given query."""
+        return self.fetchall(sql, *params).last()
     
     def fetchall(self, sql, *params):
         """Returns a row list for the given query and parameters."""
@@ -29,11 +37,9 @@ class MySQL(object):
         try:
             self._execute(cursor, sql, *params)
             column_names = [d[0] for d in cursor.description]
-            return [ dict(zip(column_names, row)) for row in cursor ]
+            return Collection([ Record(zip(column_names, row)) for row in cursor ])
         finally:
             cursor.close()
-            
-        return self._execute(sql, *params).cursor.fetchall()
 
     def execute_lastrowid(self, sql, *params):
         """Executes the given query, returning the lastrowid from the query."""
@@ -167,4 +173,4 @@ class MySQL(object):
         return self
 
     def table(self, tbname):
-        return self.table_class().from_(tbname)
+        return self.table_class(self, tbname)
