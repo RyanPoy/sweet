@@ -1,6 +1,7 @@
 # coding: utf8
 import sys, unittest
 from sweet.tests.unit.query.test_mysql_sqlbuilder import MysqlSQLBuilderTest
+from sweet.tests.unit.db.test_mysql_conn import MySQLConnTest
 from sweet.tests.unit.orm.test_model import ModelTest
 from sweet.tests.unit.validation.test_validator_acceptance import AcceptanceValidatorTest
 from sweet.tests.unit.validation.test_validator_confirmation import ConfirmationValidatorTest
@@ -13,6 +14,7 @@ from sweet.tests.unit.validation.test_validator_presence import PresenceValidato
 
 
 unit_tests = [
+    MySQLConnTest,
     MysqlSQLBuilderTest,
     ModelTest,
     AcceptanceValidatorTest,
