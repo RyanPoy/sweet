@@ -1,6 +1,7 @@
 #coding: utf8
 from sweet.utils import *
 
+
 class WhereExpr(object):
 
     ops = {
@@ -134,11 +135,12 @@ class Table(object):
         return '.'.join([ '%s%s%s' % (self.qutotation_marks, x, self.qutotation_marks) for x in s.split('.') ])
 
     __aqm = __add_quotation_marks
+    _join_columns_sql = lambda self, columns: ', '.join(map(self.__aqm, columns))
 
     @property
     def sql(self):
         sql = 'SELECT {columns} FROM {tablename}'.format(
-            columns = ', '.join(map(self.__aqm, self._select)) if self._select else '*',
+            columns = self._join_columns_sql(self._select) if self._select else '*',
             tablename = self.__aqm(self.tbname)
         )
         join_sql = self.join_sql
@@ -227,6 +229,39 @@ class Table(object):
         if self._offset:
             sqls.append('OFFSET %s' % self._offset)
         return ' '.join(sqls)
+
+    def insert(self, records=None, **kwargs):
+        list_records = []
+        if records:
+            if is_hash(records):
+                list_records.append(records)
+            elif is_array(records):
+                list_records.extend(records)
+
+        if kwargs:
+            list_records.append(kwargs)
+
+        if not list_records:
+            return 0 # nothing insert
+
+        if len(list_records) > 1:
+            keys = list_records[0].keys()
+            for r in list_records:
+                if r.keys() != keys:
+                    raise Exception("multiple insert only support same keys records")
+
+        values_sql, bindings = [], []
+        for r in list_records:
+            values_sql.append('(%s)' % ', '.join(['%s']*len(r)))
+            bindings.extend(r.values())
+        
+        sql = 'INSERT INTO `{tablename}` ({columns}) VALUES {values_sql}'.format(
+            tablename=self.tbname, 
+            columns=self._join_columns_sql(list_records[0].keys()),
+            values_sql=', '.join(values_sql)
+        )
+        
+        return self.db.execute_rowcount(sql, *bindings)
 
     def first(self):
         return self.db.fetchone(self.sql, *self.bindings)

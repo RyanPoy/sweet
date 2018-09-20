@@ -181,6 +181,7 @@ class classproperty(object):
     def __get__(self, owner_self, owner_cls): return self.fget(owner_cls)
 
 
+class InvalidArg(Exception): pass
 # class ValidationError(Exception): pass
 # class RecordNotFound(Exception): pass
 # class RecordHasNotBeenPersisted(Exception): pass

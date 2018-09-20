@@ -3,7 +3,7 @@ from sweet.tests.unit import TestCase
 from sweet.database.table import MySQLTable
 
 
-class MySQLTableTest(TestCase):
+class MySQLTableQueryTest(TestCase):
 
     def get_table(self):
         return MySQLTable(db=None, tbname="users")
