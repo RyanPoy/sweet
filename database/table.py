@@ -280,6 +280,9 @@ class Table(object):
             )
         return self.db.execute_rowcount(sql, *self.bindings)
 
+    def truncate(self):
+        return self.db.execute_rowcount('TRUNCATE {}'.format(self.__aqm(self.tbname)))
+
     def first(self):
         return self.db.fetchone(self.sql, *self.bindings)
 

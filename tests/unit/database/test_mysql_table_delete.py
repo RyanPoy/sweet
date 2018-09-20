@@ -31,6 +31,16 @@ class MySQLTableDeleteTest(TestCase):
         r = tb.where(id=[1,2,3]).or_(name="ryanpoy").join('cars', on="users.id=cars.user_id").delete()
         self.assertEqual(3, r)
 
+    def test_truncate(self):
+        def _(sql, *params):
+            self.assertEqual('TRUNCATE `users`', sql)
+            self.assertTrue(not params)
+            return 10
+        tb = self.get_table()
+        tb.db.execute_rowcount = _
+
+        r = tb.where(id=[1, 2, 3]).truncate()
+        self.assertEqual(10, r)
 
 if __name__ == '__main__':
     import unittest
