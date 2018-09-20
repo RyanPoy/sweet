@@ -61,6 +61,31 @@ class MySQLTest(TestCase):
         self.assertEqual('lucy', r.name)
         self.assertEqual(22, r.age)
 
+    def test_insert_getid(self):
+        tb = self.db.table('users')
+        user_id = tb.insert_getid(id=3, name="Poy", age=33)
+        self.assertEqual(3, user_id)
+
+        rs = tb.where(id=3).all()
+        self.assertEqual(1, len(rs))
+
+        r = rs[0]
+        self.assertEqual(3, r.id)
+        self.assertEqual('Poy', r.name)
+        self.assertEqual(33, r.age)
+
+    def test_insert_getid_with_autoincrementid(self):
+        tb = self.db.table('users')
+        user_id = tb.insert_getid(name="Poy", age=33)
+
+        rs = tb.where(name="Poy").where(age=33).all()
+        self.assertEqual(1, len(rs))
+
+        r = rs[0]
+        self.assertEqual(user_id, r.id)
+        self.assertEqual('Poy', r.name)
+        self.assertEqual(33, r.age)
+
     def test_insert(self):
         tb = self.db.table('users')
         cnt = tb.insert(id=3, name="Poy", age=33)

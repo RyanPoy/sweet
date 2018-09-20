@@ -230,6 +230,19 @@ class Table(object):
             sqls.append('OFFSET %s' % self._offset)
         return ' '.join(sqls)
 
+    def insert_getid(self, record=None, **kwargs):
+        record = record or {}
+        if kwargs:
+            record.update(kwargs)
+        
+        sql = 'INSERT INTO `{tablename}` ({columns}) VALUES {values_sql}'.format(
+            tablename=self.tbname, 
+            columns=self._join_columns_sql(record.keys()),
+            values_sql='(%s)' % ', '.join(['%s']*len(record))
+        )    
+        return self.db.execute_lastrowid(sql, *record.values())
+
+
     def insert(self, records=None, **kwargs):
         list_records = []
         if records:
@@ -259,8 +272,7 @@ class Table(object):
             tablename=self.tbname, 
             columns=self._join_columns_sql(list_records[0].keys()),
             values_sql=', '.join(values_sql)
-        )
-        
+        )    
         return self.db.execute_rowcount(sql, *bindings)
 
     def first(self):

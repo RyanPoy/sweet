@@ -20,6 +20,15 @@ class MySQLTableInsertTest(TestCase):
         tb.db.execute_rowcount = _
         self.assertEqual(1, tb.insert(id=3, name="Poy", age=33))
 
+    def test_insert_getid(self):
+        def _(sql, *params):
+            self.assertEqual('INSERT INTO `users` (`id`, `name`, `age`) VALUES (%s, %s, %s)', sql)
+            self.assertEqual([3, "Poy", 33], list(params))
+            return 1
+        tb = self.get_table()
+        tb.db.execute_lastrowid = _
+        self.assertEqual(1, tb.insert_getid(id=3, name="Poy", age=33))
+
     def test_insert_an_record_with_a_dict(self):
         def _(sql, *params):
             self.assertEqual('INSERT INTO `users` (`id`, `name`, `age`) VALUES (%s, %s, %s)', sql)
