@@ -195,18 +195,18 @@ class Table(object):
                     if not is_array(v) or len(v) != 2:
                         raise TypeError('Should give between 2 params, but %s' % v)
                     bt = 'NOT BETWEEN' if is_or_not == 'not' else 'BETWEEN'
-                    sqls.append('%s %s %s %%s AND %%s' % (and_or, k, bt))
+                    sqls.append('%s %s %s %s AND %s' % (and_or, k, bt, self.paramstyle_marks, self.paramstyle_marks))
                     self._bindings.extend(v)
                 else:
                     if is_array(v):
                         _in = 'NOT IN' if is_or_not == 'not' else 'IN'
-                        sqls.append('%s %s %s (%s)' % (and_or, k, _in, ', '.join(['%s']*len(v))) )
+                        sqls.append('%s %s %s (%s)' % (and_or, k, _in, ', '.join([self.paramstyle_marks]*len(v))) )
                         self._bindings.extend(v)
                     elif v is None:
                         _is = 'IS NOT NULL' if is_or_not == 'not' else 'IS NULL'
                         sqls.append('%s %s %s' % (and_or, k, _is) )
                     else:
-                        sqls.append('%s %s %s %%s' % (and_or, k, op) )
+                        sqls.append('%s %s %s %s' % (and_or, k, op, self.paramstyle_marks) )
                         self._bindings.append(v)
         
         if sqls:
@@ -231,10 +231,10 @@ class Table(object):
         if kwargs:
             record.update(kwargs)
         
-        sql = 'INSERT INTO `{tablename}` ({columns}) VALUES {values_sql}'.format(
-            tablename=self.tbname, 
+        sql = 'INSERT INTO {tablename} ({columns}) VALUES {values_sql}'.format(
+            tablename=self.__aqm(self.tbname),
             columns=self._join_columns_sql(record.keys()),
-            values_sql='(%s)' % ', '.join(['%s']*len(record))
+            values_sql='(%s)' % ', '.join([self.paramstyle_marks]*len(record))
         )    
         return self.db.execute_lastrowid(sql, *record.values())
 
@@ -260,7 +260,7 @@ class Table(object):
 
         values_sql, bindings = [], []
         for r in list_records:
-            values_sql.append('(%s)' % ', '.join(['%s']*len(r)))
+            values_sql.append('(%s)' % ', '.join([self.paramstyle_marks]*len(r)))
             bindings.extend(r.values())
         
         sql = 'INSERT INTO {tablename} ({columns}) VALUES {values_sql}'.format(
@@ -293,6 +293,7 @@ class Table(object):
 class MySQLTable(Table):
 
     qutotation_marks = '`'
+    paramstyle_marks = '%s'
 
     def list_column_sql(self, dbname, tbname):
         return '''
