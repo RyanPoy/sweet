@@ -10,6 +10,7 @@ class MySQLTest(TestCase):
     def setUp(self):
         self.db = MySQL('sweet_test')
         self.remove_record()
+        self.prepare_record()
 
     def tearDown(self):
         self.remove_record()
@@ -26,7 +27,6 @@ class MySQLTest(TestCase):
         self.assertTrue(isinstance(table, MySQLTable))
 
     def test_first(self):
-        self.prepare_record()
         r = self.db.table('users').first()
         self.assertTrue(isinstance(r, Record))
         self.assertEqual(1, r.id)
@@ -34,7 +34,6 @@ class MySQLTest(TestCase):
         self.assertEqual(25, r.age)
 
     def test_last(self):
-        self.prepare_record()
         r = self.db.table('users').last()
         self.assertTrue(isinstance(r, Record))
         self.assertEqual(2, r.id)
@@ -42,7 +41,6 @@ class MySQLTest(TestCase):
         self.assertEqual(22, r.age)
 
     def test_all(self):
-        self.prepare_record()
         coll = self.db.table('users').all()
         self.assertTrue(isinstance(coll, Collection))
         self.assertEqual(2, len(coll))
@@ -56,7 +54,6 @@ class MySQLTest(TestCase):
         self.assertEqual(22, coll[1].age)
 
     def test_where(self):
-        self.prepare_record()
         coll = self.db.table('users').where(age=22).all()
         self.assertEqual(1, len(coll))
         r = coll[0]
@@ -82,7 +79,7 @@ class MySQLTest(TestCase):
             dict(id=3, name="Poy", age=33),
             dict(id=4, name="Ryan", age=44),
         ])
-        rs = tb.all()
+        rs = tb.where(age__gt=30).all()
         self.assertEqual(2, len(rs))
 
         self.assertEqual(3, rs[0].id)
