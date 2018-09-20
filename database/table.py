@@ -139,15 +139,19 @@ class Table(object):
 
     @property
     def sql(self):
-        sql = 'SELECT {columns} FROM {tablename}'.format(
-            columns = self._join_columns_sql(self._select) if self._select else '*',
-            tablename = self.__aqm(self.tbname)
+        return 'SELECT {columns} {from_sql}'.format(
+            columns=self._join_columns_sql(self._select) if self._select else '*',
+            from_sql=self.__from_sql
         )
+
+    @property
+    def __from_sql(self):
+        sql = 'FROM {tablename}'.format(tablename=self.__aqm(self.tbname))
         join_sql = self.join_sql
         if join_sql:
             sql = '%s %s' % (sql, join_sql)
 
-        where_sql = self.where_sql
+        where_sql = self.__where_having_sql(self._wheres, self._where_bindings)
         if where_sql:
             if join_sql:
                 sql = '%s AND %s' % (sql, where_sql)
@@ -157,7 +161,7 @@ class Table(object):
         if self._group_bys:
             sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_bys))
 
-        having_sql = self.having_sql
+        having_sql = self.__where_having_sql(self._havings, self._having_bindings)
         if having_sql:
             sql = '%s HAVING %s' % (sql, having_sql)
 
@@ -177,14 +181,6 @@ class Table(object):
             on = ' = '.join([ self.__aqm(x.strip()) for x in j.on.split('=') ])
             sqls.append('%s %s ON %s' % (j.join_type, self.__aqm(j.tbname), on))
         return ' '.join(sqls)
-
-    @property
-    def where_sql(self):
-        return self.__where_having_sql(self._wheres, self._where_bindings)
-
-    @property
-    def having_sql(self):
-        return self.__where_having_sql(self._havings, self._having_bindings)
 
     def __where_having_sql(self, wheres_or_havings, where_or_having_bindings):
         sqls = []
@@ -242,7 +238,6 @@ class Table(object):
         )    
         return self.db.execute_lastrowid(sql, *record.values())
 
-
     def insert(self, records=None, **kwargs):
         list_records = []
         if records:
@@ -268,12 +263,22 @@ class Table(object):
             values_sql.append('(%s)' % ', '.join(['%s']*len(r)))
             bindings.extend(r.values())
         
-        sql = 'INSERT INTO `{tablename}` ({columns}) VALUES {values_sql}'.format(
-            tablename=self.tbname, 
+        sql = 'INSERT INTO {tablename} ({columns}) VALUES {values_sql}'.format(
+            tablename=self.__aqm(self.tbname),
             columns=self._join_columns_sql(list_records[0].keys()),
             values_sql=', '.join(values_sql)
         )    
         return self.db.execute_rowcount(sql, *bindings)
+
+    def delete(self):
+        if not self._joins: # needn't join
+            sql = "DELETE {from_sql}".format(from_sql=self.__from_sql)
+        else:
+            sql = "DELETE {tablename} {from_sql}".format(
+                tablename=self.__aqm(self.tbname),
+                from_sql=self.__from_sql
+            )
+        return self.db.execute_rowcount(sql, *self.bindings)
 
     def first(self):
         return self.db.fetchone(self.sql, *self.bindings)

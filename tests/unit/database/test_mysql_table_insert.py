@@ -7,8 +7,6 @@ class MySQLTableInsertTest(TestCase):
 
     def get_table(self):
         class FakeDB(object): pass
-            # def execute_lastrowid(self, sql, *params): pass
-            # def execute_rowcount(self, sql, *params): pass
         return MySQLTable(db=FakeDB(), tbname="users")
 
     def test_insert_an_record(self):
