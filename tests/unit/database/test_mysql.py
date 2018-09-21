@@ -132,7 +132,25 @@ class MySQLTest(TestCase):
         self.assertEqual('Ryan', rs[1].name)
         self.assertEqual(44, rs[1].age)
 
-    # def test_delete(self):
+    def test_delete(self):
+        r = self.db.table('mobiles').where(id=[1, 3]).delete()
+        c = self.db.table('mobiles').all()
+        self.assertEqual(2, r)
+        self.assertEqual(1, len(c))
+        self.assertEqual(2, c[0].id)
+
+    def test_delete_with_join(self):
+        r = self.db.table('mobiles').join('users', on="users.id=mobiles.user_id").where(users__id=1).delete()
+        c = self.db.table('mobiles').all()
+        self.assertEqual(2, r)
+        self.assertEqual(1, len(c))
+        self.assertEqual(3, c[0].id)
+
+    def test_truncate(self):
+        r = self.db.table('mobiles').truncate()
+        c = self.db.table('mobiles').all()
+        self.assertEqual(0, len(c))
+
 
 
 if __name__ == '__main__':

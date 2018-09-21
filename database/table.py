@@ -148,7 +148,7 @@ class Table(object):
     @property
     def __from_sql(self):
         sql = 'FROM {tablename}'.format(tablename=self.__aqm(self.tbname))
-        join_sql = self.join_sql
+        join_sql = self.__join_sql
         if join_sql:
             sql = '%s %s' % (sql, join_sql)
 
@@ -173,7 +173,7 @@ class Table(object):
         return sql
 
     @property
-    def join_sql(self):
+    def __join_sql(self):
         sqls = []
         for j in self._joins:
             on = ' = '.join([ self.__aqm(x.strip()) for x in j.on.split('=') ])
