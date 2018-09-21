@@ -3,6 +3,7 @@ from sweet.utils import *
 import functools
 import copy
 
+
 def cp(method):
     @functools.wraps(method)
     def _(self, *args, **kwargs):
