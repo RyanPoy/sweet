@@ -9,6 +9,15 @@ class MySQLTableQueryTest(TestCase):
     def table(self):
         return MySQLTable(db=None, tbname="users")
 
+    def test_copy_deep(self):
+        tb = self.table
+        self.assertEqual('SELECT `id`, `name` FROM `users`', tb.select('id').select('name').sql)
+        self.assertEqual([], tb.bindings)
+
+        tb = tb.select('*').where(id=1, name='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` = %s AND `name` = %s', tb.sql)
+        self.assertEqual([1, 'ryanpoy'], tb.bindings)
+
     def test_basic_select(self):
         tb = self.table.select('*')
         self.assertEqual('SELECT * FROM `users`', tb.sql)
