@@ -76,8 +76,10 @@ class MySQL(object):
                 for p in params:
                     if is_str(p):
                         p = "'%s'" % p
+                    else:
+                        p = str(p)
                     param_buff.append(p)
-                print ((time.time() - btime), '\t|', sql, '\t|', *param_buff)
+                print ((time.time() - btime), '\t|', sql, '\t|', ', '.join(param_buff))
         return self
 
 #     def get_table_by(self, name):
