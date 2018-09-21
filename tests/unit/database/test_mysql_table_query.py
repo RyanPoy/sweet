@@ -313,25 +313,26 @@ class MySQLTableQueryTest(TestCase):
 
     def test_join(self):
         tb = self.get_table()
-        tb.select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_(name="ryanpoy").join('cars', on="users.id=cars.user_id")
-        self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` AND `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
+        tb.select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_(name="ryanpoy")\
+          .join('cars', on="users.id=cars.user_id").where(cars__name='focus')
+        self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s AND `cars`.`name` = %s', tb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy', 'focus'], tb.bindings)
 
     def test_left_join(self):
         tb = self.get_table()
         tb.select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_(name="ryanpoy").left_join('cars', on="users.id=cars.user_id")
-        self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` AND `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
+        self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
 
     def test_right_join(self):
         tb = self.get_table()
         tb.select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_(name="ryanpoy").right_join('cars', on="users.id=cars.user_id")
-        self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` RIGHT JOIN `cars` ON `users`.`id` = `cars`.`user_id` AND `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
+        self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` RIGHT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
 
 
 if __name__ == '__main__':
     import unittest
-    unitest.testmain()
+    unittest.main()
 
     

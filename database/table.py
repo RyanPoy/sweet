@@ -25,6 +25,7 @@ class WhereExpr(object):
             self.column = s[:-len(vs[-1])-2]
         else:
             self.is_or_not, self.column, self.operator = '', s, '='
+        self.column = self.column.replace('__', '.')
 
 
 
@@ -153,10 +154,7 @@ class Table(object):
 
         where_sql = self.__where_having_sql(self._wheres, self._where_bindings)
         if where_sql:
-            if join_sql:
-                sql = '%s AND %s' % (sql, where_sql)
-            else:
-                sql = '%s WHERE %s' % (sql, where_sql)
+            sql = '%s WHERE %s' % (sql, where_sql)
 
         if self._group_bys:
             sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_bys))

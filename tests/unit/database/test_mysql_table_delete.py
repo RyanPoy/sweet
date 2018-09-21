@@ -22,7 +22,7 @@ class MySQLTableDeleteTest(TestCase):
 
     def test_delete_with_join(self):
         def _(sql, *params):
-            self.assertEqual('DELETE `users` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` AND `id` IN (%s, %s, %s) OR `name` = %s', sql)
+            self.assertEqual('DELETE `users` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', sql)
             self.assertEqual([1, 2, 3, 'ryanpoy'], list(params))
             return 3
         tb = self.get_table()
@@ -42,7 +42,8 @@ class MySQLTableDeleteTest(TestCase):
         r = tb.where(id=[1, 2, 3]).truncate()
         self.assertEqual(10, r)
 
+
 if __name__ == '__main__':
     import unittest
-    unitest.testmain()
+    unittest.main()
 

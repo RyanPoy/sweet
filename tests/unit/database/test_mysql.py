@@ -16,10 +16,15 @@ class MySQLTest(TestCase):
         self.remove_record()
 
     def prepare_record(self):
-        self.db.execute("insert into users (id, name, age) values (1, 'jack', 25) ")
+        self.db.raw("insert into users (id, name, age) values (1, 'jack', 25) ")
         self.db.execute("insert into users (id, name, age) values (2, 'lucy', 22) ")
 
+        self.db.raw("insert into mobiles (id, name, user_id) values (1, 'iphone', 1) ")
+        self.db.raw("insert into mobiles (id, name, user_id) values (2, 'xiaomi', 1) ")
+        self.db.raw("insert into mobiles (id, name, user_id) values (3, 'iphone', 2) ")
+
     def remove_record(self):
+        self.db.execute("delete from mobiles")
         self.db.execute("delete from users")
 
     def test_table(self):
@@ -53,6 +58,12 @@ class MySQLTest(TestCase):
         self.assertEqual('lucy', coll[1].name)
         self.assertEqual(22, coll[1].age)
 
+    def test_select(self):
+        coll = self.db.table('users').select('name').where(age=22).all()
+        self.assertEqual(1, len(coll))
+        r = coll[0]
+        self.assertEqual('lucy', r.name)
+
     def test_where(self):
         coll = self.db.table('users').where(age=22).all()
         self.assertEqual(1, len(coll))
@@ -60,6 +71,12 @@ class MySQLTest(TestCase):
         self.assertEqual(2, r.id)
         self.assertEqual('lucy', r.name)
         self.assertEqual(22, r.age)
+
+    def test_join(self):
+        coll = self.db.table('users').select('users.*').join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
+        self.assertEqual(2, len(coll))
+        self.assertEqual(1, coll[0].id)
+        self.assertEqual(2, coll[1].id)
 
     def test_insert_getid(self):
         tb = self.db.table('users')
@@ -115,8 +132,9 @@ class MySQLTest(TestCase):
         self.assertEqual('Ryan', rs[1].name)
         self.assertEqual(44, rs[1].age)
 
+    # def test_delete(self):
 
 
 if __name__ == '__main__':
     import unittest
-    unitest.testmain()
+    unittest.main()

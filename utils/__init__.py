@@ -108,6 +108,7 @@ def str2date(s):
 # check the object type functions
 is_num      = lambda obj: isinstance(obj, (int, float, Decimal))
 is_blank_str = lambda obj: obj.strip() == ''
+is_bytes      = lambda obj: isinstance(obj, bytes)
 is_str      = lambda obj: isinstance(obj, str)
 is_decimal  = lambda obj: isinstance(obj, Decimal)
 
