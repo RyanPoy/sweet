@@ -1,7 +1,5 @@
 #coding: utf8
-from sweet.utils import is_str, is_datetime, is_date, \
-                        flatten, str2date, str2datetime, \
-                        mydict, Collection
+from sweet.utils import *
 from contextlib import contextmanager
 from sweet.database.table import MySQLTable
 import MySQLdb
@@ -28,7 +26,7 @@ class MySQL(object):
         return self.fetchall(sql, *params).first()
 
     def fetchlastone(self, sql, *params):
-        """Returns the first row returned for the given query."""
+        """Returns the last row returned for the given query."""
         return self.fetchall(sql, *params).last()
     
     def fetchall(self, sql, *params):
@@ -66,18 +64,20 @@ class MySQL(object):
             return self
         finally:
             cursor.close()
+    raw = execute
 
     def _execute(self, cursor, sql, *params):
         try:
             btime = time.time()
-            if self.show_sql:
-                raw_sql = self.__show_sql(sql, params)
-            sql = sql.replace('?', '%s')    # @TODO: should fix a bug if query like this: 
-                                            # select users.* from users where users.name like "?abc"
             cursor.execute(sql, params)
         finally:
             if self.show_sql:
-                print (time.time() - btime), '\t|', raw_sql
+                param_buff = []
+                for p in params:
+                    if is_str(p):
+                        p = "'%s'" % p
+                    param_buff.append(p)
+                print ((time.time() - btime), '\t|', sql, '\t|', *param_buff)
         return self
 
 #     def get_table_by(self, name):
@@ -108,6 +108,8 @@ class MySQL(object):
         self.set_autocommit(True)
     
     def _cursor(self):
+        # from MySQLdb.cursors import DictCursor
+        # return self._conn.cursor(DictCursor)
         return self._conn.cursor()
 
     def close(self):
@@ -119,28 +121,6 @@ class MySQL(object):
     
     def __del__(self):
         self.close()
-
-    def __show_sql(self, sql, params):
-        if isinstance(sql, unicode):
-            sql = sql.encode('utf8')
-        if not params:
-            return sql
-        else:
-            formated_params = []
-            for param in params:
-                if isinstance(param, unicode):
-                    param = param.encode('utf8')
-                if is_str(param):
-                    param = "'%s'" % MySQLdb.escape_string(param)
-                elif is_datetime(param):
-                    param = "'%s'" % str2datetime(param)
-                elif is_date(param):
-                    param = "'%s'" % str2date(param)
-                else:
-                    param = str(param)
-                formated_params.append(param)
-            formated_params.append(';')
-            return ''.join(flatten(izip(sql.split('?'), formated_params)))
 
     def commit(self):
         self._conn.commit()
