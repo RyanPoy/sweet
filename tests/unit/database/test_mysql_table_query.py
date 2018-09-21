@@ -38,10 +38,30 @@ class MySQLTableQueryTest(TestCase):
         self.assertEqual('SELECT * FROM `users` WHERE `id` = %s AND `name` = %s', tb.sql)
         self.assertEqual([1, 'ryanpoy'], tb.bindings)
 
+    def test_where_not(self):
+        tb = self.table.select('*').where(id__not=1, name__not='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` != %s AND `name` != %s', tb.sql)
+        self.assertEqual([1, 'ryanpoy'], tb.bindings)
+
     def test_where_in(self):
         tb = self.table.select('*').where(id=[1, 2, 3], name='ryanpoy')
         self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` = %s', tb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
+
+    def test_where_not_in(self):
+        tb = self.table.select('*').where(id__not=[1, 2, 3], name__not='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` NOT IN (%s, %s, %s) AND `name` != %s', tb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
+
+    def test_where_like(self):
+        tb = self.table.select('*').where(id=[1, 2, 3], name__like='%yanpo%')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` like %s', tb.sql)
+        self.assertEqual([1, 2, 3, '%yanpo%'], tb.bindings)
+
+    def test_where_not_like(self):
+        tb = self.table.select('*').where(id=[1, 2, 3], name__not_like='%yanpo%')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` not like %s', tb.sql)
+        self.assertEqual([1, 2, 3, '%yanpo%'], tb.bindings)
 
     def test_where_in_empty(self):
         tb = self.table.select('*').where(id=[], name='ryanpoy')
@@ -56,6 +76,11 @@ class MySQLTableQueryTest(TestCase):
     def test_where_null(self):
         tb = self.table.select('*').where(id=[1, 2, 3], name=None)
         self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` IS NULL', tb.sql)
+        self.assertEqual([1, 2, 3], tb.bindings)
+
+    def test_where_not_null(self):
+        tb = self.table.select('*').where(id=[1, 2, 3]).where(name__not=None)
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` IS NOT NULL', tb.sql)
         self.assertEqual([1, 2, 3], tb.bindings)
 
     def test_where_gt(self):
@@ -83,34 +108,24 @@ class MySQLTableQueryTest(TestCase):
         self.assertEqual('SELECT * FROM `users` WHERE `id` BETWEEN %s AND %s', tb.sql)
         self.assertEqual([1, 2], tb.bindings)
 
-    def test_where_between_should_give_me_error(self):
-        tb = self.table.select('*').where(id__bt=[1, 2, 3])
-        with self.assertRaises(TypeError):
-            tb.sql
-
-    def test_where_not(self):
-        tb = self.table.select('*').where(id__not=1, name__not='ryanpoy')
-        self.assertEqual('SELECT * FROM `users` WHERE `id` != %s AND `name` != %s', tb.sql)
-        self.assertEqual([1, 'ryanpoy'], tb.bindings)
-
-    def test_where_not_null(self):
-        tb = self.table.select('*').where(id=[1, 2, 3]).where(name__not=None)
-        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` IS NOT NULL', tb.sql)
-        self.assertEqual([1, 2, 3], tb.bindings)
-
-    def test_where_not_in(self):
-        tb = self.table.select('*').where(id__not=[1, 2, 3], name__not='ryanpoy')
-        self.assertEqual('SELECT * FROM `users` WHERE `id` NOT IN (%s, %s, %s) AND `name` != %s', tb.sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
-
     def test_where_not_between(self):
         tb = self.table.select('*').where(id__not_bt=[1, 2])
         self.assertEqual('SELECT * FROM `users` WHERE `id` NOT BETWEEN %s AND %s', tb.sql)
         self.assertEqual([1, 2], tb.bindings)
 
+    def test_where_between_should_give_me_error(self):
+        tb = self.table.select('*').where(id__bt=[1, 2, 3])
+        with self.assertRaises(TypeError):
+            tb.sql
+
     def test_or(self):
         tb = self.table.select('*').or_(id=1, name='ryanpoy')
         self.assertEqual('SELECT * FROM `users` WHERE `id` = %s OR `name` = %s', tb.sql)
+        self.assertEqual([1, 'ryanpoy'], tb.bindings)
+
+    def test_or_not(self):
+        tb = self.table.select('*').or_(id__not=1, name__not='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` != %s OR `name` != %s', tb.sql)
         self.assertEqual([1, 'ryanpoy'], tb.bindings)
 
     def test_or_between(self):
@@ -118,36 +133,31 @@ class MySQLTableQueryTest(TestCase):
         self.assertEqual('SELECT * FROM `users` WHERE `name` = %s OR `id` BETWEEN %s AND %s', tb.sql)
         self.assertEqual(['ryanpoy', 1, 2], tb.bindings)
 
-    def test_or_in(self):
-        tb = self.table.select('*').or_(id=[1, 2, 3], name='ryanpoy')
-        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
-
-    def test_or_null(self):
-        tb = self.table.select('*').or_(id=[1, 2, 3], name=None)
-        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` IS NULL', tb.sql)
-        self.assertEqual([1, 2, 3], tb.bindings)
-
     def test_or_not_between(self):
         tb = self.table.select('*').where(name='ryanpoy').or_(id__not_bt=[1, 2])
         self.assertEqual('SELECT * FROM `users` WHERE `name` = %s OR `id` NOT BETWEEN %s AND %s', tb.sql)
         self.assertEqual(['ryanpoy', 1, 2], tb.bindings)
 
-    def test_or_not(self):
-        tb = self.table.select('*').or_(id__not=1, name__not='ryanpoy')
-        self.assertEqual('SELECT * FROM `users` WHERE `id` != %s OR `name` != %s', tb.sql)
-        self.assertEqual([1, 'ryanpoy'], tb.bindings)
-
-    def test_or_not_null(self):
-        tb = self.table.select('*').or_(id=[1, 2, 3]).or_(name__not=None)
-        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` IS NOT NULL', tb.sql)
-        self.assertEqual([1, 2, 3], tb.bindings)
+    def test_or_in(self):
+        tb = self.table.select('*').or_(id=[1, 2, 3], name='ryanpoy')
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
 
     def test_or_not_in(self):
         tb = self.table.select('*').or_(id__not=[1, 2, 3], name__not='ryanpoy')
         self.assertEqual('SELECT * FROM `users` WHERE `id` NOT IN (%s, %s, %s) OR `name` != %s', tb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
-        
+    
+    def test_or_null(self):
+        tb = self.table.select('*').or_(id=[1, 2, 3], name=None)
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` IS NULL', tb.sql)
+        self.assertEqual([1, 2, 3], tb.bindings)
+
+    def test_or_not_null(self):
+        tb = self.table.select('*').or_(id=[1, 2, 3]).or_(name__not=None)
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` IS NOT NULL', tb.sql)
+        self.assertEqual([1, 2, 3], tb.bindings)
+    
     def test_order_by(self):
         tb = self.table.select('*').order_by('email').order_by('age', 'desc')
         self.assertEqual('SELECT * FROM `users` ORDER BY `email`, `age` DESC', tb.sql)

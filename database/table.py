@@ -15,6 +15,8 @@ def cp(method):
 class WhereExpr(object):
 
     ops = {
+        'like': ('', 'like'),
+        'not_like': ('', 'not like'),
         'gt': ('', '>'), 
         'not_gt': ('not', '>'), 
         'gte': ('', '>='), 
