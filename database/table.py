@@ -1,5 +1,14 @@
 #coding: utf8
 from sweet.utils import *
+import functools
+import copy
+
+def cp(method):
+    @functools.wraps(method)
+    def _(self, *args, **kwargs):
+        tb = copy.deepcopy(self)
+        return method(tb, *args, **kwargs)
+    return _
 
 
 class WhereExpr(object):
@@ -49,9 +58,21 @@ class Table(object):
         self._limit = None
         self._offset = None
 
+    def __deepcopy__(self, memo):
+        """ Deep copy """
+        obj = self.__class__(self.db, self.tbname)
+        for k, v in self.__dict__.items():
+            if k == 'db' or k == 'tbname': # conn can not deep copy
+                obj.__dict__[k] = v
+            else:
+                obj.__dict__[k] = copy.deepcopy(v, memo)
+        return obj
+
+    @cp
     def distinct(self):
         self._distinct = True
 
+    @cp
     def select(self, *columns):
         columns = columns or '*'
         for c in columns:
@@ -62,15 +83,19 @@ class Table(object):
     def bindings(self):
         return self._bindings
 
+    @cp
     def where(self, **kwargs):
         return self.__where_or_having_or(self._wheres, self._where_bindings, 'AND', **kwargs)
 
+    @cp
     def or_(self, **kwargs):
         return self.__where_or_having_or(self._wheres, self._where_bindings, 'OR', **kwargs)
 
+    @cp
     def having(self, **kwargs):
         return self.__where_or_having_or(self._havings, self._having_bindings, 'AND', **kwargs)
 
+    @cp
     def or_having(self, **kwargs):
         return self.__where_or_having_or(self._havings, self._having_bindings, 'OR', **kwargs)
 
@@ -87,11 +112,13 @@ class Table(object):
 
         return self
 
+    @cp
     def group_by(self, *columns):
         for c in columns:
             self._group_bys.append(self.__aqm(c))
         return self
 
+    @cp
     def order_by(self, column, desc=False):
         c = self.__aqm(column)
         if not desc:
@@ -100,25 +127,30 @@ class Table(object):
             self._order_bys.append('%s DESC' % c)
         return self
 
+    @cp
     def limit(self, limit):
         self._limit = limit
         return self
 
+    @cp
     def offset(self, offset):
         self._offset = offset
         return self
 
+    @cp
     def page(self, page_num, page_size):
         page_num = 1 if page_num < 0 else page_num
-        self.limit((page_num-1) * page_size).offset(page_size)
-        return self
+        return self.limit((page_num-1) * page_size).offset(page_size)
 
+    @cp
     def join(self, tbname, on):
         return self.__join('INNER JOIN', tbname, on)
 
+    @cp
     def left_join(self, tbname, on):
         return self.__join('LEFT JOIN', tbname, on)
 
+    @cp
     def right_join(self, tbname, on):
         return self.__join('RIGHT JOIN', tbname, on)
 

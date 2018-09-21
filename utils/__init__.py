@@ -208,7 +208,7 @@ class mydict(dict):
     def __getattr__(self, k):
         if k in self:
             return self[k]
-        return super(__getattr__, k)
+        return super().__getattr__(k)
 
 
 class Collection(BaseCollection):

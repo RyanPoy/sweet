@@ -133,8 +133,9 @@ class MySQLTest(TestCase):
         self.assertEqual(44, rs[1].age)
 
     def test_delete(self):
-        r = self.db.table('mobiles').where(id=[1, 3]).delete()
-        c = self.db.table('mobiles').all()
+        tb = self.db.table('mobiles')
+        r = tb.where(id=[1, 3]).delete()
+        c = tb.where(id=[1, 2, 3]).all()
         self.assertEqual(2, r)
         self.assertEqual(1, len(c))
         self.assertEqual(2, c[0].id)
