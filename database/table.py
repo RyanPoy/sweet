@@ -325,6 +325,14 @@ class Table(object):
     def all(self):
         return self.db.fetchall(self.sql, *self.bindings)
 
+    def count(self, column=None):
+        sql = 'SELECT COUNT({column_name}) {from_sql}'.format(
+            column_name=self.__aqm(column) if column else '*',
+            from_sql=self.__from_sql
+        )
+        vs = self.db.fetchone(sql, *self.bindings)
+        return list(vs.values())[0]
+
 
 class MySQLTable(Table):
 
