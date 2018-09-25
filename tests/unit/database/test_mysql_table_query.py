@@ -416,10 +416,8 @@ class MySQLTableQueryTest(TestCase):
         self.assertEqual(2048, sum_value)
 
     def test_exists_distinct(self):
-        def _(sql, *params):
-            return {'id': 1, 'name': 'Poy', 'age': 25}
         tb = self.get_table()
-        tb.db.fetchone = _
+        tb.first = lambda: {'id': 1, 'name': 'Poy', 'age': 25}
         exists = tb.where(name__not='Lily').exists()
         self.assertEqual(True, exists)
     
