@@ -422,6 +422,39 @@ class MySQLTableQueryTest(TestCase):
         exists = tb.where(name__not='Lily').exists()
         self.assertEqual(True, exists)
     
+    def test_shared_lock(self):
+        tb = self.get_table().select('users.id').select('cars.name')\
+                 .where(id=[1,2,3]).or_(name="ryanpoy")\
+                 .left_join('cars', on="users.id=cars.user_id").shared_lock()
+        self.assertEqual('SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s LOCK IN SHARE MODE', tb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
+
+    def test_lock_for_update(self):
+        tb = self.get_table().select('users.id').select('cars.name')\
+                 .where(id=[1,2,3]).or_(name="ryanpoy")\
+                 .left_join('cars', on="users.id=cars.user_id").lock_for_update()
+        self.assertEqual('SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s FOR UPDATE', tb.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
+
+    # def test_mysql_lock(self):
+    #     builder = self.get_mysql_builder()
+    #     marker = builder.get_grammar().get_marker()
+    #     builder.select('*').from_('foo').where('bar', '=', 'baz').lock()
+    #     self.assertEqual(
+    #         'SELECT * FROM `foo` WHERE `bar` = %s FOR UPDATE' % marker,
+    #         builder.to_sql()
+    #     )
+    #     self.assertEqual(['baz'], builder.get_bindings())
+
+    #     builder = self.get_mysql_builder()
+    #     marker = builder.get_grammar().get_marker()
+    #     builder.select('*').from_('foo').where('bar', '=', 'baz').lock(False)
+    #     self.assertEqual(
+    #         'SELECT * FROM `foo` WHERE `bar` = %s LOCK IN SHARE MODE' % marker,
+    #         builder.to_sql()
+    #     )
+    #     self.assertEqual(['baz'], builder.get_bindings())
+
 
 if __name__ == '__main__':
     import unittest

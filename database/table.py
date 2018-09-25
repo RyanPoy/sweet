@@ -1,4 +1,5 @@
 #coding: utf8
+from collections import namedtuple
 from sweet.utils import *
 import functools
 import copy
@@ -43,6 +44,8 @@ class WhereExpr(object):
 
 class Table(object):
 
+    LOCK = namedtuple("Lock", ['NILL', 'READ', 'WRITE'])._make([0, 1, 2])
+
     def __init__(self, db, tbname):
         self.db = db
         self.tbname = tbname
@@ -60,6 +63,7 @@ class Table(object):
         self._joins = []
         self._limit = None
         self._offset = None
+        self._lock = self.LOCK.NILL
 
     def __deepcopy__(self, memo):
         """ Deep copy """
@@ -157,6 +161,16 @@ class Table(object):
     def right_join(self, tbname, on):
         return self.__join('RIGHT JOIN', tbname, on)
 
+    @cp
+    def shared_lock(self):
+        self._lock = self.LOCK.READ
+        return self
+
+    @cp
+    def lock_for_update(self):
+        self._lock = self.LOCK.WRITE
+        return self
+
     def __join(self, join_type, tbname, on):
         self._joins.append(mydict(
             join_type = join_type,
@@ -175,10 +189,19 @@ class Table(object):
 
     @property
     def sql(self):
-        return 'SELECT {columns} {from_sql}'.format(
+        return 'SELECT {columns} {from_sql}{lock_sql}'.format(
             columns=self._join_columns_sql(self._select) if self._select else '*',
-            from_sql=self.__from_sql()
+            from_sql=self.__from_sql(),
+            lock_sql=self.__lock_sql()
         )
+
+    def __lock_sql(self):
+        lock = ''
+        if self._lock == self.LOCK.READ:
+            lock = ' LOCK IN SHARE MODE'
+        elif self._lock == self.LOCK.WRITE:
+            lock = ' FOR UPDATE'
+        return lock
 
     def __from_sql(self, for_query=True):
         sql = 'FROM {tablename}'.format(tablename=self.__aqm(self.tbname)) if for_query else ''
