@@ -1,6 +1,7 @@
 #coding: utf8
 from sweet.tests.unit import TestCase
 from sweet.database.table import MySQLTable
+from sweet.database.db import Record
 
 
 class MySQLTableQueryTest(TestCase):
@@ -297,9 +298,9 @@ class MySQLTableQueryTest(TestCase):
 
     def test_count(self):
         def _(sql, *params):
-            self.assertEqual('SELECT COUNT(*) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual('SELECT COUNT(*) AS aggregate FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return {'count(id)': 2}
+            return Record({'aggregate': 2})
         tb = self.get_table()
         tb.db.fetchone = _
         cnt = tb.where(name__not='Lily').count()
@@ -307,9 +308,9 @@ class MySQLTableQueryTest(TestCase):
 
     def test_count_with_column(self):
         def _(sql, *params):
-            self.assertEqual('SELECT COUNT(`id`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual('SELECT COUNT(`id`) AS aggregate FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return {'count(id)': 2}
+            return Record({'aggregate': 2})
         tb = self.get_table()
         tb.db.fetchone = _
         cnt = tb.where(name__not='Lily').count('id')
@@ -317,9 +318,9 @@ class MySQLTableQueryTest(TestCase):
 
     def test_count_distinct(self):
         def _(sql, *params):
-            self.assertEqual('SELECT COUNT(*) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual('SELECT COUNT(*) AS aggregate FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return {'count(id)': 2}
+            return Record({'aggregate': 2})
         tb = self.get_table()
         tb.db.fetchone = _
         cnt = tb.where(name__not='Lily').count(distinct=True)
@@ -327,9 +328,9 @@ class MySQLTableQueryTest(TestCase):
 
     def test_count_distinct_with_column(self):
         def _(sql, *params):
-            self.assertEqual('SELECT COUNT(DISTINCT `id`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual('SELECT COUNT(DISTINCT `id`) AS aggregate FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return {'count(id)': 2}
+            return Record({'aggregate': 2})
         tb = self.get_table()
         tb.db.fetchone = _
         cnt = tb.where(name__not='Lily').count('id', True)
@@ -337,9 +338,9 @@ class MySQLTableQueryTest(TestCase):
 
     def test_max(self):
         def _(sql, *params):
-            self.assertEqual('SELECT COUNT(`id`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual('SELECT MAX(`id`) AS aggregate FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return {'max(id)': 1024}
+            return Record({'aggregate': 1024})
         tb = self.get_table()
         tb.db.fetchone = _
         max_value = tb.where(name__not='Lily').max('id')
@@ -347,9 +348,9 @@ class MySQLTableQueryTest(TestCase):
 
     def test_max_distinct(self):
         def _(sql, *params):
-            self.assertEqual('SELECT COUNT(DISTINCT `id`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual('SELECT MAX(DISTINCT `id`) AS aggregate FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return {'max(id)': 1024}
+            return Record({'aggregate': 1024})
         tb = self.get_table()
         tb.db.fetchone = _
         max_value = tb.where(name__not='Lily').max('id', True)
@@ -357,9 +358,9 @@ class MySQLTableQueryTest(TestCase):
 
     def test_min(self):
         def _(sql, *params):
-            self.assertEqual('SELECT MIN(`id`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual('SELECT MIN(`id`) AS aggregate FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return {'min(id)': 1}
+            return Record({'aggregate': 1})
         tb = self.get_table()
         tb.db.fetchone = _
         min_value = tb.where(name__not='Lily').min('id')
@@ -367,9 +368,9 @@ class MySQLTableQueryTest(TestCase):
 
     def test_min_distinct(self):
         def _(sql, *params):
-            self.assertEqual('SELECT MIN(DISTINCT `id`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual('SELECT MIN(DISTINCT `id`) AS aggregate FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return {'min(id)': 1}
+            return Record({'aggregate': 1})
         tb = self.get_table()
         tb.db.fetchone = _
         min_value = tb.where(name__not='Lily').min('id', True)
@@ -377,9 +378,9 @@ class MySQLTableQueryTest(TestCase):
 
     def test_avg(self):
         def _(sql, *params):
-            self.assertEqual('SELECT AVERAGE(`age`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual('SELECT AVERAGE(`age`) AS aggregate FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return {'average(id)': 32}
+            return Record({'aggregate': 32})
         tb = self.get_table()
         tb.db.fetchone = _
         avg = tb.where(name__not='Lily').avg('age')
@@ -387,9 +388,9 @@ class MySQLTableQueryTest(TestCase):
 
     def test_avg_distinct(self):
         def _(sql, *params):
-            self.assertEqual('SELECT AVERAGE(DISTINCT `age`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual('SELECT AVERAGE(DISTINCT `age`) AS aggregate FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return {'average(id)': 32}
+            return Record({'aggregate': 32})
         tb = self.get_table()
         tb.db.fetchone = _
         avg = tb.where(name__not='Lily').avg('age', True)
@@ -397,9 +398,9 @@ class MySQLTableQueryTest(TestCase):
 
     def test_sum(self):
         def _(sql, *params):
-            self.assertEqual('SELECT SUM(`age`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual('SELECT SUM(`age`) AS aggregate FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return {'sum(id)': 2048}
+            return Record({'aggregate': 2048})
         tb = self.get_table()
         tb.db.fetchone = _
         sum_value = tb.where(name__not='Lily').sum('age')
@@ -407,9 +408,9 @@ class MySQLTableQueryTest(TestCase):
 
     def test_sum_distinct(self):
         def _(sql, *params):
-            self.assertEqual('SELECT SUM(DISTINCT `age`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual('SELECT SUM(DISTINCT `age`) AS aggregate FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return {'sum(id)': 2048}
+            return Record({'aggregate': 2048})
         tb = self.get_table()
         tb.db.fetchone = _
         sum_value = tb.where(name__not='Lily').sum('age', True)
