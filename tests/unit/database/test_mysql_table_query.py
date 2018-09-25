@@ -488,50 +488,7 @@ class MySQLTableQueryTest(TestCase):
               ' AND EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)'
         self.assertEqual(sql, users.sql)
         self.assertEqual([20, 'iphone', 'iphone', 'aphone', 'aphone'], users.bindings)
-        # def test_where_exists(self):
-    #     builder = self.get_builder()
-    #     builder.select('*').from_('orders').where_exists(
-    #         self.get_builder().select('*').from_('products').where('products.id', '=', QueryExpression('"orders"."id"'))
-    #     )
-    #     self.assertEqual(
-    #         'SELECT * FROM "orders" '
-    #         'WHERE EXISTS (SELECT * FROM "products" WHERE "products"."id" = "orders"."id")',
-    #         builder.to_sql()
-    #     )
-    #     self.assertEqual([], builder.get_bindings())
 
-    #     builder = self.get_builder()
-    #     builder.select('*').from_('orders').where_not_exists(
-    #         self.get_builder().select('*').from_('products').where('products.id', '=', QueryExpression('"orders"."id"'))
-    #     )
-    #     self.assertEqual(
-    #         'SELECT * FROM "orders" '
-    #         'WHERE NOT EXISTS (SELECT * FROM "products" WHERE "products"."id" = "orders"."id")',
-    #         builder.to_sql()
-    #     )
-    #     self.assertEqual([], builder.get_bindings())
-
-    #     builder = self.get_builder()
-    #     builder.select('*').from_('orders').where('id', '=', 1).or_where_exists(
-    #         self.get_builder().select('*').from_('products').where('products.id', '=', QueryExpression('"orders"."id"'))
-    #     )
-    #     self.assertEqual(
-    #         'SELECT * FROM "orders" WHERE "id" = ? '
-    #         'OR EXISTS (SELECT * FROM "products" WHERE "products"."id" = "orders"."id")',
-    #         builder.to_sql()
-    #     )
-    #     self.assertEqual([1], builder.get_bindings())
-
-    #     builder = self.get_builder()
-    #     builder.select('*').from_('orders').where('id', '=', 1).or_where_not_exists(
-    #         self.get_builder().select('*').from_('products').where('products.id', '=', QueryExpression('"orders"."id"'))
-    #     )
-    #     self.assertEqual(
-    #         'SELECT * FROM "orders" WHERE "id" = ? '
-    #         'OR NOT EXISTS (SELECT * FROM "products" WHERE "products"."id" = "orders"."id")',
-    #         builder.to_sql()
-    #     )
-    #     self.assertEqual([1], builder.get_bindings())
 
 if __name__ == '__main__':
     import unittest
