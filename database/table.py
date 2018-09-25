@@ -177,12 +177,11 @@ class Table(object):
     def sql(self):
         return 'SELECT {columns} {from_sql}'.format(
             columns=self._join_columns_sql(self._select) if self._select else '*',
-            from_sql=self.__from_sql
+            from_sql=self.__from_sql()
         )
 
-    @property
-    def __from_sql(self):
-        sql = 'FROM {tablename}'.format(tablename=self.__aqm(self.tbname))
+    def __from_sql(self, for_query=True):
+        sql = 'FROM {tablename}'.format(tablename=self.__aqm(self.tbname)) if for_query else ''
         join_sql = self.__join_sql
         if join_sql:
             sql = '%s %s' % (sql, join_sql)
@@ -303,13 +302,27 @@ class Table(object):
         )    
         return self.db.execute_rowcount(sql, *bindings)
 
+    def update(self, **kwargs):
+        columns, new_bindings = [], []
+        for k, v in kwargs.items():
+            columns.append('%s = %%s' % self.__aqm(k))
+            new_bindings.append(v)
+
+        sql = 'UPDATE {tbname} SET {columns}{from_sql}'.format(
+            tbname=self.__aqm(self.tbname),
+            columns=', '.join(columns),
+            from_sql=self.__from_sql(False)
+        )
+        new_bindings.extend(self.bindings)
+        return self.db.execute_rowcount(sql, *new_bindings)
+
     def delete(self):
         if not self._joins: # needn't join
-            sql = "DELETE {from_sql}".format(from_sql=self.__from_sql)
+            sql = "DELETE {from_sql}".format(from_sql=self.__from_sql())
         else:
             sql = "DELETE {tablename} {from_sql}".format(
                 tablename=self.__aqm(self.tbname),
-                from_sql=self.__from_sql
+                from_sql=self.__from_sql()
             )
         return self.db.execute_rowcount(sql, *self.bindings)
 
@@ -355,7 +368,7 @@ class Table(object):
         sql = 'SELECT {func_name}({column_name}) AS aggregate {from_sql}'.format(
             func_name=func_name,
             column_name=column_name if not distinct else 'DISTINCT %s' % column_name,
-            from_sql=self.__from_sql
+            from_sql=self.__from_sql()
         )
         vs = self.db.fetchone(sql, *self.bindings)
         return vs.aggregate
