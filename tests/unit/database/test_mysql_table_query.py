@@ -295,7 +295,7 @@ class MySQLTableQueryTest(TestCase):
         self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` RIGHT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
 
-    def test_count_with_column(self):
+    def test_count(self):
         def _(sql, *params):
             self.assertEqual('SELECT COUNT(*) FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
@@ -305,7 +305,7 @@ class MySQLTableQueryTest(TestCase):
         cnt = tb.where(name__not='Lily').count()
         self.assertEqual(2, cnt)
 
-    def test_count_id_with_column(self):
+    def test_count_with_column(self):
         def _(sql, *params):
             self.assertEqual('SELECT COUNT(`id`) FROM `users` WHERE `name` != %s', sql)
             self.assertEqual(['Lily'], list(params))
@@ -315,6 +315,25 @@ class MySQLTableQueryTest(TestCase):
         cnt = tb.where(name__not='Lily').count('id')
         self.assertEqual(2, cnt)
 
+    def test_count_distinct(self):
+        def _(sql, *params):
+            self.assertEqual('SELECT COUNT(*) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual(['Lily'], list(params))
+            return {'count(id)': 2}
+        tb = self.get_table()
+        tb.db.fetchone = _
+        cnt = tb.where(name__not='Lily').count(distinct=True)
+        self.assertEqual(2, cnt)
+
+    def test_count_distinct_with_column(self):
+        def _(sql, *params):
+            self.assertEqual('SELECT COUNT(DISTINCT `id`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual(['Lily'], list(params))
+            return {'count(id)': 2}
+        tb = self.get_table()
+        tb.db.fetchone = _
+        cnt = tb.where(name__not='Lily').count('id', True)
+        self.assertEqual(2, cnt)
 
 if __name__ == '__main__':
     import unittest

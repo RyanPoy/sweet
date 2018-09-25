@@ -325,9 +325,15 @@ class Table(object):
     def all(self):
         return self.db.fetchall(self.sql, *self.bindings)
 
-    def count(self, column=None):
+    def count(self, column=None, distinct=False):
+        if not column:
+            column = '*'
+        if column == '*':
+            distinct = False
+
+        column_name = self.__aqm(column) if column else '*'
         sql = 'SELECT COUNT({column_name}) {from_sql}'.format(
-            column_name=self.__aqm(column) if column else '*',
+            column_name=column_name if not distinct else 'DISTINCT %s' % column_name,
             from_sql=self.__from_sql
         )
         vs = self.db.fetchone(sql, *self.bindings)
