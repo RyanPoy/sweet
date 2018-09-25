@@ -23,6 +23,10 @@ class MySQLTableQueryTest(TestCase):
         tb = self.get_table().select('*')
         self.assertEqual('SELECT * FROM `users`', tb.sql)
 
+    def test_basic_distinct(self):
+        tb = self.get_table().distinct().select('id')
+        self.assertEqual('SELECT DISTINCT `id` FROM `users`', tb.sql)
+
     def test_default_select(self):
         self.assertEqual('SELECT * FROM `users`', self.get_table().sql)
 

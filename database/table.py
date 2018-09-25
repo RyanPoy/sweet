@@ -79,6 +79,7 @@ class Table(object):
     @cp
     def distinct(self):
         self._distinct = True
+        return self
 
     @cp
     def select(self, *columns):
@@ -202,7 +203,8 @@ class Table(object):
 
     @property
     def sql(self):
-        return 'SELECT {columns} {from_sql}{lock_sql}'.format(
+        return 'SELECT {distinct}{columns} {from_sql}{lock_sql}'.format(
+            distinct='DISTINCT ' if self._distinct else '', 
             columns=self._join_columns_sql(self._select) if self._select else '*',
             from_sql=self.__from_sql(),
             lock_sql=self.__lock_sql()
