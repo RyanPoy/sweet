@@ -335,6 +335,87 @@ class MySQLTableQueryTest(TestCase):
         cnt = tb.where(name__not='Lily').count('id', True)
         self.assertEqual(2, cnt)
 
+    def test_max(self):
+        def _(sql, *params):
+            self.assertEqual('SELECT COUNT(`id`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual(['Lily'], list(params))
+            return {'max(id)': 1024}
+        tb = self.get_table()
+        tb.db.fetchone = _
+        max_value = tb.where(name__not='Lily').max('id')
+        self.assertEqual(1024, max_value)
+
+    def test_max_distinct(self):
+        def _(sql, *params):
+            self.assertEqual('SELECT COUNT(DISTINCT `id`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual(['Lily'], list(params))
+            return {'max(id)': 1024}
+        tb = self.get_table()
+        tb.db.fetchone = _
+        max_value = tb.where(name__not='Lily').max('id', True)
+        self.assertEqual(1024, max_value)
+
+    def test_min(self):
+        def _(sql, *params):
+            self.assertEqual('SELECT MIN(`id`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual(['Lily'], list(params))
+            return {'min(id)': 1}
+        tb = self.get_table()
+        tb.db.fetchone = _
+        cnt = tb.where(name__not='Lily').min('id')
+        self.assertEqual(1, cnt)
+
+    def test_min_distinct(self):
+        def _(sql, *params):
+            self.assertEqual('SELECT MIN(DISTINCT `id`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual(['Lily'], list(params))
+            return {'min(id)': 1}
+        tb = self.get_table()
+        tb.db.fetchone = _
+        cnt = tb.where(name__not='Lily').min('id', True)
+        self.assertEqual(1, cnt)
+
+    def test_avg(self):
+        def _(sql, *params):
+            self.assertEqual('SELECT AVERAGE(`age`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual(['Lily'], list(params))
+            return {'average(id)': 32}
+        tb = self.get_table()
+        tb.db.fetchone = _
+        cnt = tb.where(name__not='Lily').avg('age')
+        self.assertEqual(32, cnt)
+
+    def test_avg_distinct(self):
+        def _(sql, *params):
+            self.assertEqual('SELECT AVERAGE(DISTINCT `age`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual(['Lily'], list(params))
+            return {'average(id)': 32}
+        tb = self.get_table()
+        tb.db.fetchone = _
+        cnt = tb.where(name__not='Lily').avg('age', True)
+        self.assertEqual(32, cnt)
+
+    def test_sum(self):
+        def _(sql, *params):
+            self.assertEqual('SELECT SUM(`age`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual(['Lily'], list(params))
+            return {'sum(id)': 2048}
+        tb = self.get_table()
+        tb.db.fetchone = _
+        cnt = tb.where(name__not='Lily').sum('age')
+        self.assertEqual(2048, cnt)
+
+    def test_sum_distinct(self):
+        def _(sql, *params):
+            self.assertEqual('SELECT SUM(DISTINCT `age`) FROM `users` WHERE `name` != %s', sql)
+            self.assertEqual(['Lily'], list(params))
+            return {'sum(id)': 2048}
+        tb = self.get_table()
+        tb.db.fetchone = _
+        cnt = tb.where(name__not='Lily').sum('age', True)
+        self.assertEqual(2048, cnt)    
+
+
 if __name__ == '__main__':
     import unittest
     unittest.main()

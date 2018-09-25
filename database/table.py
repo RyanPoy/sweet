@@ -326,6 +326,38 @@ class Table(object):
         return self.db.fetchall(self.sql, *self.bindings)
 
     def count(self, column=None, distinct=False):
+        return self.__func('count', column, distinct)
+
+    def max(self, column, distinct=False):
+        return self.__func('max', column, distinct)
+
+    def min(self, column, distinct=False):
+        return self.__func('min', column, distinct)
+
+    def avg(self, column, distinct=False):
+        return self.__func('average', column, distinct)
+
+    def sum(self, column, distinct=False):
+        return self.__func('sum', column, distinct)
+
+    def __func(self, func_name, column, distinct=False):
+        func_name = func_name.upper()
+
+        if not column:
+            column = '*'
+        if column == '*':
+            distinct = False
+
+        column_name = self.__aqm(column) if column else '*'
+        sql = 'SELECT {func_name}({column_name}) {from_sql}'.format(
+            func_name=func_name,
+            column_name=column_name if not distinct else 'DISTINCT %s' % column_name,
+            from_sql=self.__from_sql
+        )
+        vs = self.db.fetchone(sql, *self.bindings)
+        return list(vs.values())[0]
+
+    def max(self, column, distinct=False):
         if not column:
             column = '*'
         if column == '*':
