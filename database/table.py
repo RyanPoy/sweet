@@ -325,6 +325,9 @@ class Table(object):
     def all(self):
         return self.db.fetchall(self.sql, *self.bindings)
 
+    def exists(self):
+        return True if self.first() else False
+
     def count(self, column=None, distinct=False):
         return self.__func('count', column, distinct)
 
