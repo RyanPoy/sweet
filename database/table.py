@@ -162,12 +162,12 @@ class Table(object):
         return self.__join('RIGHT JOIN', tbname, on)
 
     @cp
-    def shared_lock(self):
+    def read_lock(self):
         self._lock = self.LOCK.READ
         return self
 
     @cp
-    def lock_for_update(self):
+    def write_lock(self):
         self._lock = self.LOCK.WRITE
         return self
 
