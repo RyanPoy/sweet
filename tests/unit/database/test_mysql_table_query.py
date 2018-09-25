@@ -6,9 +6,9 @@ from sweet.database.db import Record
 
 class MySQLTableQueryTest(TestCase):
 
-    def get_table(self):
+    def get_table(self, name="users"):
         class FakeDB(object): pass
-        return MySQLTable(db=FakeDB(), tbname="users")
+        return MySQLTable(db=FakeDB(), tbname=name)
 
     def test_copy_deep(self):
         tb = self.get_table()
@@ -436,6 +436,102 @@ class MySQLTableQueryTest(TestCase):
         self.assertEqual('SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s FOR UPDATE', tb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
 
+    def test_where_exists(self):
+        users = self.get_table()
+        mobiles = self.get_table("mobiles")
+
+        users = users.where(age__lte=20).where_exists(
+            mobiles.where(name='iphone')
+        )
+        self.assertEqual('SELECT * FROM `users` WHERE `age` <= %s AND EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)', users.sql)
+        self.assertEqual([20, 'iphone'], users.bindings)
+
+    def test_multiple_where_exists(self):
+        users = self.get_table().where_exists(
+            self.get_table("mobiles").where(name='iphone'),
+            self.get_table("mobiles").where(name='aphone')
+        )
+        self.assertEqual('SELECT * FROM `users` WHERE EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s) AND EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)', users.sql)
+        self.assertEqual(['iphone', 'aphone'], users.bindings)
+
+    def test_or_exists(self):
+        users = self.get_table()
+        mobiles = self.get_table("mobiles")
+
+        users = users.where(age__lte=20).or_exists(
+            mobiles.where(name='iphone')
+        )
+        self.assertEqual('SELECT * FROM `users` WHERE `age` <= %s OR EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)', users.sql)
+        self.assertEqual([20, 'iphone'], users.bindings)
+
+    def test_multiple_or_exists(self):
+        users = self.get_table().or_exists(
+            self.get_table("mobiles").where(name='iphone'),
+            self.get_table("mobiles").where(name='aphone')
+        )
+        self.assertEqual('SELECT * FROM `users` WHERE EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s) OR EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)', users.sql)
+        self.assertEqual(['iphone', 'aphone'], users.bindings)
+
+    def test_complex_where_or_exists(self):
+        users = self.get_table().where(age__lte=20).where_exists(
+                    self.get_table("mobiles").where(name='iphone'),
+                ).or_exists(
+                    self.get_table("mobiles").where(name='iphone'),
+                    self.get_table("mobiles").where(name='aphone')
+                ).where_exists(
+                    self.get_table("mobiles").where(name='aphone')
+                )
+        sql = 'SELECT * FROM `users` WHERE `age` <= %s' \
+              ' AND EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)' \
+              ' OR EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)' \
+              ' OR EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)' \
+              ' AND EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)'
+        self.assertEqual(sql, users.sql)
+        self.assertEqual([20, 'iphone', 'iphone', 'aphone', 'aphone'], users.bindings)
+        # def test_where_exists(self):
+    #     builder = self.get_builder()
+    #     builder.select('*').from_('orders').where_exists(
+    #         self.get_builder().select('*').from_('products').where('products.id', '=', QueryExpression('"orders"."id"'))
+    #     )
+    #     self.assertEqual(
+    #         'SELECT * FROM "orders" '
+    #         'WHERE EXISTS (SELECT * FROM "products" WHERE "products"."id" = "orders"."id")',
+    #         builder.to_sql()
+    #     )
+    #     self.assertEqual([], builder.get_bindings())
+
+    #     builder = self.get_builder()
+    #     builder.select('*').from_('orders').where_not_exists(
+    #         self.get_builder().select('*').from_('products').where('products.id', '=', QueryExpression('"orders"."id"'))
+    #     )
+    #     self.assertEqual(
+    #         'SELECT * FROM "orders" '
+    #         'WHERE NOT EXISTS (SELECT * FROM "products" WHERE "products"."id" = "orders"."id")',
+    #         builder.to_sql()
+    #     )
+    #     self.assertEqual([], builder.get_bindings())
+
+    #     builder = self.get_builder()
+    #     builder.select('*').from_('orders').where('id', '=', 1).or_where_exists(
+    #         self.get_builder().select('*').from_('products').where('products.id', '=', QueryExpression('"orders"."id"'))
+    #     )
+    #     self.assertEqual(
+    #         'SELECT * FROM "orders" WHERE "id" = ? '
+    #         'OR EXISTS (SELECT * FROM "products" WHERE "products"."id" = "orders"."id")',
+    #         builder.to_sql()
+    #     )
+    #     self.assertEqual([1], builder.get_bindings())
+
+    #     builder = self.get_builder()
+    #     builder.select('*').from_('orders').where('id', '=', 1).or_where_not_exists(
+    #         self.get_builder().select('*').from_('products').where('products.id', '=', QueryExpression('"orders"."id"'))
+    #     )
+    #     self.assertEqual(
+    #         'SELECT * FROM "orders" WHERE "id" = ? '
+    #         'OR NOT EXISTS (SELECT * FROM "products" WHERE "products"."id" = "orders"."id")',
+    #         builder.to_sql()
+    #     )
+    #     self.assertEqual([1], builder.get_bindings())
 
 if __name__ == '__main__':
     import unittest

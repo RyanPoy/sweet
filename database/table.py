@@ -64,6 +64,7 @@ class Table(object):
         self._limit = None
         self._offset = None
         self._lock = self.LOCK.NILL
+        self._exists_tables = []
 
     def __deepcopy__(self, memo):
         """ Deep copy """
@@ -171,6 +172,18 @@ class Table(object):
         self._lock = self.LOCK.WRITE
         return self
 
+    @cp
+    def where_exists(self, *tables):
+        for t in tables:
+            self._exists_tables.append( ("and", t) )
+        return self
+
+    @cp
+    def or_exists(self, *tables):
+        for t in tables:
+            self._exists_tables.append( ("or", t) )
+        return self
+
     def __join(self, join_type, tbname, on):
         self._joins.append(mydict(
             join_type = join_type,
@@ -213,6 +226,17 @@ class Table(object):
         if where_sql:
             sql = '%s WHERE %s' % (sql, where_sql)
 
+        exists_tables_sql = self.__exists_tables_sql
+        if exists_tables_sql:
+            if not where_sql:
+                if exists_tables_sql.startswith('AND '):
+                    exists_tables_sql = exists_tables_sql[4:]
+                elif exists_tables_sql.startswith('OR '):
+                    exists_tables_sql = exists_tables_sql[3:]
+                sql = '%s WHERE %s' % (sql, exists_tables_sql)
+            else:
+                sql = '%s %s' % (sql, exists_tables_sql)
+
         if self._group_bys:
             sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_bys))
 
@@ -228,6 +252,18 @@ class Table(object):
             sql = '%s %s' % (sql, limit_and_offset_sql)
 
         return sql
+
+    @property
+    def __exists_tables_sql(self):
+        sql = []
+        for or_and, t in self._exists_tables:
+            if or_and == 'and':
+                sql.append('AND EXISTS (%s)' % t.sql)
+                self.bindings.extend(t.bindings)
+            else:
+                sql.append('OR EXISTS (%s)' % t.sql)
+                self.bindings.extend(t.bindings)
+        return ' '.join(sql)
 
     @property
     def __join_sql(self):
