@@ -18,6 +18,24 @@ class MySQLTableUpdateTest(TestCase):
         tb.db.execute_rowcount = _
         self.assertEqual(3, tb.update(age=20, name='nothing'))
 
+    def test_increase(self):
+        def _(sql, *params):
+            self.assertEqual('UPDATE `users` SET `age` = `age` + %s WHERE `age` >= %s OR `name` = %s', sql)
+            self.assertEqual([10, 40, 'ryanpoy'], list(params))
+            return 3
+        tb = self.get_table().where(age__gte=40).or_(name="ryanpoy")
+        tb.db.execute_rowcount = _
+        self.assertEqual(3, tb.increase(age=10))
+
+    def test_decrease(self):
+        def _(sql, *params):
+            self.assertEqual('UPDATE `users` SET `age` = `age` - %s WHERE `age` >= %s OR `name` = %s', sql)
+            self.assertEqual([10, 40, 'ryanpoy'], list(params))
+            return 3
+        tb = self.get_table().where(age__gte=40).or_(name="ryanpoy")
+        tb.db.execute_rowcount = _
+        self.assertEqual(3, tb.decrease(age=10))
+
 
 if __name__ == '__main__':
     import unittest

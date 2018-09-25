@@ -316,6 +316,27 @@ class Table(object):
         new_bindings.extend(self.bindings)
         return self.db.execute_rowcount(sql, *new_bindings)
 
+    def increase(self, **kwargs):
+        return self.__in_or_decrease('in', **kwargs)
+
+    def decrease(self, **kwargs):
+        return self.__in_or_decrease('de', **kwargs)
+
+    def __in_or_decrease(self, in_or_de='in', **kwargs):
+        flag = '+' if in_or_de == 'in' else '-'
+        columns, new_bindings = [], []
+        for k, v in kwargs.items():
+            columns.append('{name} = {name} {flag} %s'.format(name=self.__aqm(k), flag=flag))
+            new_bindings.append(v)
+
+        sql = 'UPDATE {tbname} SET {columns}{from_sql}'.format(
+            tbname=self.__aqm(self.tbname),
+            columns=', '.join(columns),
+            from_sql=self.__from_sql(False)
+        )
+        new_bindings.extend(self.bindings)
+        return self.db.execute_rowcount(sql, *new_bindings)        
+
     def delete(self):
         if not self._joins: # needn't join
             sql = "DELETE {from_sql}".format(from_sql=self.__from_sql())
