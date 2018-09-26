@@ -1,7 +1,7 @@
 # coding: utf8
 import sys, unittest
 from sweet.tests.unit.test_filter import FilterTest
-from sweet.tests.unit.test_clause_where import WhereClauseTest
+from sweet.tests.unit.test_clause_where_and_having import WhereAndHavingClauseTest
 
 from sweet.tests.unit.database.test_mysql_table_query import MySQLTableQueryTest
 from sweet.tests.unit.database.test_mysql_table_insert import MySQLTableInsertTest
@@ -22,7 +22,7 @@ from sweet.tests.unit.validation.test_validator_presence import PresenceValidato
 
 unit_tests = [
     FilterTest,
-    WhereClauseTest,
+    WhereAndHavingClauseTest,
 
     MySQLTableQueryTest,
     MySQLTableInsertTest,
