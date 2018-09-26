@@ -23,6 +23,8 @@ class MySQLTest(TestCase):
         self.db.raw("insert into mobiles (id, name, user_id) values (2, 'xiaomi', 1) ")
         self.db.raw("insert into mobiles (id, name, user_id) values (3, 'iphone', 2) ")
 
+        self.db.raw('select * from mobiles where name is %s', None)
+
     def remove_record(self):
         self.db.execute("delete from mobiles")
         self.db.execute("delete from users")

@@ -6,6 +6,7 @@ class Filter(object):
     SPLIT_TAG = '__'
 
     EQ, IN, NOT_IN = '=', 'IN', 'NOT IN'
+    IS, IS_NOT = 'IS', 'IS NOT'
     LIKE, NOT_LIKE = 'LIKE', 'NOT LIKE'
     BETWEEN, NOT_BETWEEN = 'BETWEEN', 'NOT BETWEEN'
     bt_suffix, not_bt_suffix = 'bt', 'not_bt'
@@ -40,11 +41,17 @@ class Filter(object):
             elif is_array(self.value):
                 self.operator = self.NOT_IN
                 self.name = name[:-len(suffix)-2]
+            elif self.value is None:
+                self.operator = self.IS_NOT
+                self.name = name[:-len(suffix)-2]
             else:
                 self.operator = self.SPECIALS[suffix]
                 self.name = name[:-len(suffix)-2]
         elif is_array(self.value): # 如果不在特殊的后缀里面
             self.operator = self.IN
+            self.name = name
+        elif self.value is None:
+            self.operator = self.IS
             self.name = name
         else:
             self.operator = self.EQ
@@ -61,7 +68,7 @@ class Filter(object):
             )
         elif self.operator == self.BETWEEN or self.operator == self.NOT_BETWEEN:
             if not is_array(self.value) or len(self.value) != 2:
-                raise Exception("%s just support a array which has 2 elements" )
+                raise TypeError("%s just support a array which has 2 elements" )
             return '{qutotation}{name}{qutotation} {operator} {paramstyle} AND {paramstyle}'.format(
                 qutotation=qutotation, name=self.name,
                 operator=self.operator, paramstyle=paramstyle
@@ -84,6 +91,7 @@ class Clause(object):
 class WhereClause(Clause):
     
     PREFIX = 'WHERE'
+    AND, OR = 'AND', 'OR'
 
     def __init__(self, qutotation, paramstyle):
         super().__init__(qutotation, paramstyle)
@@ -91,21 +99,21 @@ class WhereClause(Clause):
         self.sql = ''
         self.bindings = []
 
-    def and_(**kwargs):
+    def and_(self, **kwargs):
         for k, v in kwargs.items():
-            self.filters.append( ('AND', Filter(k, v)) )
+            self.filters.append( (self.AND, Filter(k, v)) )
         return self
 
-    def or_(**kwargs):
+    def or_(self, **kwargs):
         for k, v in kwargs.items():
-            self.filters.append( ('AND', Filter(k, v)) )
+            self.filters.append( (self.OR, Filter(k, v)) )
         return self
 
     def compile(self):
         sqls = []
         for and_or, f in self.filters:
             sqls.append(and_or)
-            sqls.append(f.sql(f.to_sql(self.qutotation, self.paramstyle)))
+            sqls.append(f.to_sql(self.qutotation, self.paramstyle))
             if is_array(f.value):
                 self.bindings.extend(f.value)
             else:
@@ -114,7 +122,12 @@ class WhereClause(Clause):
         if not sqls:
             self.sql = ''
         else:
-            self.sql = '%s %s' % (self.PREFIX, ' '.join(sqls))
+            s = ' '.join(sqls)
+            if s.startswith(self.AND):
+                s = s[4:]
+            elif s.startswith(self.OR):
+                s = s[3:]
+            self.sql = '%s %s' % (self.PREFIX, s)
         return self
 
 

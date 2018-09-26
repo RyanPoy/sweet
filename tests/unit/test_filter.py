@@ -19,6 +19,20 @@ class FilterTest(TestCase):
         self.assertEqual('!=', f.operator)
         self.assertEqual('`age` != %s', f.to_sql('`', '%s'))
 
+    def test_filter_none(self):
+        f = Filter('name', None)
+        self.assertEqual('name', f.name)
+        self.assertEqual(None, f.value)
+        self.assertEqual('IS', f.operator)
+        self.assertEqual('`name` IS %s', f.to_sql('`', '%s'))
+
+    def test_filter_not_none(self):
+        f = Filter('name__not', None)
+        self.assertEqual('name', f.name)
+        self.assertEqual(None, f.value)
+        self.assertEqual('IS NOT', f.operator)
+        self.assertEqual('`name` IS NOT %s', f.to_sql('`', '%s'))
+
     def test_filter_in(self):
         f = Filter('name', ['ryan', 'poy', 'judy'])
         self.assertEqual('name', f.name)
