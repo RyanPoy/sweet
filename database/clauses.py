@@ -59,26 +59,31 @@ class Filter(object):
         self.name = self.name.replace(self.SPLIT_TAG, '.')
         return self
 
+    def aqm(self, s, qutotation):
+        if s == '*':
+            return s
+        return '.'.join([ '%s%s%s' % (qutotation, x, qutotation) for x in s.split('.') ])
+
     def to_sql(self, qutotation, paramstyle):
+        name = self.aqm(self.name, qutotation)
+
         if self.operator == self.IN or self.operator == self.NOT_IN:
             param_str = ', '.join([paramstyle]*len(self.value))
-            return '{qutotation}{name}{qutotation} {operator} ({param_str})'.format(
-                qutotation=qutotation, name=self.name, 
+            return '{name} {operator} ({param_str})'.format(
+                qutotation=qutotation, name=name, 
                 operator=self.operator, param_str=param_str
             )
         elif self.operator == self.BETWEEN or self.operator == self.NOT_BETWEEN:
             if not is_array(self.value) or len(self.value) != 2:
                 raise TypeError("%s just support a array which has 2 elements" )
-            return '{qutotation}{name}{qutotation} {operator} {paramstyle} AND {paramstyle}'.format(
-                qutotation=qutotation, name=self.name,
+            return '{name} {operator} {paramstyle} AND {paramstyle}'.format(
+                qutotation=qutotation, name=name,
                 operator=self.operator, paramstyle=paramstyle
             )
-        return '{qutotation}{name}{qutotation} {operator} {paramstyle}'.format(
-            qutotation=qutotation, name=self.name, 
+        return '{name} {operator} {paramstyle}'.format(
+            qutotation=qutotation, name=name, 
             operator=self.operator, paramstyle=paramstyle
         )
-
-
 
 
 class Clause(object):
