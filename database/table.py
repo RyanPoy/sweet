@@ -206,7 +206,7 @@ class Table(object):
         return 'SELECT {distinct}{columns} {from_sql}{lock_sql}'.format(
             distinct='DISTINCT ' if self._distinct else '', 
             columns=self._join_columns_sql(self._select) if self._select else '*',
-            from_sql=self.__from_sql(),
+            from_sql=self.__from_sql,
             lock_sql=self.__lock_sql()
         )
 
@@ -218,8 +218,9 @@ class Table(object):
             lock = ' FOR UPDATE'
         return lock
 
-    def __from_sql(self, for_query=True):
-        sql = 'FROM {tablename}'.format(tablename=self.__aqm(self.tbname)) if for_query else ''
+    @property
+    def __from_sql(self):
+        sql = 'FROM {tablename}'.format(tablename=self.__aqm(self.tbname))
         join_sql = self.__join_sql
         if join_sql:
             sql = '%s %s' % (sql, join_sql)
@@ -301,7 +302,6 @@ class Table(object):
                     else:
                         sqls.append('%s %s %s %s' % (and_or, k, op, self.paramstyle_marks) )
                         self._bindings.append(v)
-        
         if sqls:
             s = ' '.join(sqls)
             if s.startswith('AND '):
@@ -363,19 +363,51 @@ class Table(object):
         )    
         return self.db.execute_rowcount(sql, *bindings)
 
+    @cp
     def update(self, **kwargs):
-        columns, new_bindings = [], []
+        update_columns, update_bindings = [], []
         for k, v in kwargs.items():
-            columns.append('%s = %%s' % self.__aqm(k))
-            new_bindings.append(v)
+            update_columns.append('%s = %%s' % self.__aqm(k))
+            update_bindings.append(v)
 
-        sql = 'UPDATE {tbname} SET {columns}{from_sql}'.format(
-            tbname=self.__aqm(self.tbname),
-            columns=', '.join(columns),
-            from_sql=self.__from_sql(False)
-        )
-        new_bindings.extend(self.bindings)
-        return self.db.execute_rowcount(sql, *new_bindings)
+        sql = 'UPDATE %s' % self.__aqm(self.tbname) 
+        join_sql = self.__join_sql
+        if join_sql:
+            sql = '%s %s' % (sql, join_sql)
+
+        sql = '%s SET %s' % (sql, ', '.join(update_columns))
+        self.bindings.extend(update_bindings)
+
+        where_sql = self.__where_having_sql(self._wheres, self._where_bindings)
+        if where_sql:
+            sql = '%s WHERE %s' % (sql, where_sql)
+
+        exists_tables_sql = self.__exists_tables_sql
+        if exists_tables_sql:
+            if not where_sql:
+                if exists_tables_sql.startswith('AND '):
+                    exists_tables_sql = exists_tables_sql[4:]
+                elif exists_tables_sql.startswith('OR '):
+                    exists_tables_sql = exists_tables_sql[3:]
+                sql = '%s WHERE %s' % (sql, exists_tables_sql)
+            else:
+                sql = '%s %s' % (sql, exists_tables_sql)
+
+        if self._group_bys:
+            sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_bys))
+
+        having_sql = self.__where_having_sql(self._havings, self._having_bindings)
+        if having_sql:
+            sql = '%s HAVING %s' % (sql, having_sql)
+
+        if self._order_bys:
+            sql = '%s ORDER BY %s' % (sql, ', '.join(self._order_bys))
+
+        limit_and_offset_sql = self.__limit_and_offset_sql()
+        if limit_and_offset_sql:
+            sql = '%s %s' % (sql, limit_and_offset_sql)
+
+        return self.db.execute_rowcount(sql, *self.bindings)
 
     def increase(self, **kwargs):
         return self.__in_or_decrease('in', **kwargs)
@@ -383,28 +415,60 @@ class Table(object):
     def decrease(self, **kwargs):
         return self.__in_or_decrease('de', **kwargs)
 
+    @cp
     def __in_or_decrease(self, in_or_de='in', **kwargs):
         flag = '+' if in_or_de == 'in' else '-'
-        columns, new_bindings = [], []
+        update_columns, update_bindings = [], []
         for k, v in kwargs.items():
-            columns.append('{name} = {name} {flag} %s'.format(name=self.__aqm(k), flag=flag))
-            new_bindings.append(v)
+            update_columns.append('{name} = {name} {flag} %s'.format(name=self.__aqm(k), flag=flag))
+            update_bindings.append(v)
 
-        sql = 'UPDATE {tbname} SET {columns}{from_sql}'.format(
-            tbname=self.__aqm(self.tbname),
-            columns=', '.join(columns),
-            from_sql=self.__from_sql(False)
-        )
-        new_bindings.extend(self.bindings)
-        return self.db.execute_rowcount(sql, *new_bindings)        
+        sql = 'UPDATE %s' % self.__aqm(self.tbname) 
+        join_sql = self.__join_sql
+        if join_sql:
+            sql = '%s %s' % (sql, join_sql)
+
+        sql = '%s SET %s' % (sql, ', '.join(update_columns))
+        self.bindings.extend(update_bindings)
+
+        where_sql = self.__where_having_sql(self._wheres, self._where_bindings)
+        if where_sql:
+            sql = '%s WHERE %s' % (sql, where_sql)
+
+        exists_tables_sql = self.__exists_tables_sql
+        if exists_tables_sql:
+            if not where_sql:
+                if exists_tables_sql.startswith('AND '):
+                    exists_tables_sql = exists_tables_sql[4:]
+                elif exists_tables_sql.startswith('OR '):
+                    exists_tables_sql = exists_tables_sql[3:]
+                sql = '%s WHERE %s' % (sql, exists_tables_sql)
+            else:
+                sql = '%s %s' % (sql, exists_tables_sql)
+
+        if self._group_bys:
+            sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_bys))
+
+        having_sql = self.__where_having_sql(self._havings, self._having_bindings)
+        if having_sql:
+            sql = '%s HAVING %s' % (sql, having_sql)
+
+        if self._order_bys:
+            sql = '%s ORDER BY %s' % (sql, ', '.join(self._order_bys))
+
+        limit_and_offset_sql = self.__limit_and_offset_sql()
+        if limit_and_offset_sql:
+            sql = '%s %s' % (sql, limit_and_offset_sql)
+
+        return self.db.execute_rowcount(sql, *self.bindings)        
 
     def delete(self):
         if not self._joins: # needn't join
-            sql = "DELETE {from_sql}".format(from_sql=self.__from_sql())
+            sql = "DELETE {from_sql}".format(from_sql=self.__from_sql)
         else:
             sql = "DELETE {tablename} {from_sql}".format(
                 tablename=self.__aqm(self.tbname),
-                from_sql=self.__from_sql()
+                from_sql=self.__from_sql
             )
         return self.db.execute_rowcount(sql, *self.bindings)
 
@@ -450,7 +514,7 @@ class Table(object):
         sql = 'SELECT {func_name}({column_name}) AS aggregate {from_sql}'.format(
             func_name=func_name,
             column_name=column_name if not distinct else 'DISTINCT %s' % column_name,
-            from_sql=self.__from_sql()
+            from_sql=self.__from_sql
         )
         vs = self.db.fetchone(sql, *self.bindings)
         return vs.aggregate

@@ -152,6 +152,32 @@ class MySQLTest(TestCase):
         c = self.db.table('mobiles').all()
         self.assertEqual(0, len(c))
 
+    def test_update(self):
+        c = self.db.table('mobiles').where(name='iphone').all()
+        self.assertEqual(2, len(c))
+
+        r = self.db.table("mobiles").where(name='iphone').update(name='aphone')
+        self.assertEqual(2, r)
+
+        c = self.db.table('mobiles').where(name='iphone').all()
+        self.assertEqual(0, len(c))
+        
+        c = self.db.table('mobiles').where(name='aphone').all()
+        self.assertEqual(2, len(c))
+
+    def test_update_with_join(self):
+        u = self.db.table('users').where(age=25).first()
+        self.assertTrue(u is not None)
+
+        r = self.db.table('users').join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name='xiaomi').update(age=52)
+        self.assertEqual(1, r)
+    
+        u = self.db.table('users').where(age=25).first()
+        self.assertTrue(u is None)
+
+        u = self.db.table('users').where(age=52).first()
+        self.assertTrue(u is not None)
+        self.assertEqual(1, u.id)
 
 
 if __name__ == '__main__':
