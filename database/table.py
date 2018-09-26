@@ -218,6 +218,19 @@ class Table(object):
             lock = ' FOR UPDATE'
         return lock
 
+    def __push_exist_sql(self, where_sql, sql):
+        exists_tables_sql = self.__exists_tables_sql
+        if exists_tables_sql:
+            if not where_sql:
+                if exists_tables_sql.startswith('AND '):
+                    exists_tables_sql = exists_tables_sql[4:]
+                elif exists_tables_sql.startswith('OR '):
+                    exists_tables_sql = exists_tables_sql[3:]
+                sql = '%s WHERE %s' % (sql, exists_tables_sql)
+            else:
+                sql = '%s %s' % (sql, exists_tables_sql)
+        return sql
+
     @property
     def __from_sql(self):
         sql = 'FROM {tablename}'.format(tablename=self.__aqm(self.tbname))
@@ -229,16 +242,7 @@ class Table(object):
         if where_sql:
             sql = '%s WHERE %s' % (sql, where_sql)
 
-        exists_tables_sql = self.__exists_tables_sql
-        if exists_tables_sql:
-            if not where_sql:
-                if exists_tables_sql.startswith('AND '):
-                    exists_tables_sql = exists_tables_sql[4:]
-                elif exists_tables_sql.startswith('OR '):
-                    exists_tables_sql = exists_tables_sql[3:]
-                sql = '%s WHERE %s' % (sql, exists_tables_sql)
-            else:
-                sql = '%s %s' % (sql, exists_tables_sql)
+        sql = self.__push_exist_sql(where_sql, sql)
 
         if self._group_bys:
             sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_bys))
@@ -382,16 +386,7 @@ class Table(object):
         if where_sql:
             sql = '%s WHERE %s' % (sql, where_sql)
 
-        exists_tables_sql = self.__exists_tables_sql
-        if exists_tables_sql:
-            if not where_sql:
-                if exists_tables_sql.startswith('AND '):
-                    exists_tables_sql = exists_tables_sql[4:]
-                elif exists_tables_sql.startswith('OR '):
-                    exists_tables_sql = exists_tables_sql[3:]
-                sql = '%s WHERE %s' % (sql, exists_tables_sql)
-            else:
-                sql = '%s %s' % (sql, exists_tables_sql)
+        sql = self.__push_exist_sql(where_sql, sql)
 
         if self._group_bys:
             sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_bys))
@@ -435,16 +430,7 @@ class Table(object):
         if where_sql:
             sql = '%s WHERE %s' % (sql, where_sql)
 
-        exists_tables_sql = self.__exists_tables_sql
-        if exists_tables_sql:
-            if not where_sql:
-                if exists_tables_sql.startswith('AND '):
-                    exists_tables_sql = exists_tables_sql[4:]
-                elif exists_tables_sql.startswith('OR '):
-                    exists_tables_sql = exists_tables_sql[3:]
-                sql = '%s WHERE %s' % (sql, exists_tables_sql)
-            else:
-                sql = '%s %s' % (sql, exists_tables_sql)
+        sql = self.__push_exist_sql(where_sql, sql)
 
         if self._group_bys:
             sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_bys))
