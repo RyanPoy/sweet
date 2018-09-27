@@ -1,6 +1,7 @@
 #coding: utf8
 from sweet.utils import is_array
 
+aqm = lambda s, qutotation: s if s == '*' else '.'.join([ '%s%s%s' % (qutotation, x, qutotation) for x in s.split('.') ])
 
 class Filter(object):
     SPLIT_TAG = '__'
@@ -59,13 +60,8 @@ class Filter(object):
         self.name = self.name.replace(self.SPLIT_TAG, '.')
         return self
 
-    def aqm(self, s, qutotation):
-        if s == '*':
-            return s
-        return '.'.join([ '%s%s%s' % (qutotation, x, qutotation) for x in s.split('.') ])
-
     def to_sql(self, qutotation, paramstyle):
-        name = self.aqm(self.name, qutotation)
+        name = aqm(self.name, qutotation)
 
         if self.operator == self.IN or self.operator == self.NOT_IN:
             param_str = ', '.join([paramstyle]*len(self.value))
@@ -86,20 +82,13 @@ class Filter(object):
         )
 
 
-class Clause(object):
+class WhereClause(object):
+    
+    AND, OR = 'AND', 'OR'
 
     def __init__(self, qutotation, paramstyle):
         self.qutotation = qutotation
         self.paramstyle = paramstyle
-
-
-class WhereClause(Clause):
-    
-    PREFIX = 'WHERE'
-    AND, OR = 'AND', 'OR'
-
-    def __init__(self, qutotation, paramstyle):
-        super().__init__(qutotation, paramstyle)
         self.filters = []
         self.sql = ''
         self.bindings = []
@@ -115,6 +104,12 @@ class WhereClause(Clause):
         return self
 
     def compile(self):
+        s = self._compile()
+        if s:
+            self.sql = 'WHERE %s' % s
+        return self
+
+    def _compile(self):
         sqls = []
         for and_or, f in self.filters:
             sqls.append(and_or)
@@ -125,19 +120,35 @@ class WhereClause(Clause):
                 self.bindings.append(f.value)
 
         if not sqls:
-            self.sql = ''
+            s = ''
         else:
             s = ' '.join(sqls)
             if s.startswith(self.AND):
                 s = s[4:]
             elif s.startswith(self.OR):
                 s = s[3:]
-            self.sql = '%s %s' % (self.PREFIX, s)
-        return self
+        return s
 
 
 class HavingClause(WhereClause):
 
-    PREFIX = 'HAVING'
+    def compile(self):
+        s = self._compile()
+        if s:
+            self.sql = 'HAVING %s' % s
+        return self
+
+
+class JoinOnClause(WhereClause):
+    
+    def __init__(self, qutotation, paramstyle, tbname):
+        super().__init__(qutotation, paramstyle)
+        self.tbname = tbname
+
+    def compile(self):
+        s = self._compile()
+        if s:
+            self.sql = 'JOIN %s ON %s' % (aqm(self.tbname), s)
+        return self
 
 
