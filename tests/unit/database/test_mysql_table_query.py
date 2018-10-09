@@ -80,13 +80,13 @@ class MySQLTableQueryTest(TestCase):
 
     def test_where_null(self):
         tb = self.get_table().select('*').where(id=[1, 2, 3], name=None)
-        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` IS %s', tb.sql)
-        self.assertEqual([1, 2, 3, None], tb.bindings)
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` IS NULL', tb.sql)
+        self.assertEqual([1, 2, 3], tb.bindings)
 
     def test_where_not_null(self):
         tb = self.get_table().select('*').where(id=[1, 2, 3]).where(name__not=None)
-        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` IS NOT %s', tb.sql)
-        self.assertEqual([1, 2, 3, None], tb.bindings)
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` IS NOT NULL', tb.sql)
+        self.assertEqual([1, 2, 3], tb.bindings)
 
     def test_where_gt(self):
         tb = self.get_table().select('*').where(id=[1, 2, 3], age__gt=30)
@@ -155,13 +155,13 @@ class MySQLTableQueryTest(TestCase):
     
     def test_or_null(self):
         tb = self.get_table().select('*').or_(id=[1, 2, 3], name=None)
-        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` IS %s', tb.sql)
-        self.assertEqual([1, 2, 3, None], tb.bindings)
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` IS NULL', tb.sql)
+        self.assertEqual([1, 2, 3], tb.bindings)
 
     def test_or_not_null(self):
         tb = self.get_table().select('*').or_(id=[1, 2, 3]).or_(name__not=None)
-        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` IS NOT %s', tb.sql)
-        self.assertEqual([1, 2, 3, None], tb.bindings)
+        self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` IS NOT NULL', tb.sql)
+        self.assertEqual([1, 2, 3], tb.bindings)
     
     def test_order_by(self):
         tb = self.get_table().select('*').order_by('email').order_by('age', 'desc')
@@ -183,8 +183,8 @@ class MySQLTableQueryTest(TestCase):
 
     def test_having_null(self):
         tb = self.get_table().select('*').having(id=[1, 2, 3], name=None)
-        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) AND `name` IS %s', tb.sql)
-        self.assertEqual([1, 2, 3, None], tb.bindings)
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) AND `name` IS NULL', tb.sql)
+        self.assertEqual([1, 2, 3], tb.bindings)
 
     def test_having_gt(self):
         tb = self.get_table().select('*').having(id=[1, 2, 3], age__gt=30)
@@ -223,8 +223,8 @@ class MySQLTableQueryTest(TestCase):
 
     def test_having_not_null(self):
         tb = self.get_table().select('*').having(id=[1, 2, 3]).having(name__not=None)
-        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) AND `name` IS NOT %s', tb.sql)
-        self.assertEqual([1, 2, 3, None], tb.bindings)
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) AND `name` IS NOT NULL', tb.sql)
+        self.assertEqual([1, 2, 3], tb.bindings)
 
     def test_having_not_in(self):
         tb = self.get_table().select('*').having(id__not=[1, 2, 3], name__not='ryanpoy')
@@ -253,8 +253,8 @@ class MySQLTableQueryTest(TestCase):
 
     def test_or_having_null(self):
         tb = self.get_table().select('*').or_having(id=[1, 2, 3], name=None)
-        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) OR `name` IS %s', tb.sql)
-        self.assertEqual([1, 2, 3, None], tb.bindings)
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) OR `name` IS NULL', tb.sql)
+        self.assertEqual([1, 2, 3], tb.bindings)
 
     def test_or_having_not_between(self):
         tb = self.get_table().select('*').having(name='ryanpoy').or_having(id__not_bt=[1, 2])
@@ -268,8 +268,8 @@ class MySQLTableQueryTest(TestCase):
 
     def test_or_having_not_null(self):
         tb = self.get_table().select('*').or_having(id=[1, 2, 3]).or_having(name__not=None)
-        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) OR `name` IS NOT %s', tb.sql)
-        self.assertEqual([1, 2, 3, None], tb.bindings)
+        self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) OR `name` IS NOT NULL', tb.sql)
+        self.assertEqual([1, 2, 3], tb.bindings)
 
     def test_or_having_not_in(self):
         tb = self.get_table().select('*').or_having(id__not=[1, 2, 3], name__not='ryanpoy')

@@ -27,14 +27,14 @@ class FilterTest(TestCase):
         self.assertEqual('name', f.name)
         self.assertEqual(None, f.value)
         self.assertEqual('IS', f.operator)
-        self.assertEqual('`name` IS %s', f.to_sql())
+        self.assertEqual('`name` IS NULL', f.to_sql())
 
     def test_filter_not_none(self):
         f = self.get_filter('name__not', None)
         self.assertEqual('name', f.name)
         self.assertEqual(None, f.value)
         self.assertEqual('IS NOT', f.operator)
-        self.assertEqual('`name` IS NOT %s', f.to_sql())
+        self.assertEqual('`name` IS NOT NULL', f.to_sql())
 
     def test_filter_in(self):
         f = self.get_filter('name', ['ryan', 'poy', 'judy'])
@@ -138,6 +138,27 @@ class FilterTest(TestCase):
         f = self.get_filter('age__not_lte', 10)
         self.assertEqual('age', f.name)
         self.assertEqual(10, f.value)
+        self.assertEqual('>', f.operator)
+        self.assertEqual('`age` > %s', f.to_sql())
+
+    def test_filter_is_null(self):
+        f = self.get_filter('name', None)
+        self.assertEqual('name', f.name)
+        self.assertEqual(None, f.value)
+        self.assertEqual('IS', f.operator)
+        self.assertEqual('`name` IS NULL', f.to_sql())
+
+    def test_filter_is_not_null(self):
+        f = self.get_filter('name__not', None)
+        self.assertEqual('name', f.name)
+        self.assertEqual(None, f.value)
+        self.assertEqual('IS NOT', f.operator)
+        self.assertEqual('`name` IS NOT NULL', f.to_sql())
+
+    def test_filter_is_gt_null(self):
+        f = self.get_filter('age__gt', None)
+        self.assertEqual('age', f.name)
+        self.assertEqual(None, f.value)
         self.assertEqual('>', f.operator)
         self.assertEqual('`age` > %s', f.to_sql())
 

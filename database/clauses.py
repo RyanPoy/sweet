@@ -13,7 +13,7 @@ class Filter(object):
     IS, IS_NOT = 'IS', 'IS NOT'
     LIKE, NOT_LIKE = 'LIKE', 'NOT LIKE'
     BETWEEN, NOT_BETWEEN = 'BETWEEN', 'NOT BETWEEN'
-    bt_suffix, not_bt_suffix = 'bt', 'not_bt'
+    not_suffix, bt_suffix, not_bt_suffix = 'not', 'bt', 'not_bt'
 
     SPECIALS = {
         'like':     LIKE,
@@ -37,6 +37,9 @@ class Filter(object):
         self._parse_value(value) # must before _parse_name
         self._parse_name(name)
 
+    def should_ignore_none_value(self):
+        return self.operator == self.IS or self.operator == self.IS_NOT
+
     def _parse_value(self, value):
         self.value = value
         if is_str(self.value) and '.' in self.value:
@@ -49,13 +52,23 @@ class Filter(object):
         if suffix in self.SPECIALS:
             if suffix == self.bt_suffix or suffix == self.not_bt_suffix:
                 self.operator = self.SPECIALS[suffix]
-                self.name = self.name = name[:-len(suffix)-2]
-            elif is_array(self.value):
-                self.operator = self.NOT_IN
                 self.name = name[:-len(suffix)-2]
-            elif self.value is None:
-                self.operator = self.IS_NOT
-                self.name = name[:-len(suffix)-2]
+            # elif is_array(self.value):
+            #     self.operator = self.NOT_IN
+            #     self.name = name[:-len(suffix)-2]
+            # elif self.value is None:
+            #     self.operator = self.IS_NOT
+            #     self.name = name[:-len(suffix)-2]
+            elif suffix == self.not_suffix: # not
+                if is_array(self.value): # not in
+                    self.operator = self.NOT_IN
+                    self.name = name[:-len(suffix)-2]
+                elif self.value is None: # is not
+                    self.operator = self.IS_NOT
+                    self.name = name[:-len(suffix)-2]
+                else:
+                    self.operator = self.SPECIALS[suffix]
+                    self.name = name[:-len(suffix)-2]
             else:
                 self.operator = self.SPECIALS[suffix]
                 self.name = name[:-len(suffix)-2]
@@ -86,6 +99,10 @@ class Filter(object):
             return '{name} {operator} {paramstyle} AND {paramstyle}'.format(
                 qutotation=self.qutotation, name=name,
                 operator=self.operator, paramstyle=self.paramstyle
+            )
+        elif self.should_ignore_none_value():
+            return '{name} {operator} NULL'.format(
+                qutotation=self.qutotation, name=name, operator=self.operator
             )
         return '{name} {operator} {paramstyle}'.format(
             qutotation=self.qutotation, name=name, 
@@ -137,7 +154,7 @@ class WhereClause(object):
             sqls.append(f.to_sql())
             if is_array(f.value):
                 self.bindings.extend(f.value)
-            else:
+            elif not f.should_ignore_none_value():
                 self.bindings.append(f.value)
         return ' '.join(sqls) if sqls else ''
 
