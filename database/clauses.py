@@ -1,9 +1,12 @@
 #coding: utf8
-from sweet.utils import is_array
+from sweet.utils import is_array, is_str
 
-aqm = lambda s, qutotation: s if s == '*' else '.'.join([ '%s%s%s' % (qutotation, x, qutotation) for x in s.split('.') ])
+
+aqm = lambda s, qutotation: s if s == '*' or not s else '.'.join([ '%s%s%s' % (qutotation, x.strip(qutotation), qutotation) for x in s.split('.') ])
+
 
 class Filter(object):
+
     SPLIT_TAG = '__'
 
     EQ, IN, NOT_IN = '=', 'IN', 'NOT IN'
@@ -28,11 +31,19 @@ class Filter(object):
         'not':      '!=',
     }
 
-    def __init__(self, name, value):
-        self.value = value
-        self._parse(name)
+    def __init__(self, name, value, qutotation, paramstyle):
+        self.qutotation = qutotation
+        self.paramstyle = paramstyle
+        self._parse_value(value) # must before _parse_name
+        self._parse_name(name)
 
-    def _parse(self, name):
+    def _parse_value(self, value):
+        self.value = value
+        if is_str(self.value) and '.' in self.value:
+            self.value = aqm(self.value, self.qutotation)
+        return self
+
+    def _parse_name(self, name):
         vs = name.split(self.SPLIT_TAG)
         suffix = vs[-1]
         if suffix in self.SPECIALS:
@@ -60,31 +71,33 @@ class Filter(object):
         self.name = self.name.replace(self.SPLIT_TAG, '.')
         return self
 
-    def to_sql(self, qutotation, paramstyle):
-        name = aqm(self.name, qutotation)
+    def to_sql(self):
+        name = aqm(self.name, self.qutotation)
 
         if self.operator == self.IN or self.operator == self.NOT_IN:
-            param_str = ', '.join([paramstyle]*len(self.value))
+            param_str = ', '.join([self.paramstyle]*len(self.value))
             return '{name} {operator} ({param_str})'.format(
-                qutotation=qutotation, name=name, 
+                qutotation=self.qutotation, name=name, 
                 operator=self.operator, param_str=param_str
             )
         elif self.operator == self.BETWEEN or self.operator == self.NOT_BETWEEN:
             if not is_array(self.value) or len(self.value) != 2:
                 raise TypeError("%s just support a array which has 2 elements" )
             return '{name} {operator} {paramstyle} AND {paramstyle}'.format(
-                qutotation=qutotation, name=name,
-                operator=self.operator, paramstyle=paramstyle
+                qutotation=self.qutotation, name=name,
+                operator=self.operator, paramstyle=self.paramstyle
             )
         return '{name} {operator} {paramstyle}'.format(
-            qutotation=qutotation, name=name, 
-            operator=self.operator, paramstyle=paramstyle
+            qutotation=self.qutotation, name=name, 
+            operator=self.operator, paramstyle=self.paramstyle
         )
 
 
 class WhereClause(object):
     
     AND, OR = 'AND', 'OR'
+
+    PREFIX = 'WHERE'
 
     def __init__(self, qutotation, paramstyle):
         self.qutotation = qutotation
@@ -95,60 +108,88 @@ class WhereClause(object):
 
     def and_(self, **kwargs):
         for k, v in kwargs.items():
-            self.filters.append( (self.AND, Filter(k, v)) )
+            self.filters.append( (self.AND, Filter(k, v, self.qutotation, self.paramstyle)) )
         return self
 
     def or_(self, **kwargs):
         for k, v in kwargs.items():
-            self.filters.append( (self.OR, Filter(k, v)) )
+            self.filters.append( (self.OR, Filter(k, v, self.qutotation, self.paramstyle)) )
         return self
 
     def compile(self):
         s = self._compile()
+        s = self._ltrip_and_or(s)
         if s:
-            self.sql = 'WHERE %s' % s
+            self.sql = '%s %s' % (self.PREFIX, s)
         return self
+
+    def _ltrip_and_or(self, s):
+        if s.startswith(self.AND):
+            s = s[4:]
+        elif s.startswith(self.OR):
+            s = s[3:]
+        return s
 
     def _compile(self):
         sqls = []
         for and_or, f in self.filters:
             sqls.append(and_or)
-            sqls.append(f.to_sql(self.qutotation, self.paramstyle))
+            sqls.append(f.to_sql())
             if is_array(f.value):
                 self.bindings.extend(f.value)
             else:
                 self.bindings.append(f.value)
-
-        if not sqls:
-            s = ''
-        else:
-            s = ' '.join(sqls)
-            if s.startswith(self.AND):
-                s = s[4:]
-            elif s.startswith(self.OR):
-                s = s[3:]
-        return s
+        return ' '.join(sqls) if sqls else ''
 
 
 class HavingClause(WhereClause):
-
-    def compile(self):
-        s = self._compile()
-        if s:
-            self.sql = 'HAVING %s' % s
-        return self
-
-
-class JoinOnClause(WhereClause):
     
+    PREFIX = 'HAVING'
+
+
+class JoinClause(WhereClause):
+    
+    PREFIX = 'INNER JOIN'
+
     def __init__(self, qutotation, paramstyle, tbname):
         super().__init__(qutotation, paramstyle)
         self.tbname = tbname
+        self._ons = []
+
+    def on(self, *ons):
+        return self._add_on(self.AND, *ons)
+
+    def or_on(self, *ons):
+        return self._add_on(self.OR, *ons)        
+
+    def _add_on(self, and_or, *ons):
+        for on in ons:
+            s = ' = '.join([ aqm(x.strip(), self.qutotation) for x in on.split('=') ])
+            # self._ons.append( (and_or, s))
+            self._ons.append('%s %s' % (and_or, s))
+        return self
 
     def compile(self):
         s = self._compile()
-        if s:
-            self.sql = 'JOIN %s ON %s' % (aqm(self.tbname), s)
+        on = self._ltrip_and_or(' '.join(self._ons).strip())
+
+        if on and s:
+            self.sql = '%s %s ON %s %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), on, s)
+        elif on:
+            self.sql = '%s %s ON %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), on)
+        elif s:
+            s = self._ltrip_and_or(s)
+            self.sql = '%s %s ON %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), s)
+        else:
+            self.sql = '%s %s' % (self.PREFIX, aqm(self.tbname, self.qutotation))
         return self
 
 
+class LeftJoinClause(JoinClause):
+
+    PREFIX = 'LEFT JOIN'
+
+
+class RightJoinClause(JoinClause):
+
+    PREFIX = 'RIGHT JOIN'

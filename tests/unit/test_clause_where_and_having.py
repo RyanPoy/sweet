@@ -1,6 +1,6 @@
 #coding: utf8
 from sweet.tests.unit import TestCase
-from sweet.database.clauses import WhereClause, HavingClause
+from sweet.database.clauses import WhereClause, HavingClause, JoinClause
 
 
 class WhereAndHavingClauseTest(TestCase):
@@ -8,6 +8,7 @@ class WhereAndHavingClauseTest(TestCase):
     def setUp(self):
         self.where_clause = WhereClause('`', '%s')
         self.having_clause = HavingClause('`', '%s')
+        self.join_clause = JoinClause('`', '%s', 'mobiles')
 
     def test_basic_where_clause(self):
         c = self.where_clause.compile()
@@ -138,6 +139,24 @@ class WhereAndHavingClauseTest(TestCase):
         c = self.having_clause.or_(id=1, name='ryanpoy').compile()
         self.assertEqual('HAVING `id` = %s OR `name` = %s', c.sql)
         self.assertEqual([1, 'ryanpoy'], c.bindings)
+
+    def test_join_and(self):
+        c = self.join_clause
+        c.on('users.id=cars.user_id').and_(mobiles__name='iphone').and_(users__age=20).compile()
+        self.assertEqual('INNER JOIN `mobiles` ON `users`.`id` = `cars`.`user_id` AND `mobiles`.`name` = %s AND `users`.`age` = %s', c.sql)
+        self.assertEqual(['iphone', 20], c.bindings)
+
+    def test_join_or(self):
+        c = self.join_clause
+        c.on('users.id=cars.user_id').or_(mobiles__name='iphone').or_(users__age=20).compile()
+        self.assertEqual('INNER JOIN `mobiles` ON `users`.`id` = `cars`.`user_id` OR `mobiles`.`name` = %s OR `users`.`age` = %s', c.sql)
+        self.assertEqual(['iphone', 20], c.bindings)
+
+    def test_join_without_on(self):
+        c = self.join_clause
+        c.or_(mobiles__name='iphone').or_(users__age=20).compile()
+        self.assertEqual('INNER JOIN `mobiles` ON `mobiles`.`name` = %s OR `users`.`age` = %s', c.sql)
+        self.assertEqual(['iphone', 20], c.bindings)
 
     # def test_order_by(self):
     #     c = self.where_clause.select('*').order_by('email').order_by('age', 'desc')

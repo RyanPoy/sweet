@@ -286,19 +286,19 @@ class MySQLTableQueryTest(TestCase):
 
     def test_join(self):
         tb = self.get_table().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_(name="ryanpoy")\
-          .join('cars', on="users.id=cars.user_id").where(cars__name='focus')
+          .join('cars', "users.id=cars.user_id").where(cars__name='focus')
         self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s AND `cars`.`name` = %s', tb.sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy', 'focus'], tb.bindings)
+        self.assertEqual([ 1, 2, 3, 'ryanpoy', 'focus'], tb.bindings)
 
     def test_left_join(self):
-        tb = self.get_table().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_(name="ryanpoy").left_join('cars', on="users.id=cars.user_id")
+        tb = self.get_table().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_(name="ryanpoy").left_join('cars', "users.id=cars.user_id")
         self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
+        self.assertEqual([ 1, 2, 3, 'ryanpoy'], tb.bindings)
 
     def test_right_join(self):
-        tb = self.get_table().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_(name="ryanpoy").right_join('cars', on="users.id=cars.user_id")
+        tb = self.get_table().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_(name="ryanpoy").right_join('cars', "users.id=cars.user_id")
         self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` RIGHT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
+        self.assertEqual([ 1, 2, 3, 'ryanpoy'], tb.bindings)
 
     def test_count(self):
         def _(sql, *params):
@@ -429,16 +429,16 @@ class MySQLTableQueryTest(TestCase):
     def test_read_lock(self):
         tb = self.get_table().select('users.id').select('cars.name')\
                  .where(id=[1,2,3]).or_(name="ryanpoy")\
-                 .left_join('cars', on="users.id=cars.user_id").read_lock()
+                 .left_join('cars', "users.id=cars.user_id").read_lock()
         self.assertEqual('SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s LOCK IN SHARE MODE', tb.sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
+        self.assertEqual([ 1, 2, 3, 'ryanpoy'], tb.bindings)
 
     def test_write_lock(self):
         tb = self.get_table().select('users.id').select('cars.name')\
                  .where(id=[1,2,3]).or_(name="ryanpoy")\
-                 .left_join('cars', on="users.id=cars.user_id").write_lock()
+                 .left_join('cars', "users.id=cars.user_id").write_lock()
         self.assertEqual('SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s FOR UPDATE', tb.sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
+        self.assertEqual([ 1, 2, 3, 'ryanpoy'], tb.bindings)
 
     def test_where_exists(self):
         users = self.get_table()

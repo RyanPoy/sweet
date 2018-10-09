@@ -28,7 +28,7 @@ class Table(object):
         self._bindings = []
         self._group_bys = []
         self._order_bys = []
-        self._joins = []
+        self._joins_clauses = []
         self._limit = None
         self._offset = None
         self._lock = self.LOCK.NILL
@@ -89,10 +89,10 @@ class Table(object):
     @cp
     def order_by(self, column, desc=False):
         c = self.__aqm(column)
-        if not desc:
-            self._order_bys.append(c)
-        else:
+        if desc:
             self._order_bys.append('%s DESC' % c)
+        else:
+            self._order_bys.append(c)
         return self
 
     @cp
@@ -110,17 +110,24 @@ class Table(object):
         page_num = 1 if page_num < 0 else page_num
         return self.limit((page_num-1) * page_size).offset(page_size)
 
-    @cp
-    def join(self, tbname, on):
-        return self.__join('INNER JOIN', tbname, on)
+    def join(self, tbname, on, func=None):
+        return self.__join(JoinClause, tbname, on, func)
+
+    def left_join(self, tbname, on, func=None):
+        return self.__join(LeftJoinClause, tbname, on, func)
+
+    def right_join(self, tbname, on, func=None):
+        return self.__join(RightJoinClause, tbname, on, func)
 
     @cp
-    def left_join(self, tbname, on):
-        return self.__join('LEFT JOIN', tbname, on)
-
-    @cp
-    def right_join(self, tbname, on):
-        return self.__join('RIGHT JOIN', tbname, on)
+    def __join(self, join_clause_clazz, tbname, on, func=None):
+        jc = join_clause_clazz(self.qutotation_marks, self.paramstyle_marks, tbname)
+        if on:
+            jc.on(on)
+        if func: 
+            jc = func(jc)
+        self._joins_clauses.append(jc)
+        return self
 
     @cp
     def read_lock(self):
@@ -135,29 +142,19 @@ class Table(object):
     @cp
     def where_exists(self, *tables):
         for t in tables:
-            self._exists_tables.append( ("and", t) )
+            self._exists_tables.append( (WhereClause.AND, t) )
         return self
 
     @cp
     def or_exists(self, *tables):
         for t in tables:
-            self._exists_tables.append( ("or", t) )
+            self._exists_tables.append( (WhereClause.OR, t) )
         return self
 
-    def __join(self, join_type, tbname, on):
-        self._joins.append(mydict(
-            join_type = join_type,
-            tbname = tbname,
-            on = on
-        ))
-        return self
-
-    def __add_quotation_marks(self, s):
+    def __aqm(self, s):
         if s == '*':
             return s
         return '.'.join([ '%s%s%s' % (self.qutotation_marks, x, self.qutotation_marks) for x in s.split('.') ])
-
-    __aqm = __add_quotation_marks
     _join_columns_sql = lambda self, columns: ', '.join(map(self.__aqm, columns))
 
     @property
@@ -178,7 +175,12 @@ class Table(object):
         return lock
 
     def __push_exist_sql(self, where_sql, sql):
-        exists_tables_sql = self.__exists_tables_sql
+        sqls = []
+        for or_and, t in self._exists_tables:
+            sqls.append('%s EXISTS (%s)' % (or_and, t.sql))
+            self.bindings.extend(t.bindings)
+        exists_tables_sql = ' '.join(sqls)
+
         if exists_tables_sql:
             if not where_sql:
                 if exists_tables_sql.startswith('AND '):
@@ -224,23 +226,13 @@ class Table(object):
         return sql
 
     @property
-    def __exists_tables_sql(self):
-        sql = []
-        for or_and, t in self._exists_tables:
-            if or_and == 'and':
-                sql.append('AND EXISTS (%s)' % t.sql)
-                self.bindings.extend(t.bindings)
-            else:
-                sql.append('OR EXISTS (%s)' % t.sql)
-                self.bindings.extend(t.bindings)
-        return ' '.join(sql)
-
-    @property
     def __join_sql(self):
         sqls = []
-        for j in self._joins:
-            on = ' = '.join([ self.__aqm(x.strip()) for x in j.on.split('=') ])
-            sqls.append('%s %s ON %s' % (j.join_type, self.__aqm(j.tbname), on))
+        for j in self._joins_clauses:
+            j.compile()
+            if j.sql:
+                sqls.append(j.sql)
+            self.bindings.extend(j.bindings)
         return ' '.join(sqls)
 
     def __limit_and_offset_sql(self):
@@ -385,7 +377,7 @@ class Table(object):
         return self.db.execute_rowcount(sql, *self.bindings)        
 
     def delete(self):
-        if not self._joins: # needn't join
+        if not self._joins_clauses: # needn't join
             sql = "DELETE {from_sql}".format(from_sql=self.__from_sql)
         else:
             sql = "DELETE {tablename} {from_sql}".format(
@@ -432,7 +424,7 @@ class Table(object):
         if column == '*':
             distinct = False
 
-        column_name = self.__aqm(column) if column else '*'
+        column_name = self.__aqm(column)
         sql = 'SELECT {func_name}({column_name}) AS aggregate {from_sql}'.format(
             func_name=func_name,
             column_name=column_name if not distinct else 'DISTINCT %s' % column_name,
