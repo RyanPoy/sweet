@@ -176,107 +176,107 @@ class WhereAndHavingClauseTest(TestCase):
         self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `name` = %s', c.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], c.bindings)
 
-    # def test_having_null(self):
-    #     c = self.having_clause.and_(id=[1, 2, 3], name=None).compile()
-    #     self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `name` IS NULL', c.sql)
-    #     self.assertEqual([1, 2, 3], c.bindings)
+    def test_having_null(self):
+        c = self.having_clause.and_(id=[1, 2, 3], name=None).compile()
+        self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `name` IS NULL', c.sql)
+        self.assertEqual([1, 2, 3], c.bindings)
 
-    # def test_having_gt(self):
-    #     c = self.where_clause.and_(id=[1, 2, 3], age__gt=30).compile()
-    #     self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `age` > %s', c.sql)
-    #     self.assertEqual([1, 2, 3, 30], c.bindings)
+    def test_having_gt(self):
+        c = self.having_clause.and_(id=[1, 2, 3], age__gt=30).compile()
+        self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `age` > %s', c.sql)
+        self.assertEqual([1, 2, 3, 30], c.bindings)
 
-    # def test_having_gte(self):
-    #     c = self.where_clause.and_(id=[1, 2, 3], age__gte=30).compile()
-    #     self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `age` >= %s', c.sql)
-    #     self.assertEqual([1, 2, 3, 30], c.bindings)
+    def test_having_gte(self):
+        c = self.having_clause.and_(id=[1, 2, 3], age__gte=30).compile()
+        self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `age` >= %s', c.sql)
+        self.assertEqual([1, 2, 3, 30], c.bindings)
 
-    # def test_having_lt(self):
-    #     c = self.where_clause.and_(id=[1, 2, 3], age__lt=30)
-    #     self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `age` < %s', c.sql)
-    #     self.assertEqual([1, 2, 3, 30], c.bindings)
+    def test_having_lt(self):
+        c = self.having_clause.and_(id=[1, 2, 3], age__lt=30).compile()
+        self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `age` < %s', c.sql)
+        self.assertEqual([1, 2, 3, 30], c.bindings)
 
-    # def test_having_lte(self):
-    #     c = self.where_clause.and_(id=[1, 2, 3], age__lte=30)
-    #     self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `age` <= %s', c.sql)
-    #     self.assertEqual([1, 2, 3, 30], c.bindings)
+    def test_having_lte(self):
+        c = self.having_clause.and_(id=[1, 2, 3], age__lte=30).compile()
+        self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `age` <= %s', c.sql)
+        self.assertEqual([1, 2, 3, 30], c.bindings)
 
-    # def test_having_between(self):
-    #     c = self.where_clause.and_(id__bt=[1, 2])
-    #     self.assertEqual('HAVING `id` BETWEEN %s AND %s', c.sql)
-    #     self.assertEqual([1, 2], c.bindings)
+    def test_having_between(self):
+        c = self.having_clause.and_(id__bt=[1, 2]).compile()
+        self.assertEqual('HAVING `id` BETWEEN %s AND %s', c.sql)
+        self.assertEqual([1, 2], c.bindings)
 
-    # def test_having_between_should_give_me_error(self):
-    #     c = self.where_clause.and_(id__bt=[1, 2, 3])
-    #     with self.assertRaises(TypeError):
-    #         c.sql
+    def test_having_between_should_give_me_error(self):
+        c = self.having_clause.and_(id__bt=[1, 2, 3])
+        with self.assertRaises(TypeError):
+            c.compile()
 
-    # def test_having_not(self):
-    #     c = self.where_clause.and_(id__not=1, name__not='ryanpoy')
-    #     self.assertEqual('HAVING `id` != %s AND `name` != %s', c.sql)
-    #     self.assertEqual([1, 'ryanpoy'], c.bindings)
+    def test_having_not(self):
+        c = self.having_clause.and_(id__not=1, name__not='ryanpoy').compile()
+        self.assertEqual('HAVING `id` != %s AND `name` != %s', c.sql)
+        self.assertEqual([1, 'ryanpoy'], c.bindings)
 
-    # def test_having_not_null(self):
-    #     c = self.where_clause.and_(id=[1, 2, 3]).and_(name__not=None)
-    #     self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `name` IS NOT NULL', c.sql)
-    #     self.assertEqual([1, 2, 3], c.bindings)
+    def test_having_not_null(self):
+        c = self.having_clause.and_(id=[1, 2, 3]).and_(name__not=None).compile()
+        self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `name` IS NOT NULL', c.sql)
+        self.assertEqual([1, 2, 3], c.bindings)
 
-    # def test_having_not_in(self):
-    #     c = self.where_clause.and_(id__not=[1, 2, 3], name__not='ryanpoy')
-    #     self.assertEqual('HAVING `id` NOT IN (%s, %s, %s) AND `name` != %s', c.sql)
-    #     self.assertEqual([1, 2, 3, 'ryanpoy'], c.bindings)
+    def test_having_not_in(self):
+        c = self.having_clause.and_(id__not=[1, 2, 3], name__not='ryanpoy').compile()
+        self.assertEqual('HAVING `id` NOT IN (%s, %s, %s) AND `name` != %s', c.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], c.bindings)
 
-    # def test_having_not_between(self):
-    #     c = self.where_clause.and_(id__not_bt=[1, 2])
-    #     self.assertEqual('HAVING `id` NOT BETWEEN %s AND %s', c.sql)
-    #     self.assertEqual([1, 2], c.bindings)
+    def test_having_not_between(self):
+        c = self.having_clause.and_(id__not_bt=[1, 2]).compile()
+        self.assertEqual('HAVING `id` NOT BETWEEN %s AND %s', c.sql)
+        self.assertEqual([1, 2], c.bindings)
 
-    # def test_or_having(self):
-    #     c = self.where_clause.or_having(id=1, name='ryanpoy')
-    #     self.assertEqual('HAVING `id` = %s OR `name` = %s', c.sql)
-    #     self.assertEqual([1, 'ryanpoy'], c.bindings)
+    def test_or_having(self):
+        c = self.having_clause.or_(id=1, name='ryanpoy').compile()
+        self.assertEqual('HAVING `id` = %s OR `name` = %s', c.sql)
+        self.assertEqual([1, 'ryanpoy'], c.bindings)
 
-    # def test_or_having_between(self):
-    #     c = self.where_clause.and_(name='ryanpoy').or_having(id__bt=[1, 2])
-    #     self.assertEqual('HAVING `name` = %s OR `id` BETWEEN %s AND %s', c.sql)
-    #     self.assertEqual(['ryanpoy', 1, 2], c.bindings)
+    def test_or_having_between(self):
+        c = self.having_clause.and_(name='ryanpoy').or_(id__bt=[1, 2]).compile()
+        self.assertEqual('HAVING `name` = %s OR `id` BETWEEN %s AND %s', c.sql)
+        self.assertEqual(['ryanpoy', 1, 2], c.bindings)
 
-    # def test_or_having_in(self):
-    #     c = self.where_clause.or_having(id=[1, 2, 3], name='ryanpoy')
-    #     self.assertEqual('HAVING `id` IN (%s, %s, %s) OR `name` = %s', c.sql)
-    #     self.assertEqual([1, 2, 3, 'ryanpoy'], c.bindings)
+    def test_or_having_in(self):
+        c = self.having_clause.or_(id=[1, 2, 3], name='ryanpoy').compile()
+        self.assertEqual('HAVING `id` IN (%s, %s, %s) OR `name` = %s', c.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], c.bindings)
 
-    # def test_or_having_null(self):
-    #     c = self.where_clause.or_having(id=[1, 2, 3], name=None)
-    #     self.assertEqual('HAVING `id` IN (%s, %s, %s) OR `name` IS NULL', c.sql)
-    #     self.assertEqual([1, 2, 3], c.bindings)
+    def test_or_having_null(self):
+        c = self.having_clause.or_(id=[1, 2, 3], name=None).compile()
+        self.assertEqual('HAVING `id` IN (%s, %s, %s) OR `name` IS NULL', c.sql)
+        self.assertEqual([1, 2, 3], c.bindings)
 
-    # def test_or_having_not_between(self):
-    #     c = self.where_clause.and_(name='ryanpoy').or_having(id__not_bt=[1, 2])
-    #     self.assertEqual('HAVING `name` = %s OR `id` NOT BETWEEN %s AND %s', c.sql)
-    #     self.assertEqual(['ryanpoy', 1, 2], c.bindings)
+    def test_or_having_not_between(self):
+        c = self.having_clause.and_(name='ryanpoy').or_(id__not_bt=[1, 2]).compile()
+        self.assertEqual('HAVING `name` = %s OR `id` NOT BETWEEN %s AND %s', c.sql)
+        self.assertEqual(['ryanpoy', 1, 2], c.bindings)
 
-    # def test_or_having_not(self):
-    #     c = self.where_clause.or_having(id__not=1, name__not='ryanpoy')
-    #     self.assertEqual('HAVING `id` != %s OR `name` != %s', c.sql)
-    #     self.assertEqual([1, 'ryanpoy'], c.bindings)
+    def test_or_having_not(self):
+        c = self.having_clause.or_(id__not=1, name__not='ryanpoy').compile()
+        self.assertEqual('HAVING `id` != %s OR `name` != %s', c.sql)
+        self.assertEqual([1, 'ryanpoy'], c.bindings)
 
-    # def test_or_having_not_null(self):
-    #     c = self.where_clause.or_having(id=[1, 2, 3]).or_having(name__not=None)
-    #     self.assertEqual('HAVING `id` IN (%s, %s, %s) OR `name` IS NOT NULL', c.sql)
-    #     self.assertEqual([1, 2, 3], c.bindings)
+    def test_or_having_not_null(self):
+        c = self.having_clause.or_(id=[1, 2, 3]).or_(name__not=None).compile()
+        self.assertEqual('HAVING `id` IN (%s, %s, %s) OR `name` IS NOT NULL', c.sql)
+        self.assertEqual([1, 2, 3], c.bindings)
 
-    # def test_or_having_not_in(self):
-    #     c = self.where_clause.or_having(id__not=[1, 2, 3], name__not='ryanpoy')
-    #     self.assertEqual('HAVING `id` NOT IN (%s, %s, %s) OR `name` != %s', c.sql)
-    #     self.assertEqual([1, 2, 3, 'ryanpoy'], c.bindings)
+    def test_or_having_not_in(self):
+        c = self.having_clause.or_(id__not=[1, 2, 3], name__not='ryanpoy').compile()
+        self.assertEqual('HAVING `id` NOT IN (%s, %s, %s) OR `name` != %s', c.sql)
+        self.assertEqual([1, 2, 3, 'ryanpoy'], c.bindings)
 
     # def test_limits_and_offsets(self):
-    #     c = self.get_clause().offset(5).limit(10)
+    #     c = self.get_clause().offset(5).limit(10).compile()
     #     self.assertEqual('LIMIT 10 OFFSET 5', c.sql)
 
     # def test_page(self):
-    #     c = self.get_clause().page(2, 15)
+    #     c = self.get_clause().page(2, 15).compile()
     #     self.assertEqual('LIMIT 15 OFFSET 15', c.sql)
 
     # def test_join(self):
