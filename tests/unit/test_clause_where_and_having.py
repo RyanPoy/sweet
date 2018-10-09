@@ -1,6 +1,8 @@
 #coding: utf8
 from sweet.tests.unit import TestCase
-from sweet.database.clauses import WhereClause, HavingClause, JoinClause
+from sweet.database.clauses import WhereClause, HavingClause, \
+                                    JoinClause, OrderClause, \
+                                    GroupClause
 
 
 class WhereAndHavingClauseTest(TestCase):
@@ -9,6 +11,8 @@ class WhereAndHavingClauseTest(TestCase):
         self.where_clause = WhereClause('`', '%s')
         self.having_clause = HavingClause('`', '%s')
         self.join_clause = JoinClause('`', '%s', 'mobiles')
+        self.order_clause = OrderClause('`')
+        self.group_clause = GroupClause('`')
 
     def test_basic_where_clause(self):
         c = self.where_clause.compile()
@@ -158,13 +162,13 @@ class WhereAndHavingClauseTest(TestCase):
         self.assertEqual('INNER JOIN `mobiles` ON `mobiles`.`name` = %s OR `users`.`age` = %s', c.sql)
         self.assertEqual(['iphone', 20], c.bindings)
 
-    # def test_order_by(self):
-    #     c = self.where_clause.order_by('email').order_by('age', 'desc')
-    #     self.assertEqual('SELECT * FROM `users` ORDER BY `email`, `age` DESC', c.sql)
+    def test_order_by(self):
+        c = self.order_clause.by('email').by('age', desc=True).compile()
+        self.assertEqual('ORDER BY `email`, `age` DESC', c.sql)
 
-    # def test_group_bys(self):
-    #     c = self.where_clause.group_by('id', 'email')
-    #     self.assertEqual('SELECT * FROM `users` GROUP BY `id`, `email`', c.sql )
+    def test_group_bys(self):
+        c = self.group_clause.by('id', 'email').compile()
+        self.assertEqual('GROUP BY `id`, `email`', c.sql )
 
     def test_having(self):
         c = self.having_clause.and_(id=1, name='ryanpoy').compile()

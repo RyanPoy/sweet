@@ -26,8 +26,8 @@ class Table(object):
         self._where_clause = WhereClause(self.qutotation_marks, self.paramstyle_marks)
         self._having_clause = HavingClause(self.qutotation_marks, self.paramstyle_marks)
         self._bindings = []
-        self._group_bys = []
-        self._order_bys = []
+        self._group_clause = GroupClause(self.qutotation_marks)
+        self._order_clause = OrderClause(self.qutotation_marks)
         self._joins_clauses = []
         self._limit = None
         self._offset = None
@@ -82,17 +82,12 @@ class Table(object):
 
     @cp
     def group_by(self, *columns):
-        for c in columns:
-            self._group_bys.append(self.__aqm(c))
+        self._group_clause.by(*columns)
         return self
 
     @cp
     def order_by(self, column, desc=False):
-        c = self.__aqm(column)
-        if desc:
-            self._order_bys.append('%s DESC' % c)
-        else:
-            self._order_bys.append(c)
+        self._order_clause.by(column, desc)
         return self
 
     @cp
@@ -208,18 +203,18 @@ class Table(object):
             self.bindings.extend(self._where_clause.bindings)
 
         sql = self.__push_exist_sql(where_sql, sql)
+        group_sql = self._group_clause.compile().sql
+        if group_sql:
+            sql = '%s %s' % (sql, group_sql)
 
-        if self._group_bys:
-            sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_bys))
-
-        self._having_clause.compile()
-        having_sql = self._having_clause.sql
+        having_sql = self._having_clause.compile().sql
         if having_sql:
             sql = '%s %s' % (sql, having_sql)
             self.bindings.extend(self._having_clause.bindings)
 
-        if self._order_bys:
-            sql = '%s ORDER BY %s' % (sql, ', '.join(self._order_bys))
+        order_sql = self._order_clause.compile().sql
+        if order_sql:
+            sql = '%s %s' % (sql, order_sql)
 
         limit_and_offset_sql = self.__limit_and_offset_sql()
         if limit_and_offset_sql:

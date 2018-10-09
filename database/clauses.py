@@ -164,6 +164,8 @@ class HavingClause(WhereClause):
     PREFIX = 'HAVING'
 
 
+######################################
+###
 class JoinClause(WhereClause):
     
     PREFIX = 'INNER JOIN'
@@ -210,3 +212,41 @@ class LeftJoinClause(JoinClause):
 class RightJoinClause(JoinClause):
 
     PREFIX = 'RIGHT JOIN'
+
+
+######################################
+###
+class ByClause(object):
+
+    def __init__(self, qutotation):
+        self.qutotation = qutotation
+        self._bys = []
+        self.sql = ''
+
+    def compile(self):
+        if self._bys:
+            self.sql = '%s %s' % (self.PREFIX, ', '.join(self._bys))
+        return self
+
+
+class OrderClause(ByClause):
+
+    PREFIX = 'ORDER BY'
+
+    def by(self, column, desc=False):
+        c = aqm(column, self.qutotation)
+        if desc:
+            self._bys.append('%s DESC' % c)
+        else:
+            self._bys.append(c)
+        return self
+
+
+class GroupClause(ByClause):
+
+    PREFIX = 'GROUP BY'
+
+    def by(self, *columns):
+        for c in columns:
+            self._bys.append(aqm(c, self.qutotation))
+        return self
