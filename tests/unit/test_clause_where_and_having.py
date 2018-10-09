@@ -14,7 +14,7 @@ class WhereAndHavingClauseTest(TestCase):
         self.join_clause = JoinClause('`', '%s', 'mobiles')
         self.order_clause = OrderClause('`')
         self.group_clause = GroupClause('`')
-        self.select_clause = SelectClause('`', '%s')
+        self.select_clause = SelectClause('`')
         self.page_clause = PageClause()
 
     def test_basic_where_clause(self):

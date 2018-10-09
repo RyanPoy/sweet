@@ -21,7 +21,7 @@ class Table(object):
     def __init__(self, db, tbname):
         self.db = db
         self.tbname = tbname
-        self.select_clause = SelectClause(self.qutotation_marks, self.paramstyle_marks)
+        self.select_clause = SelectClause(self.qutotation_marks)
         self.where_clause = WhereClause(self.qutotation_marks, self.paramstyle_marks)
         self.having_clause = HavingClause(self.qutotation_marks, self.paramstyle_marks)
         self._bindings = []
@@ -143,10 +143,8 @@ class Table(object):
         return self
 
     def __aqm(self, s):
-        if s == '*':
-            return s
-        return '.'.join([ '%s%s%s' % (self.qutotation_marks, x, self.qutotation_marks) for x in s.split('.') ])
-    _join_columns_sql = lambda self, columns: ', '.join(map(self.__aqm, columns))
+        return aqm(s, self.qutotation_marks)
+    _join_columns_sql = lambda self, columns: ', '.join([ aqm(c, self.qutotation_marks) for c in columns ])
 
     @property
     def sql(self):
@@ -239,36 +237,9 @@ class Table(object):
         return self.db.execute_lastrowid(sql, *record.values())
 
     def insert(self, records=None, **kwargs):
-        list_records = []
-        if records:
-            if is_hash(records):
-                list_records.append(records)
-            elif is_array(records):
-                list_records.extend(records)
-
-        if kwargs:
-            list_records.append(kwargs)
-
-        if not list_records:
-            return 0 # nothing insert
-
-        if len(list_records) > 1:
-            keys = list_records[0].keys()
-            for r in list_records:
-                if r.keys() != keys:
-                    raise Exception("multiple insert only support same keys records")
-
-        values_sql, bindings = [], []
-        for r in list_records:
-            values_sql.append('(%s)' % ', '.join([self.paramstyle_marks]*len(r)))
-            bindings.extend(r.values())
-        
-        sql = 'INSERT INTO {tablename} ({columns}) VALUES {values_sql}'.format(
-            tablename=self.__aqm(self.tbname),
-            columns=self._join_columns_sql(list_records[0].keys()),
-            values_sql=', '.join(values_sql)
-        )    
-        return self.db.execute_rowcount(sql, *bindings)
+        insert_clause = InsertClause(self.qutotation_marks, self.paramstyle_marks, self.tbname)
+        insert_clause.insert(records, **kwargs).compile()
+        return self.db.execute_rowcount(insert_clause.sql, *insert_clause.bindings)
 
     @cp
     def update(self, **kwargs):

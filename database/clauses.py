@@ -1,5 +1,5 @@
 #coding: utf8
-from sweet.utils import is_array, is_str
+from sweet.utils import is_array, is_str, is_hash
 
 
 aqm = lambda s, qutotation: s if s == '*' or not s else '.'.join([ '%s%s%s' % (qutotation, x.strip(qutotation), qutotation) for x in s.split('.') ])
@@ -284,9 +284,8 @@ class PageClause(object):
 ###
 class SelectClause(object):
 
-    def __init__(self, qutotation, paramstyle):
+    def __init__(self, qutotation):
         self.qutotation = qutotation
-        self.paramstyle = paramstyle
         self.sql = ''
         self.columns = []
         self._distinct = False
@@ -309,4 +308,49 @@ class SelectClause(object):
             self.sql = 'SELECT DISTINCT %s' % sql
         else:
             self.sql = 'SELECT %s' % sql
+        return self
+
+
+class InsertClause(object):
+    
+    def __init__(self, qutotation, paramstyle, tbname):
+        self.qutotation = qutotation
+        self.paramstyle = paramstyle
+        self.sql = ''
+        self.tbname = tbname
+        self.list_records = []
+        self.bindings = []
+
+    def insert(self, records=None, **kwargs):
+        if records:
+            if is_hash(records):
+                self.list_records.append(records)
+            elif is_array(records):
+                self.list_records.extend(records)
+
+        if kwargs:
+            self.list_records.append(kwargs)
+
+        return self
+
+    def compile(self):
+        if not self.list_records:
+            return self # nothing insert
+
+        if len(self.list_records) > 1:
+            keys = self.list_records[0].keys()
+            for r in self.list_records:
+                if r.keys() != keys:
+                    raise Exception("multiple insert only support same keys records")
+
+        values_sql = []
+        for r in self.list_records:
+            values_sql.append('(%s)' % ', '.join([self.paramstyle]*len(r)))
+            self.bindings.extend(r.values())
+        
+        self.sql = 'INSERT INTO {tablename} ({columns}) VALUES {values_sql}'.format(
+            tablename=aqm(self.tbname, self.qutotation),
+            columns=', '.join([ aqm(c, self.qutotation) for c in self.list_records[0].keys() ]),
+            values_sql=', '.join(values_sql)
+        )
         return self
