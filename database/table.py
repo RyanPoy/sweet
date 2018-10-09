@@ -198,7 +198,9 @@ class Table(object):
         join_sql = self.__join_sql
         if join_sql:
             sql = '%s %s' % (sql, join_sql)
+        return self.__core_sql(sql)
 
+    def __core_sql(self, sql):
         self._where_clause.compile()
         where_sql = self._where_clause.sql
         if where_sql:
@@ -302,41 +304,18 @@ class Table(object):
         sql = '%s SET %s' % (sql, ', '.join(update_columns))
         self.bindings.extend(update_bindings)
 
-        self._where_clause.compile()
-        where_sql = self._where_clause.sql
-        if where_sql:
-            sql = '%s %s' % (sql, where_sql)
-            self.bindings.extend(self._where_clause.bindings)
-
-        sql = self.__push_exist_sql(where_sql, sql)
-
-        if self._group_bys:
-            sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_bys))
-
-        self._having_clause.compile()
-        having_sql = self._having_clause.sql
-        if having_sql:
-            sql = '%s %s' % (sql, having_sql)
-            self.bindings.extend(self._having_clause.bindings)
-
-        if self._order_bys:
-            sql = '%s ORDER BY %s' % (sql, ', '.join(self._order_bys))
-
-        limit_and_offset_sql = self.__limit_and_offset_sql()
-        if limit_and_offset_sql:
-            sql = '%s %s' % (sql, limit_and_offset_sql)
+        sql = self.__core_sql(sql)
 
         return self.db.execute_rowcount(sql, *self.bindings)
 
     def increase(self, **kwargs):
-        return self.__in_or_decrease('in', **kwargs)
+        return self.__in_or_decrease('+', **kwargs)
 
     def decrease(self, **kwargs):
-        return self.__in_or_decrease('de', **kwargs)
+        return self.__in_or_decrease('-', **kwargs)
 
     @cp
-    def __in_or_decrease(self, in_or_de='in', **kwargs):
-        flag = '+' if in_or_de == 'in' else '-'
+    def __in_or_decrease(self, flag='+', **kwargs):
         update_columns, update_bindings = [], []
         for k, v in kwargs.items():
             update_columns.append('{name} = {name} {flag} %s'.format(name=self.__aqm(k), flag=flag))
@@ -350,29 +329,7 @@ class Table(object):
         sql = '%s SET %s' % (sql, ', '.join(update_columns))
         self.bindings.extend(update_bindings)
 
-        self._where_clause.compile()
-        where_sql = self._where_clause.sql
-        if where_sql:
-            sql = '%s %s' % (sql, where_sql)
-            self.bindings.extend(self._where_clause.bindings)
-
-        sql = self.__push_exist_sql(where_sql, sql)
-
-        if self._group_bys:
-            sql = '%s GROUP BY %s' % (sql, ', '.join(self._group_bys))
-
-        self._having_clause.compile()
-        having_sql = self._having_clause.sql
-        if having_sql:
-            sql = '%s %s' % (sql, having_sql)
-            self.bindings.extend(self._having_clause.bindings)
-
-        if self._order_bys:
-            sql = '%s ORDER BY %s' % (sql, ', '.join(self._order_bys))
-
-        limit_and_offset_sql = self.__limit_and_offset_sql()
-        if limit_and_offset_sql:
-            sql = '%s %s' % (sql, limit_and_offset_sql)
+        sql = self.__core_sql(sql)
 
         return self.db.execute_rowcount(sql, *self.bindings)        
 
