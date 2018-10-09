@@ -250,3 +250,32 @@ class GroupClause(ByClause):
         for c in columns:
             self._bys.append(aqm(c, self.qutotation))
         return self
+
+
+class PageClause(object):
+
+    def __init__(self):
+        self._limit = None
+        self._offset = None
+
+    def limit(self, n):
+        self._limit = n
+        return self
+
+    def offset(self, n):
+        self._offset = n
+        return self
+
+    def page(self, page_num, page_size):
+        page_num = 1 if page_num < 0 else page_num
+        return self.limit((page_num-1) * page_size).offset(page_size)
+
+    def compile(self):
+        sqls = []
+        if self._limit:
+            sqls.append('LIMIT %s' % self._limit)
+        if self._offset:
+            sqls.append('OFFSET %s' % self._offset)
+        self.sql = ' '.join(sqls)
+        return self
+

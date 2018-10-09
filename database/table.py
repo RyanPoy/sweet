@@ -23,14 +23,13 @@ class Table(object):
         self.tbname = tbname
         self._select = []
         self._distinct = False
-        self._where_clause = WhereClause(self.qutotation_marks, self.paramstyle_marks)
-        self._having_clause = HavingClause(self.qutotation_marks, self.paramstyle_marks)
+        self.where_clause = WhereClause(self.qutotation_marks, self.paramstyle_marks)
+        self.having_clause = HavingClause(self.qutotation_marks, self.paramstyle_marks)
         self._bindings = []
-        self._group_clause = GroupClause(self.qutotation_marks)
-        self._order_clause = OrderClause(self.qutotation_marks)
+        self.group_clause = GroupClause(self.qutotation_marks)
+        self.order_clause = OrderClause(self.qutotation_marks)
         self._joins_clauses = []
-        self._limit = None
-        self._offset = None
+        self.page_clause = PageClause()
         self._lock = self.LOCK.NILL
         self._exists_tables = []
 
@@ -62,42 +61,42 @@ class Table(object):
 
     @cp
     def where(self, **kwargs):
-        self._where_clause.and_(**kwargs)
+        self.where_clause.and_(**kwargs)
         return self
 
     @cp
     def or_(self, **kwargs):
-        self._where_clause.or_(**kwargs)
+        self.where_clause.or_(**kwargs)
         return self
 
     @cp
     def having(self, **kwargs):
-        self._having_clause.and_(**kwargs)
+        self.having_clause.and_(**kwargs)
         return self
 
     @cp
     def or_having(self, **kwargs):
-        self._having_clause.or_(**kwargs)
+        self.having_clause.or_(**kwargs)
         return self
 
     @cp
     def group_by(self, *columns):
-        self._group_clause.by(*columns)
+        self.group_clause.by(*columns)
         return self
 
     @cp
     def order_by(self, column, desc=False):
-        self._order_clause.by(column, desc)
+        self.order_clause.by(column, desc)
         return self
 
     @cp
-    def limit(self, limit):
-        self._limit = limit
+    def limit(self, num):
+        self.page_clause.limit(num)
         return self
 
     @cp
-    def offset(self, offset):
-        self._offset = offset
+    def offset(self, num):
+        self.page_clause.offset(num)
         return self
 
     @cp
@@ -196,27 +195,26 @@ class Table(object):
         return self.__core_sql(sql)
 
     def __core_sql(self, sql):
-        self._where_clause.compile()
-        where_sql = self._where_clause.sql
+        where_sql = self.where_clause.compile().sql
         if where_sql:
             sql = '%s %s' % (sql, where_sql)
-            self.bindings.extend(self._where_clause.bindings)
+            self.bindings.extend(self.where_clause.bindings)
 
         sql = self.__push_exist_sql(where_sql, sql)
-        group_sql = self._group_clause.compile().sql
+        group_sql = self.group_clause.compile().sql
         if group_sql:
             sql = '%s %s' % (sql, group_sql)
 
-        having_sql = self._having_clause.compile().sql
+        having_sql = self.having_clause.compile().sql
         if having_sql:
             sql = '%s %s' % (sql, having_sql)
-            self.bindings.extend(self._having_clause.bindings)
+            self.bindings.extend(self.having_clause.bindings)
 
-        order_sql = self._order_clause.compile().sql
+        order_sql = self.order_clause.compile().sql
         if order_sql:
             sql = '%s %s' % (sql, order_sql)
 
-        limit_and_offset_sql = self.__limit_and_offset_sql()
+        limit_and_offset_sql = self.page_clause.compile().sql
         if limit_and_offset_sql:
             sql = '%s %s' % (sql, limit_and_offset_sql)
 
@@ -230,14 +228,6 @@ class Table(object):
             if j.sql:
                 sqls.append(j.sql)
             self.bindings.extend(j.bindings)
-        return ' '.join(sqls)
-
-    def __limit_and_offset_sql(self):
-        sqls = []
-        if self._limit is not None:
-            sqls.append('LIMIT %s' % self._limit)
-        if self._offset:
-            sqls.append('OFFSET %s' % self._offset)
         return ' '.join(sqls)
 
     def insert_getid(self, record=None, **kwargs):
