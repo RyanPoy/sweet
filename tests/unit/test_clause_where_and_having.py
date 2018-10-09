@@ -2,7 +2,7 @@
 from sweet.tests.unit import TestCase
 from sweet.database.clauses import WhereClause, HavingClause, \
                                     JoinClause, OrderClause, \
-                                    GroupClause
+                                    GroupClause, PageClause
 
 
 class WhereAndHavingClauseTest(TestCase):
@@ -13,6 +13,7 @@ class WhereAndHavingClauseTest(TestCase):
         self.join_clause = JoinClause('`', '%s', 'mobiles')
         self.order_clause = OrderClause('`')
         self.group_clause = GroupClause('`')
+        self.page_clause = PageClause()
 
     def test_basic_where_clause(self):
         c = self.where_clause.compile()
@@ -275,13 +276,13 @@ class WhereAndHavingClauseTest(TestCase):
         self.assertEqual('HAVING `id` NOT IN (%s, %s, %s) OR `name` != %s', c.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], c.bindings)
 
-    # def test_limits_and_offsets(self):
-    #     c = self.get_clause().offset(5).limit(10).compile()
-    #     self.assertEqual('LIMIT 10 OFFSET 5', c.sql)
+    def test_limits_and_offsets(self):
+        c = self.page_clause.offset(5).limit(10).compile()
+        self.assertEqual('LIMIT 10 OFFSET 5', c.sql)
 
-    # def test_page(self):
-    #     c = self.get_clause().page(2, 15).compile()
-    #     self.assertEqual('LIMIT 15 OFFSET 15', c.sql)
+    def test_page(self):
+        c = self.page_clause.page(2, 15).compile()
+        self.assertEqual('LIMIT 15 OFFSET 15', c.sql)
 
     # def test_join(self):
     #     c = self.get_clause().select('users.id').select('users.name').select('cars.name').and_(id=[1,2,3]).or_(name="ryanpoy")\
