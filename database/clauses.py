@@ -176,12 +176,12 @@ class JoinClause(WhereClause):
         self._ons = []
 
     def on(self, *ons):
-        return self._add_on(self.AND, *ons)
+        return self._on(self.AND, *ons)
 
     def or_on(self, *ons):
-        return self._add_on(self.OR, *ons)        
+        return self._on(self.OR, *ons)        
 
-    def _add_on(self, and_or, *ons):
+    def _on(self, and_or, *ons):
         for on in ons:
             s = ' = '.join([ aqm(x.strip(), self.qutotation) for x in on.split('=') ])
             # self._ons.append( (and_or, s))
@@ -279,3 +279,34 @@ class PageClause(object):
         self.sql = ' '.join(sqls)
         return self
 
+
+##################################
+###
+class SelectClause(object):
+
+    def __init__(self, qutotation, paramstyle):
+        self.qutotation = qutotation
+        self.paramstyle = paramstyle
+        self.sql = ''
+        self.columns = []
+        self._distinct = False
+
+    def distinct(self):
+        self._distinct = True
+        return self
+
+    def select(self, *columns):
+        columns = columns or '*'
+        for c in columns:
+            self.columns.append(c)
+        return self
+
+    def compile(self):
+        sql = '*'
+        if self.columns:
+            sql = ', '.join([ aqm(c, self.qutotation) for c in self.columns ])
+        if self._distinct:
+            self.sql = 'SELECT DISTINCT %s' % sql
+        else:
+            self.sql = 'SELECT %s' % sql
+        return self

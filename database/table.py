@@ -21,8 +21,7 @@ class Table(object):
     def __init__(self, db, tbname):
         self.db = db
         self.tbname = tbname
-        self._select = []
-        self._distinct = False
+        self.select_clause = SelectClause(self.qutotation_marks, self.paramstyle_marks)
         self.where_clause = WhereClause(self.qutotation_marks, self.paramstyle_marks)
         self.having_clause = HavingClause(self.qutotation_marks, self.paramstyle_marks)
         self._bindings = []
@@ -45,14 +44,12 @@ class Table(object):
 
     @cp
     def distinct(self):
-        self._distinct = True
+        self.select_clause.distinct()
         return self
 
     @cp
     def select(self, *columns):
-        columns = columns or '*'
-        for c in columns:
-            self._select.append(c)
+        self.select_clause.select(*columns)
         return self
 
     @property
@@ -153,9 +150,8 @@ class Table(object):
 
     @property
     def sql(self):
-        return 'SELECT {distinct}{columns} {from_sql}{lock_sql}'.format(
-            distinct='DISTINCT ' if self._distinct else '', 
-            columns=self._join_columns_sql(self._select) if self._select else '*',
+        return '{select_sql} {from_sql}{lock_sql}'.format(
+            select_sql=self.select_clause.compile().sql,
             from_sql=self.__from_sql,
             lock_sql=self.__lock_sql()
         )

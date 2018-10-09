@@ -2,7 +2,8 @@
 from sweet.tests.unit import TestCase
 from sweet.database.clauses import WhereClause, HavingClause, \
                                     JoinClause, OrderClause, \
-                                    GroupClause, PageClause
+                                    GroupClause, PageClause, \
+                                    SelectClause
 
 
 class WhereAndHavingClauseTest(TestCase):
@@ -13,6 +14,7 @@ class WhereAndHavingClauseTest(TestCase):
         self.join_clause = JoinClause('`', '%s', 'mobiles')
         self.order_clause = OrderClause('`')
         self.group_clause = GroupClause('`')
+        self.select_clause = SelectClause('`', '%s')
         self.page_clause = PageClause()
 
     def test_basic_where_clause(self):
@@ -284,8 +286,24 @@ class WhereAndHavingClauseTest(TestCase):
         c = self.page_clause.page(2, 15).compile()
         self.assertEqual('LIMIT 15 OFFSET 15', c.sql)
 
+    def test_select(self):
+        c = self.select_clause.compile()
+        self.assertEqual('SELECT *', c.sql)
+
+    def test_select_with_columns(self):
+        c = self.select_clause.select('name').select('users.age').compile()
+        self.assertEqual('SELECT `name`, `users`.`age`', c.sql)
+
+    def test_select_with_distinct(self):
+        c = self.select_clause.distinct().compile()
+        self.assertEqual('SELECT DISTINCT *', c.sql)
+
+    def test_select_with_distinct_and_columns(self):
+        c = self.select_clause.select('name').select('users.age').distinct().compile()
+        self.assertEqual('SELECT DISTINCT `name`, `users`.`age`', c.sql)
+
     # def test_join(self):
-    #     c = self.get_clause().select('users.id').select('users.name').select('cars.name').and_(id=[1,2,3]).or_(name="ryanpoy")\
+    #     c = self.join_clause.and_(id=[1,2,3]).or_(name="ryanpoy")\
     #       .join('cars', on="users.id=cars.user_id").and_(cars__name='focus')
     #     self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s AND `cars`.`name` = %s', c.sql)
     #     self.assertEqual([1, 2, 3, 'ryanpoy', 'focus'], c.bindings)
