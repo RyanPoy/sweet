@@ -18,13 +18,13 @@ class Filter(object):
     SPECIALS = {
         'like':     LIKE,
         'not_like': NOT_LIKE,
-        bt_suffix:     BETWEEN,
+        bt_suffix:     BETWEEN,     # between
         not_bt_suffix: NOT_BETWEEN, # not between
         'gt':       '>', 
         'gte':      '>=',
         'lt':       '<', 
         'lte':      '<=', 
-        'not':      '!=',
+        not_suffix:      '!=', # not
     }
 
     def __init__(self, name, value, qutotation, paramstyle):
