@@ -354,3 +354,5 @@ class InsertClause(object):
             values_sql=', '.join(values_sql)
         )
         return self
+
+

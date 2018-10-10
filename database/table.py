@@ -226,15 +226,10 @@ class Table(object):
 
     def insert_getid(self, record=None, **kwargs):
         record = record or {}
-        if kwargs:
-            record.update(kwargs)
-        
-        sql = 'INSERT INTO {tablename} ({columns}) VALUES {values_sql}'.format(
-            tablename=self.__aqm(self.tbname),
-            columns=self._join_columns_sql(record.keys()),
-            values_sql='(%s)' % ', '.join([self.paramstyle_marks]*len(record))
-        )    
-        return self.db.execute_lastrowid(sql, *record.values())
+        if kwargs: record.update(kwargs)
+        insert_clause = InsertClause(self.qutotation_marks, self.paramstyle_marks, self.tbname)
+        insert_clause.insert(record).compile()
+        return self.db.execute_lastrowid(insert_clause.sql, *insert_clause.bindings)
 
     def insert(self, records=None, **kwargs):
         insert_clause = InsertClause(self.qutotation_marks, self.paramstyle_marks, self.tbname)
