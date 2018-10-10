@@ -53,12 +53,6 @@ class Filter(object):
             if suffix == self.bt_suffix or suffix == self.not_bt_suffix:
                 self.operator = self.SPECIALS[suffix]
                 self.name = name[:-len(suffix)-2]
-            # elif is_array(self.value):
-            #     self.operator = self.NOT_IN
-            #     self.name = name[:-len(suffix)-2]
-            # elif self.value is None:
-            #     self.operator = self.IS_NOT
-            #     self.name = name[:-len(suffix)-2]
             elif suffix == self.not_suffix: # not
                 if is_array(self.value): # not in
                     self.operator = self.NOT_IN
