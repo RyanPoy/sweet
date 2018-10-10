@@ -21,13 +21,9 @@ class Filter(object):
         bt_suffix:     BETWEEN,
         not_bt_suffix: NOT_BETWEEN, # not between
         'gt':       '>', 
-        'not_gt':   '<=',
         'gte':      '>=',
-        'not_gte':  '<', 
         'lt':       '<', 
-        'not_lt':   '>=', 
         'lte':      '<=', 
-        'not_lte':  '>',
         'not':      '!=',
     }
 

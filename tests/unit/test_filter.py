@@ -92,26 +92,12 @@ class FilterTest(TestCase):
         self.assertEqual('>', f.operator)
         self.assertEqual('`name` > %s', f.to_sql())
 
-    def test_filter_not_gt(self):
-        f = self.get_filter('age__not_gt', 10)
-        self.assertEqual('age', f.name)
-        self.assertEqual(10, f.value)
-        self.assertEqual('<=', f.operator)
-        self.assertEqual('`age` <= %s', f.to_sql())
-
     def test_filter_gte(self):
         f = self.get_filter('name__gte', 'ryanpoy')
         self.assertEqual('name', f.name)
         self.assertEqual('ryanpoy', f.value)
         self.assertEqual('>=', f.operator)
         self.assertEqual('`name` >= %s', f.to_sql())
-
-    def test_filter_not_gte(self):
-        f = self.get_filter('age__not_gte', 10)
-        self.assertEqual('age', f.name)
-        self.assertEqual(10, f.value)
-        self.assertEqual('<', f.operator)
-        self.assertEqual('`age` < %s', f.to_sql())
 
     def test_filter_lt(self):
         f = self.get_filter('name__lt', 'ryanpoy')
@@ -120,26 +106,12 @@ class FilterTest(TestCase):
         self.assertEqual('<', f.operator)
         self.assertEqual('`name` < %s', f.to_sql())
 
-    def test_filter_not_lt(self):
-        f = self.get_filter('age__not_lt', 10)
-        self.assertEqual('age', f.name)
-        self.assertEqual(10, f.value)
-        self.assertEqual('>=', f.operator)
-        self.assertEqual('`age` >= %s', f.to_sql())
-
     def test_filter_lte(self):
         f = self.get_filter('name__lte', 'ryanpoy')
         self.assertEqual('name', f.name)
         self.assertEqual('ryanpoy', f.value)
         self.assertEqual('<=', f.operator)
         self.assertEqual('`name` <= %s', f.to_sql())
-
-    def test_filter_not_lte(self):
-        f = self.get_filter('age__not_lte', 10)
-        self.assertEqual('age', f.name)
-        self.assertEqual(10, f.value)
-        self.assertEqual('>', f.operator)
-        self.assertEqual('`age` > %s', f.to_sql())
 
     def test_filter_is_null(self):
         f = self.get_filter('name', None)
