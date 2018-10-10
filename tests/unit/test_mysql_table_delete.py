@@ -1,13 +1,13 @@
 #coding: utf8
 from sweet.tests.unit import TestCase
-from sweet.database.table import MySQLTable
+from sweet.database.recordset import MySQLRecordSet
 
 
-class MySQLTableDeleteTest(TestCase):
+class MySQLRecordSetDeleteTest(TestCase):
 
     def get_table(self):
         class FakeDB(object): pass
-        return MySQLTable(db=FakeDB(), tbname="users")
+        return MySQLRecordSet(db=FakeDB(), tbname="users")
 
     def test_delete(self):
         def _(sql, *params):

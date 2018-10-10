@@ -5,10 +5,10 @@ from sweet.tests.integration.test_mysql import MySQLTest
 from sweet.tests.unit.test_filter import FilterTest
 from sweet.tests.unit.test_clauses import ClausesTest
 
-from sweet.tests.unit.test_mysql_table_query import MySQLTableQueryTest
-from sweet.tests.unit.test_mysql_table_insert import MySQLTableInsertTest
-from sweet.tests.unit.test_mysql_table_delete import MySQLTableDeleteTest
-from sweet.tests.unit.test_mysql_table_update import MySQLTableUpdateTest
+from sweet.tests.unit.test_mysql_table_query import MySQLRecordSetQueryTest
+from sweet.tests.unit.test_mysql_table_insert import MySQLRecordSetInsertTest
+from sweet.tests.unit.test_mysql_table_delete import MySQLRecordSetDeleteTest
+from sweet.tests.unit.test_mysql_table_update import MySQLRecordSetUpdateTest
 
 from sweet.tests.unit.test_model import ModelTest
 
@@ -26,10 +26,10 @@ unit_tests = [
     FilterTest,
     ClausesTest,
 
-    MySQLTableQueryTest,
-    MySQLTableInsertTest,
-    MySQLTableDeleteTest,
-    MySQLTableUpdateTest,
+    MySQLRecordSetQueryTest,
+    MySQLRecordSetInsertTest,
+    MySQLRecordSetDeleteTest,
+    MySQLRecordSetUpdateTest,
 
     ModelTest,
     

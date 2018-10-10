@@ -6,7 +6,7 @@ import functools
 import copy
 
 
-def cp(method):
+def dcp(method):
     @functools.wraps(method)
     def _(self, *args, **kwargs):
         tb = copy.deepcopy(self)
@@ -14,7 +14,7 @@ def cp(method):
     return _
 
 
-class Table(object):
+class RecordSet(object):
 
     LOCK = namedtuple("Lock", ['NILL', 'READ', 'WRITE'])._make([0, 1, 2])
 
@@ -42,12 +42,12 @@ class Table(object):
                 obj.__dict__[k] = copy.deepcopy(v, memo)
         return obj
 
-    @cp
+    @dcp
     def distinct(self):
         self.select_clause.distinct()
         return self
 
-    @cp
+    @dcp
     def select(self, *columns):
         self.select_clause.select(*columns)
         return self
@@ -56,47 +56,47 @@ class Table(object):
     def bindings(self):
         return self._bindings
 
-    @cp
+    @dcp
     def where(self, **kwargs):
         self.where_clause.and_(**kwargs)
         return self
 
-    @cp
+    @dcp
     def or_(self, **kwargs):
         self.where_clause.or_(**kwargs)
         return self
 
-    @cp
+    @dcp
     def having(self, **kwargs):
         self.having_clause.and_(**kwargs)
         return self
 
-    @cp
+    @dcp
     def or_having(self, **kwargs):
         self.having_clause.or_(**kwargs)
         return self
 
-    @cp
+    @dcp
     def group_by(self, *columns):
         self.group_clause.by(*columns)
         return self
 
-    @cp
+    @dcp
     def order_by(self, column, desc=False):
         self.order_clause.by(column, desc)
         return self
 
-    @cp
+    @dcp
     def limit(self, num):
         self.page_clause.limit(num)
         return self
 
-    @cp
+    @dcp
     def offset(self, num):
         self.page_clause.offset(num)
         return self
 
-    @cp
+    @dcp
     def page(self, page_num, page_size):
         page_num = 1 if page_num < 0 else page_num
         return self.limit((page_num-1) * page_size).offset(page_size)
@@ -110,7 +110,7 @@ class Table(object):
     def right_join(self, tbname, on, func=None):
         return self.__join(RightJoinClause, tbname, on, func)
 
-    @cp
+    @dcp
     def __join(self, join_clause_clazz, tbname, on, func=None):
         jc = join_clause_clazz(self.qutotation_marks, self.paramstyle_marks, tbname)
         if on:
@@ -120,23 +120,23 @@ class Table(object):
         self._joins_clauses.append(jc)
         return self
 
-    @cp
+    @dcp
     def read_lock(self):
         self._lock = self.LOCK.READ
         return self
 
-    @cp
+    @dcp
     def write_lock(self):
         self._lock = self.LOCK.WRITE
         return self
 
-    @cp
+    @dcp
     def where_exists(self, *tables):
         for t in tables:
             self._exists_tables.append( (WhereClause.AND, t) )
         return self
 
-    @cp
+    @dcp
     def or_exists(self, *tables):
         for t in tables:
             self._exists_tables.append( (WhereClause.OR, t) )
@@ -236,7 +236,7 @@ class Table(object):
         insert_clause.insert(records, **kwargs).compile()
         return self.db.execute_rowcount(insert_clause.sql, *insert_clause.bindings)
 
-    @cp
+    @dcp
     def update(self, **kwargs):
         update_columns, update_bindings = [], []
         for k, v in kwargs.items():
@@ -261,7 +261,7 @@ class Table(object):
     def decrease(self, **kwargs):
         return self.__in_or_decrease('-', **kwargs)
 
-    @cp
+    @dcp
     def __in_or_decrease(self, flag='+', **kwargs):
         update_columns, update_bindings = [], []
         for k, v in kwargs.items():
@@ -338,7 +338,7 @@ class Table(object):
         return vs.aggregate
 
 
-class MySQLTable(Table):
+class MySQLRecordSet(RecordSet):
 
     qutotation_marks = '`'
     paramstyle_marks = '%s'
