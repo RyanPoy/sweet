@@ -1,14 +1,14 @@
 #coding: utf8
 from sweet.tests.unit import TestCase
-from sweet.database.recordset import MySQLRecordSet
+from sweet.database.recordset import MySQLRecordset
 from sweet.database.db import Record
 
 
-class MySQLRecordSetQueryTest(TestCase):
+class MySQLRecordsetQueryTest(TestCase):
 
     def get_table(self, name="users"):
         class FakeDB(object): pass
-        return MySQLRecordSet(db=FakeDB(), tbname=name)
+        return MySQLRecordset(db=FakeDB(), tbname=name)
 
     def test_copy_deep(self):
         tb = self.get_table()

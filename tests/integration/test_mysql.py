@@ -1,6 +1,6 @@
 #coding: utf8
 from sweet.tests.unit import TestCase
-from sweet.database.recordset import MySQLRecordSet
+from sweet.database.recordset import MySQLRecordset
 from sweet.database import MySQL, Record
 from sweet.utils import Collection
 
@@ -33,7 +33,7 @@ class MySQLTest(TestCase):
 
     def test_table(self):
         table = self.db.table('users')
-        self.assertTrue(isinstance(table, MySQLRecordSet))
+        self.assertTrue(isinstance(table, MySQLRecordset))
 
     def test_first(self):
         r = self.db.table('users').first()

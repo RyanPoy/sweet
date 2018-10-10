@@ -305,6 +305,8 @@ class SelectClause(object):
         return self
 
 
+#################################
+###
 class InsertClause(object):
     
     def __init__(self, qutotation, paramstyle, tbname):

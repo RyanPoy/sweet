@@ -1,13 +1,13 @@
 #coding: utf8
 from sweet.tests.unit import TestCase
-from sweet.database.recordset import MySQLRecordSet
+from sweet.database.recordset import MySQLRecordset
 
 
-class MySQLRecordSetUpdateTest(TestCase):
+class MySQLRecordsetUpdateTest(TestCase):
 
     def get_table(self):
         class FakeDB(object): pass
-        return MySQLRecordSet(db=FakeDB(), tbname="users")
+        return MySQLRecordset(db=FakeDB(), tbname="users")
 
     def test_update(self):
         def _(sql, *params):

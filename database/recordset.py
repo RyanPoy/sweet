@@ -14,7 +14,7 @@ def dcp(method):
     return _
 
 
-class RecordSet(object):
+class Recordset(object):
 
     LOCK = namedtuple("Lock", ['NILL', 'READ', 'WRITE'])._make([0, 1, 2])
 
@@ -338,7 +338,7 @@ class RecordSet(object):
         return vs.aggregate
 
 
-class MySQLRecordSet(RecordSet):
+class MySQLRecordset(Recordset):
 
     qutotation_marks = '`'
     paramstyle_marks = '%s'

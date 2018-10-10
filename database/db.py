@@ -1,7 +1,7 @@
 #coding: utf8
 from sweet.utils import *
 from contextlib import contextmanager
-from sweet.database.recordset import MySQLRecordSet
+from sweet.database.recordset import MySQLRecordset
 import MySQLdb
 import time
 
@@ -12,7 +12,7 @@ class Record(mydict):
 
 class MySQL(object):
     
-    table_class = MySQLRecordSet
+    table_class = MySQLRecordset
 
     def __init__(self, dbname, user='root', password='', host='localhost', port=3306, charset='utf8', show_sql=False):
         self._db_args = dict(db=dbname, user=user, passwd=password, host=host, port=port, charset=charset,
