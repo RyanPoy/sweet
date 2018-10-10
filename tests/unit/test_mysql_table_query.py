@@ -124,42 +124,42 @@ class MySQLRecordsetQueryTest(TestCase):
             tb.sql
 
     def test_or(self):
-        tb = self.get_table().select('*').or_(id=1, name='ryanpoy')
+        tb = self.get_table().select('*').or_where(id=1, name='ryanpoy')
         self.assertEqual('SELECT * FROM `users` WHERE `id` = %s OR `name` = %s', tb.sql)
         self.assertEqual([1, 'ryanpoy'], tb.bindings)
 
     def test_or_not(self):
-        tb = self.get_table().select('*').or_(id__not=1, name__not='ryanpoy')
+        tb = self.get_table().select('*').or_where(id__not=1, name__not='ryanpoy')
         self.assertEqual('SELECT * FROM `users` WHERE `id` != %s OR `name` != %s', tb.sql)
         self.assertEqual([1, 'ryanpoy'], tb.bindings)
 
     def test_or_between(self):
-        tb = self.get_table().select('*').where(name='ryanpoy').or_(id__bt=[1, 2])
+        tb = self.get_table().select('*').where(name='ryanpoy').or_where(id__bt=[1, 2])
         self.assertEqual('SELECT * FROM `users` WHERE `name` = %s OR `id` BETWEEN %s AND %s', tb.sql)
         self.assertEqual(['ryanpoy', 1, 2], tb.bindings)
 
     def test_or_not_between(self):
-        tb = self.get_table().select('*').where(name='ryanpoy').or_(id__not_bt=[1, 2])
+        tb = self.get_table().select('*').where(name='ryanpoy').or_where(id__not_bt=[1, 2])
         self.assertEqual('SELECT * FROM `users` WHERE `name` = %s OR `id` NOT BETWEEN %s AND %s', tb.sql)
         self.assertEqual(['ryanpoy', 1, 2], tb.bindings)
 
     def test_or_in(self):
-        tb = self.get_table().select('*').or_(id=[1, 2, 3], name='ryanpoy')
+        tb = self.get_table().select('*').or_where(id=[1, 2, 3], name='ryanpoy')
         self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
 
     def test_or_not_in(self):
-        tb = self.get_table().select('*').or_(id__not=[1, 2, 3], name__not='ryanpoy')
+        tb = self.get_table().select('*').or_where(id__not=[1, 2, 3], name__not='ryanpoy')
         self.assertEqual('SELECT * FROM `users` WHERE `id` NOT IN (%s, %s, %s) OR `name` != %s', tb.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], tb.bindings)
     
     def test_or_null(self):
-        tb = self.get_table().select('*').or_(id=[1, 2, 3], name=None)
+        tb = self.get_table().select('*').or_where(id=[1, 2, 3], name=None)
         self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` IS NULL', tb.sql)
         self.assertEqual([1, 2, 3], tb.bindings)
 
     def test_or_not_null(self):
-        tb = self.get_table().select('*').or_(id=[1, 2, 3]).or_(name__not=None)
+        tb = self.get_table().select('*').or_where(id=[1, 2, 3]).or_where(name__not=None)
         self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` IS NOT NULL', tb.sql)
         self.assertEqual([1, 2, 3], tb.bindings)
     
@@ -285,18 +285,18 @@ class MySQLRecordsetQueryTest(TestCase):
         self.assertEqual('SELECT * FROM `users` LIMIT 15 OFFSET 15', tb.sql)
 
     def test_join(self):
-        tb = self.get_table().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_(name="ryanpoy")\
+        tb = self.get_table().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_where(name="ryanpoy")\
           .join('cars', "users.id=cars.user_id").where(cars__name='focus')
         self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s AND `cars`.`name` = %s', tb.sql)
         self.assertEqual([ 1, 2, 3, 'ryanpoy', 'focus'], tb.bindings)
 
     def test_left_join(self):
-        tb = self.get_table().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_(name="ryanpoy").left_join('cars', "users.id=cars.user_id")
+        tb = self.get_table().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_where(name="ryanpoy").left_join('cars', "users.id=cars.user_id")
         self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
         self.assertEqual([ 1, 2, 3, 'ryanpoy'], tb.bindings)
 
     def test_right_join(self):
-        tb = self.get_table().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_(name="ryanpoy").right_join('cars', "users.id=cars.user_id")
+        tb = self.get_table().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_where(name="ryanpoy").right_join('cars', "users.id=cars.user_id")
         self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` RIGHT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
         self.assertEqual([ 1, 2, 3, 'ryanpoy'], tb.bindings)
 
@@ -428,14 +428,14 @@ class MySQLRecordsetQueryTest(TestCase):
     
     def test_read_lock(self):
         tb = self.get_table().select('users.id').select('cars.name')\
-                 .where(id=[1,2,3]).or_(name="ryanpoy")\
+                 .where(id=[1,2,3]).or_where(name="ryanpoy")\
                  .left_join('cars', "users.id=cars.user_id").read_lock()
         self.assertEqual('SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s LOCK IN SHARE MODE', tb.sql)
         self.assertEqual([ 1, 2, 3, 'ryanpoy'], tb.bindings)
 
     def test_write_lock(self):
         tb = self.get_table().select('users.id').select('cars.name')\
-                 .where(id=[1,2,3]).or_(name="ryanpoy")\
+                 .where(id=[1,2,3]).or_where(name="ryanpoy")\
                  .left_join('cars', "users.id=cars.user_id").write_lock()
         self.assertEqual('SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s FOR UPDATE', tb.sql)
         self.assertEqual([ 1, 2, 3, 'ryanpoy'], tb.bindings)

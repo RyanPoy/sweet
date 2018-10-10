@@ -62,7 +62,7 @@ class Recordset(object):
         return self
 
     @dcp
-    def or_(self, **kwargs):
+    def or_where(self, **kwargs):
         self.where_clause.or_(**kwargs)
         return self
 
