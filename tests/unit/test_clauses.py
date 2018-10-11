@@ -37,7 +37,7 @@ class ClausesTest(TestCase):
     def test_where_and_not(self):
         c = self.where_clause
         c.and_(id__not=1, name__not='ryanpoy').compile()
-        self.assertEqual('WHERE `id` != %s AND `name` != %s', c.sql)
+        self.assertEqual('WHERE `id` <> %s AND `name` <> %s', c.sql)
         self.assertEqual([1, 'ryanpoy'], c.bindings)
 
     def test_where_and_in(self):
@@ -49,7 +49,7 @@ class ClausesTest(TestCase):
     def test_where_and_not_in(self):
         c = self.where_clause
         c.and_(id__not=[1, 2, 3], name__not='ryanpoy').compile()
-        self.assertEqual('WHERE `id` NOT IN (%s, %s, %s) AND `name` != %s', c.sql)
+        self.assertEqual('WHERE `id` NOT IN (%s, %s, %s) AND `name` <> %s', c.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], c.bindings)
 
     def test_where_and_like(self):
@@ -123,8 +123,7 @@ class ClausesTest(TestCase):
         self.assertEqual([1, 2], c.bindings)
 
     def test_where_and_between_should_give_me_error(self):
-        c = self.where_clause.and_(id__bt=[1, 2, 3])
-        self.assertRaises(TypeError, c.compile)
+        self.assertRaises(TypeError, self.where_clause.and_, id__bt=[1, 2, 3])
 
     def test_where_or(self):
         c = self.where_clause.or_(id=1, name='ryanpoy').compile()
@@ -214,13 +213,11 @@ class ClausesTest(TestCase):
         self.assertEqual([1, 2], c.bindings)
 
     def test_having_between_should_give_me_error(self):
-        c = self.having_clause.and_(id__bt=[1, 2, 3])
-        with self.assertRaises(TypeError):
-            c.compile()
+        self.assertRaises(TypeError, self.having_clause.and_, id__bt=[1, 2, 3])
 
     def test_having_not(self):
         c = self.having_clause.and_(id__not=1, name__not='ryanpoy').compile()
-        self.assertEqual('HAVING `id` != %s AND `name` != %s', c.sql)
+        self.assertEqual('HAVING `id` <> %s AND `name` <> %s', c.sql)
         self.assertEqual([1, 'ryanpoy'], c.bindings)
 
     def test_having_not_null(self):
@@ -230,7 +227,7 @@ class ClausesTest(TestCase):
 
     def test_having_not_in(self):
         c = self.having_clause.and_(id__not=[1, 2, 3], name__not='ryanpoy').compile()
-        self.assertEqual('HAVING `id` NOT IN (%s, %s, %s) AND `name` != %s', c.sql)
+        self.assertEqual('HAVING `id` NOT IN (%s, %s, %s) AND `name` <> %s', c.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], c.bindings)
 
     def test_having_not_between(self):
@@ -265,7 +262,7 @@ class ClausesTest(TestCase):
 
     def test_or_having_not(self):
         c = self.having_clause.or_(id__not=1, name__not='ryanpoy').compile()
-        self.assertEqual('HAVING `id` != %s OR `name` != %s', c.sql)
+        self.assertEqual('HAVING `id` <> %s OR `name` <> %s', c.sql)
         self.assertEqual([1, 'ryanpoy'], c.bindings)
 
     def test_or_having_not_null(self):
@@ -275,7 +272,7 @@ class ClausesTest(TestCase):
 
     def test_or_having_not_in(self):
         c = self.having_clause.or_(id__not=[1, 2, 3], name__not='ryanpoy').compile()
-        self.assertEqual('HAVING `id` NOT IN (%s, %s, %s) OR `name` != %s', c.sql)
+        self.assertEqual('HAVING `id` NOT IN (%s, %s, %s) OR `name` <> %s', c.sql)
         self.assertEqual([1, 2, 3, 'ryanpoy'], c.bindings)
 
     def test_limits_and_offsets(self):
@@ -320,7 +317,7 @@ class ClausesTest(TestCase):
 
     # def test_count(self):
     #     def _(sql, *params):
-    #         self.assertEqual('SELECT COUNT(*) AS aggregate FROM `users` WHERE `name` != %s', sql)
+    #         self.assertEqual('SELECT COUNT(*) AS aggregate FROM `users` WHERE `name` <> %s', sql)
     #         self.assertEqual(['Lily'], list(params))
     #         return Record({'aggregate': 2})
     #     c = self.get_clause()
@@ -330,7 +327,7 @@ class ClausesTest(TestCase):
 
     # def test_count_with_column(self):
     #     def _(sql, *params):
-    #         self.assertEqual('SELECT COUNT(`id`) AS aggregate FROM `users` WHERE `name` != %s', sql)
+    #         self.assertEqual('SELECT COUNT(`id`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
     #         self.assertEqual(['Lily'], list(params))
     #         return Record({'aggregate': 2})
     #     c = self.get_clause()
@@ -340,7 +337,7 @@ class ClausesTest(TestCase):
 
     # def test_count_distinct(self):
     #     def _(sql, *params):
-    #         self.assertEqual('SELECT COUNT(*) AS aggregate FROM `users` WHERE `name` != %s', sql)
+    #         self.assertEqual('SELECT COUNT(*) AS aggregate FROM `users` WHERE `name` <> %s', sql)
     #         self.assertEqual(['Lily'], list(params))
     #         return Record({'aggregate': 2})
     #     c = self.get_clause()
@@ -350,7 +347,7 @@ class ClausesTest(TestCase):
 
     # def test_count_distinct_with_column(self):
     #     def _(sql, *params):
-    #         self.assertEqual('SELECT COUNT(DISTINCT `id`) AS aggregate FROM `users` WHERE `name` != %s', sql)
+    #         self.assertEqual('SELECT COUNT(DISTINCT `id`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
     #         self.assertEqual(['Lily'], list(params))
     #         return Record({'aggregate': 2})
     #     c = self.get_clause()
@@ -360,7 +357,7 @@ class ClausesTest(TestCase):
 
     # def test_max(self):
     #     def _(sql, *params):
-    #         self.assertEqual('SELECT MAX(`id`) AS aggregate FROM `users` WHERE `name` != %s', sql)
+    #         self.assertEqual('SELECT MAX(`id`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
     #         self.assertEqual(['Lily'], list(params))
     #         return Record({'aggregate': 1024})
     #     c = self.get_clause()
@@ -370,7 +367,7 @@ class ClausesTest(TestCase):
 
     # def test_max_distinct(self):
     #     def _(sql, *params):
-    #         self.assertEqual('SELECT MAX(DISTINCT `id`) AS aggregate FROM `users` WHERE `name` != %s', sql)
+    #         self.assertEqual('SELECT MAX(DISTINCT `id`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
     #         self.assertEqual(['Lily'], list(params))
     #         return Record({'aggregate': 1024})
     #     c = self.get_clause()
@@ -380,7 +377,7 @@ class ClausesTest(TestCase):
 
     # def test_min(self):
     #     def _(sql, *params):
-    #         self.assertEqual('SELECT MIN(`id`) AS aggregate FROM `users` WHERE `name` != %s', sql)
+    #         self.assertEqual('SELECT MIN(`id`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
     #         self.assertEqual(['Lily'], list(params))
     #         return Record({'aggregate': 1})
     #     c = self.get_clause()
@@ -390,7 +387,7 @@ class ClausesTest(TestCase):
 
     # def test_min_distinct(self):
     #     def _(sql, *params):
-    #         self.assertEqual('SELECT MIN(DISTINCT `id`) AS aggregate FROM `users` WHERE `name` != %s', sql)
+    #         self.assertEqual('SELECT MIN(DISTINCT `id`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
     #         self.assertEqual(['Lily'], list(params))
     #         return Record({'aggregate': 1})
     #     c = self.get_clause()
@@ -400,7 +397,7 @@ class ClausesTest(TestCase):
 
     # def test_avg(self):
     #     def _(sql, *params):
-    #         self.assertEqual('SELECT AVERAGE(`age`) AS aggregate FROM `users` WHERE `name` != %s', sql)
+    #         self.assertEqual('SELECT AVERAGE(`age`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
     #         self.assertEqual(['Lily'], list(params))
     #         return Record({'aggregate': 32})
     #     c = self.get_clause()
@@ -410,7 +407,7 @@ class ClausesTest(TestCase):
 
     # def test_avg_distinct(self):
     #     def _(sql, *params):
-    #         self.assertEqual('SELECT AVERAGE(DISTINCT `age`) AS aggregate FROM `users` WHERE `name` != %s', sql)
+    #         self.assertEqual('SELECT AVERAGE(DISTINCT `age`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
     #         self.assertEqual(['Lily'], list(params))
     #         return Record({'aggregate': 32})
     #     c = self.get_clause()
@@ -420,7 +417,7 @@ class ClausesTest(TestCase):
 
     # def test_sum(self):
     #     def _(sql, *params):
-    #         self.assertEqual('SELECT SUM(`age`) AS aggregate FROM `users` WHERE `name` != %s', sql)
+    #         self.assertEqual('SELECT SUM(`age`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
     #         self.assertEqual(['Lily'], list(params))
     #         return Record({'aggregate': 2048})
     #     c = self.get_clause()
@@ -430,7 +427,7 @@ class ClausesTest(TestCase):
 
     # def test_sum_distinct(self):
     #     def _(sql, *params):
-    #         self.assertEqual('SELECT SUM(DISTINCT `age`) AS aggregate FROM `users` WHERE `name` != %s', sql)
+    #         self.assertEqual('SELECT SUM(DISTINCT `age`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
     #         self.assertEqual(['Lily'], list(params))
     #         return Record({'aggregate': 2048})
     #     c = self.get_clause()
