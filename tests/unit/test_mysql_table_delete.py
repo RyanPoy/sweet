@@ -5,7 +5,7 @@ from sweet.database.recordset import MySQLRecordset
 
 class MySQLRecordsetDeleteTest(TestCase):
 
-    def get_table(self):
+    def get_recordset(self):
         class FakeDB(object): pass
         return MySQLRecordset(db=FakeDB(), tbname="users")
 
@@ -14,7 +14,7 @@ class MySQLRecordsetDeleteTest(TestCase):
             self.assertEqual('DELETE FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` = %s AND `age` >= %s', sql)
             self.assertEqual([1, 2, 3, "ryanpoy", 30], list(params))
             return 3
-        tb = self.get_table()
+        tb = self.get_recordset()
         tb.db.execute_rowcount = _
         
         r = tb.where(id=[1, 2, 3], name='ryanpoy', age__gte=30).delete()
@@ -25,7 +25,7 @@ class MySQLRecordsetDeleteTest(TestCase):
             self.assertEqual('DELETE `users` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', sql)
             self.assertEqual([1, 2, 3, 'ryanpoy'], list(params))
             return 3
-        tb = self.get_table()
+        tb = self.get_recordset()
         tb.db.execute_rowcount = _
 
         r = tb.where(id=[1,2,3]).or_where(name="ryanpoy").join('cars', on='users.id=cars.user_id').delete()
@@ -36,7 +36,7 @@ class MySQLRecordsetDeleteTest(TestCase):
             self.assertEqual('TRUNCATE `users`', sql)
             self.assertTrue(not params)
             return 10
-        tb = self.get_table()
+        tb = self.get_recordset()
         tb.db.execute_rowcount = _
 
         r = tb.where(id=[1, 2, 3]).truncate()

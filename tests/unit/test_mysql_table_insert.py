@@ -5,7 +5,7 @@ from sweet.database.recordset import MySQLRecordset
 
 class MySQLRecordsetInsertTest(TestCase):
 
-    def get_table(self):
+    def get_recordset(self):
         class FakeDB(object): pass
         return MySQLRecordset(db=FakeDB(), tbname="users")
 
@@ -14,7 +14,7 @@ class MySQLRecordsetInsertTest(TestCase):
             self.assertEqual('INSERT INTO `users` (`id`, `name`, `age`) VALUES (%s, %s, %s)', sql)
             self.assertEqual([3, "Poy", 33], list(params))
             return 1
-        tb = self.get_table()
+        tb = self.get_recordset()
         tb.db.execute_rowcount = _
         self.assertEqual(1, tb.insert(id=3, name="Poy", age=33))
 
@@ -23,7 +23,7 @@ class MySQLRecordsetInsertTest(TestCase):
             self.assertEqual('INSERT INTO `users` (`id`, `name`, `age`) VALUES (%s, %s, %s)', sql)
             self.assertEqual([3, "Poy", 33], list(params))
             return 1
-        tb = self.get_table()
+        tb = self.get_recordset()
         tb.db.execute_lastrowid = _
         self.assertEqual(1, tb.insert_getid(id=3, name="Poy", age=33))
 
@@ -32,7 +32,7 @@ class MySQLRecordsetInsertTest(TestCase):
             self.assertEqual('INSERT INTO `users` (`id`, `name`, `age`) VALUES (%s, %s, %s)', sql)
             self.assertEqual([3, "Poy", 33], list(params))
             return 1
-        tb = self.get_table()
+        tb = self.get_recordset()
         tb.db.execute_rowcount = _
         self.assertEqual(1, tb.insert(dict(id=3, name="Poy", age=33)))
 
@@ -41,7 +41,7 @@ class MySQLRecordsetInsertTest(TestCase):
             self.assertEqual('INSERT INTO `users` (`id`, `name`, `age`) VALUES (%s, %s, %s), (%s, %s, %s)', sql)
             self.assertEqual([3, "Poy", 33, 4, "Ryan", 44], list(params))
             return 2
-        tb = self.get_table()
+        tb = self.get_recordset()
         tb.db.execute_rowcount = _
         self.assertEqual(
             2, 
