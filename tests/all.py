@@ -5,10 +5,10 @@ from sweet.tests.integration.test_mysql import MySQLTest
 from sweet.tests.unit.test_filter import FilterTest
 from sweet.tests.unit.test_clauses import ClausesTest
 
-from sweet.tests.unit.test_mysql_table_query import MySQLRecordsetQueryTest
-from sweet.tests.unit.test_mysql_table_insert import MySQLRecordsetInsertTest
-from sweet.tests.unit.test_mysql_table_delete import MySQLRecordsetDeleteTest
-from sweet.tests.unit.test_mysql_table_update import MySQLRecordsetUpdateTest
+from sweet.tests.unit.test_recordset_query_for_mysql import MySQLRecordsetQueryTest
+from sweet.tests.unit.test_recordset_insert_for_mysql import MySQLRecordsetInsertTest
+from sweet.tests.unit.test_recordset_delete_for_mysql import MySQLRecordsetDeleteTest
+from sweet.tests.unit.test_recordset_update_for_mysql import MySQLRecordsetUpdateTest
 
 from sweet.tests.unit.test_model import ModelTest
 
