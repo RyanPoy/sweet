@@ -1,7 +1,8 @@
 #coding: utf8
 from sweet.tests.unit import TestCase
 from sweet.database.clauses import WhereClause, HavingClause, \
-                                    JoinClause, OrderClause, \
+                                    JoinClause, LeftJoinClause, \
+                                    RightJoinClause, OrderClause, \
                                     GroupClause, PageClause, \
                                     SelectClause
 
@@ -11,7 +12,9 @@ class ClausesTest(TestCase):
     def setUp(self):
         self.where_clause = WhereClause('`', '%s')
         self.having_clause = HavingClause('`', '%s')
-        self.join_clause = JoinClause('`', '%s', 'mobiles')
+        self.inner_join_clause = JoinClause('`', '%s', 'mobiles')
+        self.left_join_clause = LeftJoinClause('`', '%s', 'mobiles')
+        self.right_join_clause = RightJoinClause('`', '%s', 'mobiles')
         self.order_clause = OrderClause('`')
         self.group_clause = GroupClause('`')
         self.select_clause = SelectClause('`')
@@ -145,24 +148,6 @@ class ClausesTest(TestCase):
         c = self.having_clause.or_(id=1, name='ryanpoy').compile()
         self.assertEqual('HAVING `id` = %s OR `name` = %s', c.sql)
         self.assertEqual([1, 'ryanpoy'], c.bindings)
-
-    def test_join_and(self):
-        c = self.join_clause
-        c.on('users.id=cars.user_id').and_(mobiles__name='iphone').and_(users__age=20).compile()
-        self.assertEqual('INNER JOIN `mobiles` ON `users`.`id` = `cars`.`user_id` AND `mobiles`.`name` = %s AND `users`.`age` = %s', c.sql)
-        self.assertEqual(['iphone', 20], c.bindings)
-
-    def test_join_or(self):
-        c = self.join_clause
-        c.on('users.id=cars.user_id').or_(mobiles__name='iphone').or_(users__age=20).compile()
-        self.assertEqual('INNER JOIN `mobiles` ON `users`.`id` = `cars`.`user_id` OR `mobiles`.`name` = %s OR `users`.`age` = %s', c.sql)
-        self.assertEqual(['iphone', 20], c.bindings)
-
-    def test_join_without_on(self):
-        c = self.join_clause
-        c.or_(mobiles__name='iphone').or_(users__age=20).compile()
-        self.assertEqual('INNER JOIN `mobiles` ON `mobiles`.`name` = %s OR `users`.`age` = %s', c.sql)
-        self.assertEqual(['iphone', 20], c.bindings)
 
     def test_order_by(self):
         c = self.order_clause.by('email').by('age', desc=True).compile()
@@ -299,21 +284,35 @@ class ClausesTest(TestCase):
         c = self.select_clause.select('name').select('users.age').distinct().compile()
         self.assertEqual('SELECT DISTINCT `name`, `users`.`age`', c.sql)
 
-    # def test_join(self):
-    #     c = self.join_clause.and_(id=[1,2,3]).or_(name="ryanpoy")\
-    #       .join('cars', on="users.id=cars.user_id").and_(cars__name='focus')
-    #     self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s AND `cars`.`name` = %s', c.sql)
-    #     self.assertEqual([1, 2, 3, 'ryanpoy', 'focus'], c.bindings)
+    def test_join_and(self):
+        c = self.inner_join_clause
+        c.on('users.id=cars.user_id').and_(mobiles__name='iphone').and_(users__age=20).compile()
+        self.assertEqual('INNER JOIN `mobiles` ON `users`.`id` = `cars`.`user_id` AND `mobiles`.`name` = %s AND `users`.`age` = %s', c.sql)
+        self.assertEqual(['iphone', 20], c.bindings)
 
-    # def test_left_join(self):
-    #     c = self.get_clause().select('users.id').select('users.name').select('cars.name').and_(id=[1,2,3]).or_(name="ryanpoy").left_join('cars', on="users.id=cars.user_id")
-    #     self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', c.sql)
-    #     self.assertEqual([1, 2, 3, 'ryanpoy'], c.bindings)
+    def test_join_or(self):
+        c = self.inner_join_clause
+        c.on('users.id=cars.user_id').or_(mobiles__name='iphone').or_(users__age=20).compile()
+        self.assertEqual('INNER JOIN `mobiles` ON `users`.`id` = `cars`.`user_id` OR `mobiles`.`name` = %s OR `users`.`age` = %s', c.sql)
+        self.assertEqual(['iphone', 20], c.bindings)
 
-    # def test_right_join(self):
-    #     c = self.get_clause().select('users.id').select('users.name').select('cars.name').and_(id=[1,2,3]).or_(name="ryanpoy").right_join('cars', on="users.id=cars.user_id")
-    #     self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` RIGHT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', c.sql)
-    #     self.assertEqual([1, 2, 3, 'ryanpoy'], c.bindings)
+    def test_join_without_on(self):
+        c = self.inner_join_clause
+        c.or_(mobiles__name='iphone').or_(users__age=20).compile()
+        self.assertEqual('INNER JOIN `mobiles` ON `mobiles`.`name` = %s OR `users`.`age` = %s', c.sql)
+        self.assertEqual(['iphone', 20], c.bindings)
+
+    def test_left_join(self):
+        c = self.left_join_clause
+        c.on('users.id=cars.user_id').or_(mobiles__name='iphone').or_(users__age=20).compile()
+        self.assertEqual('LEFT JOIN `mobiles` ON `users`.`id` = `cars`.`user_id` OR `mobiles`.`name` = %s OR `users`.`age` = %s', c.sql)
+        self.assertEqual(['iphone', 20], c.bindings)
+
+    def test_right_join(self):
+        c = self.right_join_clause
+        c.on('users.id=cars.user_id').or_(mobiles__name='iphone').or_(users__age=20).compile()
+        self.assertEqual('RIGHT JOIN `mobiles` ON `users`.`id` = `cars`.`user_id` OR `mobiles`.`name` = %s OR `users`.`age` = %s', c.sql)
+        self.assertEqual(['iphone', 20], c.bindings)
 
     # def test_count(self):
     #     def _(sql, *params):

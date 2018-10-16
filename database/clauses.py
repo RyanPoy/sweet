@@ -61,7 +61,7 @@ class HavingClause(WhereClause):
 ###
 class JoinClause(WhereClause):
     
-    PREFIX = 'INNER JOIN'
+    PREFIX = 'INNER'
 
     def __init__(self, qutotation, paramstyle, tbname):
         super().__init__(qutotation, paramstyle)
@@ -80,30 +80,36 @@ class JoinClause(WhereClause):
             self._ons.append('%s %s' % (and_or, s))
         return self
 
+    # @classmethod
+    # def join(self, tbname, on=None):
+    #     self.tbname = tbname
+    #     self._ons.append(on)
+    #     return self
+
     def compile(self):
         s = self._compile()
         on = self._ltrip_and_or(' '.join(self._ons).strip())
 
         if on and s:
-            self.sql = '%s %s ON %s %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), on, s)
+            self.sql = '%s JOIN %s ON %s %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), on, s)
         elif on:
-            self.sql = '%s %s ON %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), on)
+            self.sql = '%s JOIN %s ON %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), on)
         elif s:
             s = self._ltrip_and_or(s)
-            self.sql = '%s %s ON %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), s)
+            self.sql = '%s JOIN %s ON %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), s)
         else:
-            self.sql = '%s %s' % (self.PREFIX, aqm(self.tbname, self.qutotation))
+            self.sql = '%s JOIN %s' % (self.PREFIX, aqm(self.tbname, self.qutotation))
         return self
 
 
 class LeftJoinClause(JoinClause):
 
-    PREFIX = 'LEFT JOIN'
+    PREFIX = 'LEFT'
 
 
 class RightJoinClause(JoinClause):
 
-    PREFIX = 'RIGHT JOIN'
+    PREFIX = 'RIGHT'
 
 
 ######################################
