@@ -107,6 +107,9 @@ class Recordset(object):
     def left_join(self, tbname, on, func=None):
         return self.__join(LeftJoinClause, tbname, on, func)
 
+    def cross_join(self, tbname, on, func=None):
+        return self.__join(CrossJoinClause, tbname, on, func)
+
     def right_join(self, tbname, on, func=None):
         return self.__join(RightJoinClause, tbname, on, func)
 

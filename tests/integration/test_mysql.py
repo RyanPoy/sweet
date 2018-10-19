@@ -140,7 +140,7 @@ class MySQLTest(TestCase):
         self.assertEqual(1, coll[0].id)
         self.assertEqual(2, coll[1].id)
 
-    def test_join(self):
+    def test_left_join(self):
         coll = self.db.table('users').left_join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
         self.assertEqual(2, len(coll))
         self.assertEqual(1, coll[0].id)
@@ -148,6 +148,12 @@ class MySQLTest(TestCase):
 
     def test_right_join(self):
         coll = self.db.table('users').left_join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
+        self.assertEqual(2, len(coll))
+        self.assertEqual(1, coll[0].id)
+        self.assertEqual(2, coll[1].id)
+
+    def test_cross_join(self):
+        coll = self.db.table('users').cross_join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
         self.assertEqual(2, len(coll))
         self.assertEqual(1, coll[0].id)
         self.assertEqual(2, coll[1].id)

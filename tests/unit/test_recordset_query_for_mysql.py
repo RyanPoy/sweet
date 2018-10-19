@@ -305,6 +305,11 @@ class MySQLRecordsetQueryTest(TestCase):
         self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` RIGHT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
         self.assertEqual([ 1, 2, 3, 'ryanpoy'], tb.bindings)
 
+    def test_cross_join(self):
+        tb = self.get_recordset().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_where(name="ryanpoy").cross_join('cars', "users.id=cars.user_id")
+        self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` CROSS JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', tb.sql)
+        self.assertEqual([ 1, 2, 3, 'ryanpoy'], tb.bindings)
+
     def test_count(self):
         def _(sql, *params):
             self.assertEqual('SELECT COUNT(*) AS aggregate FROM `users` WHERE `name` <> %s', sql)

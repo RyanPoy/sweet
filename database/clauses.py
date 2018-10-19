@@ -112,6 +112,11 @@ class RightJoinClause(JoinClause):
     PREFIX = 'RIGHT'
 
 
+class CrossJoinClause(JoinClause):
+
+    PREFIX = 'CROSS'
+
+
 ######################################
 ###
 class ByClause(object):

@@ -80,12 +80,23 @@ users = db.table('users').join('posts', on="users.id = posts.user_id").all()
 > SELECT `users`.* FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id`
 
 If you would like to perform a "left join" instead of an "inner join", use the leftJoin method. The leftJoin method has the same signature as the join method:
-
-users = db.table('users').join('posts', on="users.id = posts.users_id").all()
             
 ### Left Join Clause
+users = db.table('users').left_join('posts', on="users.id = posts.user_id").all()
+
+> SELECT `users`.* FROM `users` LEFT JOIN `posts` ON `users`.`id` = `posts`.`user_id`
+
 ### Right Join Clause
+users = db.table('users').right_join('posts', on="users.id = posts.user_id").all()
+
+> SELECT `users`.* FROM `users` RIGHT JOIN `posts` ON `users`.`id` = `posts`.`user_id`
+
 ### Cross Join Clause
+users = db.table('users').cross_join('posts', on="users.id = posts.user_id").all()
+
+> SELECT `users`.* FROM `users` CROSS JOIN `posts` ON `users`.`id` = `posts`.`user_id`
+
+
 ### Advanced Join Clauses
 
 > 待补充
