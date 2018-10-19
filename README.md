@@ -1,35 +1,152 @@
-sweet
+# sweet
 =======
+## list
+- Introduction
+- Retrieving Results
+  - Chunking Results
+  - Aggregates
+- Selects
+- Raw Expressions
+- Joins
+  - Inner Join Clause
+  - Left Join Clause
+  - Right Join Clause
+  - Cross Join Clause
+  - Advanced Join Clauses
+- Unions
+- Where Clauses
+  - Parameter Grouping
+  - Where Exists Clauses
+  - JSON Where Clauses
+- Ordering, Grouping, Limit, & Offset
+- Conditional Clauses
+- Inserts
+- Updates
+  - Updating JSON Columns
+  - Increment & Decrement
 
+
+## Introduction
 python web framework looks like rails
 
+## Retrieving Results
+db.table('users').all()
+> SELECT * FROM users
+
+db.table('users').first()
+> SELECT * FROM users limit 1
+
+db.table('users').last()
+> SELECT * FROM users
+> 
+> note: then get last record
 
 
-=============== database ===========
-articles
-    id
-    title
-    content
-    category_id
+### Chunking Results
+> 待补充
+
+### Aggregates
+db.table('users').count()
+> SELECT COUNT(*) FROM users
+
+db.table('orders').max('price')
+> SELECT MAX(price) FROM orders
+
+support: count、max、min、avg、sum
 
 
-categories
-    id
-    name
+## Selects
+db.table('users').select('age').all()
+> SELECT age FROM users
+
+db.table('users').select('age', 'name).all()
+> SELECT age, name FROM users
+
+db.table('users').select('age').select('name').all()
+> SELECT age, name FROM users
+
+## Raw Expressions
+```
+rs = db.raw('select * from users')
+for r in rs:
+  print rs
+```
+> Raw statements will be injected into the query as strings, so you should be extremely careful to not create SQL injection vulnerabilities.
+
+## Joins
+### Inner Join Clause
+users = db.table('users').join('posts', on="users.id = posts.user_id").all()
+
+> SELECT `users`.* FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id`
+
+If you would like to perform a "left join" instead of an "inner join", use the leftJoin method. The leftJoin method has the same signature as the join method:
+
+users = db.table('users').join('posts', on="users.id = posts.users_id").all()
+            
+### Left Join Clause
+### Right Join Clause
+### Cross Join Clause
+### Advanced Join Clauses
+
+> 待补充
+
+## Unions
+> 待补充
+
+## Where Clauses
+### Parameter Grouping
+> 待补充
+
+### Where Exists Clauses
+> 待补充
+
+### JSON Where Clauses
+> 待补充
+
+## Ordering, Grouping, Limit, & Offset
+> 待补充
+
+## Conditional Clauses
+> 待补充
+
+## Inserts
+> 待补充
+
+## Updates
+### Updating JSON Columns
+> 待补充
+
+### Increment & Decrement
+> 待补充
 
 
-tags
-    id
-    name
+===
 
 
-article_tags
-    id
-    article_id
-    tag_id
 
 
-==========================================
+
+# ORM
+
+- articles
+  - id
+  - title
+  - content
+  - category_id
+
+- categories
+  - id
+  - name
+
+- tags
+  - id
+  - name
+
+- article_tags
+  - id
+  - article_id
+  - tag_id
+
 
 Artcile.all()   ==> Collection (element type is Article)
 > SELECT * FROM `articles`
@@ -60,37 +177,40 @@ Category.with_('articles').first().articles ==> Collection (elment type is Artic
 
 
 Article.first().tags ==> Collection (element type is Tag)
-> a = Article.first()  ==> SELECT * FROM `articles` LIMIT 1
+> a = Article.first()
+> 
+>     SELECT * FROM `articles` LIMIT 1
 >
 > a.tags  ==> 
->       SELECT 
->           `app_tag`.*, 
->           `article_tags`.`article_id` AS `pivot_article_id`, 
->           `article_tags`.`tag_id` AS `pivot_tag_id` 
->       FROM 
->           `app_tag` 
->       INNER JOIN 
->           `article_tags` 
->       ON 
->           `app_tag`.`id` = `article_tags`.`tag_id` 
->       WHERE 
->           `article_tags`.`article_id` = 1
+> 
+>     SELECT 
+>         `app_tag`.*, 
+>         `article_tags`.`article_id` AS `pivot_article_id`, 
+>         `article_tags`.`tag_id` AS `pivot_tag_id` 
+>     FROM 
+>         `app_tag` 
+>     INNER JOIN 
+>         `article_tags` 
+>     ON 
+>         `app_tag`.`id` = `article_tags`.`tag_id` 
+>     WHERE 
+>         `article_tags`.`article_id` = 1
 
 
 Article.with_('tags').first().tags ==> Collection (element type is Tag)
->   SELECT * FROM `articles` LIMIT 1
+>     SELECT * FROM `articles` LIMIT 1
 >
->   SELECT 
+>     SELECT 
 >       `app_tag`.*, 
 >       `article_tags`.`article_id` AS `pivot_article_id`, 
 >       `article_tags`.`tag_id` AS `pivot_tag_id` 
->   FROM 
+>     FROM 
 >       `app_tag` 
->   INNER JOIN 
+>     INNER JOIN 
 >       `article_tags` 
->   ON 
+>     ON 
 >       `app_tag`.`id` = `article_tags`.`tag_id` 
->   WHERE 
+>     WHERE 
 >       `article_tags`.`article_id` IN (1)'
 >
 

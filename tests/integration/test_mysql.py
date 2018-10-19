@@ -18,6 +18,8 @@ class MySQLTest(TestCase):
     def prepare_record(self):
         self.db.raw("insert into users (id, name, age) values (1, 'jack', 25) ")
         self.db.execute("insert into users (id, name, age) values (2, 'lucy', 22) ")
+        self.db.raw("insert into users (id, name, age) values (3, 'ann', 27) ")
+        self.db.raw("insert into users (id, name, age) values (4, 'lily', 26) ")
 
         self.db.raw("insert into mobiles (id, name, user_id) values (1, 'iphone', 1) ")
         self.db.raw("insert into mobiles (id, name, user_id) values (2, 'xiaomi', 1) ")
@@ -45,14 +47,14 @@ class MySQLTest(TestCase):
     def test_last(self):
         r = self.db.table('users').last()
         self.assertTrue(isinstance(r, Record))
-        self.assertEqual(2, r.id)
-        self.assertEqual('lucy', r.name)
-        self.assertEqual(22, r.age)
+        self.assertEqual(4, r.id)
+        self.assertEqual('lily', r.name)
+        self.assertEqual(26, r.age)
 
     def test_all(self):
         coll = self.db.table('users').all()
         self.assertTrue(isinstance(coll, Collection))
-        self.assertEqual(2, len(coll))
+        self.assertEqual(4, len(coll))
         
         self.assertEqual(1, coll[0].id)
         self.assertEqual('jack', coll[0].name)
@@ -62,11 +64,67 @@ class MySQLTest(TestCase):
         self.assertEqual('lucy', coll[1].name)
         self.assertEqual(22, coll[1].age)
 
+    def test_count(self):
+        r = self.db.table('users').count()
+        self.assertEqual(4, r)
+
+    def test_count_with_column(self):
+        r = self.db.table('users').count('age')
+        self.assertEqual(4, r)
+
+    def test_max(self):
+        r = self.db.table('users').max('age')
+        self.assertEqual(27, r)
+
+    def test_min(self):
+        r = self.db.table('users').min('age')
+        self.assertEqual(22, r)
+
+    def test_avg(self):
+        r = self.db.table('users').avg('age')
+        self.assertEqual(25, r)
+
+    def test_sum(self):
+        r = self.db.table('users').sum('age')
+        self.assertEqual(100, r)
+
+    def test_exists(self):
+        r = self.db.table('users').where(age=27).exists()
+        self.assertTrue(r)
+
+    def test_not_exists(self):
+        r = self.db.table('users').where(age=100).exists()
+        self.assertFalse(r)
+
     def test_select(self):
         coll = self.db.table('users').select('name').where(age=22).all()
         self.assertEqual(1, len(coll))
         r = coll[0]
+
+        self.assertEqual(1, len(r.keys()))
+        self.assertTrue('name' in r.keys())
+        self.assertFalse('age' in r.keys())
         self.assertEqual('lucy', r.name)
+
+    def test_select_with_multiple_columns(self):
+        coll = self.db.table('users').select('name', 'age').where(age=22).all()
+        self.assertEqual(1, len(coll))
+        r = coll[0]
+        self.assertEqual(2, len(r.keys()))
+        self.assertTrue('age' in r.keys())
+        self.assertTrue('name' in r.keys())
+        self.assertEqual('lucy', r.name)
+        self.assertEqual(22, r.age)
+
+    def test_select_twice(self):
+        coll = self.db.table('users').select('name').select('age').where(age=22).all()
+        self.assertEqual(1, len(coll))
+        r = coll[0]
+        self.assertEqual(2, len(r.keys()))
+        self.assertTrue('age' in r.keys())
+        self.assertTrue('name' in r.keys())
+        self.assertEqual('lucy', r.name)
+        self.assertEqual(22, r.age)
 
     def test_where(self):
         coll = self.db.table('users').where(age=22).all()
@@ -77,21 +135,33 @@ class MySQLTest(TestCase):
         self.assertEqual(22, r.age)
 
     def test_join(self):
-        coll = self.db.table('users').select('users.*').join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
+        coll = self.db.table('users').join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
+        self.assertEqual(2, len(coll))
+        self.assertEqual(1, coll[0].id)
+        self.assertEqual(2, coll[1].id)
+
+    def test_join(self):
+        coll = self.db.table('users').left_join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
+        self.assertEqual(2, len(coll))
+        self.assertEqual(1, coll[0].id)
+        self.assertEqual(2, coll[1].id)
+
+    def test_right_join(self):
+        coll = self.db.table('users').left_join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
         self.assertEqual(2, len(coll))
         self.assertEqual(1, coll[0].id)
         self.assertEqual(2, coll[1].id)
 
     def test_insert_getid(self):
         tb = self.db.table('users')
-        user_id = tb.insert_getid(id=3, name="Poy", age=33)
-        self.assertEqual(3, user_id)
+        user_id = tb.insert_getid(id=300, name="Poy", age=33)
+        self.assertEqual(300, user_id)
 
-        rs = tb.where(id=3).all()
+        rs = tb.where(id=300).all()
         self.assertEqual(1, len(rs))
 
         r = rs[0]
-        self.assertEqual(3, r.id)
+        self.assertEqual(300, r.id)
         self.assertEqual('Poy', r.name)
         self.assertEqual(33, r.age)
 
@@ -109,30 +179,30 @@ class MySQLTest(TestCase):
 
     def test_insert(self):
         tb = self.db.table('users')
-        cnt = tb.insert(id=3, name="Poy", age=33)
+        cnt = tb.insert(id=300, name="Poy", age=33)
         self.assertEqual(1, cnt)
-        rs = tb.where(id=3).all()
+        rs = tb.where(id=300).all()
         self.assertEqual(1, len(rs))
 
         r = rs[0]
-        self.assertEqual(3, r.id)
+        self.assertEqual(300, r.id)
         self.assertEqual('Poy', r.name)
         self.assertEqual(33, r.age)
 
     def test_multple_insert(self):
         tb = self.db.table('users')
         tb.insert([
-            dict(id=3, name="Poy", age=33),
-            dict(id=4, name="Ryan", age=44),
+            dict(id=300, name="Poy", age=33),
+            dict(id=400, name="Ryan", age=44),
         ])
         rs = tb.where(age__gt=30).all()
         self.assertEqual(2, len(rs))
 
-        self.assertEqual(3, rs[0].id)
+        self.assertEqual(300, rs[0].id)
         self.assertEqual('Poy', rs[0].name)
         self.assertEqual(33, rs[0].age)
 
-        self.assertEqual(4, rs[1].id)
+        self.assertEqual(400, rs[1].id)
         self.assertEqual('Ryan', rs[1].name)
         self.assertEqual(44, rs[1].age)
 

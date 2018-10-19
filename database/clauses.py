@@ -80,11 +80,11 @@ class JoinClause(WhereClause):
             self._ons.append('%s %s' % (and_or, s))
         return self
 
-    # @classmethod
-    # def join(self, tbname, on=None):
-    #     self.tbname = tbname
-    #     self._ons.append(on)
-    #     return self
+    @classmethod
+    def join(cls, qutotation, paramstyle, tbname, on):
+        o = cls(qutotation, paramstyle, tbname)
+        o._ons.append(on)
+        return self
 
     def compile(self):
         s = self._compile()
@@ -198,10 +198,17 @@ class SelectClause(object):
             self.columns.append(c)
         return self
 
-    def compile(self):
-        sql = '*'
-        if self.columns:
-            sql = ', '.join([ aqm(c, self.qutotation) for c in self.columns ])
+    def compile(self, tablename=None):
+        if tablename:
+            tablename = aqm(tablename, self.qutotation)
+            sql = '%s.*' % tablename
+            if self.columns:
+                sql = ', '.join([ '%s.%s' % (tablename, aqm(c, self.qutotation)) for c in self.columns ])
+        else:
+            sql = '*'
+            if self.columns:
+                sql = ', '.join([ aqm(c, self.qutotation) for c in self.columns ])
+
         if self._distinct:
             self.sql = 'SELECT DISTINCT %s' % sql
         else:

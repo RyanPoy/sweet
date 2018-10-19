@@ -131,28 +131,37 @@ class Recordset(object):
         return self
 
     @dcp
-    def where_exists(self, *tables):
-        for t in tables:
+    def where_exists(self, *rset):
+        for t in rset:
             self._exists_tables.append( (WhereClause.AND, t) )
         return self
 
     @dcp
-    def or_exists(self, *tables):
-        for t in tables:
+    def or_exists(self, *rset):
+        for t in rset:
             self._exists_tables.append( (WhereClause.OR, t) )
         return self
 
     def __aqm(self, s):
         return aqm(s, self.qutotation_marks)
-    _join_columns_sql = lambda self, columns: ', '.join([ aqm(c, self.qutotation_marks) for c in columns ])
 
     @property
     def sql(self):
+        if self.select_clause.columns:
+            select_sql = self.select_clause.compile().sql
+        else:
+            select_sql = self.select_clause.compile(tablename=self.tbname).sql
+
         return '{select_sql} {from_sql}{lock_sql}'.format(
-            select_sql=self.select_clause.compile().sql,
+            select_sql= select_sql,
             from_sql=self.__from_sql,
             lock_sql=self.__lock_sql()
         )
+
+
+    @property
+    def tablename(self):
+        return self.__aqm(self.tbname)
 
     def __lock_sql(self):
         lock = ''
@@ -182,7 +191,7 @@ class Recordset(object):
 
     @property
     def __from_sql(self):
-        sql = 'FROM {tablename}'.format(tablename=self.__aqm(self.tbname))
+        sql = 'FROM {tablename}'.format(tablename=self.tablename)
         join_sql = self.__join_sql
         if join_sql:
             sql = '%s %s' % (sql, join_sql)
@@ -243,7 +252,7 @@ class Recordset(object):
             update_columns.append('%s = %%s' % self.__aqm(k))
             update_bindings.append(v)
 
-        sql = 'UPDATE %s' % self.__aqm(self.tbname) 
+        sql = 'UPDATE %s' % self.tablename 
         join_sql = self.__join_sql
         if join_sql:
             sql = '%s %s' % (sql, join_sql)
@@ -268,7 +277,7 @@ class Recordset(object):
             update_columns.append('{name} = {name} {flag} %s'.format(name=self.__aqm(k), flag=flag))
             update_bindings.append(v)
 
-        sql = 'UPDATE %s' % self.__aqm(self.tbname) 
+        sql = 'UPDATE %s' % self.tablename 
         join_sql = self.__join_sql
         if join_sql:
             sql = '%s %s' % (sql, join_sql)
@@ -285,13 +294,13 @@ class Recordset(object):
             sql = "DELETE {from_sql}".format(from_sql=self.__from_sql)
         else:
             sql = "DELETE {tablename} {from_sql}".format(
-                tablename=self.__aqm(self.tbname),
+                tablename=self.tablename,
                 from_sql=self.__from_sql
             )
         return self.db.execute_rowcount(sql, *self.bindings)
 
     def truncate(self):
-        return self.db.execute_rowcount('TRUNCATE {}'.format(self.__aqm(self.tbname)))
+        return self.db.execute_rowcount('TRUNCATE {}'.format(self.tablename))
 
     def first(self):
         return self.db.fetchone(self.sql, *self.bindings)
@@ -315,7 +324,7 @@ class Recordset(object):
         return self.__func('min', column, distinct)
 
     def avg(self, column, distinct=False):
-        return self.__func('average', column, distinct)
+        return self.__func('avg', column, distinct)
 
     def sum(self, column, distinct=False):
         return self.__func('sum', column, distinct)
@@ -325,6 +334,7 @@ class Recordset(object):
 
         if not column:
             column = '*'
+
         if column == '*':
             distinct = False
 
