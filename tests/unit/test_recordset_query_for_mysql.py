@@ -211,10 +211,10 @@ class MySQLRecordsetQueryTest(TestCase):
         self.assertEqual('SELECT * FROM `users` HAVING `id` BETWEEN %s AND %s', tb.sql)
         self.assertEqual([1, 2], tb.bindings)
 
-    # def test_having_between_should_give_me_error(self):
-    #     tb = self.get_recordset().select('*').having(id__bt=[1, 2, 3])
-    #     with self.assertRaises(TypeError):
-    #         tb.sql
+    def test_having_between_should_give_me_error(self):
+        tb = self.get_recordset().select('*')
+        with self.assertRaises(TypeError):
+            tb.having(id__bt=[1, 2, 3])
 
     def test_having_not(self):
         tb = self.get_recordset().select('*').having(id__not=1, name__not='ryanpoy')
@@ -510,6 +510,90 @@ class MySQLRecordsetQueryTest(TestCase):
               ' AND EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)'
         self.assertEqual(sql, users.sql)
         self.assertEqual([20, 'iphone', 'iphone', 'aphone', 'aphone'], users.bindings)
+
+    def test_unions(self):
+        users = self.get_recordset().where(id=1).union(
+            self.get_recordset().where(id=2)
+        )
+        self.assertEqual(
+            'SELECT * FROM `users` WHERE `id` = %s UNION SELECT * FROM `users` WHERE `id` = %s',
+            users.sql  
+        )
+        self.assertEqual([1, 2], users.bindings)
+
+    def test_union_alls(self):
+        users = self.get_recordset().where(id=1).union_all(
+            self.get_recordset().where(id=2)
+        )
+        self.assertEqual(
+            'SELECT * FROM `users` WHERE `id` = %s UNION ALL SELECT * FROM `users` WHERE `id` = %s',
+            users.sql  
+        )
+        self.assertEqual([1, 2], users.bindings)
+
+    def test_multiple_unions(self):
+        users = self.get_recordset().where(id=1).union(
+            self.get_recordset().where(id=2)
+        ).union(
+            self.get_recordset().where(id=3)
+        )
+        self.assertEqual(
+            'SELECT * FROM `users` WHERE `id` = %s '
+            'UNION SELECT * FROM `users` WHERE `id` = %s '
+            'UNION SELECT * FROM `users` WHERE `id` = %s',
+            users.sql
+        )
+        self.assertEqual([1, 2, 3], users.bindings)
+
+    def test_multiple_union_alls(self):
+        users = self.get_recordset().where(id=1).union_all(
+            self.get_recordset().where(id=2)
+        ).union_all(
+            self.get_recordset().where(id=3)
+        )
+        self.assertEqual(
+            'SELECT * FROM `users` WHERE `id` = %s '
+            'UNION ALL SELECT * FROM `users` WHERE `id` = %s '
+            'UNION ALL SELECT * FROM `users` WHERE `id` = %s',
+            users.sql
+        )
+        self.assertEqual([1, 2, 3], users.bindings)
+
+    def test_union_order_by(self):
+        users = self.get_recordset().where(id=1).union(
+            self.get_recordset().where(id=2)
+        ).order_by('id', True)
+        self.assertEqual(
+            'SELECT * FROM `users` WHERE `id` = %s '
+            'UNION SELECT * FROM `users` WHERE `id` = %s '
+            'ORDER BY `id` DESC',
+            users.sql
+        )
+        self.assertEqual([1, 2], users.bindings)
+
+    def test_union_limits_and_offsets(self):
+        users = self.get_recordset().where(id=1).union(
+            self.get_recordset().where(id=2)
+        ).limit(10).offset(20)
+        self.assertEqual(
+            'SELECT * FROM `users` WHERE `id` = %s '
+            'UNION SELECT * FROM `users` WHERE `id` = %s '
+            'LIMIT 10 OFFSET 20',
+            users.sql
+        )
+        self.assertEqual([1, 2], users.bindings)
+
+    def test_union_order_by_and_limits_and_offsets(self):
+        users = self.get_recordset().where(id=1).union(
+            self.get_recordset().where(id=2)
+        ).limit(10).offset(20).order_by('id', False)
+        self.assertEqual(
+            'SELECT * FROM `users` WHERE `id` = %s '
+            'UNION SELECT * FROM `users` WHERE `id` = %s '
+            'ORDER BY `id` LIMIT 10 OFFSET 20',
+            users.sql
+        )
+        self.assertEqual([1, 2], users.bindings)
 
 
 if __name__ == '__main__':

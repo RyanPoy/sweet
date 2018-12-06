@@ -31,6 +31,7 @@ class Recordset(object):
         self.page_clause = PageClause()
         self._lock = self.LOCK.NILL
         self._exists_tables = []
+        self.unions = []
 
     def __deepcopy__(self, memo):
         """ Deep copy """
@@ -41,6 +42,14 @@ class Recordset(object):
             else:
                 obj.__dict__[k] = copy.deepcopy(v, memo)
         return obj
+
+    def union(self, rs):
+        self.unions.append( (rs, False) )
+        return self
+
+    def union_all(self, rs):
+        self.unions.append( (rs, True) )
+        return self
 
     @dcp
     def distinct(self):
@@ -157,7 +166,6 @@ class Recordset(object):
             lock_sql=self.__lock_sql()
         )
 
-
     @property
     def tablename(self):
         return self.__aqm(self.tbname)
@@ -212,6 +220,10 @@ class Recordset(object):
             sql = '%s %s' % (sql, having_sql)
             self.bindings.extend(self.having_clause.bindings)
 
+        union_sql = self.__union_sql
+        if union_sql:
+            sql = '%s %s' % (sql, union_sql)
+
         order_sql = self.order_clause.compile().sql
         if order_sql:
             sql = '%s %s' % (sql, order_sql)
@@ -221,6 +233,15 @@ class Recordset(object):
             sql = '%s %s' % (sql, limit_and_offset_sql)
 
         return sql
+
+    @property
+    def __union_sql(self):
+        sqls = []
+        for u, _all in self.unions:
+            sqls.append( 'UNION ALL' if _all else 'UNION' )
+            sqls.append(u.sql)
+            self.bindings.extend(u.bindings)
+        return ' '.join(sqls)
 
     @property
     def __join_sql(self):

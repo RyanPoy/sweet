@@ -140,7 +140,15 @@ SELECT * FROM `users` INNER JOIN `contacts` ON `user`.`id`=`contacts`.`user_id` 
 Note：If you would like to use a "where" style clause on your joins, you may use the "and_" and "or_" methods on a join. Instead of comparing two columns, these methods will compare the column against a value
 
 ## Unions
-> 待补充
+```
+db.table('users').where(first_name=None).union(
+	db.table('users').where(last_name=None)
+).all()
+```
+
+```
+SELECT * FROM `users` WHERE first_name IS NULL UNION SELECT * FROM `users` WHERE last_name IS NULL 
+```
 
 ## Where Clauses
 ### Parameter Grouping
