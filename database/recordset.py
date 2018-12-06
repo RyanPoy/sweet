@@ -101,16 +101,16 @@ class Recordset(object):
         page_num = 1 if page_num < 0 else page_num
         return self.limit((page_num-1) * page_size).offset(page_size)
 
-    def join(self, tbname, on, func=None):
+    def join(self, tbname, on=None, func=None):
         return self.__join(JoinClause, tbname, on, func)
 
-    def left_join(self, tbname, on, func=None):
+    def left_join(self, tbname, on=None, func=None):
         return self.__join(LeftJoinClause, tbname, on, func)
 
-    def cross_join(self, tbname, on, func=None):
+    def cross_join(self, tbname, on=None, func=None):
         return self.__join(CrossJoinClause, tbname, on, func)
 
-    def right_join(self, tbname, on, func=None):
+    def right_join(self, tbname, on=None, func=None):
         return self.__join(RightJoinClause, tbname, on, func)
 
     @dcp
@@ -118,8 +118,9 @@ class Recordset(object):
         jc = join_clause_clazz(self.qutotation_marks, self.paramstyle_marks, tbname)
         if on:
             jc.on(on)
+
         if func: 
-            jc = func(jc)
+            func(jc)
         self._joins_clauses.append(jc)
         return self
 
@@ -150,13 +151,8 @@ class Recordset(object):
 
     @property
     def sql(self):
-        if self.select_clause.columns:
-            select_sql = self.select_clause.compile().sql
-        else:
-            select_sql = self.select_clause.compile(tablename=self.tbname).sql
-
         return '{select_sql} {from_sql}{lock_sql}'.format(
-            select_sql= select_sql,
+            select_sql= self.select_clause.compile().sql,
             from_sql=self.__from_sql,
             lock_sql=self.__lock_sql()
         )

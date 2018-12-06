@@ -28,7 +28,7 @@ class MySQLRecordsetQueryTest(TestCase):
         self.assertEqual('SELECT DISTINCT `id` FROM `users`', tb.sql)
 
     def test_default_select(self):
-        self.assertEqual('SELECT `users`.* FROM `users`', self.get_recordset().sql)
+        self.assertEqual('SELECT * FROM `users`', self.get_recordset().sql)
 
     def test_multi_select(self):
         tb = self.get_recordset().select('id', 'name')
@@ -118,10 +118,10 @@ class MySQLRecordsetQueryTest(TestCase):
         self.assertEqual('SELECT * FROM `users` WHERE `id` NOT BETWEEN %s AND %s', tb.sql)
         self.assertEqual([1, 2], tb.bindings)
 
-    # def test_where_between_should_give_me_error(self):
-    #     tb = self.get_recordset().select('*').where(id__bt=[1, 2, 3])
-    #     with self.assertRaises(TypeError):
-    #         tb.sql
+    def test_where_between_should_give_me_error(self):
+        tb = self.get_recordset().select('*')
+        with self.assertRaises(TypeError):
+            tb.where(id__bt=[1, 2, 3])
 
     def test_or(self):
         tb = self.get_recordset().select('*').or_where(id=1, name='ryanpoy')
@@ -292,8 +292,16 @@ class MySQLRecordsetQueryTest(TestCase):
 
     def test_join_without_select(self):
         tb = self.get_recordset().where(id=[1,2,3]).or_where(name="ryanpoy").join('cars', "users.id=cars.user_id").where(cars__name='focus')
-        self.assertEqual('SELECT `users`.* FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s AND `cars`.`name` = %s', tb.sql)
+        self.assertEqual('SELECT * FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s AND `cars`.`name` = %s', tb.sql)
         self.assertEqual([ 1, 2, 3, 'ryanpoy', 'focus'], tb.bindings)
+
+    def test_join_with_function(self):
+        def complex(join):
+            join.on('users.id=cars.user_id').and_(cars__id=10).or_(users__id=100)
+        tb = self.get_recordset().join('cars', func=complex)
+
+        self.assertEqual('SELECT * FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` AND `cars`.`id` = %s OR `users`.`id` = %s', tb.sql)
+        self.assertEqual([10, 100], tb.bindings)
 
     def test_left_join(self):
         tb = self.get_recordset().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_where(name="ryanpoy").left_join('cars', "users.id=cars.user_id")
@@ -457,7 +465,7 @@ class MySQLRecordsetQueryTest(TestCase):
         users = users.where(age__lte=20).where_exists(
             mobiles.where(name='iphone')
         )
-        self.assertEqual('SELECT `users`.* FROM `users` WHERE `age` <= %s AND EXISTS (SELECT `mobiles`.* FROM `mobiles` WHERE `name` = %s)', users.sql)
+        self.assertEqual('SELECT * FROM `users` WHERE `age` <= %s AND EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)', users.sql)
         self.assertEqual([20, 'iphone'], users.bindings)
 
     def test_multiple_where_exists(self):
@@ -465,7 +473,7 @@ class MySQLRecordsetQueryTest(TestCase):
             self.get_recordset("mobiles").where(name='iphone'),
             self.get_recordset("mobiles").where(name='aphone')
         )
-        self.assertEqual('SELECT `users`.* FROM `users` WHERE EXISTS (SELECT `mobiles`.* FROM `mobiles` WHERE `name` = %s) AND EXISTS (SELECT `mobiles`.* FROM `mobiles` WHERE `name` = %s)', users.sql)
+        self.assertEqual('SELECT * FROM `users` WHERE EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s) AND EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)', users.sql)
         self.assertEqual(['iphone', 'aphone'], users.bindings)
 
     def test_or_exists(self):
@@ -475,7 +483,7 @@ class MySQLRecordsetQueryTest(TestCase):
         users = users.where(age__lte=20).or_exists(
             mobiles.where(name='iphone')
         )
-        self.assertEqual('SELECT `users`.* FROM `users` WHERE `age` <= %s OR EXISTS (SELECT `mobiles`.* FROM `mobiles` WHERE `name` = %s)', users.sql)
+        self.assertEqual('SELECT * FROM `users` WHERE `age` <= %s OR EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)', users.sql)
         self.assertEqual([20, 'iphone'], users.bindings)
 
     def test_multiple_or_exists(self):
@@ -483,7 +491,7 @@ class MySQLRecordsetQueryTest(TestCase):
             self.get_recordset("mobiles").where(name='iphone'),
             self.get_recordset("mobiles").where(name='aphone')
         )
-        self.assertEqual('SELECT `users`.* FROM `users` WHERE EXISTS (SELECT `mobiles`.* FROM `mobiles` WHERE `name` = %s) OR EXISTS (SELECT `mobiles`.* FROM `mobiles` WHERE `name` = %s)', users.sql)
+        self.assertEqual('SELECT * FROM `users` WHERE EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s) OR EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)', users.sql)
         self.assertEqual(['iphone', 'aphone'], users.bindings)
 
     def test_complex_where_or_exists(self):
@@ -495,11 +503,11 @@ class MySQLRecordsetQueryTest(TestCase):
                 ).where_exists(
                     self.get_recordset("mobiles").where(name='aphone')
                 )
-        sql = 'SELECT `users`.* FROM `users` WHERE `age` <= %s' \
-              ' AND EXISTS (SELECT `mobiles`.* FROM `mobiles` WHERE `name` = %s)' \
-              ' OR EXISTS (SELECT `mobiles`.* FROM `mobiles` WHERE `name` = %s)' \
-              ' OR EXISTS (SELECT `mobiles`.* FROM `mobiles` WHERE `name` = %s)' \
-              ' AND EXISTS (SELECT `mobiles`.* FROM `mobiles` WHERE `name` = %s)'
+        sql = 'SELECT * FROM `users` WHERE `age` <= %s' \
+              ' AND EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)' \
+              ' OR EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)' \
+              ' OR EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)' \
+              ' AND EXISTS (SELECT * FROM `mobiles` WHERE `name` = %s)'
         self.assertEqual(sql, users.sql)
         self.assertEqual([20, 'iphone', 'iphone', 'aphone', 'aphone'], users.bindings)
 

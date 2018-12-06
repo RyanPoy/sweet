@@ -139,6 +139,8 @@ class MySQLTest(TestCase):
         self.assertEqual(2, len(coll))
         self.assertEqual(1, coll[0].id)
         self.assertEqual(2, coll[1].id)
+        self.assertEqual(1, coll[0]['mobiles.id'])
+        self.assertEqual(3, coll[1]['mobiles.id'])
 
     def test_left_join(self):
         coll = self.db.table('users').left_join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()

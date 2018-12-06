@@ -86,6 +86,12 @@ class Filter(object):
         return True
 
 
+class JoinOnFilter(Filter):
+
+    def compile(self):
+        pass
+
+
 class SimpleFilter(Filter):
     
     def compile(self):

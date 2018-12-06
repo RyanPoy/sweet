@@ -34,8 +34,7 @@ class MySQL(object):
         cursor = self._cursor()
         try:
             self._execute(cursor, sql, *params)
-            column_names = [d[0] for d in cursor.description]
-            return Collection([ Record(zip(column_names, row)) for row in cursor ])
+            return Collection([ Record(row) for row in cursor ])
         finally:
             cursor.close()
 
@@ -110,9 +109,9 @@ class MySQL(object):
         self.set_autocommit(True)
     
     def _cursor(self):
-        # from MySQLdb.cursors import DictCursor
-        # return self._conn.cursor(DictCursor)
-        return self._conn.cursor()
+        from MySQLdb.cursors import DictCursor
+        return self._conn.cursor(DictCursor)
+        # return self._conn.cursor()
 
     def close(self):
         try:

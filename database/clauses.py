@@ -2,7 +2,7 @@
 from sweet.utils import is_array, is_str, is_hash
 from sweet.database.filters import Filter
 
-aqm = lambda s, qutotation: s if s == '*' or not s else '.'.join([ '%s%s%s' % (qutotation, x.strip(qutotation), qutotation) for x in s.split('.') ])
+aqm = lambda s, qutotation, : s if s == '*' or not s else '.'.join([ '%s%s%s' % (qutotation, x.strip(qutotation), qutotation) for x in s.split('.') ])
 
 
 class WhereClause(object):
@@ -72,18 +72,12 @@ class JoinClause(WhereClause):
         return self._on(self.AND, *ons)
 
     def or_on(self, *ons):
-        return self._on(self.OR, *ons)        
+        return self._on(self.OR, *ons)
 
     def _on(self, and_or, *ons):
         for on in ons:
-            s = ' = '.join([ aqm(x.strip(), self.qutotation) for x in on.split('=') ])
+            s = ' = '.join([ aqm(x.strip(), self.qutotation) for x in on.split('=', 1) ])
             self._ons.append('%s %s' % (and_or, s))
-        return self
-
-    @classmethod
-    def join(cls, qutotation, paramstyle, tbname, on):
-        o = cls(qutotation, paramstyle, tbname)
-        o._ons.append(on)
         return self
 
     def compile(self):
@@ -203,16 +197,11 @@ class SelectClause(object):
             self.columns.append(c)
         return self
 
-    def compile(self, tablename=None):
-        if tablename:
-            tablename = aqm(tablename, self.qutotation)
-            sql = '%s.*' % tablename
-            if self.columns:
-                sql = ', '.join([ '%s.%s' % (tablename, aqm(c, self.qutotation)) for c in self.columns ])
-        else:
-            sql = '*'
-            if self.columns:
-                sql = ', '.join([ aqm(c, self.qutotation) for c in self.columns ])
+    def compile(self):
+
+        sql = '*'
+        if self.columns:
+            sql = ', '.join([ aqm(c, self.qutotation) for c in self.columns ])
 
         if self._distinct:
             self.sql = 'SELECT DISTINCT %s' % sql

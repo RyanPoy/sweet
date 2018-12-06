@@ -31,14 +31,22 @@ python web framework looks like rails
 
 ## Retrieving Results
 db.table('users').all()
-> SELECT * FROM users
+
+```
+SELECT * FROM `users`
+```
 
 db.table('users').first()
-> SELECT * FROM users limit 1
+
+```
+SELECT * FROM `users` limit 1
+```
 
 db.table('users').last()
-> SELECT * FROM users
-> 
+
+```
+SELECT * FROM `users`
+```
 > note: then get last record
 
 
@@ -47,23 +55,38 @@ db.table('users').last()
 
 ### Aggregates
 db.table('users').count()
-> SELECT COUNT(*) FROM users
+
+```
+SELECT COUNT(*) FROM `users`
+```
 
 db.table('orders').max('price')
-> SELECT MAX(price) FROM orders
 
-support: count、max、min、avg、sum
+```
+SELECT MAX(`price`) FROM orders
+```
+
+> just support: count、max、min、avg、sum
 
 
 ## Selects
 db.table('users').select('age').all()
-> SELECT age FROM users
+
+```
+SELECT `age` FROM `users`
+```
 
 db.table('users').select('age', 'name).all()
-> SELECT age, name FROM users
+
+```
+SELECT age, name FROM users
+```
 
 db.table('users').select('age').select('name').all()
-> SELECT age, name FROM users
+
+```
+SELECT age, name FROM users
+```
 
 ## Raw Expressions
 ```
@@ -75,31 +98,46 @@ for r in rs:
 
 ## Joins
 ### Inner Join Clause
-users = db.table('users').join('posts', on="users.id = posts.user_id").all()
+db.table('users').join('posts', users__id="posts.user_id").all()
 
-> SELECT `users`.* FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id`
+``` 
+SELECT * FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id`
+```  
 
 If you would like to perform a "left join" instead of an "inner join", use the leftJoin method. The leftJoin method has the same signature as the join method:
             
 ### Left Join Clause
-users = db.table('users').left_join('posts', on="users.id = posts.user_id").all()
+db.table('users').left_join('posts', on="users.id = posts.user_id").all()
 
-> SELECT `users`.* FROM `users` LEFT JOIN `posts` ON `users`.`id` = `posts`.`user_id`
+``` 
+SELECT * FROM `users` LEFT JOIN `posts` ON `users`.`id` = `posts`.`user_id`
+```
 
 ### Right Join Clause
-users = db.table('users').right_join('posts', on="users.id = posts.user_id").all()
+db.table('users').right_join('posts', on="users.id = posts.user_id").all()
 
-> SELECT `users`.* FROM `users` RIGHT JOIN `posts` ON `users`.`id` = `posts`.`user_id`
+```
+SELECT * FROM `users` RIGHT JOIN `posts` ON `users`.`id` = `posts`.`user_id`
+```
 
 ### Cross Join Clause
-users = db.table('users').cross_join('posts', on="users.id = posts.user_id").all()
+db.table('users').cross_join('posts', on="users.id = posts.user_id").all()
 
-> SELECT `users`.* FROM `users` CROSS JOIN `posts` ON `users`.`id` = `posts`.`user_id`
-
+```
+SELECT * FROM `users` CROSS JOIN `posts` ON `users`.`id` = `posts`.`user_id`
+```
 
 ### Advanced Join Clauses
+```
+def complex(join):
+    join.on('user.id=contacts.user_id').and_(user__id=10).or_(user__name='abc')
+db.table('users').join('contacts', complex).all()
+```
 
-> 待补充
+```
+SELECT * FROM `users` INNER JOIN `contacts` ON `user`.`id`=`contacts`.`user_id` AND `user`.`id` = 10 OR `user`.`name` = 'abc'
+```
+Note：If you would like to use a "where" style clause on your joins, you may use the "and_" and "or_" methods on a join. Instead of comparing two columns, these methods will compare the column against a value
 
 ## Unions
 > 待补充
@@ -195,7 +233,7 @@ Article.first().tags ==> Collection (element type is Tag)
 > a.tags  ==> 
 > 
 >     SELECT 
->         `app_tag`.*, 
+>         *, 
 >         `article_tags`.`article_id` AS `pivot_article_id`, 
 >         `article_tags`.`tag_id` AS `pivot_tag_id` 
 >     FROM 
@@ -212,7 +250,7 @@ Article.with_('tags').first().tags ==> Collection (element type is Tag)
 >     SELECT * FROM `articles` LIMIT 1
 >
 >     SELECT 
->       `app_tag`.*, 
+>       *, 
 >       `article_tags`.`article_id` AS `pivot_article_id`, 
 >       `article_tags`.`tag_id` AS `pivot_tag_id` 
 >     FROM 
