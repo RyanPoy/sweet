@@ -5,7 +5,11 @@ from sweet.database.filters import Filter
 aqm = lambda s, qutotation, : s if s == '*' or not s else '.'.join([ '%s%s%s' % (qutotation, x.strip(qutotation), qutotation) for x in s.split('.') ])
 
 
-class WhereClause(object):
+class Clause(object):
+    pass
+
+
+class WhereClause(Clause):
     
     AND, OR = 'AND', 'OR'
 
@@ -18,21 +22,30 @@ class WhereClause(object):
         self.sql = ''
         self.bindings = []
 
-    def and_(self, **kwargs):
+    def and_(self, *other_clauses, **kwargs):
+        return self.__and_or(self.AND, *other_clauses, **kwargs)
+
+    def or_(self, *other_clauses, **kwargs):
+        return self.__and_or(self.OR, *other_clauses, **kwargs)
+
+    def __and_or(self, and_or, *other_clauses, **kwargs):
+        for c in other_clauses:
+            if not isinstance(c, Clause):
+                raise TypeError("Must be a Clause type")
+            self.filters.append( (and_or, c) )
+
         for k, v in kwargs.items():
-            self.filters.append( (self.AND, Filter.new(k, v, self.qutotation, self.paramstyle)) )
+            self.filters.append( (and_or, Filter.new(k, v, self.qutotation, self.paramstyle)) )
         return self
 
-    def or_(self, **kwargs):
-        for k, v in kwargs.items():
-            self.filters.append( (self.OR, Filter.new(k, v, self.qutotation, self.paramstyle)) )
-        return self
-
-    def compile(self):
+    def compile(self, with_prefix=True):
         s = self._compile()
         s = self._ltrip_and_or(s)
         if s:
-            self.sql = '%s %s' % (self.PREFIX, s)
+            if with_prefix:
+                self.sql = '%s %s' % (self.PREFIX, s)
+            else:
+                self.sql = s
         return self
 
     def _ltrip_and_or(self, s):
@@ -45,10 +58,18 @@ class WhereClause(object):
     def _compile(self):
         sqls = []
         for and_or, f in self.filters:
-            f.compile()
-            sqls.append(and_or)
-            sqls.append(f.sql)
-            self.bindings.extend(f.params)
+            if isinstance(f, Clause):
+                f.compile(False)
+                sqls.append(and_or)
+                sqls.append("(")
+                sqls.append(f.sql)
+                sqls.append(")")
+                self.bindings.extend(f.bindings)
+            else:
+                f.compile()
+                sqls.append(and_or)
+                sqls.append(f.sql)
+                self.bindings.extend(f.params)
         return ' '.join(sqls) if sqls else ''
 
 

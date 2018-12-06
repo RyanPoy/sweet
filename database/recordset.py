@@ -66,23 +66,23 @@ class Recordset(object):
         return self._bindings
 
     @dcp
-    def where(self, **kwargs):
-        self.where_clause.and_(**kwargs)
+    def where(self, *where_clauses, **kwargs):
+        self.where_clause.and_(*where_clauses, **kwargs)
         return self
 
     @dcp
-    def or_where(self, **kwargs):
-        self.where_clause.or_(**kwargs)
+    def or_where(self, *where_clauses, **kwargs):
+        self.where_clause.or_(*where_clauses, **kwargs)
         return self
 
     @dcp
-    def having(self, **kwargs):
-        self.having_clause.and_(**kwargs)
+    def having(self, *where_clauses, **kwargs):
+        self.having_clause.and_(*where_clauses, **kwargs)
         return self
 
     @dcp
-    def or_having(self, **kwargs):
-        self.having_clause.or_(**kwargs)
+    def or_having(self, *where_clauses, **kwargs):
+        self.having_clause.or_(*where_clauses, **kwargs)
         return self
 
     @dcp

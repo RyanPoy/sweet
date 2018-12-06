@@ -2,6 +2,7 @@
 from sweet.tests.unit import TestCase
 from sweet.database.recordset import MySQLRecordset
 from sweet.database.db import Record
+from sweet.database.clauses import WhereClause, HavingClause
 
 
 class MySQLRecordsetQueryTest(TestCase):
@@ -123,6 +124,13 @@ class MySQLRecordsetQueryTest(TestCase):
         with self.assertRaises(TypeError):
             tb.where(id__bt=[1, 2, 3])
 
+    def test_where_group_parameters(self):
+        tb = self.get_recordset().select('*').where(id__bt=[1, 2]).or_where(
+            WhereClause('`', '%s').and_(name='jim').or_(name='lucy')
+        ).where(id=10)
+        self.assertEqual('SELECT * FROM `users` WHERE `id` BETWEEN %s AND %s OR ( `name` = %s OR `name` = %s ) AND `id` = %s', tb.sql)
+        self.assertEqual([1, 2, 'jim', 'lucy', 10], tb.bindings)
+
     def test_or(self):
         tb = self.get_recordset().select('*').or_where(id=1, name='ryanpoy')
         self.assertEqual('SELECT * FROM `users` WHERE `id` = %s OR `name` = %s', tb.sql)
@@ -170,6 +178,13 @@ class MySQLRecordsetQueryTest(TestCase):
     def test_group_bys(self):
         tb = self.get_recordset().select('*').group_by('id', 'email')
         self.assertEqual('SELECT * FROM `users` GROUP BY `id`, `email`', tb.sql )
+
+    def test_where_group_parameters(self):
+        tb = self.get_recordset().select('*').having(id=1, name='ryanpoy').or_having(
+            WhereClause('`', '%s').and_(name='jim').or_(name='lucy')
+        )
+        self.assertEqual('SELECT * FROM `users` HAVING `id` = %s AND `name` = %s OR ( `name` = %s OR `name` = %s )', tb.sql)
+        self.assertEqual([1, 'ryanpoy', 'jim', 'lucy'], tb.bindings)
 
     def test_having(self):
         tb = self.get_recordset().select('*').having(id=1, name='ryanpoy')

@@ -142,7 +142,7 @@ Note：If you would like to use a "where" style clause on your joins, you may us
 ## Unions
 ```
 db.table('users').where(first_name=None).union(
-	db.table('users').where(last_name=None)
+    db.table('users').where(last_name=None)
 ).all()
 ```
 
@@ -151,8 +151,105 @@ SELECT * FROM `users` WHERE first_name IS NULL UNION SELECT * FROM `users` WHERE
 ```
 
 ## Where Clauses
+### Basic where
+db.table('users').where(name=None).all()
+
+```
+SELECT * FROM `users` WHERE `id` IS NULL 
+```
+
+db.table('users').where(name__not=None).all()
+
+```
+SELECT * FROM `users` WHERE `id` IS NOT NULL 
+```
+
+db.table('users').where(name__like='%Jim%').all()
+
+```
+SELECT * FROM `users` WHERE `id` LIKE '%Jim%'
+```
+
+db.table('users').where(name__not_like='%Jim%').all()
+
+```
+SELECT * FROM `users` WHERE `id` NOT LIKE '%Jim%'
+```
+
+db.table('users').where(id=10).all()
+
+```
+SELECT * FROM `users` WHERE `id` = 10 
+```
+
+db.table('users').where(id__not=10).all()
+
+```
+SELECT * FROM `users` WHERE `id` <> 10
+```
+
+db.table('users').where(id__lt=10).all()
+
+```
+SELECT * FROM `users` WHERE `id` < 10
+```
+
+db.table('users').where(id__lte=10).all()
+
+```
+SELECT * FROM `users` WHERE `id` <= 10
+```
+
+db.table('users').where(id__gt=10).all()
+
+```
+SELECT * FROM `users` WHERE `id` > 10
+```
+
+db.table('users').where(id__gte=10).all()
+
+```
+SELECT * FROM `users` WHERE `id` >= 10
+```
+
+db.table('users').where(id__bt=[1, 5]).all()
+
+```
+SELECT * FROM `users` WHERE `id` BETWEEN 1 AND 5
+```
+
+
+db.table('users').where(id__not_bt=[1, 5]).all()
+
+```
+SELECT * FROM `users` WHERE `id` NOT BETWEEN 1 AND 5
+```
+
+
+db.table('users').where(id=[1, 5]).all()
+
+```
+SELECT * FROM `users` WHERE `id` IN (1, 5)
+```
+
+
+db.table('users').where(id__not=[1, 5]).all()
+
+```
+SELECT * FROM `users` WHERE `id` NOT IN (1, 5)
+```
+
 ### Parameter Grouping
-> 待补充
+```
+db.table('users').where(id__not=[1, 5]).where(
+	WhereClause().and_(name='jim').or_(name='lucy')
+).all()
+```
+
+```
+SELECT * FROM `users` WHERE `id` NOT IN (1, 5) AND ( `name` = 'jim' OR `name` = 'lucy' )
+```
+
 
 ### Where Exists Clauses
 > 待补充
