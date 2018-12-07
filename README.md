@@ -23,7 +23,7 @@
 - Inserts
 - Updates
   - Increment & Decrement
-
+- Deletes
 
 ## Introduction
 python web framework looks like rails
@@ -353,6 +353,24 @@ db.table('users').decrement(age=10, score=20)
 ```
 UPDATE `users` SET `age` = `age` - 10, `score` = `score` - 20
 ```
+
+
+## Deletes
+### delete
+db.table('users').delete()
+
+```
+DELETE `users`
+```
+
+### truncate
+db.table('users').truncate()
+
+```
+TRUNCATE `users`
+```
+
+
 
 ===
 
