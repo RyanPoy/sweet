@@ -24,6 +24,8 @@
 - Updates
   - Increment & Decrement
 - Deletes
+- Locking
+
 
 ## Introduction
 python web framework looks like rails
@@ -370,7 +372,36 @@ db.table('users').truncate()
 TRUNCATE `users`
 ```
 
+## Locking
 
+### read_lock
+```
+db.table('users')
+  .select('users.id', 'cars.name')
+  .left_join('cars', 'users.id=cars.user_id')
+  .where(car_id=10)
+  .read_lock()
+```
+
+```
+SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `car_id` = 10 LOCK IN SHARE MODE'
+```
+
+
+### write_lock
+
+```
+db.table('users)
+  .select('user.id')
+  .select('cars.name')
+  .left_join('cars', 'users.id=cars.user_id')
+  .where(car_id=10)
+  .write_lock()
+```
+
+```
+SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `car_id` = 10 FOR UPDATE
+```
 
 ===
 
