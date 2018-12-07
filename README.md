@@ -17,13 +17,11 @@
 - Where Clauses
   - Parameter Grouping
   - Where Exists Clauses
-  - JSON Where Clauses（@TODO）
 - Order By
 - Group By / Having 
 - Page
 - Inserts
 - Updates
-  - Updating JSON Columns
   - Increment & Decrement
 
 
@@ -261,10 +259,7 @@ users = db.table('users').where_exists(
 
 ```
 SELECT * FROM `users` WHERE EXISTS (SELECT * FROM `mobiles` WHERE `name` = 'iphone') AND EXISTS (SELECT * FROM `mobiles` WHERE `name` = 'aphone')
-```        
-
-### JSON Where Clauses
-> @TODO
+```
 
 ## Order By
 db.table('users').order_by('id')
@@ -338,12 +333,26 @@ INSERT INTO `users` (`id`, `name`, `age`) VALUES (3, 'jim', 23), (5, 'lily', 32)
 
 
 ## Updates
-### Updating JSON Columns
-> 待补充
+### Updating Columns
+db.table('users').where(id__gt=10).update(age=30, gender='m')
+
+```
+UPDATE `users` SET `age` = 30, `gender` = 'm' WHERE id > 10
+```
+
 
 ### Increment & Decrement
-> 待补充
+db.table('users').increment(age=10, score=20)
 
+```
+UPDATE `users` SET `age` = `age` + 10, `score` = `score` + 20
+```
+
+db.table('users').decrement(age=10, score=20)
+
+```
+UPDATE `users` SET `age` = `age` - 10, `score` = `score` - 20
+```
 
 ===
 

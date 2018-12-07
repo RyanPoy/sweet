@@ -307,7 +307,7 @@ class Recordset(object):
 
         sql = self.__core_sql(sql)
 
-        return self.db.execute_rowcount(sql, *self.bindings)        
+        return self.db.execute_rowcount(sql, *self.bindings)
 
     def delete(self):
         if not self._joins_clauses: # needn't join
