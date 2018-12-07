@@ -17,9 +17,10 @@
 - Where Clauses
   - Parameter Grouping
   - Where Exists Clauses
-  - JSON Where Clauses
-- Ordering, Grouping, Limit, & Offset
-- Conditional Clauses
+  - JSON Where Clauses（@TODO）
+- Order By
+- Group By / Having 
+- Page
 - Inserts
 - Updates
   - Updating JSON Columns
@@ -39,7 +40,7 @@ SELECT * FROM `users`
 db.table('users').first()
 
 ```
-SELECT * FROM `users` limit 1
+> SELECT * FROM `users` limit 1
 ```
 
 db.table('users').last()
@@ -250,21 +251,91 @@ db.table('users').where(id__not=[1, 5]).where(
 SELECT * FROM `users` WHERE `id` NOT IN (1, 5) AND ( `name` = 'jim' OR `name` = 'lucy' )
 ```
 
-
 ### Where Exists Clauses
-> 待补充
+```
+users = db.table('users').where_exists(
+    db.table('mobiles').where(name='iphone'),
+    db.table('mobiles').where(name='aphone')
+).all()
+```
+
+```
+SELECT * FROM `users` WHERE EXISTS (SELECT * FROM `mobiles` WHERE `name` = 'iphone') AND EXISTS (SELECT * FROM `mobiles` WHERE `name` = 'aphone')
+```        
 
 ### JSON Where Clauses
-> 待补充
+> @TODO
 
-## Ordering, Grouping, Limit, & Offset
-> 待补充
+## Order By
+db.table('users').order_by('id')
 
-## Conditional Clauses
-> 待补充
+```
+SELECT * FROM `users` ORDER BY `id`
+```
+
+db.table('users').order_by('id', False)
+
+```
+SELECT * FROM `users` ORDER BY `id`
+```
+
+db.table('users').order_by('id', True)
+
+```
+SELECT * FROM `users` ORDER BY `id` DESC
+```
+
+## Group By / Having 
+db.table('users').group_by('school_id').having(school_id__bt=[1, 100]).all()
+
+```
+SELECT * FROM `users` GROUP BY `school_id` HAVING `school_id` BETWEEN 1 AND 100
+```
+
+
+## Page
+### Limit / Offset
+db.table('users').limit(10).offset(5).all()
+
+```
+SELECT * FROM `users` LIMIT 10 OFFSET 5
+```
+
+### Paginator
+db.table('users').page(2, 15).all()
+
+```
+SELECT * FROM `users` LIMIT 15 OFFSET 15
+```
 
 ## Inserts
-> 待补充
+
+### single insert and get id
+db.table('users').insert_getid(id=3, name='jim', age=23)
+
+```
+INSERT INTO `users` (`id`, `name`, `age`) VALUES (3, 'jim', 23)
+```
+
+### single insert and get how many insert successful
+db.table('users').insert(id=3, name='jim', age=23)
+
+```
+INSERT INTO `users` (`id`, `name`, `age`) VALUES (3, 'jim', 23)
+```
+
+### multiple insert and get how many insert successful
+```
+db.table('users').insert([
+	dict(id=3, name='jim', age=23),
+	dict(id=5, name='lily', age=32),
+])
+```
+
+```
+INSERT INTO `users` (`id`, `name`, `age`) VALUES (3, 'jim', 23), (5, 'lily', 32)
+```
+
 
 ## Updates
 ### Updating JSON Columns
