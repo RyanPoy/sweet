@@ -12,7 +12,7 @@ class Record(mydict):
 
 class MySQL(object):
     
-    table_class = MySQLRecordset
+    rset_class = MySQLRecordset
 
     def __init__(self, dbname, user='root', password='', host='localhost', port=3306, charset='utf8', show_sql=False):
         self._db_args = dict(db=dbname, user=user, passwd=password, host=host, port=port, charset=charset,
@@ -153,5 +153,5 @@ class MySQL(object):
         self._conn.autocommit(auto)
         return self
 
-    def table(self, tbname):
-        return self.table_class(self, tbname)
+    def records(self, tbname):
+        return self.rset_class(self, tbname)

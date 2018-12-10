@@ -31,19 +31,19 @@
 python web framework looks like rails
 
 ## Retrieving Results
-db.table('users').all()
+db.records('users').all()
 
 ```
 SELECT * FROM `users`
 ```
 
-db.table('users').first()
+db.records('users').first()
 
 ```
 > SELECT * FROM `users` limit 1
 ```
 
-db.table('users').last()
+db.records('users').last()
 
 ```
 SELECT * FROM `users`
@@ -55,13 +55,13 @@ SELECT * FROM `users`
 > 待补充
 
 ### Aggregates
-db.table('users').count()
+db.records('users').count()
 
 ```
 SELECT COUNT(*) FROM `users`
 ```
 
-db.table('orders').max('price')
+db.records('orders').max('price')
 
 ```
 SELECT MAX(`price`) FROM orders
@@ -71,19 +71,19 @@ SELECT MAX(`price`) FROM orders
 
 
 ## Selects
-db.table('users').select('age').all()
+db.records('users').select('age').all()
 
 ```
 SELECT `age` FROM `users`
 ```
 
-db.table('users').select('age', 'name).all()
+db.records('users').select('age', 'name).all()
 
 ```
 SELECT age, name FROM users
 ```
 
-db.table('users').select('age').select('name').all()
+db.records('users').select('age').select('name').all()
 
 ```
 SELECT age, name FROM users
@@ -99,7 +99,7 @@ for r in rs:
 
 ## Joins
 ### Inner Join Clause
-db.table('users').join('posts', users__id="posts.user_id").all()
+db.records('users').join('posts', users__id="posts.user_id").all()
 
 ``` 
 SELECT * FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id`
@@ -108,21 +108,21 @@ SELECT * FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id`
 If you would like to perform a "left join" instead of an "inner join", use the leftJoin method. The leftJoin method has the same signature as the join method:
             
 ### Left Join Clause
-db.table('users').left_join('posts', on="users.id = posts.user_id").all()
+db.records('users').left_join('posts', on="users.id = posts.user_id").all()
 
 ``` 
 SELECT * FROM `users` LEFT JOIN `posts` ON `users`.`id` = `posts`.`user_id`
 ```
 
 ### Right Join Clause
-db.table('users').right_join('posts', on="users.id = posts.user_id").all()
+db.records('users').right_join('posts', on="users.id = posts.user_id").all()
 
 ```
 SELECT * FROM `users` RIGHT JOIN `posts` ON `users`.`id` = `posts`.`user_id`
 ```
 
 ### Cross Join Clause
-db.table('users').cross_join('posts', on="users.id = posts.user_id").all()
+db.records('users').cross_join('posts', on="users.id = posts.user_id").all()
 
 ```
 SELECT * FROM `users` CROSS JOIN `posts` ON `users`.`id` = `posts`.`user_id`
@@ -132,7 +132,7 @@ SELECT * FROM `users` CROSS JOIN `posts` ON `users`.`id` = `posts`.`user_id`
 ```
 def complex(join):
     join.on('user.id=contacts.user_id').and_(user__id=10).or_(user__name='abc')
-db.table('users').join('contacts', complex).all()
+db.records('users').join('contacts', complex).all()
 ```
 
 ```
@@ -142,8 +142,8 @@ Note：If you would like to use a "where" style clause on your joins, you may us
 
 ## Unions
 ```
-db.table('users').where(first_name=None).union(
-    db.table('users').where(last_name=None)
+db.records('users').where(first_name=None).union(
+    db.records('users').where(last_name=None)
 ).all()
 ```
 
@@ -153,88 +153,88 @@ SELECT * FROM `users` WHERE first_name IS NULL UNION SELECT * FROM `users` WHERE
 
 ## Where Clauses
 ### Basic where
-db.table('users').where(name=None).all()
+db.records('users').where(name=None).all()
 
 ```
 SELECT * FROM `users` WHERE `id` IS NULL 
 ```
 
-db.table('users').where(name__not=None).all()
+db.records('users').where(name__not=None).all()
 
 ```
 SELECT * FROM `users` WHERE `id` IS NOT NULL 
 ```
 
-db.table('users').where(name__like='%Jim%').all()
+db.records('users').where(name__like='%Jim%').all()
 
 ```
 SELECT * FROM `users` WHERE `id` LIKE '%Jim%'
 ```
 
-db.table('users').where(name__not_like='%Jim%').all()
+db.records('users').where(name__not_like='%Jim%').all()
 
 ```
 SELECT * FROM `users` WHERE `id` NOT LIKE '%Jim%'
 ```
 
-db.table('users').where(id=10).all()
+db.records('users').where(id=10).all()
 
 ```
 SELECT * FROM `users` WHERE `id` = 10 
 ```
 
-db.table('users').where(id__not=10).all()
+db.records('users').where(id__not=10).all()
 
 ```
 SELECT * FROM `users` WHERE `id` <> 10
 ```
 
-db.table('users').where(id__lt=10).all()
+db.records('users').where(id__lt=10).all()
 
 ```
 SELECT * FROM `users` WHERE `id` < 10
 ```
 
-db.table('users').where(id__lte=10).all()
+db.records('users').where(id__lte=10).all()
 
 ```
 SELECT * FROM `users` WHERE `id` <= 10
 ```
 
-db.table('users').where(id__gt=10).all()
+db.records('users').where(id__gt=10).all()
 
 ```
 SELECT * FROM `users` WHERE `id` > 10
 ```
 
-db.table('users').where(id__gte=10).all()
+db.records('users').where(id__gte=10).all()
 
 ```
 SELECT * FROM `users` WHERE `id` >= 10
 ```
 
-db.table('users').where(id__bt=[1, 5]).all()
+db.records('users').where(id__bt=[1, 5]).all()
 
 ```
 SELECT * FROM `users` WHERE `id` BETWEEN 1 AND 5
 ```
 
 
-db.table('users').where(id__not_bt=[1, 5]).all()
+db.records('users').where(id__not_bt=[1, 5]).all()
 
 ```
 SELECT * FROM `users` WHERE `id` NOT BETWEEN 1 AND 5
 ```
 
 
-db.table('users').where(id=[1, 5]).all()
+db.records('users').where(id=[1, 5]).all()
 
 ```
 SELECT * FROM `users` WHERE `id` IN (1, 5)
 ```
 
 
-db.table('users').where(id__not=[1, 5]).all()
+db.records('users').where(id__not=[1, 5]).all()
 
 ```
 SELECT * FROM `users` WHERE `id` NOT IN (1, 5)
@@ -242,7 +242,7 @@ SELECT * FROM `users` WHERE `id` NOT IN (1, 5)
 
 ### Parameter Grouping
 ```
-db.table('users').where(id__not=[1, 5]).where(
+db.records('users').where(id__not=[1, 5]).where(
 	WhereClause().and_(name='jim').or_(name='lucy')
 ).all()
 ```
@@ -253,9 +253,9 @@ SELECT * FROM `users` WHERE `id` NOT IN (1, 5) AND ( `name` = 'jim' OR `name` = 
 
 ### Where Exists Clauses
 ```
-users = db.table('users').where_exists(
-    db.table('mobiles').where(name='iphone'),
-    db.table('mobiles').where(name='aphone')
+users = db.records('users').where_exists(
+    db.records('mobiles').where(name='iphone'),
+    db.records('mobiles').where(name='aphone')
 ).all()
 ```
 
@@ -264,26 +264,26 @@ SELECT * FROM `users` WHERE EXISTS (SELECT * FROM `mobiles` WHERE `name` = 'ipho
 ```
 
 ## Order By
-db.table('users').order_by('id')
+db.records('users').order_by('id')
 
 ```
 SELECT * FROM `users` ORDER BY `id`
 ```
 
-db.table('users').order_by('id', False)
+db.records('users').order_by('id', False)
 
 ```
 SELECT * FROM `users` ORDER BY `id`
 ```
 
-db.table('users').order_by('id', True)
+db.records('users').order_by('id', True)
 
 ```
 SELECT * FROM `users` ORDER BY `id` DESC
 ```
 
 ## Group By / Having 
-db.table('users').group_by('school_id').having(school_id__bt=[1, 100]).all()
+db.records('users').group_by('school_id').having(school_id__bt=[1, 100]).all()
 
 ```
 SELECT * FROM `users` GROUP BY `school_id` HAVING `school_id` BETWEEN 1 AND 100
@@ -292,14 +292,14 @@ SELECT * FROM `users` GROUP BY `school_id` HAVING `school_id` BETWEEN 1 AND 100
 
 ## Page
 ### Limit / Offset
-db.table('users').limit(10).offset(5).all()
+db.records('users').limit(10).offset(5).all()
 
 ```
 SELECT * FROM `users` LIMIT 10 OFFSET 5
 ```
 
 ### Paginator
-db.table('users').page(2, 15).all()
+db.records('users').page(2, 15).all()
 
 ```
 SELECT * FROM `users` LIMIT 15 OFFSET 15
@@ -308,14 +308,14 @@ SELECT * FROM `users` LIMIT 15 OFFSET 15
 ## Inserts
 
 ### single insert and get id
-db.table('users').insert_getid(id=3, name='jim', age=23)
+db.records('users').insert_getid(id=3, name='jim', age=23)
 
 ```
 INSERT INTO `users` (`id`, `name`, `age`) VALUES (3, 'jim', 23)
 ```
 
 ### single insert and get how many insert successful
-db.table('users').insert(id=3, name='jim', age=23)
+db.records('users').insert(id=3, name='jim', age=23)
 
 ```
 INSERT INTO `users` (`id`, `name`, `age`) VALUES (3, 'jim', 23)
@@ -323,7 +323,7 @@ INSERT INTO `users` (`id`, `name`, `age`) VALUES (3, 'jim', 23)
 
 ### multiple insert and get how many insert successful
 ```
-db.table('users').insert([
+db.records('users').insert([
 	dict(id=3, name='jim', age=23),
 	dict(id=5, name='lily', age=32),
 ])
@@ -336,7 +336,7 @@ INSERT INTO `users` (`id`, `name`, `age`) VALUES (3, 'jim', 23), (5, 'lily', 32)
 
 ## Updates
 ### Updating Columns
-db.table('users').where(id__gt=10).update(age=30, gender='m')
+db.records('users').where(id__gt=10).update(age=30, gender='m')
 
 ```
 UPDATE `users` SET `age` = 30, `gender` = 'm' WHERE id > 10
@@ -344,13 +344,13 @@ UPDATE `users` SET `age` = 30, `gender` = 'm' WHERE id > 10
 
 
 ### Increment & Decrement
-db.table('users').increment(age=10, score=20)
+db.records('users').increment(age=10, score=20)
 
 ```
 UPDATE `users` SET `age` = `age` + 10, `score` = `score` + 20
 ```
 
-db.table('users').decrement(age=10, score=20)
+db.records('users').decrement(age=10, score=20)
 
 ```
 UPDATE `users` SET `age` = `age` - 10, `score` = `score` - 20
@@ -359,14 +359,14 @@ UPDATE `users` SET `age` = `age` - 10, `score` = `score` - 20
 
 ## Deletes
 ### delete
-db.table('users').delete()
+db.records('users').delete()
 
 ```
 DELETE `users`
 ```
 
 ### truncate
-db.table('users').truncate()
+db.records('users').truncate()
 
 ```
 TRUNCATE `users`
@@ -376,7 +376,7 @@ TRUNCATE `users`
 
 ### read_lock
 ```
-db.table('users')
+db.records('users')
   .select('users.id', 'cars.name')
   .left_join('cars', 'users.id=cars.user_id')
   .where(car_id=10)
@@ -391,7 +391,7 @@ SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id`
 ### write_lock
 
 ```
-db.table('users)
+db.records('users)
   .select('user.id')
   .select('cars.name')
   .left_join('cars', 'users.id=cars.user_id')
