@@ -1,5 +1,5 @@
 # sweet
-this is a framework looks like rails.
+python web framework looks like rails
 
 # recordset
 [recordset](./documents/recordset.md)

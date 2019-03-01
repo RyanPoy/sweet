@@ -1,5 +1,63 @@
 # ORM
 
+## list
+- Introduction
+- define
+- save
+- update
+- delete
+
+==
+- Introduction
+the orm which implement ActiveRecord
+
+- define
+
+```
+class User(Model):
+  pass
+```
+
+User would be add column named created_at, updated_at, id auto. 
+And created_at, updated_at are datetime type, id is a integer auto increament
+
+if you don't create created_at and updated_at, you can set __timestamp__ is False in User.
+Just like this:
+
+```
+class User(Model):
+  __timestamp__ = False
+
+```
+
+
+- save / create
+
+```  
+User(name='jim', age=20).save()
+
+User.create(name='jim', age=20)
+```
+
+- update
+
+```
+u = User.where(name="jim")
+u.update(name="lily", age=20)
+
+u = User.where(name='jim')
+u.name = 'lily'
+u.age = 20
+u.save()
+```
+
+
+
+
+
+
+
+==
 - articles
   - id
   - title

@@ -1,5 +1,6 @@
 # coding: utf8
 import sys, unittest
+# from sweet.tests import helper
 from sweet.tests.integration.test_mysql import MySQLTest
 
 from sweet.tests.unit.test_filter import FilterTest
@@ -10,7 +11,7 @@ from sweet.tests.unit.test_recordset_insert_for_mysql import MySQLRecordsetInser
 from sweet.tests.unit.test_recordset_delete_for_mysql import MySQLRecordsetDeleteTest
 from sweet.tests.unit.test_recordset_update_for_mysql import MySQLRecordsetUpdateTest
 
-from sweet.tests.unit.test_model import ModelTest
+from sweet.tests.unit.test_model_define import ModelDefineTest
 
 from sweet.tests.unit.test_validator_acceptance import AcceptanceValidatorTest
 from sweet.tests.unit.test_validator_confirmation import ConfirmationValidatorTest
@@ -31,7 +32,7 @@ unit_tests = [
     MySQLRecordsetDeleteTest,
     MySQLRecordsetUpdateTest,
 
-    ModelTest,
+    ModelDefineTest,
     
     AcceptanceValidatorTest,
     ConfirmationValidatorTest,

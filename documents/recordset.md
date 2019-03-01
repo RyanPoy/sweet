@@ -1,6 +1,5 @@
 # recordset
 =======
-## list
 - Introduction
 - Retrieving Results
   - Chunking Results
@@ -28,7 +27,7 @@
 
 
 ## Introduction
-python web framework looks like rails
+the basic database operate 
 
 ## Retrieving Results
 db.records('users').all()
