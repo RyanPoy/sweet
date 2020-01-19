@@ -28,7 +28,7 @@ class Template(object):
         self.fname = fname or '<string>'
         self.tokens = self._parse()
         self.compiled = self._compile()
-        self.pp()
+#         self.pp()
 
     def pp(self):
         print ('\n ----- compiled -----\n')
@@ -96,3 +96,18 @@ class Template(object):
         exec(self.compiled, kwargs)
         _tt_exec = kwargs['_tt_exec']
         return _tt_exec()
+
+
+
+if __name__ == '__main__':
+    from cProfile import Profile
+    n = 500000
+    user = {
+        'age': '露西',
+        'age': 23
+    }
+    s = """<h1>{{ user.name{% }} %}</h1><h2>{{ user.age }}</h2>"""*n
+    p = Profile()
+    t = Template(s)
+    p.run("t.generate(user=user)")
+    p.print_stats()
