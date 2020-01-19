@@ -1,6 +1,6 @@
 #coding: utf8
 from io import StringIO
-from _sqlite3 import Statement
+
 
 class CodeWriter(object):
 
@@ -10,7 +10,7 @@ class CodeWriter(object):
         self.io = StringIO()
         self.indent  = ''
         self.indent_num = 0
-
+    
     def begin(self):
         self.io.write("def _tt_exec():\n")
         self.backward_indent()
