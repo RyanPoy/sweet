@@ -31,10 +31,19 @@ class ExpressionToken(Token):
         writer.write_line("str(%s)" % self.content)
         
 
+class SpecialExpressionToken(Token):
+    """ continue
+        pass
+        break
+    """
+    def compile(self, writer):
+        writer.write_line("%s" % self.content, False)
+
+
 class IfExpressionToken(Token):
 
     def compile(self, writer):
-        writer.write_line("%s:" % self.content, True)
+        writer.write_line("%s:" % self.content, False)
         writer.backward_indent()
 
 
@@ -42,7 +51,7 @@ class ElifExpressionToken(Token):
 
     def compile(self, writer):
         writer.forward_indent()
-        writer.write_line("%s:" % self.content, True)
+        writer.write_line("%s:" % self.content, False)
         writer.backward_indent()
 
         
@@ -50,7 +59,14 @@ class ElseExpressionToken(Token):
 
     def compile(self, writer):
         writer.forward_indent()
-        writer.write_line("%s:" % self.content, True)
+        writer.write_line("%s:" % self.content, False)
+        writer.backward_indent()
+
+
+class ForExpressionToken(Token):
+
+    def compile(self, writer):
+        writer.write_line("%s:" % self.content, False)
         writer.backward_indent()
 
 

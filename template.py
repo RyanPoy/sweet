@@ -18,10 +18,10 @@ class Template(object):
         print ('\n --- end compiled ---\n')
         return self
     
-    # re_nodes = re.compile(r"(?s)({{.*?}}|{%.*?%}|{#.*?#})")
 #     re_nodes = re.compile(r"(?s)(<%=.*?%>|<%.*?%>|<%#.*?%>)")
     re_nodes = re.compile(r"(?s)(<%[=#]?.*?%>)")
     def _parse(self):
+        special_ops = set(['continue', 'pass', 'break'])
         nodes = []
         for t in self.re_nodes.split(self.content):
             if t.startswith('<%='):
@@ -37,8 +37,12 @@ class Template(object):
                     nodes.append(ElifExpressionToken(e))
                 elif op == 'else':
                     nodes.append(ElseExpressionToken(e))
-                elif op in ('end'):
+                elif op == 'for':
+                    nodes.append(ForExpressionToken(e))
+                elif op == 'end':
                     nodes.append(EndExpressionToken(e))
+                elif op in special_ops:
+                    nodes.append(SpecialExpressionToken(e))
                 else:
                     nodes.append(ExpressionToken(e))
             else:

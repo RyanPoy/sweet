@@ -13,19 +13,16 @@ class CodeWriter(object):
 
     def begin(self):
         self.io.write("def _tt_exec():\n")
-        
-        self.io.write(self.FLAG)
-        self.io.write("_tt_buff = []\n")
-        
-        self.io.write(self.FLAG)
-        self.io.write("_tt_append = _tt_buff.append\n")
         self.backward_indent()
+
+        self.write_line("_tt_buff = []", False)
+        self.write_line("_tt_append = _tt_buff.append", False)
         return self
     
     def end(self):
+#         self.io.write(self.FLAG)
+        self.write_line("return ''.join(_tt_buff)", False)
         self.forward_indent()
-        self.io.write(self.FLAG)
-        self.io.write("return ''.join(_tt_buff)")
         return self
 
     def forward_indent(self):
@@ -38,9 +35,9 @@ class CodeWriter(object):
         self.indent = self.FLAG * self.indent_num
         return self 
         
-    def write_line(self, s, is_statement=False):
+    def write_line(self, s, append=True):
         self.io.write(self.indent)
-        if is_statement:
+        if not append:
             self.io.write(s)
         else:
             self.io.write('_tt_append(%s)' % s) 
