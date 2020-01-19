@@ -23,7 +23,7 @@ class TextToken(Token):
 
 class CommentToken(Token):
     pass
-    
+
 
 class ExpressionToken(Token):
     
@@ -41,14 +41,14 @@ class SpecialExpressionToken(Token):
 
 
 class IfExpressionToken(Token):
-
+    
     def compile(self, writer):
         writer.write_line("%s:" % self.content, False)
         writer.backward_indent()
 
 
 class ElifExpressionToken(Token):
-
+    
     def compile(self, writer):
         writer.forward_indent()
         writer.write_line("%s:" % self.content, False)
@@ -56,7 +56,7 @@ class ElifExpressionToken(Token):
 
         
 class ElseExpressionToken(Token):
-
+    
     def compile(self, writer):
         writer.forward_indent()
         writer.write_line("%s:" % self.content, False)

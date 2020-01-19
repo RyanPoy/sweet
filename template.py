@@ -19,8 +19,7 @@ class ParseError(Exception):
 
 class Template(object):
     
-    last_op, last_op_expression = '', ''
-    op_stack, op_expression_stack = [], [] 
+    last_op, op_stack = '', []
 #     re_nodes = re.compile(r"(?s)(<%=.*?%>|<%.*?%>|<%#.*?%>)")
     re_nodes = re.compile(r"(?s)(<%[=#]?.*?%>)")
             
@@ -38,17 +37,13 @@ class Template(object):
         return self
     
     @classmethod
-    def insert_op(cls, op, op_expression):
+    def _insert_op(cls, op):
         cls.last_op = op
-        cls.last_op_expression = op_expression
-        
         cls.op_stack.append(op)
-        cls.op_expression_stack.append(op_expression)
     
     @classmethod
-    def pop_op(cls):
+    def _pop_op(cls):
         cls.last_op = cls.op_stack.pop()
-        cls.last_op_expression = cls.op_expression_stack.pop()
     
     def _parse(self):
         cls = self.__class__
@@ -63,17 +58,17 @@ class Template(object):
                 e = t[2:-2].strip()
                 op = e.split(' ', 1)[0]  
                 if op == 'if':
-                    cls.insert_op(op, t)
+                    cls._insert_op(t)
                     nodes.append(IfExpressionToken(e))
                 elif op == 'elif':
                     nodes.append(ElifExpressionToken(e))
                 elif op == 'else':
                     nodes.append(ElseExpressionToken(e))
                 elif op == 'for':
-                    cls.insert_op(op, t)
+                    cls._insert_op(t)
                     nodes.append(ForExpressionToken(e))
                 elif op == 'end':
-                    cls.pop_op()
+                    cls._pop_op()
                     nodes.append(EndExpressionToken(e))
                 elif op in special_ops:
                     nodes.append(SpecialExpressionToken(e))
@@ -82,9 +77,9 @@ class Template(object):
             else:
                 nodes.append(TextToken(t))
                 
-        if self.__class__.op_stack:
-            print(self.op_stack)
-            raise ParseError("Missing <%% end %%> block for %s block" % cls.last_op_expression, self.fname)
+        if cls.op_stack:
+            cls._pop_op()
+            raise ParseError("Missing <%% end %%> block for %s block" % cls.last_op, self.fname)
 
         return nodes
 
