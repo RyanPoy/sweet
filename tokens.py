@@ -10,9 +10,6 @@ class Token(object):
     def compile(self, writer):
         pass
     
-    def render(self, buff):
-        pass
-    
     def __str__(self):
         return 'Node[type=%s; name=%s]' % (self.tp, self.content) 
     
@@ -25,10 +22,8 @@ class TextToken(Token):
         
 
 class CommentToken(Token):
+    pass
     
-    def render(self, **kwargs):
-        return ''
-
 
 class ExpressionToken(Token):
     
@@ -58,7 +53,7 @@ class ElseExpressionToken(Token):
         writer.write_line("%s:" % self.content, True)
         writer.backward_indent()
 
-    
+
 class EndExpressionToken(Token):
 
     def compile(self, writer):
