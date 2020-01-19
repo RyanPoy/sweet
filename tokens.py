@@ -5,7 +5,7 @@ class Token(object):
     def __init__(self, content):
         self.content = content
         self.tp = self.__class__.__name__
-        print (self)
+#         print (self)
 
     def compile(self, writer):
         pass

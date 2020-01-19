@@ -52,17 +52,6 @@ class Template(object):
             t.compile(writer)
         writer.end()
         return str(writer)
-
-#     def _compile(self):
-#         writer = CodeBuffer()
-# 
-#         writer.write_line("def _tt_exec():")
-#         for t in self.tokens:
-#             writer.backward_indent()
-#             t.render(writer)
-#         writer.forward_indent()
-# 
-#         return str(writer)
         
     def generate(self, **kwargs):
         compile(self.compiled, '<string>', 'exec')
