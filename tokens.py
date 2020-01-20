@@ -2,6 +2,9 @@
 
 class Token(object):
     
+    MUST_END = False
+    HAS_SIBLING = False
+    
     def __init__(self, content):
         self.content = content
         self.tp = self.__class__.__name__
@@ -13,7 +16,7 @@ class Token(object):
     def __str__(self):
         return 'Node[type=%s; name=%s]' % (self.tp, self.content) 
     
-
+    
 class TextToken(Token):
     """ Text Token
     """
@@ -42,6 +45,9 @@ class SpecialExpressionToken(Token):
 
 class IfExpressionToken(Token):
     
+    MUST_END = True
+    HAS_SIBLING = True # if =>  elif, else
+    
     def compile(self, writer):
         writer.write_line("%s:" % self.content, False)
         writer.backward_indent()
@@ -64,6 +70,8 @@ class ElseExpressionToken(Token):
 
 
 class ForExpressionToken(Token):
+    
+    MUST_END = True
 
     def compile(self, writer):
         writer.write_line("%s:" % self.content, False)

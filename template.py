@@ -15,19 +15,60 @@ class ParseError(Exception):
         return '%s at %s' % (self.message, self.filename)
     
 
+class TokenStack(object):
+    
+    def __init__(self):
+        self.stack = []
+        self._if_num = 0
+        self._end_num = 0
+
+    def push(self, token):
+        self.stack.append(token)
+        
+        if token.MUST_END:
+            self._end_num += 1
+
+        if token.HAS_SIBLING:
+            self._if_num += 1
+
+    def pop(self):
+        if not self.stack:
+            return None
+        token = self.stack.pop()
+        
+        if token.MUST_END:
+            self._end_num -= 1
+
+        if token.HAS_SIBLING:
+            self._if_num -= 1
+
+        return token
+    
+    def has_if(self):
+        return self._if_num > 0
+    
+    def has_end(self):
+        return self._end_num > 0
+        
+    def empty(self):
+        return len(self.stack) <= 0
+
+    @property
+    def last(self):
+        return self.stack[-1]
+    
+
 class Template(object):
     
     re_nodes = re.compile(r"(?s)(<%[=#]?.*?%>)")
-            
+
     def __init__(self, content, fname=None):
-        self.last_op, self.op_stack = '', []
-        self.if_op_str_stack = 0
-    
+        self.token_stack = TokenStack()
         self.content = content
         self.fname = fname or '<string>'
         self.tokens = self._parse()
         self.compiled = self._compile()
-        self.pp()
+#         self.pp()
 
     def pp(self):
         print ('\n ----- compiled -----\n')
@@ -35,62 +76,49 @@ class Template(object):
         print ('\n --- end compiled ---\n')
         return self
     
-    def _insert_op(self, op):
-        self.last_op = op
-        self.op_stack.append(op)
-    
-    def _pop_op(self):
-        if self.op_stack:
-            self.last_op = self.op_stack.pop()
-            if isinstance(self.last_op, (ForExpressionToken, IfExpressionToken)):
-                if self.if_op_stack:
-                    self.if_op_str_stack -= 1
-        else:
-            self.last_op = ''
-    
     def _parse(self):
         special_ops = set(['continue', 'pass', 'break'])
-        nodes = []
+        tokens, tstack = [], self.token_stack
         for t in self.re_nodes.split(self.content):
             if t.startswith('<%='):
-                nodes.append(ExpressionToken(t[3:-2]))
+                tokens.append(ExpressionToken(t[3:-2]))
             elif t.startswith('<%#'):
-                nodes.append(CommentToken(t[3:-2]))
+                tokens.append(CommentToken(t[3:-2]))
             elif t.startswith('<%'):
                 e = t[2:-2].strip()
                 op = e.split(' ', 1)[0]  
                 if op == 'if':
-                    self._insert_op(t)
-                    self.if_op_str_stack += 1
-                    nodes.append(IfExpressionToken(e))
+                    if_token = IfExpressionToken(e)
+                    tokens.append(if_token)
+                    tstack.push(if_token)
                 elif op == 'elif':
-                    if not self.if_op_str_stack:
+                    if not tstack.has_if():
                         raise ParseError("Missing <%% if %%> block before %s block" % t, self.fname)
-                    nodes.append(ElifExpressionToken(e))
+                    tokens.append(ElifExpressionToken(e))
                 elif op == 'else':
-                    if not self.if_op_str_stack:
+                    if not tstack.has_if():
                         raise ParseError("Missing <%% if %%> block before %s block" % t, self.fname)
-                    nodes.append(ElseExpressionToken(e))
+                    tokens.append(ElseExpressionToken(e))
                 elif op == 'for':
-                    self._insert_op(t)
-                    nodes.append(ForExpressionToken(e))
+                    for_token = ForExpressionToken(e)
+                    tokens.append(for_token)
+                    tstack.push(for_token)
                 elif op == 'end':
-                    if not self.op_stack:
+                    if not tstack.has_end(): 
                         raise ParseError("Missing <%% if %%> block or <%% for %%> block before %s block" % t, self.fname)
-                    self._pop_op()
-                    nodes.append(EndExpressionToken(e))
+                    tstack.pop()
+                    tokens.append(EndExpressionToken(e))
                 elif op in special_ops:
-                    nodes.append(SpecialExpressionToken(e))
+                    tokens.append(SpecialExpressionToken(e))
                 else:
-                    nodes.append(ExpressionToken(e))
+                    tokens.append(ExpressionToken(e))
             else:
-                nodes.append(TextToken(t))
-                
-        if self.op_stack:
-            self._pop_op()
-            raise ParseError("Missing <%% end %%> block for %s block" % self.last_op, self.fname)
+                tokens.append(TextToken(t))
 
-        return nodes
+        if not tstack.empty() or tstack.has_end():
+            raise ParseError("Missing <%% end %%> block for <%% %s %%> block" % tstack.last.content, self.fname)
+
+        return tokens
 
     def _compile(self):
         writer = CodeWriter()
