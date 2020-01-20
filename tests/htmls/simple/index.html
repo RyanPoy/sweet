@@ -1,0 +1,9 @@
+<% for i in range(10) %>
+    <% if i == 2 %>
+        <% continue %>
+    <% end %>
+    <%= i %>
+    <% if i == 6 %>
+        <% break %>
+    <% end %>
+<% end %>
