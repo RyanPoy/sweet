@@ -68,20 +68,21 @@ class Template(object):
     
     re_nodes = re.compile(r"(?s)(<%[=#]?.*?%>)")
 
-    def __init__(self, content, fname=None):
+    def __init__(self, content, fname=None, loader=None):
         self.token_stack = TokenStack()
         self.content = content
         self.fname = fname or '<string>'
+        self.loader = loader
         self.tokens = self._parse()
         self.compiled = self._compile()
         self.pp()
 
     @classmethod
-    def from_file(cls, fname):
+    def from_file(cls, fname, loader=None):
         content = []
         with open(fname) as f:
             content = [ l for l in f ]
-        return cls(''.join(content), fname)
+        return cls(''.join(content), fname, loader)
 
     def pp(self):
         print ('\n ----- compiled -----\n')
@@ -93,6 +94,7 @@ class Template(object):
         special_ops = set(['continue', 'pass', 'break'])
         tokens, tstack = [], self.token_stack
         for t in self.re_nodes.split(self.content):
+#             t = t.lstrip('\n')
             if t.startswith('<%='):
                 tokens.append(ExpressionToken(t[3:-2]))
             elif t.startswith('<%#'):
@@ -123,8 +125,18 @@ class Template(object):
                     tokens.append(EndExpressionToken(e))
                 elif op in special_ops:
                     tokens.append(SpecialExpressionToken(e))
-#                 elif op == 'include':
-#                     tokens.append(IncludeBlock(e))
+                elif op == 'include': # should expand the template in include block
+                    block = IncludeBlock(e)
+                    tokens.append(block)
+                    tmpl = self.loader.load(block.tmpl_path, self.fname)
+                    for n in tmpl.tokens:
+                        tokens.append(n)
+                elif op == 'extends':
+                    block = ExtendsBlock(e)
+                    tokens.append(block)
+                    tmpl = self.loader.load(block.tmpl_path, self.fname)
+                    for n in tmpl.tokens:
+                        tokens.append(n)
                 else:
                     tokens.append(ExpressionToken(e))
             else:
@@ -158,13 +170,12 @@ class TemplateLoader(object):
 
     def build_path(self, tmpl_path, parent_path=None):
         if not parent_path:
-            print("normpath(joinpath(%s, %s))" % (self.root_dir, tmpl_path))
             return normpath(joinpath(self.root_dir, tmpl_path))
         return normpath(joinpath(dirname(parent_path), tmpl_path))
 
     def load(self, tmpl_path, parent_path=None):
         abs_path = self.build_path(tmpl_path, parent_path)
-        return Template.from_file(abs_path)
+        return Template.from_file(abs_path, loader=self)
 
     
 if __name__ == '__main__':

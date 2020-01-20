@@ -39,7 +39,7 @@ class CodeWriter(object):
         if not append:
             self.io.write(s)
         else:
-            self.io.write('_tt_append(%s)' % s) 
+            self.io.write('_tt_append(%s)' % s)
         self.io.write('\n')
         return self
     

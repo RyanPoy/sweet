@@ -88,8 +88,18 @@ class IncludeBlock(Token):
     
     def __init__(self, content):
         super().__init__(content)
-                
-    def compile(self, writer):
-        print (self)
-        pass
+        vs = [ c for c in content.split() if c and c.strip() ]
+        self.tmpl_path = vs[1]
+        self.params = vs[2:] 
 
+    def compile(self, writer):
+        for p in self.params:
+            writer.write_line('%s' % p, False)
+
+
+class ExtendsBlock(Token):
+    
+    def __init__(self, content):
+        super().__init__(content)
+        vs = [ c for c in content.split() if c and c.strip() ]
+        self.tmpl_path = vs[1]
