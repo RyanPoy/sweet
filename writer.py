@@ -20,7 +20,6 @@ class CodeWriter(object):
         return self
     
     def end(self):
-#         self.io.write(self.FLAG)
         self.write_line("return ''.join(_tt_buff)", False)
         self.forward_indent()
         return self
@@ -43,9 +42,13 @@ class CodeWriter(object):
             self.io.write('_tt_append(%s)' % s) 
         self.io.write('\n')
         return self
-
+    
+    def __len__(self):
+        return self.io.tell()
+    
     def __str__(self):
+        length = len(self)
         self.io.seek(0)
-        s = self.io.read()
-        self.io.seek(self.io.tell())
+        s = self.io.read(length)
+        self.io.seek(length)
         return s
