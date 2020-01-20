@@ -1,14 +1,16 @@
 #coding: utf8
+from __init__ import TestCase
 import os
 import unittest
 from template import TemplateLoader
 
 
-class TemplateLoaderTest(unittest.TestCase):
+
+class TemplateLoaderTest(TestCase):
     
     def setUp(self):
         self.abs_dir = os.path.dirname(os.path.abspath(__file__))
-        self.loader = TemplateLoader(root_dir='root')
+        self.loader = TemplateLoader(root_abs_dir=os.path.join(self.abs_dir, 'root'))
     
     def test_abs_root_path(self):
         expected = os.path.join(self.abs_dir, 'root')
@@ -24,14 +26,14 @@ class TemplateLoaderTest(unittest.TestCase):
         self.assertEqual(expected,
                          self.loader.build_path('_partial.html', parent_path=parent_path)
         )
-        
+         
     def test_build_path_with_parent_path2(self):
         expected = os.path.join(self.abs_dir, 'root/_partial.html')
         parent_path = self.loader.build_path('level-1/index.html')
         self.assertEqual(expected,
                          self.loader.build_path('../_partial.html', parent_path=parent_path)
         )
-        
+         
     def test_build_path_with_parent_path3(self):
         expected = os.path.join(self.abs_dir, 'root/level-1/level-2/_partial.html')
         parent_path = self.loader.build_path('level-1/index.html')

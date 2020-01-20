@@ -3,4 +3,4 @@
 .settings
 .pyc
 __pycache__
-tests/
+tests/tornado_template.py

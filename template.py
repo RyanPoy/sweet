@@ -123,6 +123,8 @@ class Template(object):
                     tokens.append(EndExpressionToken(e))
                 elif op in special_ops:
                     tokens.append(SpecialExpressionToken(e))
+#                 elif op == 'include':
+#                     tokens.append(IncludeBlock(e))
                 else:
                     tokens.append(ExpressionToken(e))
             else:
@@ -150,17 +152,19 @@ class Template(object):
 
 class TemplateLoader(object):
     
-    def __init__(self, root_dir):
-        self.root_dir = normpath(abspath(root_dir))
+    def __init__(self, root_abs_dir):
+        self.root_dir = normpath(abspath(root_abs_dir))
         self.tmpl_dict = {}
 
     def build_path(self, tmpl_path, parent_path=None):
         if not parent_path:
+            print("normpath(joinpath(%s, %s))" % (self.root_dir, tmpl_path))
             return normpath(joinpath(self.root_dir, tmpl_path))
         return normpath(joinpath(dirname(parent_path), tmpl_path))
 
     def load(self, tmpl_path, parent_path=None):
-        pass
+        abs_path = self.build_path(tmpl_path, parent_path)
+        return Template.from_file(abs_path)
 
     
 if __name__ == '__main__':

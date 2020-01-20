@@ -82,3 +82,14 @@ class EndExpressionToken(Token):
 
     def compile(self, writer):
         writer.forward_indent()
+
+
+class IncludeBlock(Token):
+    
+    def __init__(self, content):
+        super().__init__(content)
+                
+    def compile(self, writer):
+        print (self)
+        pass
+
