@@ -88,9 +88,15 @@ class IncludeBlock(Token):
     
     def __init__(self, content):
         super().__init__(content)
+        self.tmpl_path = ''
+        self.params = []
+
         vs = [ c for c in content.split() if c and c.strip() ]
-        self.tmpl_path = vs[1]
-        self.params = vs[2:] 
+        l = len(vs)
+        if l >= 2:
+            self.tmpl_path = vs[1]
+        if l > 2:
+            self.params = vs[2:] 
 
     def compile(self, writer):
         for p in self.params:

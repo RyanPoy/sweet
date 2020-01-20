@@ -202,7 +202,19 @@ this is a string 3
     <li>Lily | 10</li>
 
 </ul>""", t.generate(users=self.users))
-
+        
+    def test_parse_error_if_include_block_does_not_has_a_tmpl_path(self):
+        loader = TemplateLoader(os.path.join(self.dirname, 'htmls'))
+        with self.assertRaises(ParseError) as err:
+            t = loader.load('include/index_no_include_tmpl_path.html')
+        self.assertTrue(str(err.exception).startswith("Missing include template name for <%include %> block at"))
+        
+    def test_parse_error_if_include_tmpl_path_not_found(self):
+        loader = TemplateLoader(os.path.join(self.dirname, 'htmls'))
+        with self.assertRaises(ParseError) as err:
+            t = loader.load('include/index_not_found_include_tmpl_path.html')
+        self.assertTrue(str(err.exception).startswith("Error: [Errno 2] No such file or directory"))
     
+
 if __name__ == '__main__':
     unittest.main()

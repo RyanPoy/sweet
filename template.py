@@ -127,8 +127,13 @@ class Template(object):
                     tokens.append(SpecialExpressionToken(e))
                 elif op == 'include': # should expand the template in include block
                     block = IncludeBlock(e)
+                    if not block.tmpl_path:
+                        raise ParseError("Missing include template name for %s block" % t, self.fname)
                     tokens.append(block)
-                    tmpl = self.loader.load(block.tmpl_path, self.fname)
+                    try:
+                        tmpl = self.loader.load(block.tmpl_path, self.fname)
+                    except Exception as ex:
+                        raise ParseError("Error: %s for %s block" % (ex, t), self.fname)
                     for n in tmpl.tokens:
                         tokens.append(n)
                 elif op == 'extends':
