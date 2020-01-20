@@ -1,7 +1,13 @@
 # coding: utf8
 import re
+import os
 from writer import CodeWriter
 from tokens import *
+
+normpath = os.path.normpath
+dirname = os.path.dirname
+abspath = os.path.abspath
+joinpath = os.path.join
 
 
 class ParseError(Exception):
@@ -68,7 +74,14 @@ class Template(object):
         self.fname = fname or '<string>'
         self.tokens = self._parse()
         self.compiled = self._compile()
-#         self.pp()
+        self.pp()
+
+    @classmethod
+    def from_file(cls, fname):
+        content = []
+        with open(fname) as f:
+            content = [ l for l in f ]
+        return cls(''.join(content), fname)
 
     def pp(self):
         print ('\n ----- compiled -----\n')
@@ -135,7 +148,21 @@ class Template(object):
         return _tt_exec()
 
 
+class TemplateLoader(object):
+    
+    def __init__(self, root_dir):
+        self.root_dir = normpath(abspath(root_dir))
+        self.tmpl_dict = {}
 
+    def build_path(self, tmpl_path, parent_path=None):
+        if not parent_path:
+            return normpath(joinpath(self.root_dir, tmpl_path))
+        return normpath(joinpath(dirname(parent_path), tmpl_path))
+
+    def load(self, tmpl_path, parent_path=None):
+        pass
+
+    
 if __name__ == '__main__':
     from cProfile import Profile
     n = 500000
