@@ -74,9 +74,9 @@ this is a string 3
 <% else %>
     Equal
 <% end %>""")
-        self.assertEqual("\n\n    Great\n", t.generate(x=20))
-        self.assertEqual("\n\n    Equal\n", t.generate(x=10))
-        self.assertEqual("\n\n    Less\n", t.generate(x=5))
+        self.assertEqual("\n    Great\n", t.generate(x=20))
+        self.assertEqual("\n    Equal\n", t.generate(x=10))
+        self.assertEqual("\n    Less\n", t.generate(x=5))
        
     def test_multi_level_if(self):
         t = Template("""
@@ -105,17 +105,17 @@ this is a string 3
         x = 10 and y > 10
     <% end %>
 <% end %>""")
-        self.assertEqual("\n\n    \n        x > 10 and y < 10\n    \n", t.generate(x=20, y=5))
-        self.assertEqual("\n\n    \n        x > 10 and y = 10\n    \n", t.generate(x=20, y=10))
-        self.assertEqual("\n\n    \n        x > 10 and y > 10\n    \n", t.generate(x=20, y=20))
+        self.assertEqual("\n    \n        x > 10 and y < 10\n    \n", t.generate(x=20, y=5))
+        self.assertEqual("\n    \n        x > 10 and y = 10\n    \n", t.generate(x=20, y=10))
+        self.assertEqual("\n    \n        x > 10 and y > 10\n    \n", t.generate(x=20, y=20))
                
-        self.assertEqual("\n\n    \n        x = 10 and y < 10\n    \n", t.generate(x=10, y=5))
-        self.assertEqual("\n\n    \n        x = 10 and y = 10\n    \n", t.generate(x=10, y=10))
-        self.assertEqual("\n\n    \n        x = 10 and y > 10\n    \n", t.generate(x=10, y=20))
+        self.assertEqual("\n    \n        x = 10 and y < 10\n    \n", t.generate(x=10, y=5))
+        self.assertEqual("\n    \n        x = 10 and y = 10\n    \n", t.generate(x=10, y=10))
+        self.assertEqual("\n    \n        x = 10 and y > 10\n    \n", t.generate(x=10, y=20))
                
-        self.assertEqual("\n\n    \n        x < 10 and y < 10\n    \n", t.generate(x=5, y=5))
-        self.assertEqual("\n\n    \n        x < 10 and y = 10\n    \n", t.generate(x=5, y=10))
-        self.assertEqual("\n\n    \n        x < 10 and y > 10\n    \n", t.generate(x=5, y=20))
+        self.assertEqual("\n    \n        x < 10 and y < 10\n    \n", t.generate(x=5, y=5))
+        self.assertEqual("\n    \n        x < 10 and y = 10\n    \n", t.generate(x=5, y=10))
+        self.assertEqual("\n    \n        x < 10 and y > 10\n    \n", t.generate(x=5, y=20))
                
     def test_for(self):
         t = Template("""<ul>
@@ -207,7 +207,7 @@ this is a string 3
         loader = TemplateLoader(os.path.join(self.dirname, 'htmls'))
         with self.assertRaises(ParseError) as err:
             t = loader.load('include/index_no_include_tmpl_path.html')
-        self.assertTrue(str(err.exception).startswith("Missing include template name for <%include %> block at"))
+        self.assertTrue(str(err.exception).startswith("Missing template name for <%include %> block at"))
         
     def test_parse_error_if_include_tmpl_path_not_found(self):
         loader = TemplateLoader(os.path.join(self.dirname, 'htmls'))
@@ -215,6 +215,15 @@ this is a string 3
             t = loader.load('include/index_not_found_include_tmpl_path.html')
         self.assertTrue(str(err.exception).startswith("Error: [Errno 2] No such file or directory"))
     
+    def test_parse_error_if_extends_block_not_top_of_template(self):
+        with self.assertRaises(ParseError) as err:
+            Template("abc<% extends a.html %>")
+        self.assertEqual("<% extends a.html %> block must be first line at <string>", str(err.exception))
+        
+    def test_parse_error_if_extends_block_without_tmeplate_name(self):
+        with self.assertRaises(ParseError) as err:
+            Template("<% extends %>")
+        self.assertEqual("Missing template name for <% extends %> block at <string>", str(err.exception))
 
 if __name__ == '__main__':
     unittest.main()

@@ -108,4 +108,4 @@ class ExtendsBlock(Token):
     def __init__(self, content):
         super().__init__(content)
         vs = [ c for c in content.split() if c and c.strip() ]
-        self.tmpl_path = vs[1]
+        self.tmpl_path = '' if len(vs) < 2 else vs[1] 

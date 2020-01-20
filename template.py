@@ -75,7 +75,7 @@ class Template(object):
         self.loader = loader
         self.tokens = self._parse()
         self.compiled = self._compile()
-        self.pp()
+#         self.pp()
 
     @classmethod
     def from_file(cls, fname, loader=None):
@@ -93,8 +93,11 @@ class Template(object):
     def _parse(self):
         special_ops = set(['continue', 'pass', 'break'])
         tokens, tstack = [], self.token_stack
+        token_num = 0
         for t in self.re_nodes.split(self.content):
-#             t = t.lstrip('\n')
+            if token_num == 0 and not t.strip():
+                continue
+            token_num += 1
             if t.startswith('<%='):
                 tokens.append(ExpressionToken(t[3:-2]))
             elif t.startswith('<%#'):
@@ -128,7 +131,7 @@ class Template(object):
                 elif op == 'include': # should expand the template in include block
                     block = IncludeBlock(e)
                     if not block.tmpl_path:
-                        raise ParseError("Missing include template name for %s block" % t, self.fname)
+                        raise ParseError("Missing template name for %s block" % t, self.fname)
                     tokens.append(block)
                     try:
                         tmpl = self.loader.load(block.tmpl_path, self.fname)
@@ -137,7 +140,12 @@ class Template(object):
                     for n in tmpl.tokens:
                         tokens.append(n)
                 elif op == 'extends':
+                    if token_num != 1:
+                        raise ParseError("%s block must be first line" % t, self.fname)
                     block = ExtendsBlock(e)
+                    if not block.tmpl_path:
+                        raise ParseError("Missing template name for %s block" % t, self.fname)
+
                     tokens.append(block)
                     tmpl = self.loader.load(block.tmpl_path, self.fname)
                     for n in tmpl.tokens:
