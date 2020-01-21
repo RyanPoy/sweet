@@ -15,8 +15,8 @@ class Token(object):
     
     def __str__(self):
         return 'Node[type=%s; name=%s]' % (self.tp, self.content) 
-    
-    
+
+
 class TextToken(Token):
     """ Text Token
     """

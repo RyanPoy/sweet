@@ -220,10 +220,17 @@ this is a string 3
             Template("abc<% extends a.html %>")
         self.assertEqual("<% extends a.html %> block must be first line at <string>", str(err.exception))
         
-    def test_parse_error_if_extends_block_without_tmeplate_name(self):
+    def test_parse_error_if_extends_block_without_template_name(self):
         with self.assertRaises(ParseError) as err:
-            Template("<% extends %>")
+            Template("""
+<% extends %>""")
         self.assertEqual("Missing template name for <% extends %> block at <string>", str(err.exception))
+        
+#     def test_ignore_block_block_if_tmeplate_does_not_extends_an_other(self):
+#         t = Template("""<body>{% block js %}<script type="javascript" src="xxxx"></script>{%end%}Her name is <%= name %>, and <%= age %> years old{%block%}{%end%}""")
+#         self.assertEqual("""Her name is Lucy, and 10 years old""",
+#                          t.generate(name="Lucy", age=10))
+
 
 if __name__ == '__main__':
     unittest.main()

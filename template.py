@@ -90,10 +90,11 @@ class Template(object):
         print ('\n --- end compiled ---\n')
         return self
     
-    def _parse(self):
+    def _parse(self, sub_blocks=None):
+        sub_blocks = sub_blocks or {} 
         special_ops = set(['continue', 'pass', 'break'])
         tokens, tstack = [], self.token_stack
-        token_num = 0
+        token_num, is_extends = 0, False
         for t in self.re_nodes.split(self.content):
             if token_num == 0 and not t.strip():
                 continue
@@ -145,11 +146,18 @@ class Template(object):
                     block = ExtendsBlock(e)
                     if not block.tmpl_path:
                         raise ParseError("Missing template name for %s block" % t, self.fname)
-
-                    tokens.append(block)
-                    tmpl = self.loader.load(block.tmpl_path, self.fname)
-                    for n in tmpl.tokens:
-                        tokens.append(n)
+                    is_extends = True
+#                     1). 先走自己的blocks里面所有的东西，形成一个hashmap => {
+#                         header: [nodes]
+#                         body: [nodes]
+#                         footer: [nodes]
+#                     }
+#                     
+#                     2). 走父亲的解析，如果是1个extends，父亲的第1）步骤
+#                     3). 走父亲的解析，如果是正常网页，解析nodes，遇到 block，用1）的hashmap进行替换。
+                elif op == 'block':
+                    if not is_extends: # if the template is not extends other template, the block should be ignore
+                        continue
                 else:
                     tokens.append(ExpressionToken(e))
             else:
