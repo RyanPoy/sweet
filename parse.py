@@ -94,7 +94,7 @@ def parse(reader, parent_tag=''):
                 nodes.append(EndBlock(content))
                 break
             else:
-                raise ParseError("Missing '<% if %>' or '<% for %>' before '<% end %>'", reader.lineno)
+                raise ParseError("Missing '<% if|for|block %>' before '<% end %>'", reader.lineno)
         elif content.startswith('include'):  # <% include %>
             include = Include(content)
             if not include.template_name:

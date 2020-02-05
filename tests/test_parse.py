@@ -92,31 +92,26 @@ this is a string 3
         self.assertEqual('end', children[1].content)
 
     def test_parse_error_when_has_elif_but_not_has_if(self):
-        """ Error: [elif] but not [if] """
         with self.assertRaises(ParseError) as err:
             Template("""<%elif x = 10 %><%=x%><% end %>""").parse().nodes
         self.assertEqual("Missing '<% if %>' before '<% elif x = 10 %>'", str(err.exception))
 
     def test_parse_error_when_has_else_but_not_has_if(self):
-        """ Error: [else] but not [if] """
         with self.assertRaises(ParseError) as err:
             Template("""<%else x = 10 %><%=x%><% end %>""").parse().nodes
         self.assertEqual("Missing '<% if %>' before '<% else x = 10 %>'", str(err.exception))    
         
     def test_parse_error_when_has_end_but_not_has_if_or_for(self):
-        """ Error: [end] but not [if|for] """
         with self.assertRaises(ParseError) as err:
             Template("""<% end %>""").parse().nodes
-        self.assertEqual("Missing '<% if %>' or '<% for %>' before '<% end %>'", str(err.exception))
+        self.assertEqual("Missing '<% if|for|block %>' before '<% end %>'", str(err.exception))
     
     def test_parse_error_when_has_if_but_not_has_end(self):
-        """ Error: [if] but not [end] """
         with self.assertRaises(ParseError) as err:
             Template("""<%if x = 10 %><%=x%>""").parse().nodes
         self.assertEqual("Missing '<% end %>' for '<% if x = 10 %>'", str(err.exception))
 
     def test_parse_error_when_has_for_but_not_has_end(self):
-        """ Error: [if] but not [end] """
         with self.assertRaises(ParseError) as err:
             Template("""<%for x in range(10) %><%=x%>""").parse().nodes
         self.assertEqual("Missing '<% end %>' for '<% for x in range(10) %>'", str(err.exception))
@@ -180,12 +175,12 @@ this is a string 3
         children = nodes[1].children
         self.assertEqual("标题文本", children[0].content)
         self.assertTrue(isinstance(children[1], EndBlock))
-        
+
     def test_error_if_block_not_end(self):
         with self.assertRaises(ParseError) as err:
             Template("""<% extends base.html %><% block title %>标题文本""").parse()
         self.assertEqual("Missing '<% end %>' for '<% block title %>'", str(err.exception))
 
-
+    
 if __name__ == '__main__':
     unittest.main()

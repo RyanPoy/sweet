@@ -71,6 +71,17 @@ class Loader(object):
             return Template(content, name=abs_path, loader=self)
 
 
+class MemLoader(Loader):
+
+    def __init__(self, root_abs_dir):
+        super().__init__(root_abs_dir)
+        self.content_dict = {}
+
+    def load(self, tmpl_path, parent_path=None):
+        content = self.content_dict[tmpl_path]
+        return Template(content, name=tmpl_path, loader=self)
+    
+    
 class Template(object):
     
     def __init__(self, content, name="<string>", loader=None):
