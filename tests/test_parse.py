@@ -1,11 +1,11 @@
 #coding: utf8
+from __init__ import TestCase
 import unittest
 import os
-from __init__ import TestCase
 from parse import ParseError
-from lib import Template, Loader
 from nodes import Text, Expression, Comment, If, EndIf, Elif, Else, For, EndFor,\
     Include, Extends, Block, EndBlock
+from template import Template, Loader
 
 
 class ParseTest(TestCase):
@@ -145,7 +145,6 @@ this is a string 3
     def test_parse_include_error_if_not_has_fname(self):
         with self.assertRaises(ParseError) as err:
             Template("""<ul>测试include是否OK<%include %></ul>""").parse()
-        
         self.assertEqual("Missing template file path for '<% include %>'", str(err.exception))
         
     def test_parse_extends(self):
@@ -158,7 +157,6 @@ this is a string 3
     def test_parse_extends_error_if_not_has_fname(self):
         with self.assertRaises(ParseError) as err:
             Template("""<% extends %>""").parse()
-         
         self.assertEqual("Missing template file path for '<% extends %>'", str(err.exception))
         
     def test_parse_extends_error_if_extends_does_not_begin_of_template_content(self):

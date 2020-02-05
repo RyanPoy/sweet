@@ -2,15 +2,14 @@
 from __init__ import TestCase
 import os
 import unittest
-from template import TemplateLoader
-
+from template import Loader
 
 
 class TemplateLoaderTest(TestCase):
     
     def setUp(self):
         self.abs_dir = os.path.dirname(os.path.abspath(__file__))
-        self.loader = TemplateLoader(root_abs_dir=os.path.join(self.abs_dir, 'root'))
+        self.loader = Loader(root_abs_dir=os.path.join(self.abs_dir, 'root'))
     
     def test_abs_root_path(self):
         expected = os.path.join(self.abs_dir, 'root')

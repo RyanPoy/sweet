@@ -1,10 +1,14 @@
 #coding :utf8
+
 class Node(object):
     
     def __init__(self, content, children=None):
         self.content = content
         self.children = children or []
         self.attrs = []
+    
+    def compile_with(self, codegen):
+        return self
 
     def __str__(self):
         return "%s[%s]" % (self.__class__.__name__, self.content)
@@ -16,11 +20,17 @@ class Node(object):
 
 
 class Text(Node):
-    pass
+    
+    def compile_with(self, codegen):
+        codegen.write_line("'''%s'''" % self.content)
+        return self
 
 
 class Expression(Node):
-    pass
+
+    def compile_with(self, codegen):
+        codegen.write_line("str(%s)" % self.content)
+        return self
 
 
 class Comment(Node):
@@ -28,26 +38,58 @@ class Comment(Node):
 
 
 class If(Node):
-    pass
+    
+    def compile_with(self, codegen):
+        codegen.write_line("%s:" % self.content, False)
+        codegen.backward_indent()
+        for child in self.children:
+            child.compile_with(codegen)
+        return self
 
 
 class Elif(Node):
-    pass
 
+    def compile_with(self, codegen):
+        codegen.forward_indent()
+        codegen.write_line("%s:" % self.content, False)
+        codegen.backward_indent()
+        return self
 
 class Else(Node):
-    pass
+    
+    def compile_with(self, codegen):
+        codegen.forward_indent()
+        codegen.write_line("%s:" % self.content, False)
+        codegen.backward_indent()
+        return self
 
 
 class For(Node):
+    
+    def compile_with(self, codegen):
+        codegen.write_line("%s:" % self.content, False)
+        codegen.backward_indent()
+        for child in self.children:
+            child.compile_with(codegen)
+        return self
+
+
+class SpecialExpression(Node):
+    """ continue
+        pass
+        break
+    """
+    def compile_with(self, codegen):
+        codegen.write_line("%s" % self.content, False)
+        return self
+
+class Pass(SpecialExpression):
     pass
 
-
-class Break(Node):
+class Break(SpecialExpression):
     pass
 
-
-class Continue(Node):
+class Continue(SpecialExpression):
     pass
 
 
@@ -56,11 +98,17 @@ class End(Node):
 
 
 class EndIf(End):
-    pass
+    
+    def compile_with(self, codegen):
+        codegen.forward_indent()
+        return self
 
 
 class EndFor(End):
-    pass
+    
+    def compile_with(self, codegen):
+        codegen.forward_indent()
+        return self
 
 
 class EndBlock(End):

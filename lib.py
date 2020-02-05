@@ -1,10 +1,5 @@
 # coding: utf8
-import os
-from parse import parse
-normpath = os.path.normpath
-dirname = os.path.dirname
-abspath = os.path.abspath
-joinpath = os.path.join
+from io import StringIO
 
 
 class StringReader(object):
@@ -53,54 +48,57 @@ class StringReader(object):
         return self.remain_s
 
 
-class Loader(object):
+class CodeGenerator(object):
 
-    def __init__(self, root_abs_dir):
-        self.root_dir = normpath(abspath(root_abs_dir))
-        self.tmpl_dict = {}
+    FLAG = '  '
 
-    def build_path(self, tmpl_path, parent_path=None):
-        if not parent_path:
-            return normpath(joinpath(self.root_dir, tmpl_path))
-        return normpath(joinpath(dirname(parent_path), tmpl_path))
+    def __init__(self):
+        self.io = StringIO()
+        self.indent  = ''
+        self.indent_num = 0
 
-    def load(self, tmpl_path, parent_path=None):
-        abs_path = self.build_path(tmpl_path, parent_path)
-        with open(abs_path) as f:
-            content = f.read()
-            return Template(content, name=abs_path, loader=self)
+    def begin(self):
+        self.io.write("def _my_temp_exec():\n")
+        self.backward_indent()
 
-
-class MemLoader(Loader):
-
-    def __init__(self, root_abs_dir):
-        super().__init__(root_abs_dir)
-        self.content_dict = {}
-
-    def load(self, tmpl_path, parent_path=None):
-        content = self.content_dict[tmpl_path]
-        return Template(content, name=tmpl_path, loader=self)
+        self.write_line("_my_temp_buff = []", False)
+        self.write_line("_my_temp_append = _my_temp_buff.append", False)
+        return self
     
-    
-class Template(object):
-    
-    def __init__(self, content, name="<string>", loader=None):
-        self.nodes = []
-        self.name = name
-        self.loader = loader
-        self.is_parsed = False
-
-        self.reader = StringReader(content)
-#         self.codegen = CodeGenerator()
-        
-    def parse(self):
-        if not self.is_parsed:
-            self.nodes = parse(self.reader)
-            self.is_parsed = True
+    def end(self):
+        self.write_line("return ''.join(_my_temp_buff)", False)
+        self.forward_indent()
         return self
 
-    def compile(self):
-        pass
+    def forward_indent(self):
+        self.indent_num -= 1
+        self.indent = self.FLAG * self.indent_num
+        return self
+        
+    def backward_indent(self):
+        self.indent_num += 1
+        self.indent = self.FLAG * self.indent_num
+        return self 
+        
+    def write_line(self, s, append=True):
+        self.io.write(self.indent)
+        if not append:
+            self.io.write(s)
+        else:
+            self.io.write('_my_temp_append(%s)' % s)
+        self.io.write('\n')
+        return self
+    
+    def __len__(self):
+        return self.io.tell()
+    
+    def __str__(self):
+        length = len(self)
+        self.io.seek(0)
+        s = self.io.read(length)
+        self.io.seek(length)
+        return s
+
 
 
 if __name__ == '__main__':

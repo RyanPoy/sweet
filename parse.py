@@ -1,6 +1,6 @@
 #coding: utf8
 from nodes import Text, Expression, Comment, If, EndIf, Elif, Else, For, EndFor,\
-    Include, Extends, EndBlock, Block
+    Include, Extends, EndBlock, Block, Continue, Break
 
 
 class ParseError(Exception):
@@ -78,6 +78,12 @@ def parse(reader, parent_tag=''):
             if not children or not isinstance(children[-1], EndFor):
                 raise ParseError("Missing '<%% end %%>' for '<%% %s %%>'" % content, reader.lineno)
             nodes.append(For(content, children))
+        elif content.startswith('continue'):
+            nodes.append(Continue('continue'))
+        elif content.startswith('break'):
+            nodes.append(Break('break'))
+        elif content.startswith('pass'):
+            nodes.append(Break('pass'))
         elif content.startswith('block'):
             children = parse(reader, parent_tag='block')
             if not children or not isinstance(children[-1], EndBlock):
