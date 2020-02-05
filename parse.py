@@ -1,7 +1,7 @@
 #coding: utf8
 from nodes import Text, Expression, Comment, If, EndIf, Elif, Else, For, EndFor,\
     Include, Extends, EndBlock, Block, Continue, Break
-from lib import StringReader
+from libs import StringReader
 
 
 class ParseError(Exception):

@@ -2,7 +2,7 @@
 import os
 from parse import parse
 from nodes import Extends, Include
-from lib import StringReader, CodeGenerator
+from libs import StringReader, CodeGenerator
 
 normpath = os.path.normpath
 dirname = os.path.dirname
