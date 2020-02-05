@@ -1,0 +1,112 @@
+#coding: utf8
+from nodes import Text, Expression, Comment, If, EndIf, Elif, Else, For, EndFor,\
+    Include, Extends, EndBlock, Block
+
+
+class ParseError(Exception):
+
+    def __init__(self, message, filename=None, lineno=0):
+        self.message = message
+        self.filename = filename
+        self.lineno = lineno
+    
+    def __str__(self):
+#         return '%s at %s: %s' % (self.message, self.filename, self.lineno)
+        return '%s' % (self.message)
+
+
+class Nodes(object):
+    
+    def __init__(self):
+        self.data = []
+        self.can_extends = True
+        
+    def append(self, node):
+        if self.can_extends:
+            if not isinstance(node, Text):
+                self.can_extends = False
+            elif node.content.strip():
+                self.can_extends = False
+        self.data.append(node)
+        
+
+def parse(reader, parent_tag=''):
+    nodes = Nodes()
+    while True:
+        p0 = reader.find('<%')
+        if p0 < 0:  # not found begin tag
+            if not reader.eof():  # end remaining text
+                nodes.append(Text(reader.read()))
+            break
+        if p0 != 0:  # not begin
+            nodes.append(Text(reader.read(p0)))  # text
+            continue
+
+        # process this line, the p0 must equals 0
+        reader.skip(2)  # skip the <% 
+        p1 = reader.find('%>')
+        if p1 == -1:  # found the begin tag but not found end tag
+            nodes.append(Text(reader.read()))  # @TODO: maybe should throw exception
+            break
+
+        content = reader.read(p1)
+        reader.skip(2)  # skip the %>
+
+        content = content.strip()
+        if not content:
+            continue
+        
+        if content[0] == '=':  # <%=  xxx %>
+            nodes.append(Expression(content[1:].strip()))  # base expression
+        elif content[0] == '#':  # <%# xxx %>
+            nodes.append(Comment(content[1:].strip()))
+        elif content.startswith('if'):  # <% if xxx %>
+            children = parse(reader, parent_tag='if')
+            if not children or not isinstance(children[-1], EndIf):
+                raise ParseError("Missing '<%% end %%>' for '<%% %s %%>'" % content, reader.lineno)
+            nodes.append(If(content, children))
+        elif content.startswith('elif'):  # <% elif xxx %>
+            if parent_tag != 'if':
+                raise ParseError("Missing '<%% if %%>' before '<%% %s %%>'" % content, reader.lineno)
+            nodes.append(Elif(content))
+        elif content.startswith('else'):
+            if parent_tag != 'if':
+                raise ParseError("Missing '<%% if %%>' before '<%% %s %%>'" % content, reader.lineno)
+            nodes.append(Else(content))
+        elif content.startswith('for'):
+            children = parse(reader, parent_tag='for')
+            if not children or not isinstance(children[-1], EndFor):
+                raise ParseError("Missing '<%% end %%>' for '<%% %s %%>'" % content, reader.lineno)
+            nodes.append(For(content, children))
+        elif content.startswith('block'):
+            children = parse(reader, parent_tag='block')
+            if not children or not isinstance(children[-1], EndBlock):
+                raise ParseError("Missing '<%% end %%>' for '<%% %s %%>'" % content, reader.lineno)
+            nodes.append(Block(content, children))
+        elif content.startswith('end'):  # <% end %>
+            if parent_tag == 'if':
+                nodes.append(EndIf(content))
+                break
+            elif parent_tag == 'for':
+                nodes.append(EndFor(content))
+                break
+            elif parent_tag == 'block':
+                nodes.append(EndBlock(content))
+                break
+            else:
+                raise ParseError("Missing '<% if %>' or '<% for %>' before '<% end %>'", reader.lineno)
+        elif content.startswith('include'):  # <% include %>
+            include = Include(content)
+            if not include.template_name:
+                raise ParseError("Missing template file path for '<%% %s %%>'" % content, reader.lineno)
+            nodes.append(include)
+        elif content.startswith('extends'): # <% extends %>
+            if not nodes.can_extends:
+                raise ParseError("'<%% %s %%>' must begin of the template content" % content, reader.lineno)
+            extends = Extends(content)
+            if not extends.template_name:
+                raise ParseError("Missing template file path for '<%% %s %%>'" % content, reader.lineno)
+            nodes.append(extends)
+
+    return nodes.data
+
