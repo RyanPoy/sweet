@@ -1,6 +1,7 @@
 #coding: utf8
 from nodes import Text, Expression, Comment, If, EndIf, Elif, Else, For, EndFor,\
     Include, Extends, EndBlock, Block, Continue, Break
+from lib import StringReader
 
 
 class ParseError(Exception):
@@ -116,3 +117,12 @@ def parse(reader, parent_tag=''):
 
     return nodes.data
 
+
+if __name__ == '__main__':
+    from cProfile import Profile
+    n = 30000
+    s = """<h1><%= user.name %></h1><h2><%= user.age %></h2>"""*n
+    reader = StringReader(s)
+    p = Profile()
+    p.run("parse(reader)")
+    p.print_stats()

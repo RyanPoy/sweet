@@ -99,13 +99,3 @@ class CodeGenerator(object):
         self.io.seek(length)
         return s
 
-
-
-if __name__ == '__main__':
-    from cProfile import Profile
-    n = 30000
-    s = """<h1><%= user.name %></h1><h2><%= user.age %></h2>"""*n
-    reader = StringReader(s)
-    p = Profile()
-    p.run("parse(reader)")
-    p.print_stats()
