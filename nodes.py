@@ -132,9 +132,15 @@ class Include(Node):
             self.template_name = ''
         else:
             self.template_name = vs[1].replace('"', '').replace("'", '')
-            self.attrs = vs[2:] 
+            self.attrs = vs[2:]
+#             print(self.attrs)
 
+    def compile_with(self, codegen):
+        if self.attrs:
+            codegen.write_line("str(%s)" % ' '.join(self.attrs))
+        return self
 
+    
 class Extends(Node):
     
     def __init__(self, content, children=None):

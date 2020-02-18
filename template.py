@@ -46,7 +46,7 @@ class MemLoader(Loader):
     def build_path(self, tmpl_path, parent_path=None):
         return tmpl_path
 
-    def get_templte_content(self, filepath):
+    def get_template_content(self, filepath):
         return self.content_dict[filepath]
 
     
@@ -70,10 +70,17 @@ class Template(object):
         return self
     
     def _expand(self):
+        nodes = []
         for node in self.nodes:
-            if not self.loader or not isinstance(node, (Include, Extends)):
+            nodes.append(node)
+            if not self.loader:
                 continue
-            self.loader.load(node.template_name)
+            if isinstance(node, Include):
+                t = self.loader.load(node.template_name).parse()
+                nodes.extend(t.nodes)
+            elif isinstance(node, Extends):
+                self.loader.load(node.template_name)
+        self.nodes = nodes
         return self
 
     def compile(self):

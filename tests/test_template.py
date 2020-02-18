@@ -2,7 +2,7 @@
 from __init__ import TestCase
 import unittest
 import os
-from template import Template
+from template import Template, MemLoader
 
 
 class UserForTest(object):
@@ -150,26 +150,22 @@ this is a string 3
         t = Template("""<% for i in range(10) %><% end %>""")
         self.assertEqual('', t.render())
 
-#     def test_include(self):
-#         loader = MemLoader()
-        
-#     def test_from_file(self):
-#         p = os.path.join(self.dirname, 'htmls/simple/index.html')
-#         t = Template.from_file(p)
-#         relt = ''.join(t.generate().split())
-#         self.assertEqual(relt, "013456")
-# 
-#     def test_include(self):
-#         loader = Template(os.path.join(self.dirname, 'htmls'))
-#         t = loader.load('include/index.html')
-#         self.assertEqual("""<ul>
-#     测试include是否OK
-#     
-#     <li>露西 | 20</li>
-# 
-#     <li>Lily | 10</li>
-# 
-# </ul>""", t.generate(users=self.users))
+    def test_include(self):
+        class User(object):
+            def __init__(self, id, name):
+                self.id = id
+                self.name = name
+
+        loader = MemLoader({
+            "index.html": "<ul><% include _partial.html %></ul>",
+            "_partial.html": """<% for u in users %><li><%= u.id %>|<%= u.name %></li><% end %>""",
+        })
+        t = loader.load('index.html')
+        r = t.render(users = [
+            User(1, 'user-1'),
+            User(2, 'user-2'),
+        ])
+        self.assertEqual("<ul><li>1|user-1</li><li>2|user-2</li></ul>", r)
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ import os
 from parse import ParseError
 from nodes import Text, Expression, Comment, If, EndIf, Elif, Else, For, EndFor,\
     Include, Extends, Block, EndBlock
-from template import Template, Loader
+from template import Template, Loader, MemLoader
 
 
 class ParseTest(TestCase):
@@ -178,7 +178,18 @@ this is a string 3
         with self.assertRaises(ParseError) as err:
             Template("""<% extends base.html %><% block title %>标题文本""").parse()
         self.assertEqual("Missing '<% end %>' for '<% block title %>'", str(err.exception))
+        
+    def test_include(self):
+        loader = MemLoader({
+            "index.html": "<ul><% include _partial.html %></ul>",
+            "_partial.html": """<% for u in users %><li><%= user.id %>|<%= user.name %></li><% end %>""",
+        })
+        nodes = loader.load('index.html').parse().nodes
+        self.assertEqual(4, len(nodes))
+        node = nodes[2]
+        self.assertTrue(isinstance(node, For))
 
+#         self.assertEqual("<ul><li>1|user-1</li><li>2|user-2s</li></ul>", r)
     
 if __name__ == '__main__':
     unittest.main()
