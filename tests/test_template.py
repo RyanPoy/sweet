@@ -150,8 +150,9 @@ this is a string 3
         t = Template("""<% for i in range(10) %><% end %>""")
         self.assertEqual('', t.render())
 
-    def test_include(self):
-        pass
+#     def test_include(self):
+#         loader = MemLoader()
+        
 #     def test_from_file(self):
 #         p = os.path.join(self.dirname, 'htmls/simple/index.html')
 #         t = Template.from_file(p)

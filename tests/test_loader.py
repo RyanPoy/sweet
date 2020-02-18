@@ -5,7 +5,7 @@ import unittest
 from template import FileLoader, MemLoader
 
 
-class FileLoaderTest(TestCase):
+class LoaderTest(TestCase):
     
     def setUp(self):
         self.abs_dir = os.path.dirname(os.path.abspath(__file__))
@@ -39,20 +39,9 @@ class FileLoaderTest(TestCase):
         self.assertEqual(expected,
                          self.loader.build_path('level-2/_partial.html', parent_path=parent_path)
         )
-
-
-class MemLoaderTest(TestCase):
     
-    def setUp(self): 
-        self.loader = MemLoader()
-        self.loader.content_dict = {
-            "parent.html": "aaaaaa",
-            "child.html": "<extends parent.html>",
-        }
-
-    def test_build_path(self):
-        self.assertEqual("parent.html", self.loader.build_path("parent.html"))
-
+    def test_mem_load_build_path(self):
+        self.assertEqual("parent.html", MemLoader({"parent.html": "aaaaaa"}).build_path("parent.html"))
 
 if __name__ == '__main__':
     unittest.main()

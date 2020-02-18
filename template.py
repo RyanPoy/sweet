@@ -12,10 +12,9 @@ joinpath = os.path.join
 
 class Loader(object):
 
-    def __init__(self, root_abs_dir=''):
+    def __init__(self, root_abs_dir):
         self.root_dir = normpath(abspath(root_abs_dir))
         self.tmpl_dict_cache = {} # filename: Template 
-        self.content_dict = {}    # filename: content
     
     def load(self, tmpl_path, parent_path=None):
         abs_path = self.build_path(tmpl_path, parent_path)
@@ -39,7 +38,11 @@ class FileLoader(Loader):
 
 
 class MemLoader(Loader):
-
+    
+    def __init__(self, content_dict):
+        super().__init__('')
+        self.content_dict = content_dict # filename: content
+        
     def build_path(self, tmpl_path, parent_path=None):
         return tmpl_path
 
