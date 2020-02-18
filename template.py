@@ -92,9 +92,9 @@ class Template(object):
         self.compile()
         try:
             exec(self.compiled, kwargs)
+            _my_temp_exec = kwargs['_my_temp_exec']
+            return _my_temp_exec()
         except:
             print (self.compiled)
             raise
-        _my_temp_exec = kwargs['_my_temp_exec']
-        return _my_temp_exec()
 

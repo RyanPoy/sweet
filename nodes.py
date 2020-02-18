@@ -70,6 +70,9 @@ class For(Node):
     def compile_with(self, codegen):
         codegen.write_line("%s:" % self.content, False)
         codegen.backward_indent()
+        if self.children and isinstance(self.children[0], EndFor):
+            codegen.write_line("''")
+
         for child in self.children:
             child.compile_with(codegen)
         return self

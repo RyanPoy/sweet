@@ -50,7 +50,11 @@ this is a string 3
                   
         t = Template("<%= 1 / 2 %>")
         self.assertEqual('0.5', t.render())
- 
+    
+#     def test_empty_if(self):
+#         t = Template("""<% if x > 10 %><% elif x < 10 %><% else %><% end %>""")
+#         self.assertEqual("", t.render(x=20))
+
     def test_if_lines(self):
         t = Template(
 """<% if x > 10 %>
@@ -141,7 +145,13 @@ this is a string 3
 <% end %>""")
         relt = ''.join(t.render().split())
         self.assertEqual(relt, "013456")
-    
+        
+    def test_for_empty_body(self):
+        t = Template("""<% for i in range(10) %><% end %>""")
+        self.assertEqual('', t.render())
+
+    def test_include(self):
+        pass
 #     def test_from_file(self):
 #         p = os.path.join(self.dirname, 'htmls/simple/index.html')
 #         t = Template.from_file(p)
