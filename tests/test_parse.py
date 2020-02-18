@@ -153,7 +153,7 @@ this is a string 3
         self.assertEqual("\r\n\t", nodes[0].content)
         self.assertTrue(isinstance(nodes[1], Extends))
         self.assertEqual("base.html", nodes[1].template_name)
-        
+
     def test_parse_extends_error_if_not_has_fname(self):
         with self.assertRaises(ParseError) as err:
             Template("""<% extends %>""").parse()

@@ -51,10 +51,6 @@ this is a string 3
         t = Template("<%= 1 / 2 %>")
         self.assertEqual('0.5', t.render())
  
-#     def test_if_empty_body(self):
-#         template = Template("<% if True %><% else %><% end %>")
-#         self.assertEqual(template.render(), "")
- 
     def test_if_lines(self):
         t = Template(
 """<% if x > 10 %>

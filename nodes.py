@@ -42,6 +42,7 @@ class If(Node):
     def compile_with(self, codegen):
         codegen.write_line("%s:" % self.content, False)
         codegen.backward_indent()
+        
         for child in self.children:
             child.compile_with(codegen)
         return self
@@ -83,11 +84,14 @@ class SpecialExpression(Node):
         codegen.write_line("%s" % self.content, False)
         return self
 
+
 class Pass(SpecialExpression):
     pass
 
+
 class Break(SpecialExpression):
     pass
+
 
 class Continue(SpecialExpression):
     pass
@@ -123,7 +127,7 @@ class Include(Node):
         if len(vs) < 2:
             self.template_name = ''
         else:
-            self.template_name = vs[1]
+            self.template_name = vs[1].replace('"', '').replace("'", '')
             self.attrs = vs[2:] 
 
 
@@ -135,7 +139,7 @@ class Extends(Node):
         if len(vs) < 2:
             self.template_name = ''
         else:
-            self.template_name = vs[1]
+            self.template_name = vs[1].replace('"', '').replace("'", '')
 
 
 class Block(Node):

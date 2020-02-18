@@ -5,13 +5,14 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import unittest
 from tests.test_template import TemplateTest
-from tests.test_template_loader import TemplateLoaderTest
+from tests.test_loader import FileLoaderTest, MemLoaderTest
 from tests.test_parse import ParseTest
 
 
 tests = [
     TemplateTest,
-    TemplateLoaderTest,
+    FileLoaderTest,
+    MemLoaderTest,
     ParseTest
 ]
 
