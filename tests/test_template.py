@@ -51,9 +51,9 @@ this is a string 3
         t = Template("<%= 1 / 2 %>")
         self.assertEqual('0.5', t.render())
     
-#     def test_empty_if(self):
-#         t = Template("""<% if x > 10 %><% elif x < 10 %><% else %><% end %>""")
-#         self.assertEqual("", t.render(x=20))
+    def test_empty_if(self):
+        t = Template("""<% if x > 10 %><% elif x < 10 %><% else %><% end %>""")
+        self.assertEqual("", t.render(x=20))
 
     def test_if_lines(self):
         t = Template(

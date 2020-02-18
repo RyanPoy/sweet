@@ -42,7 +42,7 @@ class If(Node):
     def compile_with(self, codegen):
         codegen.write_line("%s:" % self.content, False)
         codegen.backward_indent()
-        
+        codegen.write_line("''") # empty if
         for child in self.children:
             child.compile_with(codegen)
         return self
@@ -54,6 +54,7 @@ class Elif(Node):
         codegen.forward_indent()
         codegen.write_line("%s:" % self.content, False)
         codegen.backward_indent()
+        codegen.write_line("''") # empty elif
         return self
 
 class Else(Node):
@@ -62,6 +63,7 @@ class Else(Node):
         codegen.forward_indent()
         codegen.write_line("%s:" % self.content, False)
         codegen.backward_indent()
+        codegen.write_line("''") # empty else
         return self
 
 
@@ -70,8 +72,7 @@ class For(Node):
     def compile_with(self, codegen):
         codegen.write_line("%s:" % self.content, False)
         codegen.backward_indent()
-        if self.children and isinstance(self.children[0], EndFor):
-            codegen.write_line("''")
+        codegen.write_line("''") # empty for
 
         for child in self.children:
             child.compile_with(codegen)
