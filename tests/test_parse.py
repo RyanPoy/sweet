@@ -155,21 +155,16 @@ this is a string 3
             Template("""<ul>测试include是否OK<%include %></ul>""").parse()
         self.assertEqual("Missing template file path for '<% include %>'", str(err.exception))
         
-    def test_parse_extends(self):
-        nodes = Template("""\r\n\t<% extends base.html %>""").parse().nodes
-        self.assertEqual(2, len(nodes))
-        self.assertEqual("\r\n\t", nodes[0].content)
-        self.assertTrue(isinstance(nodes[1], Extends))
-        self.assertEqual("base.html", nodes[1].template_name)
-    
     def test_should_ignore_not_block_tag_if_template_is_extends(self):
-        nodes = Template("""<% extends base.html %><p>文本是要忽略的</p><% block title %><b>标题要保留</b><% end %>""").parse().nodes
-        self.assertEqual(2, len(nodes))
-        self.assertTrue(isinstance(nodes[0], Extends))
-        self.assertEqual("base.html", nodes[0].template_name)
-        self.assertTrue(isinstance(nodes[1], Block))
-        self.assertEqual("title", nodes[1].name)
-        children = nodes[1].children
+        loader = MemLoader({
+            "base.html": "<% block title %><% end %>",
+            "index.html": "<% extends base.html %><p>文本是要忽略的</p><% block title %><b>标题要保留</b><% end %>",
+        })
+        nodes = loader.load('index.html').parse().nodes
+        self.assertEqual(1, len(nodes))
+        self.assertTrue(isinstance(nodes[0], Block))
+        self.assertEqual("title", nodes[0].name)
+        children = nodes[0].children
         self.assertEqual(2, len(children))
         self.assertEqual('<b>标题要保留</b>', children[0].content)
         self.assertTrue(isinstance(children[1], EndBlock))
@@ -185,20 +180,28 @@ this is a string 3
         self.assertEqual("'<% extends base.html %>' must begin of the template content", str(err.exception))
 
     def test_parse_block(self):
-        nodes = Template("""<% extends base.html %><% block title %>标题文本<% end %>""").parse().nodes
-        self.assertEqual(2, len(nodes))
-        self.assertTrue(isinstance(nodes[1], Block))
-        self.assertEqual('block title', nodes[1].content)
-        self.assertEqual(2, len(nodes[1].children))
-        children = nodes[1].children
+        loader = MemLoader({
+            "base.html": "<% block title %><% end %>",
+            "index.html": "<% extends base.html %><% block title %>标题文本<% end %>"
+        })
+        nodes = loader.load("index.html").parse().nodes
+        self.assertEqual(1, len(nodes))
+        self.assertTrue(isinstance(nodes[0], Block))
+        self.assertEqual('block title', nodes[0].content)
+        self.assertEqual(2, len(nodes[0].children))
+        children = nodes[0].children
         self.assertEqual("标题文本", children[0].content)
         self.assertTrue(isinstance(children[1], EndBlock))
 
     def test_error_if_block_not_end(self):
+        loader = MemLoader({
+            'base.html': '<% block title %>标题文本',
+            "index.html": '<% extends base.html %>'
+        })
         with self.assertRaises(ParseError) as err:
-            Template("""<% extends base.html %><% block title %>标题文本""").parse()
+            loader.load('index.html').parse()
         self.assertEqual("Missing '<% end %>' for '<% block title %>'", str(err.exception))
-        
+
     def test_include(self):
         loader = MemLoader({
             "index.html": "<ul><% include _partial.html %></ul>",
@@ -209,14 +212,14 @@ this is a string 3
         node = nodes[2]
         self.assertTrue(isinstance(node, For))
         
-    def test_extends(self):
-        loader = MemLoader({
-            "base.html": "开始<% block title%>标题<% end %><% block body%>主体<% end %>结束",
-            "index.html": """<% extends base.html %><% block title%>真正的标题<% end %><% block body%>真正的主体<% end %>""",
-        })
-        nodes = loader.load('index.html').parse().nodes
-        for n in nodes:
-            print (n)
+#     def test_extends(self):
+#         loader = MemLoader({
+#             "base.html": "开始<% block title%>标题<% end %><% block body%>主体<% end %>结束",
+#             "index.html": """<% extends base.html %><% block title%>真正的标题<% end %><% block body%>真正的主体<% end %>""",
+#         })
+#         nodes = loader.load('index.html').parse().nodes
+#         for n in nodes:
+#             print (n)
         
 
 if __name__ == '__main__':

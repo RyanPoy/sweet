@@ -2,7 +2,7 @@
 
 class Node(object):
     
-    def __init__(self, content, children=None):
+    def __init__(self, content='', children=None):
         self.content = content
         self.children = children or []
         self.attrs = []
@@ -90,15 +90,24 @@ class SpecialExpression(Node):
 
 
 class Pass(SpecialExpression):
-    pass
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.content = 'pass'
 
 
 class Break(SpecialExpression):
-    pass
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.content = 'break'
 
 
 class Continue(SpecialExpression):
-    pass
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.content = 'continue'
 
 
 class End(Node):

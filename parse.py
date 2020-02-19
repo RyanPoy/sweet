@@ -1,6 +1,6 @@
 #coding: utf8
 from nodes import Text, Expression, Comment, If, EndIf, Elif, Else, For, EndFor,\
-    Include, Extends, EndBlock, Block, Continue, Break
+    Include, Extends, EndBlock, Block, Continue, Break, Pass
 from libs import StringReader
 
 
@@ -16,10 +16,16 @@ class ParseError(Exception):
         return '%s' % (self.message)
 
 
+class DeferBlock(object):
+    def __init__(self, name):
+        self.name = name
+
+
 class Nodes(object):
     
     def __init__(self):
-        self.data = []
+        self._data = []
+        self._blocks = {}
         self.can_extends = True
         self.is_extends = False
         
@@ -29,17 +35,27 @@ class Nodes(object):
                 self.can_extends = False
             elif node.content.strip():
                 self.can_extends = False
-        if isinstance(node, Extends):
-            self.is_extends = True
-            self.data.append(node)
-        else:
-            if not self.is_extends:
-                self.data.append(node)
-            elif isinstance(node, Block):
-                self.data.append(node)
-        return self
 
-        
+        if self.is_extends:
+            if isinstance(node, Block):
+                if node.name not in self._blocks:
+                    self._data.append(DeferBlock(node.name))
+                self._blocks[node.name] = node
+        else:
+            self._data.append(node)
+            
+        return self
+    
+    @property
+    def data(self):
+        ns = []
+        for n in self._data:
+            if isinstance(n, DeferBlock):
+                n = self._blocks[n.name]
+            ns.append(n)
+        return ns
+
+
 def parse(reader, loader, parent_tag=''):
     nodes = Nodes()
     while True:
@@ -71,7 +87,7 @@ def parse(reader, loader, parent_tag=''):
         elif content[0] == '#':  # <%# xxx %>
             nodes.append(Comment(content[1:].strip()))
         elif content.startswith('if'):  # <% if xxx %>
-            children = parse(reader, loader, parent_tag='if')
+            children = parse(reader, loader, parent_tag='if').data
             if not children or not isinstance(children[-1], EndIf):
                 raise ParseError("Missing '<%% end %%>' for '<%% %s %%>'" % content, reader.lineno)
             nodes.append(If(content, children))
@@ -84,18 +100,18 @@ def parse(reader, loader, parent_tag=''):
                 raise ParseError("Missing '<%% if %%>' before '<%% %s %%>'" % content, reader.lineno)
             nodes.append(Else(content))
         elif content.startswith('for'):
-            children = parse(reader, loader, parent_tag='for')
+            children = parse(reader, loader, parent_tag='for').data
             if not children or not isinstance(children[-1], EndFor):
                 raise ParseError("Missing '<%% end %%>' for '<%% %s %%>'" % content, reader.lineno)
             nodes.append(For(content, children))
         elif content.startswith('continue'):
-            nodes.append(Continue('continue'))
+            nodes.append(Continue())
         elif content.startswith('break'):
-            nodes.append(Break('break'))
+            nodes.append(Break())
         elif content.startswith('pass'):
-            nodes.append(Break('pass'))
+            nodes.append(Pass())
         elif content.startswith('block'):
-            children = parse(reader, loader, parent_tag='block')
+            children = parse(reader, loader, parent_tag='block').data
             if not children or not isinstance(children[-1], EndBlock):
                 raise ParseError("Missing '<%% end %%>' for '<%% %s %%>'" % content, reader.lineno)
             nodes.append(Block(content, children))
@@ -126,9 +142,17 @@ def parse(reader, loader, parent_tag=''):
             extends = Extends(content)
             if not extends.template_name:
                 raise ParseError("Missing template file path for '<%% %s %%>'" % content, reader.lineno)
-            nodes.append(extends)
+#             nodes.append(extends)
+            t = loader.load(extends.template_name).parse()
+            tmp_nodes = Nodes()
+            tmp_nodes.is_extends = True
+            for n in t.nodes:
+                tmp_nodes.append(n)
+            for n in nodes.data:
+                tmp_nodes.append(n)
+            nodes = tmp_nodes
 
-    return nodes.data
+    return nodes
 
 
 if __name__ == '__main__':
