@@ -1,8 +1,7 @@
 #coding: utf8
 from __init__ import TestCase
 import unittest
-from parse import ParseError
-from template import  MemLoader
+from template import  MemLoader, FormatError
 
 
 class ExtendsTest(TestCase):
@@ -26,7 +25,7 @@ class ExtendsTest(TestCase):
             "base.html": "开始<% block title%>标题<% end %><% block body%>主体<% end %>结束",
             "index.html": """<% extends %><% block title%>真正的标题<% end %><% block body%>真正的主体<% end %>""",
         })
-        with self.assertRaises(ParseError) as err:
+        with self.assertRaises(FormatError) as err:
             loader.load('index.html').render()
         self.assertEqual("Missing template file path for '<% extends %>'", str(err.exception))
         
@@ -35,7 +34,7 @@ class ExtendsTest(TestCase):
             "base.html": "开始<% block title%>标题<% end %><% block body%>主体<% end %>结束",
             "index.html": """extends前面有内容是要出错的<% extends base.html%>""",
         })
-        with self.assertRaises(ParseError) as err:
+        with self.assertRaises(FormatError) as err:
             loader.load('index.html').render()
         self.assertEqual("'<% extends base.html %>' must begin of the template content", str(err.exception))
         
@@ -44,7 +43,7 @@ class ExtendsTest(TestCase):
             'base.html': '<% block title %>标题文本',
             "index.html": '<% extends base.html %>'
         })
-        with self.assertRaises(ParseError) as err:
+        with self.assertRaises(FormatError) as err:
             loader.load('index.html').render()
         self.assertEqual("Missing '<% end %>' for '<% block title %>'", str(err.exception))
         

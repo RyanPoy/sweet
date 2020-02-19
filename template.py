@@ -1,7 +1,6 @@
 # coding: utf8
 import os
 from parse import parse
-from nodes import Extends, Include
 from libs import StringReader, CodeGenerator
 
 normpath = os.path.normpath
@@ -51,7 +50,7 @@ class MemLoader(Loader):
             raise FileNotFoundError('%s is not exist' % filepath)
         return self.content_dict[filepath]
 
-    
+
 class Template(object):
     
     def __init__(self, content, name="<string>", loader=None):
@@ -66,7 +65,7 @@ class Template(object):
         
     def parse(self):
         if not self.is_parsed:
-            self.nodes = parse(self.reader, self.loader).data
+            self.nodes = parse(self, self.loader).data
             self.is_parsed = True
         return self
     
@@ -89,3 +88,18 @@ class Template(object):
         except:
             print (self.compiled)
             raise
+        
+    def format_error(self, msg):
+        return FormatError(msg, self.reader.lineno)
+
+
+class FormatError(Exception):
+
+    def __init__(self, message, filename=None, lineno=0):
+        self.message = message
+        self.filename = filename
+        self.lineno = lineno
+
+    def __str__(self):
+#         return '%s at %s: %s' % (self.message, self.filename, self.lineno)
+        return '%s' % (self.message)

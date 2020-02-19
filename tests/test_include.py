@@ -1,9 +1,8 @@
 # coding: utf8
 from __init__ import TestCase, UserForTest
-from template import MemLoader
+from template import MemLoader, FormatError
 import unittest
 import os
-from parse import ParseError
 
 
 class IncludeTest(TestCase):
@@ -38,7 +37,7 @@ class IncludeTest(TestCase):
             "index.html": "<ul><% include %></ul>",
             "_partial.html": """<% for m in members %><li><%= m.name %>|<%= m.age %></li><% end %>""",
         })
-        with self.assertRaises(ParseError) as err:
+        with self.assertRaises(FormatError) as err:
             loader.load('index.html').render(users=self.users)
         self.assertEqual("Missing template file path for '<% include %>'", str(err.exception))
         

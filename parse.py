@@ -4,18 +4,6 @@ from nodes import Text, Expression, Comment, If, EndIf, Elif, Else, For, EndFor,
 from libs import StringReader
 
 
-class ParseError(Exception):
-
-    def __init__(self, message, filename=None, lineno=0):
-        self.message = message
-        self.filename = filename
-        self.lineno = lineno
-    
-    def __str__(self):
-#         return '%s at %s: %s' % (self.message, self.filename, self.lineno)
-        return '%s' % (self.message)
-
-
 class DeferBlock(object):
     def __init__(self, name):
         self.name = name
@@ -56,7 +44,9 @@ class Nodes(object):
         return ns
 
 
-def parse(reader, loader, parent_tag=''):
+def parse(template, parent_tag=''):
+    reader = template.reader
+    loader = template.loader
     nodes = Nodes()
     while True:
         p0 = reader.find('<%')
@@ -87,22 +77,22 @@ def parse(reader, loader, parent_tag=''):
         elif content[0] == '#':  # <%# xxx %>
             nodes.append(Comment(content[1:].strip()))
         elif content.startswith('if'):  # <% if xxx %>
-            children = parse(reader, loader, parent_tag='if').data
+            children = parse(template, parent_tag='if').data
             if not children or not isinstance(children[-1], EndIf):
-                raise ParseError("Missing '<%% end %%>' for '<%% %s %%>'" % content, reader.lineno)
+                raise template.format_error("Missing '<%% end %%>' for '<%% %s %%>'" % content)
             nodes.append(If(content, children))
         elif content.startswith('elif'):  # <% elif xxx %>
             if parent_tag != 'if':
-                raise ParseError("Missing '<%% if %%>' before '<%% %s %%>'" % content, reader.lineno)
+                raise template.format_error("Missing '<%% if %%>' before '<%% %s %%>'" % content)
             nodes.append(Elif(content))
         elif content.startswith('else'):
             if parent_tag != 'if':
-                raise ParseError("Missing '<%% if %%>' before '<%% %s %%>'" % content, reader.lineno)
+                raise template.format_error("Missing '<%% if %%>' before '<%% %s %%>'" % content)
             nodes.append(Else(content))
         elif content.startswith('for'):
-            children = parse(reader, loader, parent_tag='for').data
+            children = parse(template, parent_tag='for').data
             if not children or not isinstance(children[-1], EndFor):
-                raise ParseError("Missing '<%% end %%>' for '<%% %s %%>'" % content, reader.lineno)
+                raise template.format_error("Missing '<%% end %%>' for '<%% %s %%>'" % content)
             nodes.append(For(content, children))
         elif content.startswith('continue'):
             nodes.append(Continue())
@@ -111,9 +101,9 @@ def parse(reader, loader, parent_tag=''):
         elif content.startswith('pass'):
             nodes.append(Pass())
         elif content.startswith('block'):
-            children = parse(reader, loader, parent_tag='block').data
+            children = parse(template, parent_tag='block').data
             if not children or not isinstance(children[-1], EndBlock):
-                raise ParseError("Missing '<%% end %%>' for '<%% %s %%>'" % content, reader.lineno)
+                raise template.format_error("Missing '<%% end %%>' for '<%% %s %%>'" % content)
             nodes.append(Block(content, children))
         elif content.startswith('end'):  # <% end %>
             if parent_tag == 'if':
@@ -126,21 +116,21 @@ def parse(reader, loader, parent_tag=''):
                 nodes.append(EndBlock(content))
                 break
             else:
-                raise ParseError("Missing '<% if|for|block %>' before '<% end %>'", reader.lineno)
+                raise template.format_error("Missing '<% if|for|block %>' before '<% end %>'")
         elif content.startswith('include'):  # <% include %>
             include = Include(content)
             if not include.template_name:
-                raise ParseError("Missing template file path for '<%% %s %%>'" % content, reader.lineno)
+                raise template.format_error("Missing template file path for '<%% %s %%>'" % content)
             nodes.append(include)
             t = loader.load(include.template_name).parse()
             for n in t.nodes:
                 nodes.append(n)
         elif content.startswith('extends'): # <% extends %>
             if not nodes.can_extends:
-                raise ParseError("'<%% %s %%>' must begin of the template content" % content, reader.lineno)
+                raise template.format_error("'<%% %s %%>' must begin of the template content" % content)
             extends = Extends(content)
             if not extends.template_name:
-                raise ParseError("Missing template file path for '<%% %s %%>'" % content, reader.lineno)
+                raise template.format_error("Missing template file path for '<%% %s %%>'" % content)
             t = loader.load(extends.template_name).parse()
             tmp_nodes = Nodes()
             tmp_nodes.is_extends = True
