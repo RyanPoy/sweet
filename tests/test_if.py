@@ -83,8 +83,9 @@ class IfTest(TestCase):
     
     def test_parse_error_when_has_if_but_not_has_end(self):
         with self.assertRaises(FormatError) as err:
-            Template("""<%if x = 10 %><%=x%>""").render(x=20)
-        self.assertEqual("Missing '<% end %>' for '<% if x = 10 %>' on <string> at line 1", str(err.exception))
+            Template("""<%if x = 10 %>
+                        <%=x%>""").render(x=20)
+        self.assertEqual("Missing '<% end %>' for '<% if x = 10 %>' on <string> at line 2", str(err.exception))
 
         
 if __name__ == '__main__':
