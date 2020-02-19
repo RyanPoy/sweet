@@ -60,7 +60,7 @@ class ForTest(TestCase):
     def test_parse_error_when_has_for_but_not_has_end(self):
         with self.assertRaises(FormatError) as err:
             Template("""<%for x in range(10) %><%=x%>""").render(x=20)
-        self.assertEqual("Missing '<% end %>' for '<% for x in range(10) %>'", str(err.exception))
+        self.assertEqual("Missing '<% end %>' for '<% for x in range(10) %>' on <string> at line 1", str(err.exception))
     
 if __name__ == '__main__':
     unittest.main()

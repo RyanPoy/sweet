@@ -39,7 +39,7 @@ class IncludeTest(TestCase):
         })
         with self.assertRaises(FormatError) as err:
             loader.load('index.html').render(users=self.users)
-        self.assertEqual("Missing template file path for '<% include %>'", str(err.exception))
+        self.assertEqual("Missing template file path for '<% include %>' on index.html at line 1", str(err.exception))
         
     def test_parse_include_error_if_has_a_not_exist_fname(self):
         loader = MemLoader({

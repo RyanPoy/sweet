@@ -90,7 +90,7 @@ class Template(object):
             raise
         
     def format_error(self, msg):
-        return FormatError(msg, self.reader.lineno)
+        return FormatError(msg, self.name, self.reader.lineno)
 
 
 class FormatError(Exception):
@@ -101,5 +101,4 @@ class FormatError(Exception):
         self.lineno = lineno
 
     def __str__(self):
-#         return '%s at %s: %s' % (self.message, self.filename, self.lineno)
-        return '%s' % (self.message)
+        return '%s on %s at line %s' % (self.message, self.filename, self.lineno)
