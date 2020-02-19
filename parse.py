@@ -145,9 +145,10 @@ def parse(template, parent_tag=''):
 
 if __name__ == '__main__':
     from cProfile import Profile
+    from template import Template
     n = 30000
     s = """<h1><%= user.name %></h1><h2><%= user.age %></h2>"""*n
-    reader = StringReader(s)
+    t = Template(s)
     p = Profile()
-    p.run("parse(reader)")
+    p.run("parse(t)")
     p.print_stats()
