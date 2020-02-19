@@ -4,7 +4,8 @@ import unittest
 import os
 from template import Template
 
-class IfTemplateTest(TestCase):
+
+class IfTest(TestCase):
 
     def setUp(self):
         self.dirname = os.path.dirname(os.path.abspath(__file__))

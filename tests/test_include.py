@@ -5,7 +5,7 @@ import unittest
 import os
 
 
-class TemplateTest(TestCase):
+class IncludeTest(TestCase):
 
     def setUp(self):
         self.dirname = os.path.dirname(os.path.abspath(__file__))

@@ -2,10 +2,10 @@
 from __init__ import TestCase
 import unittest
 import os
-from template import Template, MemLoader
+from template import Template
 
 
-class BasicTemplateTest(TestCase):
+class BasicTest(TestCase):
 
     def setUp(self):
         self.dirname = os.path.dirname(os.path.abspath(__file__))

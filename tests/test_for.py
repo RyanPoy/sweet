@@ -1,18 +1,11 @@
 # coding: utf8
-from __init__ import TestCase
+from __init__ import TestCase, UserForTest
 import unittest
 import os
 from template import Template
 
 
-class UserForTest(object):
-
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
-
-
-class ForTemplateTest(TestCase):
+class ForTest(TestCase):
 
     def setUp(self):
         self.dirname = os.path.dirname(os.path.abspath(__file__))

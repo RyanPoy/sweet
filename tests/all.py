@@ -4,21 +4,21 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import unittest
-from tests.test_template import TemplateTest
 from tests.test_loader import LoaderTest
 from tests.test_parse import ParseTest
-from tests.test_basic_template import BasicTemplateTest
-from tests.test_if_template import IfTemplateTest
-from tests.test_for_template import ForTemplateTest
 
+from tests.test_basic import BasicTest
+from tests.test_if import IfTest
+from tests.test_for import ForTest
+from tests.test_include import IncludeTest
 
 tests = [
-    TemplateTest,
     LoaderTest,
     ParseTest,
-    BasicTemplateTest,
-    IfTemplateTest,
-    ForTemplateTest
+    BasicTest,
+    IfTest,
+    ForTest,
+    IncludeTest
 ]
 
 
