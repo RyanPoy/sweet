@@ -79,7 +79,8 @@ class Template(object):
                 t = self.loader.load(node.template_name).parse()
                 nodes.extend(t.nodes)
             elif isinstance(node, Extends):
-                self.loader.load(node.template_name)
+                t = self.loader.load(node.template_name).parse()
+                
         self.nodes = nodes
         return self
 

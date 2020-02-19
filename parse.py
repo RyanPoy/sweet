@@ -21,6 +21,7 @@ class Nodes(object):
     def __init__(self):
         self.data = []
         self.can_extends = True
+        self.is_extends = False
         
     def append(self, node):
         if self.can_extends:
@@ -28,8 +29,15 @@ class Nodes(object):
                 self.can_extends = False
             elif node.content.strip():
                 self.can_extends = False
-        self.data.append(node)
-        
+        if isinstance(node, Extends):
+            self.is_extends = True
+            self.data.append(node)
+        else:
+            if not self.is_extends:
+                self.data.append(node)
+            elif isinstance(node, Block):
+                self.data.append(node)
+        return self
 
 def parse(reader, parent_tag=''):
     nodes = Nodes()

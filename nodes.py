@@ -153,4 +153,12 @@ class Extends(Node):
 
 
 class Block(Node):
-    pass
+    
+    def __init__(self, content, children=None):
+        super().__init__(content, children)
+        vs = [ x for x in content.split() if x ]
+        if len(vs) < 2:
+            self.name = ''
+        else:
+            self.name = vs[1].replace('"', '').replace("'", '')
+        

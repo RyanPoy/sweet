@@ -153,7 +153,19 @@ this is a string 3
         self.assertEqual("\r\n\t", nodes[0].content)
         self.assertTrue(isinstance(nodes[1], Extends))
         self.assertEqual("base.html", nodes[1].template_name)
-
+    
+    def test_should_ignore_not_block_tag_if_template_is_extends(self):
+        nodes = Template("""<% extends base.html %><p>文本是要忽略的</p><% block title %><b>标题要保留</b><% end %>""").parse().nodes
+        self.assertEqual(2, len(nodes))
+        self.assertTrue(isinstance(nodes[0], Extends))
+        self.assertEqual("base.html", nodes[0].template_name)
+        self.assertTrue(isinstance(nodes[1], Block))
+        self.assertEqual("title", nodes[1].name)
+        children = nodes[1].children
+        self.assertEqual(2, len(children))
+        self.assertEqual('<b>标题要保留</b>', children[0].content)
+        self.assertTrue(isinstance(children[1], EndBlock))
+        
     def test_parse_extends_error_if_not_has_fname(self):
         with self.assertRaises(ParseError) as err:
             Template("""<% extends %>""").parse()
@@ -189,7 +201,6 @@ this is a string 3
         node = nodes[2]
         self.assertTrue(isinstance(node, For))
 
-#         self.assertEqual("<ul><li>1|user-1</li><li>2|user-2s</li></ul>", r)
-    
+
 if __name__ == '__main__':
     unittest.main()
