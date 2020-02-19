@@ -5,16 +5,17 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import unittest
 from tests.test_loader import LoaderTest
-from tests.test_parse import ParseTest
 
 from tests.test_basic import BasicTest
 from tests.test_if import IfTest
 from tests.test_for import ForTest
 from tests.test_include import IncludeTest
+from tests.test_extends import ExtendsTest
+
 
 tests = [
     LoaderTest,
-    ParseTest,
+    ExtendsTest,
     BasicTest,
     IfTest,
     ForTest,

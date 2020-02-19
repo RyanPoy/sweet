@@ -3,6 +3,7 @@ from __init__ import TestCase, UserForTest
 import unittest
 import os
 from template import Template
+from parse import ParseError
 
 
 class ForTest(TestCase):
@@ -56,6 +57,11 @@ class ForTest(TestCase):
     def test_for_empty_body(self):
         t = Template("""<% for i in range(10) %><% end %>""")
         self.assertEqual('', t.render())
-
+        
+    def test_parse_error_when_has_for_but_not_has_end(self):
+        with self.assertRaises(ParseError) as err:
+            Template("""<%for x in range(10) %><%=x%>""").render(x=20)
+        self.assertEqual("Missing '<% end %>' for '<% for x in range(10) %>'", str(err.exception))
+    
 if __name__ == '__main__':
     unittest.main()

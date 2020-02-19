@@ -132,7 +132,6 @@ def parse(reader, loader, parent_tag=''):
             if not include.template_name:
                 raise ParseError("Missing template file path for '<%% %s %%>'" % content, reader.lineno)
             nodes.append(include)
-#             if loader:
             t = loader.load(include.template_name).parse()
             for n in t.nodes:
                 nodes.append(n)
@@ -142,7 +141,6 @@ def parse(reader, loader, parent_tag=''):
             extends = Extends(content)
             if not extends.template_name:
                 raise ParseError("Missing template file path for '<%% %s %%>'" % content, reader.lineno)
-#             nodes.append(extends)
             t = loader.load(extends.template_name).parse()
             tmp_nodes = Nodes()
             tmp_nodes.is_extends = True

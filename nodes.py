@@ -13,11 +13,6 @@ class Node(object):
     def __str__(self):
         return "%s[%s]" % (self.__class__.__name__, self.content)
     
-#     def create(self, name, start_tag_name=None, content, children=None):
-#         if name == 'Text':
-#             return Text(content, children)
-#         elif name == ''
-
 
 class Text(Node):
     
@@ -56,6 +51,7 @@ class Elif(Node):
         codegen.backward_indent()
         codegen.write_line("''") # empty elif
         return self
+
 
 class Else(Node):
     
@@ -142,11 +138,10 @@ class Include(Node):
         else:
             self.template_name = vs[1].replace('"', '').replace("'", '')
             self.attrs = vs[2:]
-#             print(self.attrs)
 
     def compile_with(self, codegen):
-        if self.attrs:
-            codegen.write_line("str(%s)" % ' '.join(self.attrs))
+        for attr in self.attrs:
+            codegen.write_line("%s" % attr, False)
         return self
 
     
@@ -170,4 +165,8 @@ class Block(Node):
             self.name = ''
         else:
             self.name = vs[1].replace('"', '').replace("'", '')
-        
+    
+    def compile_with(self, codegen):
+        for child in self.children:
+            child.compile_with(codegen)
+        return self

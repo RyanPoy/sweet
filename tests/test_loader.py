@@ -43,6 +43,7 @@ class LoaderTest(TestCase):
     def test_mem_load_build_path(self):
         self.assertEqual("parent.html", MemLoader({"parent.html": "aaaaaa"}).build_path("parent.html"))
 
+
 if __name__ == '__main__':
     unittest.main()
 

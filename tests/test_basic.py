@@ -17,16 +17,12 @@ this is a string 2
 this is a string 3
 """
         self.assertEqual(content, Template(content).render())
-  
+    
     def test_variable(self):
         t = Template("""她叫<%= name %>, and <%= age %> years old """)
         self.assertEqual("""她叫露西, and 10 years old """,
                          t.render(name="露西", age=10))
                         
-    def test_comment(self):
-        t = Template("Hello<%# TODO i18n %> <%= name %>!")
-        self.assertEqual("Hello 中国!", t.render(name="中国"))
-  
     def test_expressions(self):
         t = Template("<%= 1 + 2 %>")
         self.assertEqual("3", t.render())
@@ -40,5 +36,9 @@ this is a string 3
         t = Template("<%= 1 / 2 %>")
         self.assertEqual('0.5', t.render())
 
+    def test_comment(self):
+        t = Template("Hello<%# TODO i18n %> <%= name %>!")
+        self.assertEqual("Hello 中国!", t.render(name="中国"))
+  
 if __name__ == '__main__':
     unittest.main()

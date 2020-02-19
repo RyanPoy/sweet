@@ -47,6 +47,8 @@ class MemLoader(Loader):
         return tmpl_path
 
     def get_template_content(self, filepath):
+        if filepath not in self.content_dict:
+            raise FileNotFoundError('%s is not exist' % filepath)
         return self.content_dict[filepath]
 
     
@@ -87,4 +89,3 @@ class Template(object):
         except:
             print (self.compiled)
             raise
-
