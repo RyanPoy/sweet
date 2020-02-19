@@ -39,7 +39,8 @@ class Nodes(object):
                 self.data.append(node)
         return self
 
-def parse(reader, parent_tag=''):
+        
+def parse(reader, loader, parent_tag=''):
     nodes = Nodes()
     while True:
         p0 = reader.find('<%')
@@ -70,7 +71,7 @@ def parse(reader, parent_tag=''):
         elif content[0] == '#':  # <%# xxx %>
             nodes.append(Comment(content[1:].strip()))
         elif content.startswith('if'):  # <% if xxx %>
-            children = parse(reader, parent_tag='if')
+            children = parse(reader, loader, parent_tag='if')
             if not children or not isinstance(children[-1], EndIf):
                 raise ParseError("Missing '<%% end %%>' for '<%% %s %%>'" % content, reader.lineno)
             nodes.append(If(content, children))
@@ -83,7 +84,7 @@ def parse(reader, parent_tag=''):
                 raise ParseError("Missing '<%% if %%>' before '<%% %s %%>'" % content, reader.lineno)
             nodes.append(Else(content))
         elif content.startswith('for'):
-            children = parse(reader, parent_tag='for')
+            children = parse(reader, loader, parent_tag='for')
             if not children or not isinstance(children[-1], EndFor):
                 raise ParseError("Missing '<%% end %%>' for '<%% %s %%>'" % content, reader.lineno)
             nodes.append(For(content, children))
@@ -94,7 +95,7 @@ def parse(reader, parent_tag=''):
         elif content.startswith('pass'):
             nodes.append(Break('pass'))
         elif content.startswith('block'):
-            children = parse(reader, parent_tag='block')
+            children = parse(reader, loader, parent_tag='block')
             if not children or not isinstance(children[-1], EndBlock):
                 raise ParseError("Missing '<%% end %%>' for '<%% %s %%>'" % content, reader.lineno)
             nodes.append(Block(content, children))
@@ -115,6 +116,10 @@ def parse(reader, parent_tag=''):
             if not include.template_name:
                 raise ParseError("Missing template file path for '<%% %s %%>'" % content, reader.lineno)
             nodes.append(include)
+#             if loader:
+            t = loader.load(include.template_name).parse()
+            for n in t.nodes:
+                nodes.append(n)
         elif content.startswith('extends'): # <% extends %>
             if not nodes.can_extends:
                 raise ParseError("'<%% %s %%>' must begin of the template content" % content, reader.lineno)

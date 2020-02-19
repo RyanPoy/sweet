@@ -122,7 +122,11 @@ this is a string 3
         return loader.load(filepath)
     
     def test_parse_include(self):
-        nodes = Template("""<ul>测试include是否OK<%include _partial.html members=users %></ul>""").parse().nodes
+        loader = MemLoader({
+            'index.html': '<ul>测试include是否OK<%include _partial.html members=users %></ul>',
+            '_partial.html': '',
+        })
+        nodes = loader.load('index.html').parse().nodes
         self.assertEqual(3, len(nodes))
         self.assertEqual("<ul>测试include是否OK", nodes[0].content)
         self.assertTrue(isinstance(nodes[1], Include))
@@ -132,7 +136,11 @@ this is a string 3
         self.assertEqual("</ul>", nodes[2].content)
         
     def test_parse_include_has_not_attrs(self):
-        nodes = Template("""<ul>测试include是否OK<%include _partial.html%></ul>""").parse().nodes
+        loader = MemLoader({
+            'index.html': '<ul>测试include是否OK<%include _partial.html%></ul>',
+            '_partial.html': '',
+        })
+        nodes = loader.load('index.html').parse().nodes
         self.assertEqual(3, len(nodes))
         self.assertEqual("<ul>测试include是否OK", nodes[0].content)
         self.assertTrue(isinstance(nodes[1], Include))
@@ -200,7 +208,16 @@ this is a string 3
         self.assertEqual(4, len(nodes))
         node = nodes[2]
         self.assertTrue(isinstance(node, For))
-
+        
+    def test_extends(self):
+        loader = MemLoader({
+            "base.html": "开始<% block title%>标题<% end %><% block body%>主体<% end %>结束",
+            "index.html": """<% extends base.html %><% block title%>真正的标题<% end %><% block body%>真正的主体<% end %>""",
+        })
+        nodes = loader.load('index.html').parse().nodes
+        for n in nodes:
+            print (n)
+        
 
 if __name__ == '__main__':
     unittest.main()

@@ -64,7 +64,7 @@ class Template(object):
         
     def parse(self):
         if not self.is_parsed:
-            self.nodes = parse(self.reader)
+            self.nodes = parse(self.reader, self.loader)
             self._expand()
             self.is_parsed = True
         return self
@@ -75,12 +75,15 @@ class Template(object):
             nodes.append(node)
             if not self.loader:
                 continue
-            if isinstance(node, Include):
-                t = self.loader.load(node.template_name).parse()
-                nodes.extend(t.nodes)
+#             if isinstance(node, Include):
+#                 t = self.loader.load(node.template_name).parse()
+#                 nodes.extend(t.nodes)
             elif isinstance(node, Extends):
                 t = self.loader.load(node.template_name).parse()
-                
+                tmp_nodes = []
+                tmp_nodes.extend(t.nodes)
+                tmp_nodes.extend(nodes)
+                nodes = tmp_nodes
         self.nodes = nodes
         return self
 
@@ -91,7 +94,7 @@ class Template(object):
                 node.compile_with(self.codegen)
             self.codegen.end()
             self.compiled = str(self.codegen)
-            
+
 #             print('*'*10)
 #             print(self.compiled)
 #             print('*'*10)
