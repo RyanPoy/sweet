@@ -6,7 +6,11 @@ class Node(object):
         self.content = content
         self.children = children or []
         self.attrs = []
+        self.prepare()
     
+    def prepare(self):
+        pass
+
     def compile_with(self, codegen):
         return self
 
@@ -87,22 +91,19 @@ class SpecialExpression(Node):
 
 class Pass(SpecialExpression):
     
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def prepare(self):
         self.content = 'pass'
 
 
 class Break(SpecialExpression):
     
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def prepare(self):
         self.content = 'break'
 
 
 class Continue(SpecialExpression):
     
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def prepare(self):
         self.content = 'continue'
 
 
@@ -128,43 +129,30 @@ class EndBlock(End):
     pass
 
 
-class Include(Node):
+class NamedNode(Node):
     
-    def __init__(self, content, children=None):
-        super().__init__(content, children)
-        vs = [ x for x in content.split() if x ]
+    def prepare(self):
+        vs = [ x for x in self.content.split() if x ]
         if len(vs) < 2:
-            self.template_name = ''
+            self.name = ''
         else:
-            self.template_name = vs[1].replace('"', '').replace("'", '')
+            self.name = vs[1].replace('"', '').replace("'", '')
             self.attrs = vs[2:]
 
+
+class Include(NamedNode):
+    
     def compile_with(self, codegen):
         for attr in self.attrs:
             codegen.write_line("%s" % attr, False)
         return self
 
     
-class Extends(Node):
-    
-    def __init__(self, content, children=None):
-        super().__init__(content, children)
-        vs = [ x for x in content.split() if x ]
-        if len(vs) < 2:
-            self.template_name = ''
-        else:
-            self.template_name = vs[1].replace('"', '').replace("'", '')
+class Extends(NamedNode):
+    pass
 
 
-class Block(Node):
-    
-    def __init__(self, content, children=None):
-        super().__init__(content, children)
-        vs = [ x for x in content.split() if x ]
-        if len(vs) < 2:
-            self.name = ''
-        else:
-            self.name = vs[1].replace('"', '').replace("'", '')
+class Block(NamedNode):
     
     def compile_with(self, codegen):
         for child in self.children:
