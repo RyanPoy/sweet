@@ -2,6 +2,7 @@
 import os
 from parse import parse
 from libs import StringReader, CodeGenerator
+from nodes import Include, Extends, Block, Text
 
 normpath = os.path.normpath
 dirname = os.path.dirname
@@ -31,7 +32,7 @@ class FileLoader(Loader):
             return normpath(joinpath(self.root_dir, tmpl_path))
         return normpath(joinpath(dirname(parent_path), tmpl_path))
 
-    def get_templte_content(self, filepath):
+    def get_template_content(self, filepath):
         with open(filepath) as f:
             return f.read()
 
@@ -51,6 +52,41 @@ class MemLoader(Loader):
         return self.content_dict[filepath]
 
 
+class _DeferBlock(object):
+    def __init__(self, name):
+        self.name = name
+
+
+class _Nodes(object):
+    
+    def __init__(self):
+        self._data = []
+        self._blocks = {}
+        self.only_append_block = False
+        
+    def append(self, node):
+        if isinstance(node, Block):
+            if node.name not in self._blocks:
+                self._data.append(_DeferBlock(node.name))
+            self._blocks[node.name] = node
+        else:
+            if self.only_append_block:
+                if isinstance(node, Text) and not node.content.strip():
+                    self._data.append(node)
+            else:
+                self._data.append(node)
+        return self
+    
+    @property
+    def data(self):
+        ns = []
+        for n in self._data:
+            if isinstance(n, _DeferBlock):
+                n = self._blocks[n.name]
+            ns.append(n)
+        return ns
+
+
 class Template(object):
     
     def __init__(self, content, name="<string>", loader=None):
@@ -65,7 +101,8 @@ class Template(object):
         
     def parse(self):
         if not self.is_parsed:
-            self.nodes = parse(self, self.loader).data
+            nodes = parse(self, self.loader)
+            self.nodes = self._expand(nodes)
             self.is_parsed = True
         return self
     
@@ -78,6 +115,19 @@ class Template(object):
             self.compiled = str(self.codegen)
         return self
     
+    def _expand(self, nodes):
+        ns = _Nodes()
+        for idx, n in enumerate(nodes):
+            if isinstance(n, Extends): # Extends Must first Node
+                assert (idx == 0 or idx == 1)
+                t = self.loader.load(n.template_name).parse()
+                for tmp_node in t.nodes:
+                    ns.append(tmp_node)
+                ns.only_append_block = True
+            else:
+                ns.append(n)
+        return ns.data
+
     def render(self, **kwargs):
         self.parse()
         self.compile()

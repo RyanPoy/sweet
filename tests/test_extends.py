@@ -8,17 +8,17 @@ class ExtendsTest(TestCase):
     
     def test_should_ignore_not_block_tag_if_template_is_extends(self):
         loader = MemLoader({
-            "base.html": "<% block title %><% end %>",
+            "base.html": "<title><% block title %><% end %></title>",
             "index.html": "<% extends base.html %><p>文本是要忽略的</p><% block title %><b>标题要保留</b><% end %>",
         })
-        self.assertEqual('<b>标题要保留</b>', loader.load("index.html").render())
+        self.assertEqual('<title><b>标题要保留</b></title>', loader.load("index.html").render())
     
     def test_block_cover(self):
         loader = MemLoader({
             "base.html": "开始<% block title%>标题<% end %><% block body%>主体<% end %>结束",
             "index.html": """  <% extends base.html %><% block title%>真正的标题<% end %><% block body%>真正的主体<% end %>""",
         })
-        self.assertEqual('真正的标题真正的主体', loader.load("index.html").render())
+        self.assertEqual('  开始真正的标题真正的主体结束', loader.load("index.html").render())
 
     def test_parse_extends_error_if_not_has_fname(self):
         loader = MemLoader({

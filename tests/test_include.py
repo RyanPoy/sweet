@@ -2,13 +2,11 @@
 from __init__ import TestCase, UserForTest
 from template import MemLoader, FormatError
 import unittest
-import os
 
 
 class IncludeTest(TestCase):
 
     def setUp(self):
-        self.dirname = os.path.dirname(os.path.abspath(__file__))
         self.users = [
             UserForTest("露西", 20),
             UserForTest("Lily", 10)
