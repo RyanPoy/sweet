@@ -92,9 +92,12 @@ def parse(template, parent_tag=''):
             if not include.name:
                 raise template.format_error("Missing template file path for '<%% %s %%>'" % content)
             nodes.append(include)
-            t = loader.load(include.name).parse()
-            for n in t.nodes:
-                nodes.append(n)
+            try:
+                t = loader.load(include.name, template.name).parse()
+                for n in t.nodes:
+                    nodes.append(n)
+            except FileNotFoundError as ex:
+                raise template.format_error(str(ex))
         elif content.startswith('extends'): # <% extends %>
             if not can_extends(nodes):
                 raise template.format_error("'<%% %s %%>' must begin of the template content" % content)

@@ -44,9 +44,9 @@ class IncludeTest(TestCase):
             "index.html": "<ul><% include not_exist.html %></ul>",
             "_partial.html": """<% for m in members %><li><%= m.name %>|<%= m.age %></li><% end %>""",
         })
-        with self.assertRaises(FileNotFoundError) as err:
+        with self.assertRaises(FormatError) as err:
             loader.load('index.html').render(users=self.users)
-        self.assertEqual("not_exist.html is not exist", str(err.exception))
+        self.assertEqual("not_exist.html is not exist on index.html at line 1", str(err.exception))
 
 if __name__ == '__main__':
     unittest.main()

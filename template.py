@@ -122,7 +122,7 @@ class Template(object):
         for idx, n in enumerate(nodes):
             if isinstance(n, Extends): # Extends Must first Node
                 assert (idx == 0 or idx == 1)
-                t = self.loader.load(n.name).parse()
+                t = self.loader.load(n.name, self.name).parse()
                 for tmp_node in t.nodes:
                     ns.append(tmp_node)
                 ns.only_append_block = True

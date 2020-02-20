@@ -1,8 +1,8 @@
 # coding: utf8
 from __init__ import TestCase, UserForTest
-from template import MemLoader
+from template import MemLoader, FileLoader
 import unittest
-
+import os
 
 class ComplexTest(TestCase):
 
@@ -137,6 +137,23 @@ class ComplexTest(TestCase):
   </header>
 </html>
 """.split()), ''.join(r.split()))
-
+        
+    def test_complex3_from_html_files(self):
+        html_dir = os.path.join(os.path.dirname(__file__), 'htmls')
+        loader = FileLoader(html_dir)
+        r = loader.load('users/index.html').render(users=self.users)
+        self.assertEqual(''.join("""
+<html>
+  <header>
+    <title>首页</title>
+    <body>
+      <ul>
+        <li>露西|20</li>
+        <li>Lily|10</li>
+      </ul>
+    </body>
+  </header>
+</html>
+""".split()), ''.join(r.split()))
 if __name__ == '__main__':
     unittest.main()
