@@ -12,15 +12,16 @@ joinpath = os.path.join
 
 class Loader(object):
 
-    def __init__(self, root_abs_dir):
+    def __init__(self, root_abs_dir, debug=True):
         self.root_dir = normpath(abspath(root_abs_dir))
-        self.tmpl_dict_cache = {} # filename: Template 
+        self.tmpl_dict_cache = {} # filename: Template
+        self.debug = debug 
     
     def load(self, tmpl_path, parent_path=None):
         abs_path = self.build_path(tmpl_path, parent_path)
         if abs_path not in self.tmpl_dict_cache:
             content = self.get_template_content(abs_path)
-            tmpl = Template(content, name=abs_path, loader=self)
+            tmpl = Template(content, name=abs_path, loader=self, debug=self.debug)
             self.tmpl_dict_cache[abs_path] = tmpl
         return self.tmpl_dict_cache[abs_path]
 
@@ -89,24 +90,25 @@ class _Nodes(object):
 
 class Template(object):
     
-    def __init__(self, content, name="<string>", loader=None):
-        self.nodes = []
+    def __init__(self, content, name="<string>", loader=None, debug=True):
+        self.nodes = None
         self.name = name
         self.loader = loader
-        self.is_parsed = False
 
         self.scanner = Scanner(content)
         self.compiled = ''
+        self.debug = debug
         
     def parse(self):
-        if not self.is_parsed:
+        if self.debug or self.nodes is None:
             nodes = parse(self, self.loader)
             self.nodes = self._expand(nodes)
-            self.is_parsed = True
+            if self.debug:
+                self.scanner.reset()
         return self
     
     def compile(self):
-        if not self.compiled:
+        if self.debug or not self.compiled:
             codegen = CodeGen()
             codegen.begin()
             for node in self.nodes:

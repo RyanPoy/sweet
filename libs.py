@@ -6,9 +6,8 @@ class Scanner(object):
 
     def __init__(self, s):
         self.s = s
-        self.pos = 0
         self._length = len(s)
-        self.lineno = 1
+        self.reset()
          
     @property
     def length(self):
@@ -40,6 +39,10 @@ class Scanner(object):
         self.lineno += s.count('\n')
         return s
     
+    def reset(self):
+        self.pos = 0
+        self.lineno = 1
+
     @property
     def remain_s(self):
         return self.s[self.pos:]
