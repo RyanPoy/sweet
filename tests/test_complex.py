@@ -1,6 +1,6 @@
 # coding: utf8
 from __init__ import TestCase, UserForTest
-from template import MemLoader, FormatError
+from template import MemLoader
 import unittest
 
 
@@ -14,24 +14,29 @@ class ComplexTest(TestCase):
  
     def test_complex(self):
         loader = MemLoader({
-            "base.html": """
+            "base.html": 
+"""
 <html>
     <header>
         <title><%block title%><% end %></title>
         <body><%block body%><% end %></body>
     </header>
-</html>""",
-            "index.html": """
+</html>
+""",
+            "index.html": 
+"""
 <% extends base.html %>
 <% block title %>首页<% end %>
 <% block body %><% include _members.html members=users %><% end %>
 """,
-            "_members.html": """
+            "_members.html": 
+"""
 <ul>
   <% for m in members %>
     <% include _member.html %>  
   <% end %>
-</ul>""",
+</ul>
+""",
             "_member.html": """<li><%= m.name %>|<%= m.age %></li>"""
         })
         r = loader.load('index.html').render(users=self.users)

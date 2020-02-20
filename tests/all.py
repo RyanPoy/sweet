@@ -11,6 +11,7 @@ from tests.test_if import IfTest
 from tests.test_for import ForTest
 from tests.test_include import IncludeTest
 from tests.test_extends import ExtendsTest
+from tests.test_complex import ComplexTest
 
 
 tests = [
@@ -19,7 +20,8 @@ tests = [
     BasicTest,
     IfTest,
     ForTest,
-    IncludeTest
+    IncludeTest,
+    ComplexTest
 ]
 
 
