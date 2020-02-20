@@ -1,7 +1,7 @@
 # coding: utf8
 import os
 from parse import parse
-from libs import StringReader, CodeGenerator
+from libs import Scanner, CodeGenerator
 from nodes import Extends, Block, Text
 
 normpath = os.path.normpath
@@ -95,7 +95,7 @@ class Template(object):
         self.loader = loader
         self.is_parsed = False
 
-        self.reader = StringReader(content)
+        self.scanner = Scanner(content)
         self.codegen = CodeGenerator()
         self.compiled = ''
         
@@ -140,7 +140,7 @@ class Template(object):
             raise
         
     def format_error(self, msg):
-        return FormatError(msg, self.name, self.reader.lineno)
+        return FormatError(msg, self.name, self.scanner.lineno)
 
 
 class FormatError(Exception):

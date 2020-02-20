@@ -15,28 +15,28 @@ def can_extends(nodes):
 
 
 def parse(template, parent_tag=''):
-    reader = template.reader
+    scanner = template.scanner
     loader = template.loader
     nodes = []
     while True:
-        p0 = reader.find('<%')
+        p0 = scanner.find('<%')
         if p0 < 0:  # not found begin tag
-            if not reader.eof():  # end remaining text
-                nodes.append(Text(reader.read()))
+            if not scanner.eof():  # end remaining text
+                nodes.append(Text(scanner.read()))
             break
         if p0 != 0:  # not begin
-            nodes.append(Text(reader.read(p0)))  # text
+            nodes.append(Text(scanner.read(p0)))  # text
             continue
 
         # process this line, the p0 must equals 0
-        reader.skip(2)  # skip the <% 
-        p1 = reader.find('%>')
+        scanner.skip(2)  # skip the <% 
+        p1 = scanner.find('%>')
         if p1 == -1:  # found the begin tag but not found end tag
-            nodes.append(Text(reader.read()))  # @TODO: maybe should throw exception
+            nodes.append(Text(scanner.read()))  # @TODO: maybe should throw exception
             break
 
-        content = reader.read(p1)
-        reader.skip(2)  # skip the %>
+        content = scanner.read(p1)
+        scanner.skip(2)  # skip the %>
 
         content = content.strip()
         if not content:
