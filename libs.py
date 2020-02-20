@@ -48,7 +48,7 @@ class Scanner(object):
         return self.remain_s
 
 
-class CodeGenerator(object):
+class CodeGen(object):
 
     FLAG = '  '
 
@@ -89,13 +89,16 @@ class CodeGenerator(object):
         self.io.write('\n')
         return self
     
-    def __len__(self):
-        return self.io.tell()
-    
-    def __str__(self):
+    def gen(self):
         length = len(self)
         self.io.seek(0)
         s = self.io.read(length)
         self.io.seek(length)
         return s
+
+    def __len__(self):
+        return self.io.tell()
+    
+    def __str__(self):
+        return self.gen()
 

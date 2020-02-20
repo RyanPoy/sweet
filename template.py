@@ -1,7 +1,7 @@
 # coding: utf8
 import os
 from parse import parse
-from libs import Scanner, CodeGenerator
+from libs import Scanner, CodeGen
 from nodes import Extends, Block, Text
 
 normpath = os.path.normpath
@@ -96,7 +96,6 @@ class Template(object):
         self.is_parsed = False
 
         self.scanner = Scanner(content)
-        self.codegen = CodeGenerator()
         self.compiled = ''
         
     def parse(self):
@@ -108,11 +107,12 @@ class Template(object):
     
     def compile(self):
         if not self.compiled:
-            self.codegen.begin()
+            codegen = CodeGen()
+            codegen.begin()
             for node in self.nodes:
-                node.compile_with(self.codegen)
-            self.codegen.end()
-            self.compiled = str(self.codegen)
+                node.compile_with(codegen)
+            codegen.end()
+            self.compiled = codegen.gen()
         return self
     
     def _expand(self, nodes):
