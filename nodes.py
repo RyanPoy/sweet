@@ -158,3 +158,9 @@ class Block(NamedNode):
         for child in self.children:
             child.compile_with(codegen)
         return self
+
+
+class FormNode(Node):
+    
+    def compile_with(self, codegen):
+        pass

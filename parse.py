@@ -7,7 +7,8 @@ class NodeList(object):
     
     def __init__(self):
         self.data = []
-    
+        self.types = set((If, Elif, Else, For, Block, Include, Extends, EndIf, EndFor, EndBlock, Break, Continue, Pass))
+
     def push(self, node):
         self.maybe_modify_last_textnode(node)
         return self.data.append(node)
@@ -16,14 +17,14 @@ class NodeList(object):
         if not self.data:
             return
         last_node = self.data[-1]
-        if isinstance(current_node, (If, Elif, Else, For, Block, Include, Extends, EndIf, EndFor, EndBlock, Break, Continue, Pass)) and isinstance(last_node, Text):
+        if isinstance(last_node, Text) and type(current_node) in self.types:
             # if current node is If, Elif, Else, For and last node is Text
             # should remove space which between last node and current node
             content = last_node.content
             idx = content.rfind('\n')
             if idx != -1 and not content[idx:].strip():
                 last_node.content = content[:idx]
-        elif isinstance(current_node, Text) and isinstance(last_node, ((If, Elif, Else, For, Block, Include, Extends, EndIf, EndFor, EndBlock, Break, Continue, Pass))):
+        elif isinstance(current_node, Text) and type(last_node) in self.types:
             # if current node is Text and last node is If, Elif, Else, For
             # should remove space which between last node and current node
             content = current_node.content
@@ -140,11 +141,12 @@ def parse(template, parent_tag=''):
 
 
 if __name__ == '__main__':
-    from cProfile import Profile
+#     from cProfile import Profile
     from template import Template
     n = 30000
     s = """<h1><%= user.name %></h1><h2><%= user.age %></h2>"""*n
     t = Template(s)
-    p = Profile()
-    p.run("parse(t)")
-    p.print_stats()
+    parse(t)
+#     p = Profile()
+#     p.run("parse(t)")
+#     p.print_stats()
