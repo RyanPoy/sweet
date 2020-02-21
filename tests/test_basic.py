@@ -2,7 +2,7 @@
 from __init__ import TestCase
 import unittest
 import os
-from template import Template
+from template import Template, FormatError
 
 
 class BasicTest(TestCase):
@@ -39,6 +39,12 @@ this is a string 3
     def test_comment(self):
         t = Template("Hello<%# TODO i18n %> <%= name %>!")
         self.assertEqual("Hello 中国!", t.render(name="中国"))
-  
+
+    def test_unsupport_error(self):
+        with self.assertRaises(FormatError) as err:
+            t = Template("""<% fuck %>""").render()
+        self.assertEqual("Unsupport '<% fuck %>' on <string> at line 1", str(err.exception))
+
+
 if __name__ == '__main__':
     unittest.main()

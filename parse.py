@@ -105,6 +105,8 @@ def parse(template, parent_tag=''):
             if not extends.name:
                 raise template.format_error("Missing template file path for '<%% %s %%>'" % content)
             nodes.append(extends)
+        else:
+            raise template.format_error("Unsupport '<%% %s %%>'" % content)
     return nodes
 
 
