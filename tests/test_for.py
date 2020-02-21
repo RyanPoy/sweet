@@ -23,22 +23,26 @@ class ForTest(TestCase):
 </ul>""")
         self.assertEqual(
 """<ul>
-
     <li>0|露西|20</li>
-
     <li>1|Lily|10</li>
-
 </ul>""", t.render(users=self.users))
 
     def test_for_contains_html_tag(self):
         t = Template(
-"""<ul>
+"""
+<ul>
 <% for i in range(3) %>
     <li><%= i %></li>
 <% end %>
 </ul>""")
-        self.assertEqual("<ul>\n\n    <li>0</li>\n\n    <li>1</li>\n\n    <li>2</li>\n\n</ul>", t.render())
-     
+        self.assertEqual(
+"""
+<ul>
+    <li>0</li>
+    <li>1</li>
+    <li>2</li>
+</ul>""", t.render())
+
     def test_for_which_contains_continue_and_continue(self):
         t = Template(
 """<% for i in range(10) %>
@@ -50,8 +54,13 @@ class ForTest(TestCase):
         <% break %>
     <% end %>
 <% end %>""")
-        relt = ''.join(t.render().split())
-        self.assertEqual(relt, "013456")
+        self.assertEqual("""
+    0
+    1
+    3
+    4
+    5
+    6""", t.render())
         
     def test_for_empty_body(self):
         t = Template("""<% for i in range(10) %><% end %>""")

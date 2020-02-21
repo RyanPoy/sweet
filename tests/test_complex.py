@@ -155,5 +155,8 @@ class ComplexTest(TestCase):
   </header>
 </html>
 """.split()), ''.join(r.split()))
+        print (r)
+
+
 if __name__ == '__main__':
     unittest.main()
