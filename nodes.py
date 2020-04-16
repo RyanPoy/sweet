@@ -160,7 +160,30 @@ class Block(NamedNode):
         return self
 
 
-class FormNode(Node):
+class Using(Node):
     
+    def prepare(self):
+        """using funname(*args, **kwargs) do varname
+        """
+        self.func = ""
+        self.var  = ""
+
+        vs = [ x for x in self.content.split() if x ]
+        if vs[0] != 'using' or vs[-2] != 'do':
+            return
+
+        self.func = " ".join(vs[1:-2])
+        self.var  = vs[-1]
+
     def compile_with(self, codegen):
-        pass
+        codegen.write_line("%s = %s" % (self.var, self.func), False)
+        codegen.write_line("str(%s.begin_render())" % self.var)
+        for child in self.children:
+            child.compile_with(codegen)
+        codegen.write_line("str(%s.end_render())" % self.var)
+        return self
+
+
+class EndUsing(Node):
+
+    pass

@@ -3,6 +3,7 @@ import os
 from parse import parse
 from libs import Scanner, CodeGen
 from nodes import Extends, Block, Text
+from tags import Form
 
 normpath = os.path.normpath
 dirname = os.path.dirname
@@ -134,8 +135,12 @@ class Template(object):
         self.parse()
         self.compile()
         try:
-            exec(self.compiled, kwargs)
-            _my_temp_exec = kwargs['_my_temp_exec']
+            all_kwargs = {
+                'form': Form
+            }
+            all_kwargs.update(kwargs)
+            exec(self.compiled, all_kwargs)
+            _my_temp_exec = all_kwargs['_my_temp_exec']
             return _my_temp_exec()
         except:
             print (self.compiled)

@@ -1,6 +1,6 @@
 #coding: utf8
 from nodes import Text, Expression, Comment, If, EndIf, Elif, Else, For, EndFor,\
-    Include, Extends, EndBlock, Block, Continue, Break, Pass
+    Include, Extends, EndBlock, Block, Continue, Break, Pass, Using, EndUsing
 
 
 class NodeList(object):
@@ -73,7 +73,17 @@ def parse(template, parent_tag=''):
             continue
         
         if content[0] == '=':  # <%=  xxx %>
-            nodes.push(Expression(content[1:].strip()))  # base expression
+            origin_content, content = content, content[1:].strip()
+            if content.startswith('using'):
+                children = parse(template, parent_tag='using')
+                if not children or not isinstance(children[-1], EndUsing):
+                    raise template.format_error("Missing '<%% end %%>' for '<%% %s %%>'" % origin_content)
+                using = Using(content, children)
+                if not using.func or not using.var:
+                    raise template.format_error("'<%%%s %%>' format error" % origin_content)
+                nodes.push(using)
+            else:
+                nodes.push(Expression(content))  # base expression
         elif content[0] == '#':  # <%# xxx %>
             nodes.push(Comment(content[1:].strip()))
         elif content.startswith('if'):  # <% if xxx %>
@@ -115,6 +125,9 @@ def parse(template, parent_tag=''):
             elif parent_tag == 'block':
                 nodes.push(EndBlock(content))
                 break
+            elif parent_tag == 'using':
+                nodes.push(EndUsing(content))
+                break
             else:
                 raise template.format_error("Missing '<% if|for|block %>' before '<% end %>'")
         elif content.startswith('include'):  # <% include %>
@@ -141,12 +154,11 @@ def parse(template, parent_tag=''):
 
 
 if __name__ == '__main__':
-#     from cProfile import Profile
+    from cProfile import Profile
     from template import Template
     n = 30000
     s = """<h1><%= user.name %></h1><h2><%= user.age %></h2>"""*n
     t = Template(s)
-    parse(t)
-#     p = Profile()
-#     p.run("parse(t)")
-#     p.print_stats()
+    p = Profile()
+    p.run("parse(t)")
+    p.print_stats()
