@@ -1,6 +1,4 @@
-.project
-.pydevproject
-.settings
 .pyc
 __pycache__
 tests/tornado_template.py
+.DS_Store

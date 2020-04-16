@@ -15,7 +15,7 @@ class Scanner(object):
  
     def find(self, target, p0=0, p1=None):
         s = self.pos + p0
-        e = self.po + p1 if p1 else self.length
+        e = self.pos + p1 if p1 else self.length
         idx = self.s.find(target, s, e)
         if idx == -1:
             return idx
