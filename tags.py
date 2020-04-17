@@ -56,6 +56,23 @@ class Form(object):
 
         d.update(html)
         return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
+
+    def text_field(self, name, value='', _id='', tp='text', disabled=False, html={}):
+        d = oDict()
+        d['id'] = _id or name
+        d['name'] = name
+        d['type'] = tp or 'text'
+        if value:
+            d['value'] = value
+        if disabled:
+            d['disabled'] = "disabled"
+        d.update(html)
+
+        return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
+
+    def color_field(self, name, value='', _id='', disabled=False, html={}):
+        return self.text_field(name=name, value=value, _id=_id, tp="color", disabled=disabled, html=html)
+
     # def text(self, name):
     #     return '<input name="%s" type="text" value="" />' % name
 
