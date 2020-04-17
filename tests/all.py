@@ -19,6 +19,7 @@ from tests.test_tag_form_button import TagFormButtonTest
 from tests.test_tag_form_checkbox import TagFormCheckboxTest
 from tests.test_tag_form_color_field import TagFormColorFieldTest
 from tests.test_tag_form_date_field import TagFormDateFieldTest
+from tests.test_tag_form_datetime_field import TagFormDatetimeFieldTest
 
 
 tests = [
@@ -35,7 +36,8 @@ tests = [
     TagFormButtonTest,
     TagFormCheckboxTest,
     TagFormColorFieldTest,
-    TagFormDateFieldTest
+    TagFormDateFieldTest,
+    TagFormDatetimeFieldTest
 ]
 
 

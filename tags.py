@@ -1,5 +1,6 @@
 #coding: utf8
 from collections import OrderedDict as oDict
+from datetime import datetime, date
 
 
 class Form(object):
@@ -77,6 +78,19 @@ class Form(object):
 
     def date_field(self, name, value='', _id='', disabled=False, _class='', html={}):
         return self.text_field(name=name, value=value, _id=_id, tp="date", disabled=disabled, _class=_class, html=html)
+
+    def datetime_field(self, name, value='', _min='', _max='', _id='', disabled=False, _class='', html={}):
+        def _(v):
+            if isinstance(v, datetime):
+                return datetime.strftime(v, '%Y-%m-%dT%H:%M:%S')
+            elif isinstance(v, date):
+                return date.strftime(v, '%Y-%m-%dT00:00:00')
+
+        if value: value = _(value)
+        if _min and 'min' not in html: html['min'] = _(_min)
+        if _max and 'max' not in html: html['max'] = _(_max)
+
+        return self.text_field(name=name, value=value, _id=_id, tp="datetime-local", disabled=disabled, _class=_class, html=html)
 
     # def password(self, name):
     #     return '<input name="%s" type="password" value="" />' % name
