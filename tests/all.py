@@ -13,10 +13,12 @@ from tests.test_include import IncludeTest
 from tests.test_extends import ExtendsTest
 from tests.test_complex import ComplexTest
 from tests.test_using import UsingTest
+
 from tests.test_tag_form import TagFormTest
 from tests.test_tag_form_button import TagFormButtonTest
 from tests.test_tag_form_checkbox import TagFormCheckboxTest
 from tests.test_tag_form_color_field import TagFormColorFieldTest
+from tests.test_tag_form_date_field import TagFormDateFieldTest
 
 
 tests = [
@@ -32,7 +34,8 @@ tests = [
     TagFormTest,
     TagFormButtonTest,
     TagFormCheckboxTest,
-    TagFormColorFieldTest
+    TagFormColorFieldTest,
+    TagFormDateFieldTest
 ]
 
 

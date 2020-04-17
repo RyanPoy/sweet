@@ -5,50 +5,50 @@ import os
 from template import Template, FormatError
 
 
-class TagFormColorFieldTest(TestCase):
+class TagFormDateFieldTest(TestCase):
 
-    def test_form_with_url_and_color_field_tag(self):
+    def test_form_with_url_and_date_field_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.color_field('name') %>
+    <%= f.date_field('name') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="name" name="name" type="color" />
+    <input id="name" name="name" type="date" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.color_field('color', '#DEF726') %>
+    <%= f.date_field('date', '2020-01-01') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="color" name="color" type="color" value="#DEF726" />
+    <input id="date" name="date" type="date" value="2020-01-01" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.color_field('color', _class='special_input') %>
+    <%= f.date_field('date', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="color" name="color" type="color" class="special_input" />
+    <input id="date" name="date" type="date" class="special_input" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.color_field('color', '#DEF726', disabled=True, _class='special_input') %>
+    <%= f.date_field('date', '2020-01-01', disabled=True, _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="color" name="color" type="color" value="#DEF726" disabled="disabled" class="special_input" />
+    <input id="date" name="date" type="date" value="2020-01-01" disabled="disabled" class="special_input" />
 </form>
 """, t.render())
 

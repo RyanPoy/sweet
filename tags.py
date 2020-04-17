@@ -57,7 +57,7 @@ class Form(object):
         d.update(html)
         return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
 
-    def text_field(self, name, value='', _id='', tp='text', disabled=False, html={}):
+    def text_field(self, name, value='', _id='', tp='text', disabled=False, _class='', html={}):
         d = oDict()
         d['id'] = _id or name
         d['name'] = name
@@ -66,15 +66,17 @@ class Form(object):
             d['value'] = value
         if disabled:
             d['disabled'] = "disabled"
+        if _class:
+            d['class'] = _class
         d.update(html)
 
         return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
 
-    def color_field(self, name, value='', _id='', disabled=False, html={}):
-        return self.text_field(name=name, value=value, _id=_id, tp="color", disabled=disabled, html=html)
+    def color_field(self, name, value='', _id='', disabled=False, _class='', html={}):
+        return self.text_field(name=name, value=value, _id=_id, tp="color", disabled=disabled, _class=_class, html=html)
 
-    # def text(self, name):
-    #     return '<input name="%s" type="text" value="" />' % name
+    def date_field(self, name, value='', _id='', disabled=False, _class='', html={}):
+        return self.text_field(name=name, value=value, _id=_id, tp="date", disabled=disabled, _class=_class, html=html)
 
     # def password(self, name):
     #     return '<input name="%s" type="password" value="" />' % name
