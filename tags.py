@@ -30,23 +30,32 @@ class Form(object):
         return '</form>'
 
     def button(self, value="", name="button", _id="", tp="submit", disabled=False, html={}):
-        value = value or "Button"
-        tp = tp or 'submit'
-        if self.url:
-            return self._button_tag(value, name, _id, tp, disabled, html)
-        return ""
-
-    def _button_tag(self, value, name, _id, tp, disabled, html={}):
         d = oDict()
         if _id: d['id'] = _id
-        d['name'] = name
-        d['type'] = tp
+        d['name'] = name or "button"
+        d['type'] = tp or 'submit'
         if disabled: d['disabled'] = 'disabled'
 
         d.update(html)
-        return '<button %s>%s</button>' % (' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ]), value)
+        return '<button %s>%s</button>' % \
+                    (' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ]), 
+                        value or "Button"
+                    )
 
+    def checkbox(self, name="checkbox", value="1", _id="", checked=False, disabled=False, html={}):
+        d = oDict()
+        name = name or "checkbox"
+        d['id'] = _id or name
+        d['name'] = name
+        d['type'] = "checkbox"
+        d['value'] = value
+        if checked:
+            d['checked'] = "checked"
+        if disabled:
+            d['disabled'] = "disabled"
 
+        d.update(html)
+        return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
     # def text(self, name):
     #     return '<input name="%s" type="text" value="" />' % name
 
