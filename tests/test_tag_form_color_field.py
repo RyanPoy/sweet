@@ -7,7 +7,7 @@ from template import Template, FormatError
 
 class TagFormColorFieldTest(TestCase):
 
-    def test_form_with_url_and_checkbox_tag(self):
+    def test_form_with_url_and_color_field_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
     <%= f.color_field('name') %>
