@@ -73,6 +73,9 @@ class Form(object):
 
         return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
 
+    def email_field(self, name, value='', _id='', disabled=False, _class='', html={}):
+        return self.text_field(name=name, value=value, _id=_id, tp="email", disabled=disabled, _class=_class, html=html)
+
     def color_field(self, name, value='', _id='', disabled=False, _class='', html={}):
         return self.text_field(name=name, value=value, _id=_id, tp="color", disabled=disabled, _class=_class, html=html)
 
