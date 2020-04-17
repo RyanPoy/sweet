@@ -13,6 +13,8 @@ from tests.test_include import IncludeTest
 from tests.test_extends import ExtendsTest
 from tests.test_complex import ComplexTest
 from tests.test_using import UsingTest
+from tests.test_tag_form import TagFormTest
+from tests.test_tag_form_button import TagFormButtonTest
 
 
 tests = [
@@ -23,8 +25,10 @@ tests = [
     ForTest,
     IncludeTest,
     ComplexTest,
+    UsingTest,
 
-    UsingTest
+    TagFormTest,
+    TagFormButtonTest
 ]
 
 
