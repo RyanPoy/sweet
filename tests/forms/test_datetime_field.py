@@ -12,7 +12,7 @@ from datetime import date, datetime
 
 class DatetimeFieldTest(TestCase):
 
-    def test_form_with_url_and_datetime_field_tag(self):
+    def test_form_with_url_and_datetime_field(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
     <%= f.datetime_field("user_born_on") %>

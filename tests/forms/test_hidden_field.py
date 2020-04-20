@@ -11,7 +11,7 @@ from template import Template
 
 class HiddenFieldTest(TestCase):
 
-    def test_form_with_url_and_hidden_field_tag(self):
+    def test_form_with_url_and_hidden_field(self):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>

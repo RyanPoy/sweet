@@ -27,7 +27,7 @@ class ForTest(TestCase):
     <li>1|Lily|10</li>
 </ul>""", t.render(users=self.users))
 
-    def test_for_contains_html_tag(self):
+    def test_for_contains_html(self):
         t = Template(
 """
 <ul>

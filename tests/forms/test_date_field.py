@@ -11,7 +11,7 @@ from template import Template
 
 class DateFieldTest(TestCase):
 
-    def test_form_with_url_and_date_field_tag(self):
+    def test_form_with_url_and_date_field(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
     <%= f.date_field('name') %>
