@@ -107,6 +107,21 @@ class Form(object):
 
     def hidden_field(self, name, value='', _id='', tp='text', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="hidden", disabled=disabled, _class=_class, html=html)
+
+    def label(self, name, value='Name', _id='', _class='', html=None):
+        html = html or {}
+        d = oDict()
+        if _id:
+            d['id'] = _id
+        d['for'] = name
+        if _class:
+            d['class'] = _class
+        d.update(html)
+        return '<label %s>%s</label>' % (
+                    ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ]),
+                    value
+                )
+
     # def password(self, name):
     #     return '<input name="%s" type="password" value="" />' % name
 
