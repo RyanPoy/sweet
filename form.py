@@ -93,23 +93,6 @@ class Form(object):
     def hidden_field(self, name, value=None, _id='', tp='text', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="hidden", disabled=disabled, _class=_class, html=html)
 
-    def date_field(self, name, value=None, _id='', placeholder='', disabled=False, _class='', html=None):
-        return self.text_field(name=name, value=value, _id=_id, placeholder=placeholder, tp="date", disabled=disabled, _class=_class, html=html)
-
-    def datetime_field(self, name, value=None, placeholder='', _min='', _max='', _id='', step='', disabled=False, _class='', html=None):
-        def _(v):
-            if isinstance(v, datetime):
-                return datetime.strftime(v, '%Y-%m-%dT%H:%M:%S')
-            elif isinstance(v, date):
-                return date.strftime(v, '%Y-%m-%dT00:00:00')
-
-        html = html or {}
-        if value: value = _(value)
-        if _min and 'min' not in html: html['min'] = _(_min)
-        if _max and 'max' not in html: html['max'] = _(_max)
-        if step and 'step' not in html: html['step'] = step
-        return self.text_field(name=name, value=value, _id=_id, placeholder=placeholder, tp="datetime-local", disabled=disabled, _class=_class, html=html)
-
     def label(self, name, value='Name', _class='', html=None):
         html = html or {}
         d = oDict()
@@ -132,6 +115,26 @@ class Form(object):
 
     def month_field(self, name, value=None, _id='', placeholder='', _min='', _max='', step='', disabled=False, _class='', html=None):
         return self.number_field(name=name, value=value, _id=_id, placeholder=placeholder, _min=_min, _max=_max, step=step, tp="month", disabled=disabled, _class=_class, html=html)
+
+    def date_field(self, name, value=None, _id='', placeholder='', disabled=False, _class='', html=None):
+        return self.text_field(name=name, value=value, _id=_id, placeholder=placeholder, tp="date", disabled=disabled, _class=_class, html=html)
+
+    def time_field(self, name, value=None, _id='', placeholder='', _min='', _max='', step='', disabled=False, _class='', html=None):
+        return self.number_field(name=name, value=value, _id=_id, placeholder=placeholder, _min=_min, _max=_max, step=step, tp="time", disabled=disabled, _class=_class, html=html)
+
+    def datetime_field(self, name, value=None, placeholder='', _min='', _max='', _id='', step='', disabled=False, _class='', html=None):
+        def _(v):
+            if isinstance(v, datetime):
+                return datetime.strftime(v, '%Y-%m-%dT%H:%M:%S')
+            elif isinstance(v, date):
+                return date.strftime(v, '%Y-%m-%dT00:00:00')
+
+        html = html or {}
+        if value: value = _(value)
+        if _min and 'min' not in html: html['min'] = _(_min)
+        if _max and 'max' not in html: html['max'] = _(_max)
+        if step and 'step' not in html: html['step'] = step
+        return self.text_field(name=name, value=value, _id=_id, placeholder=placeholder, tp="datetime-local", disabled=disabled, _class=_class, html=html)
 
     def radio(self, name, value, _id='', checked=False, disabled=False, _class='', html=None):
         html = html or {}

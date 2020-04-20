@@ -34,6 +34,7 @@ from tests.forms.test_range_field import RangeFieldTest
 from tests.forms.test_search_field import SearchFieldTest
 from tests.forms.test_submit import SubmitTest
 from tests.forms.test_textarea import TextareaTest
+from tests.forms.test_time_field import TimeFieldTest
 
 
 tests = [
@@ -65,7 +66,8 @@ tests = [
     SearchFieldTest,
     SubmitTest,
     TextareaTest,
-    TextFieldTest
+    TextFieldTest,
+    TimeFieldTest
 ]
 
 
