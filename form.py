@@ -158,5 +158,13 @@ class Form(object):
             html['checked'] = 'checked'
 
         return self.text_field(name=name, value=value, _id=_id, tp="radio", disabled=disabled, _class=_class, html=html)
+
+    def range_field(self, name, value=None, _id='', _in=None, step='', disabled=False, _class='', html=None):
+        html = html or {}
+        if _in and len(_in) >= 2:
+            if 'min' not in html: html['min'] = _in[0]
+            if 'max' not in html: html['max'] = _in[1]
+        if step and 'step' not in html: html['step'] = step
+        return self.text_field(name=name, value=value, _id=_id, tp="range", disabled=disabled, _class=_class, html=html)
     # def textarea(self, name):
     #     return '<textarea name="%s"></textarea>' % name
