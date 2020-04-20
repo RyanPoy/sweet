@@ -27,6 +27,7 @@ from tests.forms.test_label import LabelTest
 from tests.forms.test_month_field import MonthTest
 from tests.forms.test_number_field import NumberFieldTest
 from tests.forms.test_password_field import PasswordFieldTest
+from tests.forms.test_text_field import TextFieldTest
 from tests.forms.test_tel_field import TelFieldTest
 from tests.forms.test_radio import RadioTest
 from tests.forms.test_range_field import RangeFieldTest
@@ -63,7 +64,8 @@ tests = [
     RangeFieldTest,
     SearchFieldTest,
     SubmitTest,
-    TextareaTest
+    TextareaTest,
+    TextFieldTest
 ]
 
 
