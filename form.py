@@ -147,6 +147,9 @@ class Form(object):
     def tel_field(self, name, value=None, _id='', size='', maxlength='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="tel", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
 
+    def search_field(self, name, value=None, _id='', size='', maxlength='', disabled=False, _class='', html=None):
+        return self.text_field(name=name, value=value, _id=_id, tp="search", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
+
     def radio(self, name, value, _id='', checked=False, disabled=False, _class='', html=None):
         html = html or {}
         if not _id:
