@@ -11,7 +11,7 @@ from template import Template
 
 class SearchFieldTest(TestCase):
 
-    def test_form_with_url_and_password_field(self):
+    def test_form_with_url_and_search_field(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
     <%= f.search_field('name') %>
