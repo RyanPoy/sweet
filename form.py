@@ -82,6 +82,15 @@ class Form(object):
     def color_field(self, name, value=None, _id='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="color", disabled=disabled, _class=_class, html=html)
 
+    def file_field(self, name, value=None, _id='', accept=None, multiple=False, disabled=False, _class='', html=None):
+        html = html or {}
+        if accept and 'accept' not in html:
+            html['accept'] = accept
+        return self.text_field(name=name, value=value, _id=_id, tp="file", disabled=disabled, _class=_class, html=html)
+
+    def hidden_field(self, name, value=None, _id='', tp='text', disabled=False, _class='', html=None):
+        return self.text_field(name=name, value=value, _id=_id, tp="hidden", disabled=disabled, _class=_class, html=html)
+
     def date_field(self, name, value=None, _id='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="date", disabled=disabled, _class=_class, html=html)
 
@@ -98,15 +107,6 @@ class Form(object):
         if _max and 'max' not in html: html['max'] = _(_max)
         if step and 'step' not in html: html['step'] = step
         return self.text_field(name=name, value=value, _id=_id, tp="datetime-local", disabled=disabled, _class=_class, html=html)
-
-    def file_field(self, name, value=None, _id='', accept=None, multiple=False, disabled=False, _class='', html=None):
-        html = html or {}
-        if accept and 'accept' not in html:
-            html['accept'] = accept
-        return self.text_field(name=name, value=value, _id=_id, tp="file", disabled=disabled, _class=_class, html=html)
-
-    def hidden_field(self, name, value=None, _id='', tp='text', disabled=False, _class='', html=None):
-        return self.text_field(name=name, value=value, _id=_id, tp="hidden", disabled=disabled, _class=_class, html=html)
 
     def label(self, name, value='Name', _class='', html=None):
         html = html or {}
