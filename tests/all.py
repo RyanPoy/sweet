@@ -25,6 +25,7 @@ from tests.forms.test_file_field import FileFieldTest
 from tests.forms.test_hidden_field import HiddenFieldTest
 from tests.forms.test_label import LabelTest
 from tests.forms.test_month_field import MonthTest
+from tests.forms.test_number_field import NumberFieldTest
 
 
 tests = [
@@ -47,7 +48,8 @@ tests = [
     FileFieldTest,
     HiddenFieldTest,
     LabelTest,
-    MonthTest    
+    MonthTest,
+    NumberFieldTest
 ]
 
 

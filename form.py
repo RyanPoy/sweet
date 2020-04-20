@@ -129,6 +129,13 @@ class Form(object):
         if step and 'step' not in html: html['step'] = step
         return self.text_field(name=name, value=value, _id=_id, tp="month", disabled=disabled, _class=_class, html=html)
 
+    def number_field(self, name, value='', _id='', _min='', _max='', step='', disabled=False, _class='', html=None):
+        html = html or {}
+        if _min and 'min' not in html: html['min'] = _min
+        if _max and 'max' not in html: html['max'] = _max
+        if step and 'step' not in html: html['step'] = step
+        return self.text_field(name=name, value=value, _id=_id, tp="number", disabled=disabled, _class=_class, html=html)
+
     # def password(self, name):
     #     return '<input name="%s" type="password" value="" />' % name
 
