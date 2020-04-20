@@ -1,5 +1,9 @@
 # coding: utf8
-from __init__ import TestCase, UserForTest
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+from tests.__init__ import TestCase, UserForTest
 import unittest
 import os
 from template import Template, FormatError
