@@ -85,7 +85,7 @@ class Form(object):
     def date_field(self, name, value='', _id='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="date", disabled=disabled, _class=_class, html=html)
 
-    def datetime_field(self, name, value='', _min='', _max='', _id='', disabled=False, _class='', html=None):
+    def datetime_field(self, name, value='', _min='', _max='', _id='', step='', disabled=False, _class='', html=None):
         def _(v):
             if isinstance(v, datetime):
                 return datetime.strftime(v, '%Y-%m-%dT%H:%M:%S')
@@ -96,7 +96,7 @@ class Form(object):
         if value: value = _(value)
         if _min and 'min' not in html: html['min'] = _(_min)
         if _max and 'max' not in html: html['max'] = _(_max)
-
+        if step and 'step' not in html: html['step'] = step
         return self.text_field(name=name, value=value, _id=_id, tp="datetime-local", disabled=disabled, _class=_class, html=html)
 
     def file_field(self, name, value='', _id='', accept=None, multiple=False, disabled=False, _class='', html=None):
@@ -121,6 +121,13 @@ class Form(object):
                     ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ]),
                     value
                 )
+
+    def month_field(self, name, value='', _id='', _min='', _max='', step='', disabled=False, _class='', html=None):
+        html = html or {}
+        if _min and 'min' not in html: html['min'] = _min
+        if _max and 'max' not in html: html['max'] = _max
+        if step and 'step' not in html: html['step'] = step
+        return self.text_field(name=name, value=value, _id=_id, tp="month", disabled=disabled, _class=_class, html=html)
 
     # def password(self, name):
     #     return '<input name="%s" type="password" value="" />' % name

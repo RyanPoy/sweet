@@ -24,6 +24,7 @@ from tests.test_tag_form_email_field import TagFormEmailFieldTest
 from tests.test_tag_form_file_field import TagFormFileFieldTest
 from tests.test_tag_form_hidden_field import TagFormHiddenFieldTest
 from tests.test_tag_form_label import TagFormLabelTest
+from tests.test_tag_form_month_field import TagFormMonthTest
 
 
 tests = [
@@ -45,7 +46,8 @@ tests = [
     TagFormEmailFieldTest,
     TagFormFileFieldTest,
     TagFormHiddenFieldTest,
-    TagFormLabelTest
+    TagFormLabelTest,
+    TagFormMonthTest    
 ]
 
 
