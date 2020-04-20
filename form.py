@@ -30,10 +30,9 @@ class Form(object):
     def end_render(self):
         return '</form>'
 
-    def button(self, value=None, name="button", _id="", tp="submit", disabled=False, html=None):
+    def button(self, value=None, name="button", tp="submit", disabled=False, html=None):
         html = html or {}
         d = oDict()
-        if _id: d['id'] = _id
         d['name'] = name or "button"
         d['type'] = tp or 'submit'
         if disabled: d['disabled'] = 'disabled'
@@ -60,10 +59,13 @@ class Form(object):
         d.update(html)
         return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
 
-    def text_field(self, name, value=None, _id='', tp='text', size='', maxlength='', disabled=False, _class='', html=None):
+    def text_field(self, name, value=None, _id='', tp='text', size='', maxlength='', disabled=False, _class='', html=None, autoid=True):
         html = html or {}
         d = oDict()
-        d['id'] = _id or name
+        if _id:
+            d['id'] = _id
+        elif autoid:
+            d['id'] = name
         d['name'] = name
         d['type'] = tp or 'text'
         if value or value == '':
@@ -113,11 +115,9 @@ class Form(object):
     def hidden_field(self, name, value=None, _id='', tp='text', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="hidden", disabled=disabled, _class=_class, html=html)
 
-    def label(self, name, value='Name', _id='', _class='', html=None):
+    def label(self, name, value='Name', _class='', html=None):
         html = html or {}
         d = oDict()
-        if _id:
-            d['id'] = _id
         d['for'] = name
         if _class:
             d['class'] = _class
@@ -169,5 +169,12 @@ class Form(object):
             if 'max' not in html: html['max'] = _in[1]
         if step and 'step' not in html: html['step'] = step
         return self.text_field(name=name, value=value, _id=_id, tp="range", disabled=disabled, _class=_class, html=html)
+
+    def submit(self, value='Save changes', disabled=False, _class='', html=None):
+        html = html or {}
+        if 'data-disable-with' not in html:
+            html['data-disable-with'] = value
+        return self.text_field(name='commit', value=value, tp="submit", disabled=disabled, _class=_class, html=html, autoid=False)
+
     # def textarea(self, name):
     #     return '<textarea name="%s"></textarea>' % name
