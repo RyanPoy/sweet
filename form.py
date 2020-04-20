@@ -84,6 +84,9 @@ class Form(object):
     def color_field(self, name, value=None, _id='', placeholder='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, placeholder=placeholder, tp="color", disabled=disabled, _class=_class, html=html)
 
+    def url_field(self, name, value=None, _id='', placeholder='', disabled=False, _class='', html=None):
+        return self.text_field(name=name, value=value, _id=_id, placeholder=placeholder, tp="url", disabled=disabled, _class=_class, html=html)
+
     def file_field(self, name, value=None, _id='', placeholder='', accept=None, multiple=False, disabled=False, _class='', html=None):
         html = html or {}
         if accept and 'accept' not in html:
