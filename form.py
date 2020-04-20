@@ -67,6 +67,15 @@ class Form(object):
 
         return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
 
+    def password_field(self, name, value=None, _id='', size='', maxlength='', disabled=False, _class='', html=None):
+        return self.text_field(name=name, value=value, _id=_id, tp="password", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
+
+    def tel_field(self, name, value=None, _id='', size='', maxlength='', disabled=False, _class='', html=None):
+        return self.text_field(name=name, value=value, _id=_id, tp="tel", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
+
+    def search_field(self, name, value=None, _id='', size='', maxlength='', disabled=False, _class='', html=None):
+        return self.text_field(name=name, value=value, _id=_id, tp="search", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
+
     def email_field(self, name, value=None, _id='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="email", disabled=disabled, _class=_class, html=html)
 
@@ -111,28 +120,16 @@ class Form(object):
                     value
                 )
 
+    def number_field(self, name, value=None, _id='', tp='', _min='', _max='', step='', disabled=False, _class='', html=None):
+        html = html or {}
+        tp = tp or 'number'
+        if _min and 'min' not in html: html['min'] = _min
+        if _max and 'max' not in html: html['max'] = _max
+        if step and 'step' not in html: html['step'] = step
+        return self.text_field(name=name, value=value, _id=_id, tp=tp, disabled=disabled, _class=_class, html=html)
+
     def month_field(self, name, value=None, _id='', _min='', _max='', step='', disabled=False, _class='', html=None):
-        html = html or {}
-        if _min and 'min' not in html: html['min'] = _min
-        if _max and 'max' not in html: html['max'] = _max
-        if step and 'step' not in html: html['step'] = step
-        return self.text_field(name=name, value=value, _id=_id, tp="month", disabled=disabled, _class=_class, html=html)
-
-    def number_field(self, name, value=None, _id='', _min='', _max='', step='', disabled=False, _class='', html=None):
-        html = html or {}
-        if _min and 'min' not in html: html['min'] = _min
-        if _max and 'max' not in html: html['max'] = _max
-        if step and 'step' not in html: html['step'] = step
-        return self.text_field(name=name, value=value, _id=_id, tp="number", disabled=disabled, _class=_class, html=html)
-
-    def password_field(self, name, value=None, _id='', size='', maxlength='', disabled=False, _class='', html=None):
-        return self.text_field(name=name, value=value, _id=_id, tp="password", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
-
-    def tel_field(self, name, value=None, _id='', size='', maxlength='', disabled=False, _class='', html=None):
-        return self.text_field(name=name, value=value, _id=_id, tp="tel", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
-
-    def search_field(self, name, value=None, _id='', size='', maxlength='', disabled=False, _class='', html=None):
-        return self.text_field(name=name, value=value, _id=_id, tp="search", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
+        return self.number_field(name=name, value=value, _id=_id, _min=_min, _max=_max, step=step, tp="month", disabled=disabled, _class=_class, html=html)
 
     def radio(self, name, value, _id='', checked=False, disabled=False, _class='', html=None):
         html = html or {}
