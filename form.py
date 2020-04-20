@@ -119,6 +119,9 @@ class Form(object):
     def month_field(self, name, value=None, _id='', placeholder='', _min='', _max='', step='', disabled=False, _class='', html=None):
         return self.number_field(name=name, value=value, _id=_id, placeholder=placeholder, _min=_min, _max=_max, step=step, tp="month", disabled=disabled, _class=_class, html=html)
 
+    def week_field(self, name, value=None, _id='', placeholder='', _min='', _max='', step='', disabled=False, _class='', html=None):
+        return self.number_field(name=name, value=value, _id=_id, placeholder=placeholder, _min=_min, _max=_max, step=step, tp="week", disabled=disabled, _class=_class, html=html)
+
     def date_field(self, name, value=None, _id='', placeholder='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, placeholder=placeholder, tp="date", disabled=disabled, _class=_class, html=html)
 

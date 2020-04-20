@@ -36,6 +36,7 @@ from tests.forms.test_submit import SubmitTest
 from tests.forms.test_textarea import TextareaTest
 from tests.forms.test_time_field import TimeFieldTest
 from tests.forms.test_url_field import UrlFieldTest
+from tests.forms.test_week import WeekTest
 
 
 tests = [
@@ -70,6 +71,7 @@ tests = [
     TextFieldTest,
     TimeFieldTest,
     UrlFieldTest,
+    WeekTest,
 ]
 
 
