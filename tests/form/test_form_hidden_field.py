@@ -3,10 +3,10 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from tests.__init__ import TestCase, UserForTest
+from tests.__init__ import TestCase
 import unittest
 import os
-from template import Template, FormatError
+from template import Template
 
 
 class FormHiddenFieldTest(TestCase):
