@@ -55,10 +55,7 @@ class TelFieldTest(TestCase):
     <input id="tel" name="tel" type="tel" value="0123456789" disabled="disabled" class="special_input" />
 </form>
 """, t.render())
-        """
-        
-        # => 
-        """
+
 
 if __name__ == '__main__':
     unittest.main()
