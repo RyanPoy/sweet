@@ -21,34 +21,34 @@ class TagFormEmailFieldTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('color', '#DEF726') %>
+    <%= f.email_field('email', 'xxx@yyy.com') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="color" name="color" type="email" value="#DEF726" />
+    <input id="email" name="email" type="email" value="xxx@yyy.com" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('color', _class='special_input') %>
+    <%= f.email_field('email', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="color" name="color" type="email" class="special_input" />
+    <input id="email" name="email" type="email" class="special_input" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('color', '#DEF726', disabled=True, _class='special_input') %>
+    <%= f.email_field('email', 'xxx@yyy.com', disabled=True, _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="color" name="color" type="email" value="#DEF726" disabled="disabled" class="special_input" />
+    <input id="email" name="email" type="email" value="xxx@yyy.com" disabled="disabled" class="special_input" />
 </form>
 """, t.render())
 
