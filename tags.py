@@ -5,7 +5,7 @@ from datetime import datetime, date
 
 class Form(object):
     
-    def __init__(self, url='', model=None, method="GET", _id="", multipart=False, remote=False, charset="UTF8", html={}):
+    def __init__(self, url='', model=None, method="GET", _id="", multipart=False, remote=False, charset="UTF8", html=None):
         self.url = url
         self.model = model
         self.method = method
@@ -30,7 +30,8 @@ class Form(object):
     def end_render(self):
         return '</form>'
 
-    def button(self, value="", name="button", _id="", tp="submit", disabled=False, html={}):
+    def button(self, value="", name="button", _id="", tp="submit", disabled=False, html=None):
+        html = html or {}
         d = oDict()
         if _id: d['id'] = _id
         d['name'] = name or "button"
@@ -43,7 +44,8 @@ class Form(object):
                         value or "Button"
                     )
 
-    def checkbox(self, name="checkbox", value="1", _id="", checked=False, disabled=False, html={}):
+    def checkbox(self, name="checkbox", value="1", _id="", checked=False, disabled=False, html=None):
+        html = html or {}
         d = oDict()
         name = name or "checkbox"
         d['id'] = _id or name
@@ -58,7 +60,8 @@ class Form(object):
         d.update(html)
         return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
 
-    def text_field(self, name, value='', _id='', tp='text', disabled=False, _class='', html={}):
+    def text_field(self, name, value='', _id='', tp='text', disabled=False, _class='', html=None):
+        html = html or {}
         d = oDict()
         d['id'] = _id or name
         d['name'] = name
@@ -73,28 +76,37 @@ class Form(object):
 
         return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
 
-    def email_field(self, name, value='', _id='', disabled=False, _class='', html={}):
+    def email_field(self, name, value='', _id='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="email", disabled=disabled, _class=_class, html=html)
 
-    def color_field(self, name, value='', _id='', disabled=False, _class='', html={}):
+    def color_field(self, name, value='', _id='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="color", disabled=disabled, _class=_class, html=html)
 
-    def date_field(self, name, value='', _id='', disabled=False, _class='', html={}):
+    def date_field(self, name, value='', _id='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="date", disabled=disabled, _class=_class, html=html)
 
-    def datetime_field(self, name, value='', _min='', _max='', _id='', disabled=False, _class='', html={}):
+    def datetime_field(self, name, value='', _min='', _max='', _id='', disabled=False, _class='', html=None):
         def _(v):
             if isinstance(v, datetime):
                 return datetime.strftime(v, '%Y-%m-%dT%H:%M:%S')
             elif isinstance(v, date):
                 return date.strftime(v, '%Y-%m-%dT00:00:00')
 
+        html = html or {}
         if value: value = _(value)
         if _min and 'min' not in html: html['min'] = _(_min)
         if _max and 'max' not in html: html['max'] = _(_max)
 
         return self.text_field(name=name, value=value, _id=_id, tp="datetime-local", disabled=disabled, _class=_class, html=html)
 
+    def file_field(self, name, value='', _id='', accept=None, multiple=False, disabled=False, _class='', html=None):
+        html = html or {}
+        if accept and 'accept' not in html:
+            html['accept'] = accept
+        return self.text_field(name=name, value=value, _id=_id, tp="file", disabled=disabled, _class=_class, html=html)
+
+    def hidden_field(self, name, value='', _id='', tp='text', disabled=False, _class='', html=None):
+        return self.text_field(name=name, value=value, _id=_id, tp="hidden", disabled=disabled, _class=_class, html=html)
     # def password(self, name):
     #     return '<input name="%s" type="password" value="" />' % name
 
