@@ -9,43 +9,52 @@ import os
 from template import Template
 
 
-class FormMonthTest(TestCase):
+class ColorFieldTest(TestCase):
 
-    def test_form_with_url_and_month_field(self):
-
+    def test_form_with_url_and_color_field_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.month_field("user_born_on") %>
+    <%= f.color_field('name') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="user_born_on" name="user_born_on" type="month" />
+    <input id="name" name="name" type="color" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.month_field("user_born_on", "11") %>
+    <%= f.color_field('color', '#DEF726') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="user_born_on" name="user_born_on" type="month" value="11" />
+    <input id="color" name="color" type="color" value="#DEF726" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.month_field("user_born_on", _min="01") %>
+    <%= f.color_field('color', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="user_born_on" name="user_born_on" type="month" min="01" />
+    <input id="color" name="color" type="color" class="special_input" />
 </form>
 """, t.render())
-        
+
+        t = Template("""
+<%= using form(url="/user/new") do f %>
+    <%= f.color_field('color', '#DEF726', disabled=True, _class='special_input') %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="color" name="color" type="color" value="#DEF726" disabled="disabled" class="special_input" />
+</form>
+""", t.render())
 
 if __name__ == '__main__':
     unittest.main()

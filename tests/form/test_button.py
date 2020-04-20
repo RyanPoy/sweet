@@ -9,73 +9,72 @@ import os
 from template import Template
 
 
-class FormFileFieldTest(TestCase):
+class ButtonTest(TestCase):
 
-    def test_form_with_url_and_file_field_tag(self):
-
+    def test_form_with_url_and_button(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('attachment') %>
+    <%= f.button() %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="attachment" name="attachment" type="file" />
+    <button name="button" type="submit">Button</button>
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('avatar', _class='profile_input') %>
+    <%= f.button('Reset', tp='reset') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="avatar" name="avatar" type="file" class="profile_input" />
+    <button name="button" type="reset">Reset</button>
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('picture', disabled=True) %>
+    <%= f.button('Button', tp='button') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="picture" name="picture" type="file" disabled="disabled" />
+    <button name="button" type="button">Button</button>
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('resume', value='~/resume.doc') %>
+    <%= f.button('Reset', tp='reset', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="resume" name="resume" type="file" value="~/resume.doc" />
-</form>
-""", t.render())
-        
-        t = Template("""
-<%= using form(url="/user/new") do f %>
-    <%= f.file_field('user_pic', accept='image/png,image/gif,image/jpeg') %>
-<% end %>
-""")
-        self.assertEqual("""
-<form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="user_pic" name="user_pic" type="file" accept="image/png,image/gif,image/jpeg" />
+    <button name="button" type="reset" disabled="disabled">Reset</button>
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('file', accept='text/html', _class='upload', value='index.html') %>
+    <%= f.button('Save', html={'data-confirm': 'Are you sure?'}) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="file" name="file" type="file" value="index.html" class="upload" accept="text/html" />
+    <button name="button" type="submit" data-confirm="Are you sure?">Save</button>
+</form>
+""", t.render())
+
+        t = Template("""
+<%= using form(url="/user/new") do f %>
+    <%= f.button('Checkout', html={"data-disable-with": "Please wait..."}) %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <button name="button" type="submit" data-disable-with="Please wait...">Checkout</button>
 </form>
 """, t.render())
 

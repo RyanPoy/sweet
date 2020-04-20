@@ -9,52 +9,43 @@ import os
 from template import Template
 
 
-class FormEmailFieldTest(TestCase):
+class MonthTest(TestCase):
 
-    def test_form_with_url_and_email_field_tag(self):
+    def test_form_with_url_and_month_field(self):
+
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('name') %>
+    <%= f.month_field("user_born_on") %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="name" name="name" type="email" />
+    <input id="user_born_on" name="user_born_on" type="month" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('email', 'xxx@yyy.com') %>
+    <%= f.month_field("user_born_on", "11") %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="email" name="email" type="email" value="xxx@yyy.com" />
+    <input id="user_born_on" name="user_born_on" type="month" value="11" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('email', _class='special_input') %>
+    <%= f.month_field("user_born_on", _min="01") %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="email" name="email" type="email" class="special_input" />
+    <input id="user_born_on" name="user_born_on" type="month" min="01" />
 </form>
 """, t.render())
-
-        t = Template("""
-<%= using form(url="/user/new") do f %>
-    <%= f.email_field('email', 'xxx@yyy.com', disabled=True, _class='special_input') %>
-<% end %>
-""")
-        self.assertEqual("""
-<form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="email" name="email" type="email" value="xxx@yyy.com" disabled="disabled" class="special_input" />
-</form>
-""", t.render())
+        
 
 if __name__ == '__main__':
     unittest.main()

@@ -9,7 +9,7 @@ import os
 from template import Template
 
 
-class FormCheckboxTest(TestCase):
+class CheckboxTest(TestCase):
 
     def test_form_with_url_and_checkbox_tag(self):
         t = Template("""

@@ -9,7 +9,7 @@ import os
 from template import Template
 
 
-class FormHiddenFieldTest(TestCase):
+class HiddenFieldTest(TestCase):
 
     def test_form_with_url_and_hidden_field_tag(self):
 

@@ -9,7 +9,7 @@ import os
 from template import Template
 
 
-class FormLabelTest(TestCase):
+class LabelTest(TestCase):
 
     def test_form_with_url_and_label_tag(self):
 

@@ -15,16 +15,16 @@ from tests.test_complex import ComplexTest
 from tests.test_using import UsingTest
 
 from tests.form.test_form import FormTest
-from tests.form.test_form_button import FormButtonTest
-from tests.form.test_form_checkbox import FormCheckboxTest
-from tests.form.test_form_color_field import FormColorFieldTest
-from tests.form.test_form_date_field import FormDateFieldTest
-from tests.form.test_form_datetime_field import FormDatetimeFieldTest
-from tests.form.test_form_email_field import FormEmailFieldTest
-from tests.form.test_form_file_field import FormFileFieldTest
-from tests.form.test_form_hidden_field import FormHiddenFieldTest
-from tests.form.test_form_label import FormLabelTest
-from tests.form.test_form_month_field import FormMonthTest
+from tests.form.test_button import ButtonTest
+from tests.form.test_checkbox import CheckboxTest
+from tests.form.test_color_field import ColorFieldTest
+from tests.form.test_date_field import DateFieldTest
+from tests.form.test_datetime_field import DatetimeFieldTest
+from tests.form.test_email_field import EmailFieldTest
+from tests.form.test_file_field import FileFieldTest
+from tests.form.test_hidden_field import HiddenFieldTest
+from tests.form.test_label import LabelTest
+from tests.form.test_month_field import MonthTest
 
 
 tests = [
@@ -38,16 +38,16 @@ tests = [
     UsingTest,
 
     FormTest,
-    FormButtonTest,
-    FormCheckboxTest,
-    FormColorFieldTest,
-    FormDateFieldTest,
-    FormDatetimeFieldTest,
-    FormEmailFieldTest,
-    FormFileFieldTest,
-    FormHiddenFieldTest,
-    FormLabelTest,
-    FormMonthTest    
+    ButtonTest,
+    CheckboxTest,
+    ColorFieldTest,
+    DateFieldTest,
+    DatetimeFieldTest,
+    EmailFieldTest,
+    FileFieldTest,
+    HiddenFieldTest,
+    LabelTest,
+    MonthTest    
 ]
 
 
