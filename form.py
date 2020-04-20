@@ -30,7 +30,7 @@ class Form(object):
     def end_render(self):
         return '</form>'
 
-    def button(self, value="", name="button", _id="", tp="submit", disabled=False, html=None):
+    def button(self, value=None, name="button", _id="", tp="submit", disabled=False, html=None):
         html = html or {}
         d = oDict()
         if _id: d['id'] = _id
@@ -60,14 +60,19 @@ class Form(object):
         d.update(html)
         return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
 
-    def text_field(self, name, value='', _id='', tp='text', disabled=False, _class='', html=None):
+    def text_field(self, name, value=None, _id='', tp='text', size='', maxlength='', disabled=False, _class='', html=None):
         html = html or {}
         d = oDict()
         d['id'] = _id or name
         d['name'] = name
         d['type'] = tp or 'text'
-        if value:
+        if value or value == '':
             d['value'] = value
+        if size or size == 0:
+            d['size'] = size
+        if maxlength or maxlength == 0:
+            d['maxlength'] = maxlength
+
         if disabled:
             d['disabled'] = "disabled"
         if _class:
@@ -76,16 +81,16 @@ class Form(object):
 
         return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
 
-    def email_field(self, name, value='', _id='', disabled=False, _class='', html=None):
+    def email_field(self, name, value=None, _id='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="email", disabled=disabled, _class=_class, html=html)
 
-    def color_field(self, name, value='', _id='', disabled=False, _class='', html=None):
+    def color_field(self, name, value=None, _id='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="color", disabled=disabled, _class=_class, html=html)
 
-    def date_field(self, name, value='', _id='', disabled=False, _class='', html=None):
+    def date_field(self, name, value=None, _id='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="date", disabled=disabled, _class=_class, html=html)
 
-    def datetime_field(self, name, value='', _min='', _max='', _id='', step='', disabled=False, _class='', html=None):
+    def datetime_field(self, name, value=None, _min='', _max='', _id='', step='', disabled=False, _class='', html=None):
         def _(v):
             if isinstance(v, datetime):
                 return datetime.strftime(v, '%Y-%m-%dT%H:%M:%S')
@@ -99,13 +104,13 @@ class Form(object):
         if step and 'step' not in html: html['step'] = step
         return self.text_field(name=name, value=value, _id=_id, tp="datetime-local", disabled=disabled, _class=_class, html=html)
 
-    def file_field(self, name, value='', _id='', accept=None, multiple=False, disabled=False, _class='', html=None):
+    def file_field(self, name, value=None, _id='', accept=None, multiple=False, disabled=False, _class='', html=None):
         html = html or {}
         if accept and 'accept' not in html:
             html['accept'] = accept
         return self.text_field(name=name, value=value, _id=_id, tp="file", disabled=disabled, _class=_class, html=html)
 
-    def hidden_field(self, name, value='', _id='', tp='text', disabled=False, _class='', html=None):
+    def hidden_field(self, name, value=None, _id='', tp='text', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="hidden", disabled=disabled, _class=_class, html=html)
 
     def label(self, name, value='Name', _id='', _class='', html=None):
@@ -122,22 +127,22 @@ class Form(object):
                     value
                 )
 
-    def month_field(self, name, value='', _id='', _min='', _max='', step='', disabled=False, _class='', html=None):
+    def month_field(self, name, value=None, _id='', _min='', _max='', step='', disabled=False, _class='', html=None):
         html = html or {}
         if _min and 'min' not in html: html['min'] = _min
         if _max and 'max' not in html: html['max'] = _max
         if step and 'step' not in html: html['step'] = step
         return self.text_field(name=name, value=value, _id=_id, tp="month", disabled=disabled, _class=_class, html=html)
 
-    def number_field(self, name, value='', _id='', _min='', _max='', step='', disabled=False, _class='', html=None):
+    def number_field(self, name, value=None, _id='', _min='', _max='', step='', disabled=False, _class='', html=None):
         html = html or {}
         if _min and 'min' not in html: html['min'] = _min
         if _max and 'max' not in html: html['max'] = _max
         if step and 'step' not in html: html['step'] = step
         return self.text_field(name=name, value=value, _id=_id, tp="number", disabled=disabled, _class=_class, html=html)
 
-    # def password(self, name):
-    #     return '<input name="%s" type="password" value="" />' % name
+    def password_field(self, name, value=None, _id='', size='', maxlength='', disabled=False, _class='', html=None):
+        return self.text_field(name=name, value=value, _id=_id, tp="password", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
 
     # def textarea(self, name):
     #     return '<textarea name="%s"></textarea>' % name
