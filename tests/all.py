@@ -14,17 +14,17 @@ from tests.test_extends import ExtendsTest
 from tests.test_complex import ComplexTest
 from tests.test_using import UsingTest
 
-from tests.test_tag_form import TagFormTest
-from tests.test_tag_form_button import TagFormButtonTest
-from tests.test_tag_form_checkbox import TagFormCheckboxTest
-from tests.test_tag_form_color_field import TagFormColorFieldTest
-from tests.test_tag_form_date_field import TagFormDateFieldTest
-from tests.test_tag_form_datetime_field import TagFormDatetimeFieldTest
-from tests.test_tag_form_email_field import TagFormEmailFieldTest
-from tests.test_tag_form_file_field import TagFormFileFieldTest
-from tests.test_tag_form_hidden_field import TagFormHiddenFieldTest
-from tests.test_tag_form_label import TagFormLabelTest
-from tests.test_tag_form_month_field import TagFormMonthTest
+from tests.form.test_form import FormTest
+from tests.form.test_form_button import FormButtonTest
+from tests.form.test_form_checkbox import FormCheckboxTest
+from tests.form.test_form_color_field import FormColorFieldTest
+from tests.form.test_form_date_field import FormDateFieldTest
+from tests.form.test_form_datetime_field import FormDatetimeFieldTest
+from tests.form.test_form_email_field import FormEmailFieldTest
+from tests.form.test_form_file_field import FormFileFieldTest
+from tests.form.test_form_hidden_field import FormHiddenFieldTest
+from tests.form.test_form_label import FormLabelTest
+from tests.form.test_form_month_field import FormMonthTest
 
 
 tests = [
@@ -37,17 +37,17 @@ tests = [
     ComplexTest,
     UsingTest,
 
-    TagFormTest,
-    TagFormButtonTest,
-    TagFormCheckboxTest,
-    TagFormColorFieldTest,
-    TagFormDateFieldTest,
-    TagFormDatetimeFieldTest,
-    TagFormEmailFieldTest,
-    TagFormFileFieldTest,
-    TagFormHiddenFieldTest,
-    TagFormLabelTest,
-    TagFormMonthTest    
+    FormTest,
+    FormButtonTest,
+    FormCheckboxTest,
+    FormColorFieldTest,
+    FormDateFieldTest,
+    FormDatetimeFieldTest,
+    FormEmailFieldTest,
+    FormFileFieldTest,
+    FormHiddenFieldTest,
+    FormLabelTest,
+    FormMonthTest    
 ]
 
 

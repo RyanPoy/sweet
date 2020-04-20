@@ -5,7 +5,7 @@ import os
 from template import Template, FormatError
 
 
-class TagFormButtonTest(TestCase):
+class FormButtonTest(TestCase):
 
     def test_form_with_url_and_button_tag(self):
         t = Template("""

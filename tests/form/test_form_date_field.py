@@ -5,7 +5,7 @@ import os
 from template import Template, FormatError
 
 
-class TagFormDateFieldTest(TestCase):
+class FormDateFieldTest(TestCase):
 
     def test_form_with_url_and_date_field_tag(self):
         t = Template("""

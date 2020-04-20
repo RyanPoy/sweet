@@ -5,7 +5,7 @@ import os
 from template import Template, FormatError
 
 
-class TagFormTest(TestCase):
+class FormTest(TestCase):
 
     def test_form_with_url(self):
         t = Template("""

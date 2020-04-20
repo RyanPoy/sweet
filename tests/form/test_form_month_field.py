@@ -5,43 +5,42 @@ import os
 from template import Template, FormatError
 
 
-class TagFormHiddenFieldTest(TestCase):
+class FormMonthTest(TestCase):
 
-    def test_form_with_url_and_hidden_field_tag(self):
+    def test_form_with_url_and_month_field(self):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.hidden_field('tags_list') %>
+    <%= f.month_field("user_born_on") %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="tags_list" name="tags_list" type="hidden" />
+    <input id="user_born_on" name="user_born_on" type="month" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.hidden_field('token', 'VUBJKB23UIVI1UU1VOBVI@') %>
+    <%= f.month_field("user_born_on", "11") %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="token" name="token" type="hidden" value="VUBJKB23UIVI1UU1VOBVI@" />
+    <input id="user_born_on" name="user_born_on" type="month" value="11" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.hidden_field('collected_input', html={"onchange": "alert('Input collected!')" }) %>
+    <%= f.month_field("user_born_on", _min="01") %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="collected_input" name="collected_input" type="hidden" onchange="alert('Input collected!')" />
+    <input id="user_born_on" name="user_born_on" type="month" min="01" />
 </form>
 """, t.render())
-
         
 
 if __name__ == '__main__':

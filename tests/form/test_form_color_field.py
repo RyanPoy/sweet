@@ -5,7 +5,7 @@ import os
 from template import Template, FormatError
 
 
-class TagFormColorFieldTest(TestCase):
+class FormColorFieldTest(TestCase):
 
     def test_form_with_url_and_color_field_tag(self):
         t = Template("""

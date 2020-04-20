@@ -5,42 +5,43 @@ import os
 from template import Template, FormatError
 
 
-class TagFormLabelTest(TestCase):
+class FormHiddenFieldTest(TestCase):
 
-    def test_form_with_url_and_label_tag(self):
+    def test_form_with_url_and_hidden_field_tag(self):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.label('name') %>
+    <%= f.hidden_field('tags_list') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <label for="name">Name</label>
+    <input id="tags_list" name="tags_list" type="hidden" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.label('name', 'Your Name') %>
+    <%= f.hidden_field('token', 'VUBJKB23UIVI1UU1VOBVI@') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <label for="name">Your Name</label>
+    <input id="token" name="token" type="hidden" value="VUBJKB23UIVI1UU1VOBVI@" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.label('name', _class='small_label') %>
+    <%= f.hidden_field('collected_input', html={"onchange": "alert('Input collected!')" }) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <label for="name" class="small_label">Name</label>
+    <input id="collected_input" name="collected_input" type="hidden" onchange="alert('Input collected!')" />
 </form>
 """, t.render())
+
         
 
 if __name__ == '__main__':

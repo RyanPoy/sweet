@@ -5,40 +5,40 @@ import os
 from template import Template, FormatError
 
 
-class TagFormMonthTest(TestCase):
+class FormLabelTest(TestCase):
 
-    def test_form_with_url_and_month_field(self):
+    def test_form_with_url_and_label_tag(self):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.month_field("user_born_on") %>
+    <%= f.label('name') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="user_born_on" name="user_born_on" type="month" />
+    <label for="name">Name</label>
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.month_field("user_born_on", "11") %>
+    <%= f.label('name', 'Your Name') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="user_born_on" name="user_born_on" type="month" value="11" />
+    <label for="name">Your Name</label>
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.month_field("user_born_on", _min="01") %>
+    <%= f.label('name', _class='small_label') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="user_born_on" name="user_born_on" type="month" min="01" />
+    <label for="name" class="small_label">Name</label>
 </form>
 """, t.render())
         

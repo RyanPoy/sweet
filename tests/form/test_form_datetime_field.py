@@ -6,7 +6,7 @@ from template import Template, FormatError
 from datetime import date, datetime
 
 
-class TagFormDatetimeFieldTest(TestCase):
+class FormDatetimeFieldTest(TestCase):
 
     def test_form_with_url_and_datetime_field_tag(self):
         t = Template("""

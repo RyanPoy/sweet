@@ -5,73 +5,61 @@ import os
 from template import Template, FormatError
 
 
-class TagFormFileFieldTest(TestCase):
+class FormCheckboxTest(TestCase):
 
-    def test_form_with_url_and_file_field_tag(self):
-
+    def test_form_with_url_and_checkbox_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('attachment') %>
+    <%= f.checkbox('accept') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="attachment" name="attachment" type="file" />
+    <input id="accept" name="accept" type="checkbox" value="1" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('avatar', _class='profile_input') %>
+    <%= f.checkbox('rock', 'rock music') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="avatar" name="avatar" type="file" class="profile_input" />
+    <input id="rock" name="rock" type="checkbox" value="rock music" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('picture', disabled=True) %>
+    <%= f.checkbox('receive_email', 'yes', checked=True) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="picture" name="picture" type="file" disabled="disabled" />
+    <input id="receive_email" name="receive_email" type="checkbox" value="yes" checked="checked" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('resume', value='~/resume.doc') %>
+    <%= f.checkbox('tos', 'yes', checked=False, html={"class": 'accept_tos'}) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="resume" name="resume" type="file" value="~/resume.doc" />
-</form>
-""", t.render())
-        
-        t = Template("""
-<%= using form(url="/user/new") do f %>
-    <%= f.file_field('user_pic', accept='image/png,image/gif,image/jpeg') %>
-<% end %>
-""")
-        self.assertEqual("""
-<form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="user_pic" name="user_pic" type="file" accept="image/png,image/gif,image/jpeg" />
+    <input id="tos" name="tos" type="checkbox" value="yes" class="accept_tos" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('file', accept='text/html', _class='upload', value='index.html') %>
+    <%= f.checkbox('eula', 'accepted', checked=False, disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="file" name="file" type="file" value="index.html" class="upload" accept="text/html" />
+    <input id="eula" name="eula" type="checkbox" value="accepted" disabled="disabled" />
 </form>
 """, t.render())
 
