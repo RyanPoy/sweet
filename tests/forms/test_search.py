@@ -9,7 +9,7 @@ import os
 from template import Template
 
 
-class SearchFieldTest(TestCase):
+class SearchTest(TestCase):
 
     def test_form_with_url_and_search_field(self):
         t = Template("""

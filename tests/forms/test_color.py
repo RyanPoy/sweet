@@ -9,7 +9,7 @@ import os
 from template import Template
 
 
-class ColorFieldTest(TestCase):
+class ColorTest(TestCase):
 
     def test_form_with_url_and_color_field(self):
         t = Template("""

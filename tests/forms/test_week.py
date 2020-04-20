@@ -9,43 +9,42 @@ import os
 from template import Template
 
 
-class HiddenFieldTest(TestCase):
+class WeekTest(TestCase):
 
-    def test_form_with_url_and_hidden_field(self):
+    def test_form_with_url_and_week_field(self):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.hidden_field('tags_list') %>
+    <%= f.week_field("user_born_week") %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="tags_list" name="tags_list" type="hidden" />
+    <input id="user_born_week" name="user_born_week" type="week" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.hidden_field('token', 'VUBJKB23UIVI1UU1VOBVI@') %>
+    <%= f.week_field("user_born_week", "06") %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="token" name="token" type="hidden" value="VUBJKB23UIVI1UU1VOBVI@" />
+    <input id="user_born_week" name="user_born_week" type="week" value="06" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.hidden_field('collected_input', html={"onchange": "alert('Input collected!')" }) %>
+    <%= f.week_field("user_born_week", _min="01") %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="collected_input" name="collected_input" type="hidden" onchange="alert('Input collected!')" />
+    <input id="user_born_week" name="user_born_week" type="week" min="01" />
 </form>
 """, t.render())
-
         
 
 if __name__ == '__main__':

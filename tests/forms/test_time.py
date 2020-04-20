@@ -9,95 +9,116 @@ import os
 from template import Template
 
 
-class TextFieldTest(TestCase):
+class TimeTest(TestCase):
 
-    def test_form_with_url_and_text_field(self):
-
+    def test_form_with_url_and_time_field(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('name') %>
+    <%= f.time_field('created_at') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="name" name="name" type="text" />
+    <input id="created_at" name="created_at" type="time" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('query', 'Enter your search query here') %>
+    <%= f.time_field('created_at', '1') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="query" name="query" type="text" value="Enter your search query here" />
+    <input id="created_at" name="created_at" type="time" value="1" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('search', placeholder='Enter search term...') %>
+    <%= f.time_field('created_at', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="search" name="search" type="text" placeholder="Enter search term..." />
+    <input id="created_at" name="created_at" type="time" class="special_input" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('request', _class='special_input') %>
+    <%= f.time_field('created_at', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="request" name="request" type="text" class="special_input" />
+    <input id="created_at" name="created_at" type="time" class="special_input" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('address', '', size=75) %>
+    <%= f.time_field('created_at', _min=1) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="address" name="address" type="text" value="" size="75" />
+    <input id="created_at" name="created_at" type="time" min="1" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('zip', maxlength=5) %>
+    <%= f.time_field('created_at', _max=9) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="zip" name="zip" type="text" maxlength="5" />
+    <input id="created_at" name="created_at" type="time" max="9" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('payment_amount', '$0.00', disabled=True) %>
+    <%= f.time_field('created_at', _max=9) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="payment_amount" name="payment_amount" type="text" value="$0.00" disabled="disabled" />
+    <input id="created_at" name="created_at" type="time" max="9" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('ip', '0.0.0.0', maxlength=15, size=20, _class="ip-input") %>
+    <%= f.time_field('created_at', _min=1, _max=9) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="ip" name="ip" type="text" value="0.0.0.0" size="20" maxlength="15" class="ip-input" />
+    <input id="created_at" name="created_at" type="time" min="1" max="9" />
+</form>
+""", t.render())
+
+        t = Template("""
+<%= using form(url="/user/new") do f %>
+    <%= f.time_field('created_at', _min=1, _max=9, step=2) %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="created_at" name="created_at" type="time" min="1" max="9" step="2" />
+</form>
+""", t.render())
+
+        t = Template("""
+<%= using form(url="/user/new") do f %>
+    <%= f.time_field('created_at', '1', _class='special_input', disabled=True) %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="created_at" name="created_at" type="time" value="1" disabled="disabled" class="special_input" />
 </form>
 """, t.render())
         

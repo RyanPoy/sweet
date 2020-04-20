@@ -9,116 +9,95 @@ import os
 from template import Template
 
 
-class NumberFieldTest(TestCase):
+class TextTest(TestCase):
 
-    def test_form_with_url_and_number_field(self):
+    def test_form_with_url_and_text_field(self):
+
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity') %>
+    <%= f.text_field('name') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="number" />
+    <input id="name" name="name" type="text" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', '1') %>
+    <%= f.text_field('query', 'Enter your search query here') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="number" value="1" />
+    <input id="query" name="query" type="text" value="Enter your search query here" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _class='special_input') %>
+    <%= f.text_field('search', placeholder='Enter search term...') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="number" class="special_input" />
+    <input id="search" name="search" type="text" placeholder="Enter search term..." />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _class='special_input') %>
+    <%= f.text_field('request', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="number" class="special_input" />
+    <input id="request" name="request" type="text" class="special_input" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _min=1) %>
+    <%= f.text_field('address', '', size=75) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="number" min="1" />
+    <input id="address" name="address" type="text" value="" size="75" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _max=9) %>
+    <%= f.text_field('zip', maxlength=5) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="number" max="9" />
+    <input id="zip" name="zip" type="text" maxlength="5" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _max=9) %>
+    <%= f.text_field('payment_amount', '$0.00', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="number" max="9" />
+    <input id="payment_amount" name="payment_amount" type="text" value="$0.00" disabled="disabled" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _min=1, _max=9) %>
+    <%= f.text_field('ip', '0.0.0.0', maxlength=15, size=20, _class="ip-input") %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="number" min="1" max="9" />
-</form>
-""", t.render())
-
-        t = Template("""
-<%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _min=1, _max=9, step=2) %>
-<% end %>
-""")
-        self.assertEqual("""
-<form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="number" min="1" max="9" step="2" />
-</form>
-""", t.render())
-
-        t = Template("""
-<%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', '1', _class='special_input', disabled=True) %>
-<% end %>
-""")
-        self.assertEqual("""
-<form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="number" value="1" disabled="disabled" class="special_input" />
+    <input id="ip" name="ip" type="text" value="0.0.0.0" size="20" maxlength="15" class="ip-input" />
 </form>
 """, t.render())
         

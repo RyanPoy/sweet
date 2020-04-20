@@ -9,50 +9,51 @@ import os
 from template import Template
 
 
-class TelFieldTest(TestCase):
+class UrlTest(TestCase):
 
-    def test_form_with_url_and_tel_field(self):
+    def test_form_with_url_and_url_field(self):
+        
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.tel_field('name') %>
+    <%= f.url_field('name') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="name" name="name" type="tel" />
+    <input id="name" name="name" type="url" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.tel_field('tel', '0123456789') %>
+    <%= f.url_field('url', 'http://www.baidu.com') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="tel" name="tel" type="tel" value="0123456789" />
+    <input id="url" name="url" type="url" value="http://www.baidu.com" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.tel_field('tel', _class='special_input') %>
+    <%= f.url_field('url', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="tel" name="tel" type="tel" class="special_input" />
+    <input id="url" name="url" type="url" class="special_input" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.tel_field('tel', '0123456789', _class='special_input', disabled=True) %>
+    <%= f.url_field('url', 'http://www.baidu.com', _class='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="tel" name="tel" type="tel" value="0123456789" disabled="disabled" class="special_input" />
+    <input id="url" name="url" type="url" value="http://www.baidu.com" disabled="disabled" class="special_input" />
 </form>
 """, t.render())
 

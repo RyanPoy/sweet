@@ -9,52 +9,53 @@ import os
 from template import Template
 
 
-class EmailFieldTest(TestCase):
+class TelTest(TestCase):
 
-    def test_form_with_url_and_email_field(self):
+    def test_form_with_url_and_tel_field(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('name') %>
+    <%= f.tel_field('name') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="name" name="name" type="email" />
+    <input id="name" name="name" type="tel" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('email', 'xxx@yyy.com') %>
+    <%= f.tel_field('tel', '0123456789') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="email" name="email" type="email" value="xxx@yyy.com" />
+    <input id="tel" name="tel" type="tel" value="0123456789" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('email', _class='special_input') %>
+    <%= f.tel_field('tel', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="email" name="email" type="email" class="special_input" />
+    <input id="tel" name="tel" type="tel" class="special_input" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('email', 'xxx@yyy.com', disabled=True, _class='special_input') %>
+    <%= f.tel_field('tel', '0123456789', _class='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="email" name="email" type="email" value="xxx@yyy.com" disabled="disabled" class="special_input" />
+    <input id="tel" name="tel" type="tel" value="0123456789" disabled="disabled" class="special_input" />
 </form>
 """, t.render())
+
 
 if __name__ == '__main__':
     unittest.main()

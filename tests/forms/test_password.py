@@ -9,86 +9,86 @@ import os
 from template import Template
 
 
-class RangeFieldTest(TestCase):
+class PasswordTest(TestCase):
 
-    def test_form_with_url_and_range_field(self):
+    def test_form_with_url_and_password_field(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity') %>
+    <%= f.password_field('pass') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="range" />
+    <input id="pass" name="pass" type="password" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity', '1') %>
+    <%= f.password_field('secret', 'Your secret here') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="range" value="1" />
+    <input id="secret" name="secret" type="password" value="Your secret here" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity', _class='special_input') %>
+    <%= f.password_field('masked', _class='masked_input_field') %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="range" class="special_input" />
+    <input id="masked" name="masked" type="password" class="masked_input_field" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity', _class='special_input') %>
+    <%= f.password_field('token', '', size=15) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="range" class="special_input" />
+    <input id="token" name="token" type="password" value="" size="15" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity', _in=[1, 9]) %>
+    <%= f.password_field('key', maxlength=16) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="range" min="1" max="9" />
+    <input id="key" name="key" type="password" maxlength="16" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity', _in=[1, 9], step=2) %>
+    <%= f.password_field('confirm_pass', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="range" min="1" max="9" step="2" />
+    <input id="confirm_pass" name="confirm_pass" type="password" disabled="disabled" />
 </form>
 """, t.render())
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity', '1', _class='special_input', disabled=True) %>
+    <%= f.password_field('pin', '1234', maxlength=4, size=6, _class="pin_input") %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="range" value="1" disabled="disabled" class="special_input" />
+    <input id="pin" name="pin" type="password" value="1234" size="6" maxlength="4" class="pin_input" />
 </form>
 """, t.render())
-        
+
 
 if __name__ == '__main__':
     unittest.main()

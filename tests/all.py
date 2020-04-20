@@ -17,25 +17,25 @@ from tests.test_using import UsingTest
 from tests.forms.test_form import FormTest
 from tests.forms.test_button import ButtonTest
 from tests.forms.test_checkbox import CheckboxTest
-from tests.forms.test_color_field import ColorFieldTest
-from tests.forms.test_date_field import DateFieldTest
-from tests.forms.test_datetime_field import DatetimeFieldTest
-from tests.forms.test_email_field import EmailFieldTest
-from tests.forms.test_file_field import FileFieldTest
-from tests.forms.test_hidden_field import HiddenFieldTest
+from tests.forms.test_color import ColorTest
+from tests.forms.test_date import DateTest
+from tests.forms.test_datetime import DatetimeTest
+from tests.forms.test_email import EmailTest
+from tests.forms.test_file import FileTest
+from tests.forms.test_hidden import HiddenTest
 from tests.forms.test_label import LabelTest
-from tests.forms.test_month_field import MonthTest
-from tests.forms.test_number_field import NumberFieldTest
-from tests.forms.test_password_field import PasswordFieldTest
-from tests.forms.test_text_field import TextFieldTest
-from tests.forms.test_tel_field import TelFieldTest
+from tests.forms.test_month import MonthTest
+from tests.forms.test_number import NumberTest
+from tests.forms.test_password import PasswordTest
+from tests.forms.test_text import TextTest
+from tests.forms.test_tel import TelTest
 from tests.forms.test_radio import RadioTest
-from tests.forms.test_range_field import RangeFieldTest
-from tests.forms.test_search_field import SearchFieldTest
+from tests.forms.test_range import RangeTest
+from tests.forms.test_search import SearchTest
 from tests.forms.test_submit import SubmitTest
 from tests.forms.test_textarea import TextareaTest
-from tests.forms.test_time_field import TimeFieldTest
-from tests.forms.test_url_field import UrlFieldTest
+from tests.forms.test_time import TimeTest
+from tests.forms.test_url import UrlTest
 from tests.forms.test_week import WeekTest
 
 
@@ -52,25 +52,25 @@ tests = [
     FormTest,
     ButtonTest,
     CheckboxTest,
-    ColorFieldTest,
-    DateFieldTest,
-    DatetimeFieldTest,
-    EmailFieldTest,
-    FileFieldTest,
-    HiddenFieldTest,
+    ColorTest,
+    DateTest,
+    DatetimeTest,
+    EmailTest,
+    FileTest,
+    HiddenTest,
     LabelTest,
     MonthTest,
-    NumberFieldTest,
-    PasswordFieldTest,
-    TelFieldTest,
+    NumberTest,
+    PasswordTest,
+    TelTest,
     RadioTest,
-    RangeFieldTest,
-    SearchFieldTest,
+    RangeTest,
+    SearchTest,
     SubmitTest,
     TextareaTest,
-    TextFieldTest,
-    TimeFieldTest,
-    UrlFieldTest,
+    TextTest,
+    TimeTest,
+    UrlTest,
     WeekTest,
 ]
 

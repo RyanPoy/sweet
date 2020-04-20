@@ -10,7 +10,7 @@ from template import Template
 from datetime import date, datetime
 
 
-class DatetimeFieldTest(TestCase):
+class DatetimeTest(TestCase):
 
     def test_form_with_url_and_datetime_field(self):
         t = Template("""

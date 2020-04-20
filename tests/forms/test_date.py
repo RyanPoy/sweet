@@ -9,7 +9,7 @@ import os
 from template import Template
 
 
-class DateFieldTest(TestCase):
+class DateTest(TestCase):
 
     def test_form_with_url_and_date_field(self):
         t = Template("""
