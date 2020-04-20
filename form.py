@@ -144,5 +144,8 @@ class Form(object):
     def password_field(self, name, value=None, _id='', size='', maxlength='', disabled=False, _class='', html=None):
         return self.text_field(name=name, value=value, _id=_id, tp="password", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
 
+    def tel_field(self, name, value=None, _id='', size='', maxlength='', disabled=False, _class='', html=None):
+        return self.text_field(name=name, value=value, _id=_id, tp="tel", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
+
     # def textarea(self, name):
     #     return '<textarea name="%s"></textarea>' % name
