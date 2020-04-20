@@ -14,17 +14,17 @@ from tests.test_extends import ExtendsTest
 from tests.test_complex import ComplexTest
 from tests.test_using import UsingTest
 
-from tests.form.test_form import FormTest
-from tests.form.test_button import ButtonTest
-from tests.form.test_checkbox import CheckboxTest
-from tests.form.test_color_field import ColorFieldTest
-from tests.form.test_date_field import DateFieldTest
-from tests.form.test_datetime_field import DatetimeFieldTest
-from tests.form.test_email_field import EmailFieldTest
-from tests.form.test_file_field import FileFieldTest
-from tests.form.test_hidden_field import HiddenFieldTest
-from tests.form.test_label import LabelTest
-from tests.form.test_month_field import MonthTest
+from tests.forms.test_form import FormTest
+from tests.forms.test_button import ButtonTest
+from tests.forms.test_checkbox import CheckboxTest
+from tests.forms.test_color_field import ColorFieldTest
+from tests.forms.test_date_field import DateFieldTest
+from tests.forms.test_datetime_field import DatetimeFieldTest
+from tests.forms.test_email_field import EmailFieldTest
+from tests.forms.test_file_field import FileFieldTest
+from tests.forms.test_hidden_field import HiddenFieldTest
+from tests.forms.test_label import LabelTest
+from tests.forms.test_month_field import MonthTest
 
 
 tests = [

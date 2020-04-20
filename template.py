@@ -3,7 +3,7 @@ import os
 from parse import parse
 from libs import Scanner, CodeGen
 from nodes import Extends, Block, Text
-from tags import Form
+from form import Form
 
 normpath = os.path.normpath
 dirname = os.path.dirname
