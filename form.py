@@ -176,5 +176,24 @@ class Form(object):
             html['data-disable-with'] = value
         return self.text_field(name='commit', value=value, tp="submit", disabled=disabled, _class=_class, html=html, autoid=False)
 
-    # def textarea(self, name):
-    #     return '<textarea name="%s"></textarea>' % name
+    def textarea(self, name, value=None, _id='', size=None, rows=None, cols=None, escape=True, disabled=False, _class='', html=None):
+        html = html or {}
+        d = oDict()
+        d['id'] = _id or name
+        d['name'] = name
+        if size or size == 0:
+            d['size'] = size
+        if rows or rows == 0:
+            d['rows'] = rows
+        if cols or cols == 0:
+            d['cols'] = cols
+        if disabled:
+            d['disabled'] = "disabled"
+        if _class:
+            d['class'] = _class
+        d.update(html)
+
+        return '<textarea %s>%s</textarea>' % (
+                    ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ]),
+                    value or ''
+                )

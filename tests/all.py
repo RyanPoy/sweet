@@ -32,6 +32,7 @@ from tests.forms.test_radio import RadioTest
 from tests.forms.test_range_field import RangeFieldTest
 from tests.forms.test_search_field import SearchFieldTest
 from tests.forms.test_submit import SubmitTest
+from tests.forms.test_textarea import TextareaTest
 
 
 tests = [
@@ -61,7 +62,8 @@ tests = [
     RadioTest,
     RangeFieldTest,
     SearchFieldTest,
-    SubmitTest
+    SubmitTest,
+    TextareaTest
 ]
 
 
