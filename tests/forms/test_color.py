@@ -11,10 +11,10 @@ from template import Template
 
 class ColorTest(TestCase):
 
-    def test_form_with_url_and_color_field(self):
+    def test_for_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.color_field('name') %>
+    <%= f.color('name') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -25,7 +25,7 @@ class ColorTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.color_field('color', '#DEF726') %>
+    <%= f.color('color', '#DEF726') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -36,7 +36,7 @@ class ColorTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.color_field('color', _class='special_input') %>
+    <%= f.color('color', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -47,7 +47,7 @@ class ColorTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.color_field('color', '#DEF726', disabled=True, _class='special_input') %>
+    <%= f.color('color', '#DEF726', disabled=True, _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""

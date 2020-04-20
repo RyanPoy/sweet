@@ -11,8 +11,8 @@ from template import Template
 
 class UrlTest(TestCase):
 
-    def test_form_with_url_and_url_field(self):
-        
+    def test_for_tag(self):
+
         t = Template("""
 <%= using form(url="/user/new") do f %>
     <%= f.url_field('name') %>

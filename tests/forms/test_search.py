@@ -11,10 +11,10 @@ from template import Template
 
 class SearchTest(TestCase):
 
-    def test_form_with_url_and_search_field(self):
+    def test_for_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.search_field('name') %>
+    <%= f.search('name') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -25,7 +25,7 @@ class SearchTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.search_field('search', 'Enter your search query here') %>
+    <%= f.search('search', 'Enter your search query here') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -36,7 +36,7 @@ class SearchTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.search_field('search', None, _class='special_input') %>
+    <%= f.search('search', None, _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -47,7 +47,7 @@ class SearchTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.search_field('search', 'Enter your search query here', _class='special_input', disabled=True) %>
+    <%= f.search('search', 'Enter your search query here', _class='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""

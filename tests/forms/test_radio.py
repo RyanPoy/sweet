@@ -11,7 +11,7 @@ from template import Template
 
 class RadioTest(TestCase):
 
-    def test_form_with_url_and_radio_field(self):
+    def test_for_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
     <%= f.radio('favorite_color', 'maroon') %>

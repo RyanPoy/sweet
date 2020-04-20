@@ -11,11 +11,11 @@ from template import Template
 
 class MonthTest(TestCase):
 
-    def test_form_with_url_and_month_field(self):
+    def test_for_tag(self):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.month_field("user_born_on") %>
+    <%= f.month("user_born_on") %>
 <% end %>
 """)
         self.assertEqual("""
@@ -26,7 +26,7 @@ class MonthTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.month_field("user_born_on", "11") %>
+    <%= f.month("user_born_on", "11") %>
 <% end %>
 """)
         self.assertEqual("""
@@ -37,7 +37,7 @@ class MonthTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.month_field("user_born_on", _min="01") %>
+    <%= f.month("user_born_on", _min="01") %>
 <% end %>
 """)
         self.assertEqual("""

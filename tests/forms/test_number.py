@@ -11,10 +11,10 @@ from template import Template
 
 class NumberTest(TestCase):
 
-    def test_form_with_url_and_number_field(self):
+    def test_for_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity') %>
+    <%= f.number('quantity') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -25,7 +25,7 @@ class NumberTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', '1') %>
+    <%= f.number('quantity', '1') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -36,7 +36,7 @@ class NumberTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _class='special_input') %>
+    <%= f.number('quantity', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -47,7 +47,7 @@ class NumberTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _class='special_input') %>
+    <%= f.number('quantity', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -58,7 +58,7 @@ class NumberTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _min=1) %>
+    <%= f.number('quantity', _min=1) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -69,7 +69,7 @@ class NumberTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _max=9) %>
+    <%= f.number('quantity', _max=9) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -80,7 +80,7 @@ class NumberTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _max=9) %>
+    <%= f.number('quantity', _max=9) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -91,7 +91,7 @@ class NumberTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _min=1, _max=9) %>
+    <%= f.number('quantity', _min=1, _max=9) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -102,7 +102,7 @@ class NumberTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', _min=1, _max=9, step=2) %>
+    <%= f.number('quantity', _min=1, _max=9, step=2) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -113,7 +113,7 @@ class NumberTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.number_field('quantity', '1', _class='special_input', disabled=True) %>
+    <%= f.number('quantity', '1', _class='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""

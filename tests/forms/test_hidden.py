@@ -11,11 +11,11 @@ from template import Template
 
 class HiddenTest(TestCase):
 
-    def test_form_with_url_and_hidden_field(self):
+    def test_for_tag(self):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.hidden_field('tags_list') %>
+    <%= f.hidden('tags_list') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -26,7 +26,7 @@ class HiddenTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.hidden_field('token', 'VUBJKB23UIVI1UU1VOBVI@') %>
+    <%= f.hidden('token', 'VUBJKB23UIVI1UU1VOBVI@') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -37,7 +37,7 @@ class HiddenTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.hidden_field('collected_input', html={"onchange": "alert('Input collected!')" }) %>
+    <%= f.hidden('collected_input', html={"onchange": "alert('Input collected!')" }) %>
 <% end %>
 """)
         self.assertEqual("""

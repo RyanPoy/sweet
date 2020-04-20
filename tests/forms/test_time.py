@@ -11,10 +11,10 @@ from template import Template
 
 class TimeTest(TestCase):
 
-    def test_form_with_url_and_time_field(self):
+    def test_for_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.time_field('created_at') %>
+    <%= f.time('created_at') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -25,7 +25,7 @@ class TimeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.time_field('created_at', '1') %>
+    <%= f.time('created_at', '1') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -36,7 +36,7 @@ class TimeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.time_field('created_at', _class='special_input') %>
+    <%= f.time('created_at', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -47,7 +47,7 @@ class TimeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.time_field('created_at', _class='special_input') %>
+    <%= f.time('created_at', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -58,7 +58,7 @@ class TimeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.time_field('created_at', _min=1) %>
+    <%= f.time('created_at', _min=1) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -69,7 +69,7 @@ class TimeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.time_field('created_at', _max=9) %>
+    <%= f.time('created_at', _max=9) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -80,7 +80,7 @@ class TimeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.time_field('created_at', _max=9) %>
+    <%= f.time('created_at', _max=9) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -91,7 +91,7 @@ class TimeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.time_field('created_at', _min=1, _max=9) %>
+    <%= f.time('created_at', _min=1, _max=9) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -102,7 +102,7 @@ class TimeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.time_field('created_at', _min=1, _max=9, step=2) %>
+    <%= f.time('created_at', _min=1, _max=9, step=2) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -113,7 +113,7 @@ class TimeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.time_field('created_at', '1', _class='special_input', disabled=True) %>
+    <%= f.time('created_at', '1', _class='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""

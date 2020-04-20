@@ -11,11 +11,11 @@ from template import Template
 
 class FileTest(TestCase):
 
-    def test_form_with_url_and_file_field(self):
+    def test_for_tag(self):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('attachment') %>
+    <%= f.file('attachment') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -26,7 +26,7 @@ class FileTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('avatar', _class='profile_input') %>
+    <%= f.file('avatar', _class='profile_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -37,7 +37,7 @@ class FileTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('picture', disabled=True) %>
+    <%= f.file('picture', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -48,7 +48,7 @@ class FileTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('resume', value='~/resume.doc') %>
+    <%= f.file('resume', value='~/resume.doc') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -59,7 +59,7 @@ class FileTest(TestCase):
         
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('user_pic', accept='image/png,image/gif,image/jpeg') %>
+    <%= f.file('user_pic', accept='image/png,image/gif,image/jpeg') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -70,7 +70,7 @@ class FileTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.file_field('file', accept='text/html', _class='upload', value='index.html') %>
+    <%= f.file('file', accept='text/html', _class='upload', value='index.html') %>
 <% end %>
 """)
         self.assertEqual("""

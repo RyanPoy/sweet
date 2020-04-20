@@ -11,11 +11,11 @@ from template import Template
 
 class TextTest(TestCase):
 
-    def test_form_with_url_and_text_field(self):
+    def test_for_tag(self):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('name') %>
+    <%= f.text('name') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -26,7 +26,7 @@ class TextTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('query', 'Enter your search query here') %>
+    <%= f.text('query', 'Enter your search query here') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -37,7 +37,7 @@ class TextTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('search', placeholder='Enter search term...') %>
+    <%= f.text('search', placeholder='Enter search term...') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -48,7 +48,7 @@ class TextTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('request', _class='special_input') %>
+    <%= f.text('request', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -59,7 +59,7 @@ class TextTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('address', '', size=75) %>
+    <%= f.text('address', '', size=75) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -70,7 +70,7 @@ class TextTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('zip', maxlength=5) %>
+    <%= f.text('zip', maxlength=5) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -81,7 +81,7 @@ class TextTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('payment_amount', '$0.00', disabled=True) %>
+    <%= f.text('payment_amount', '$0.00', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -92,7 +92,7 @@ class TextTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.text_field('ip', '0.0.0.0', maxlength=15, size=20, _class="ip-input") %>
+    <%= f.text('ip', '0.0.0.0', maxlength=15, size=20, _class="ip-input") %>
 <% end %>
 """)
         self.assertEqual("""

@@ -11,7 +11,7 @@ from template import Template, FormatError
 
 class FormTest(TestCase):
 
-    def test_form_with_url(self):
+    def test_for_tag(self):
         t = Template("""
 <%= using form(url="/user/new", method="POST", multipart=True, remote=False) do f %>
 <% end %>

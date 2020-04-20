@@ -11,10 +11,10 @@ from template import Template
 
 class PasswordTest(TestCase):
 
-    def test_form_with_url_and_password_field(self):
+    def test_for_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.password_field('pass') %>
+    <%= f.password('pass') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -25,7 +25,7 @@ class PasswordTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.password_field('secret', 'Your secret here') %>
+    <%= f.password('secret', 'Your secret here') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -36,7 +36,7 @@ class PasswordTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.password_field('masked', _class='masked_input_field') %>
+    <%= f.password('masked', _class='masked_input_field') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -47,7 +47,7 @@ class PasswordTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.password_field('token', '', size=15) %>
+    <%= f.password('token', '', size=15) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -58,7 +58,7 @@ class PasswordTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.password_field('key', maxlength=16) %>
+    <%= f.password('key', maxlength=16) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -69,7 +69,7 @@ class PasswordTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.password_field('confirm_pass', disabled=True) %>
+    <%= f.password('confirm_pass', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -80,7 +80,7 @@ class PasswordTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.password_field('pin', '1234', maxlength=4, size=6, _class="pin_input") %>
+    <%= f.password('pin', '1234', maxlength=4, size=6, _class="pin_input") %>
 <% end %>
 """)
         self.assertEqual("""

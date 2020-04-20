@@ -11,10 +11,10 @@ from template import Template
 
 class DateTest(TestCase):
 
-    def test_form_with_url_and_date_field(self):
+    def test_for_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.date_field('name') %>
+    <%= f.date('name') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -25,7 +25,7 @@ class DateTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.date_field('date', '2020-01-01') %>
+    <%= f.date('date', '2020-01-01') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -36,7 +36,7 @@ class DateTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.date_field('date', _class='special_input') %>
+    <%= f.date('date', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -47,7 +47,7 @@ class DateTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.date_field('date', '2020-01-01', disabled=True, _class='special_input') %>
+    <%= f.date('date', '2020-01-01', disabled=True, _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""

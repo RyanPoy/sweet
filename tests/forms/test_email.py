@@ -11,10 +11,10 @@ from template import Template
 
 class EmailTest(TestCase):
 
-    def test_form_with_url_and_email_field(self):
+    def test_for_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('name') %>
+    <%= f.email('name') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -25,7 +25,7 @@ class EmailTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('email', 'xxx@yyy.com') %>
+    <%= f.email('email', 'xxx@yyy.com') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -36,7 +36,7 @@ class EmailTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('email', _class='special_input') %>
+    <%= f.email('email', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -47,7 +47,7 @@ class EmailTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.email_field('email', 'xxx@yyy.com', disabled=True, _class='special_input') %>
+    <%= f.email('email', 'xxx@yyy.com', disabled=True, _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""

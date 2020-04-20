@@ -11,7 +11,7 @@ from template import Template
 
 class CheckboxTest(TestCase):
 
-    def test_form_with_url_and_checkbox(self):
+    def test_for_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
     <%= f.checkbox('accept') %>

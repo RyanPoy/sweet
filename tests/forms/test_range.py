@@ -11,10 +11,10 @@ from template import Template
 
 class RangeTest(TestCase):
 
-    def test_form_with_url_and_range_field(self):
+    def test_for_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity') %>
+    <%= f.range('quantity') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -25,7 +25,7 @@ class RangeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity', '1') %>
+    <%= f.range('quantity', '1') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -36,7 +36,7 @@ class RangeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity', _class='special_input') %>
+    <%= f.range('quantity', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -47,7 +47,7 @@ class RangeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity', _class='special_input') %>
+    <%= f.range('quantity', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -58,7 +58,7 @@ class RangeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity', _in=[1, 9]) %>
+    <%= f.range('quantity', _in=[1, 9]) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -69,7 +69,7 @@ class RangeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity', _in=[1, 9], step=2) %>
+    <%= f.range('quantity', _in=[1, 9], step=2) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -80,7 +80,7 @@ class RangeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.range_field('quantity', '1', _class='special_input', disabled=True) %>
+    <%= f.range('quantity', '1', _class='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""

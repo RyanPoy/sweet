@@ -11,11 +11,11 @@ from template import Template
 
 class WeekTest(TestCase):
 
-    def test_form_with_url_and_week_field(self):
+    def test_for_tag(self):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.week_field("user_born_week") %>
+    <%= f.week("user_born_week") %>
 <% end %>
 """)
         self.assertEqual("""
@@ -26,7 +26,7 @@ class WeekTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.week_field("user_born_week", "06") %>
+    <%= f.week("user_born_week", "06") %>
 <% end %>
 """)
         self.assertEqual("""
@@ -37,7 +37,7 @@ class WeekTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.week_field("user_born_week", _min="01") %>
+    <%= f.week("user_born_week", _min="01") %>
 <% end %>
 """)
         self.assertEqual("""

@@ -11,10 +11,10 @@ from template import Template
 
 class TelTest(TestCase):
 
-    def test_form_with_url_and_tel_field(self):
+    def test_for_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.tel_field('name') %>
+    <%= f.tel('name') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -25,7 +25,7 @@ class TelTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.tel_field('tel', '0123456789') %>
+    <%= f.tel('tel', '0123456789') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -36,7 +36,7 @@ class TelTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.tel_field('tel', _class='special_input') %>
+    <%= f.tel('tel', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -47,7 +47,7 @@ class TelTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.tel_field('tel', '0123456789', _class='special_input', disabled=True) %>
+    <%= f.tel('tel', '0123456789', _class='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""

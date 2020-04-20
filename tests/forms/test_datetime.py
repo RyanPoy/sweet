@@ -12,10 +12,10 @@ from datetime import date, datetime
 
 class DatetimeTest(TestCase):
 
-    def test_form_with_url_and_datetime_field(self):
+    def test_for_tag(self):
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.datetime_field("user_born_on") %>
+    <%= f.datetime("user_born_on") %>
 <% end %>
 """)
         self.assertEqual("""
@@ -26,7 +26,7 @@ class DatetimeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.datetime_field("user_born_on", date(year=2020, month=1, day=1)) %>
+    <%= f.datetime("user_born_on", date(year=2020, month=1, day=1)) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -37,7 +37,7 @@ class DatetimeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.datetime_field("user_born_on", datetime(year=2020, month=1, day=2, hour=10, minute=20, second=30)) %>
+    <%= f.datetime("user_born_on", datetime(year=2020, month=1, day=2, hour=10, minute=20, second=30)) %>
 <% end %>
 """)
         self.assertEqual("""
@@ -48,7 +48,7 @@ class DatetimeTest(TestCase):
 
         t = Template("""
 <%= using form(url="/user/new") do f %>
-    <%= f.datetime_field("user_born_on", _min=date(year=2020, month=1, day=2)) %>
+    <%= f.datetime("user_born_on", _min=date(year=2020, month=1, day=2)) %>
 <% end %>
 """)
         self.assertEqual("""
