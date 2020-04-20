@@ -43,22 +43,6 @@ class Form(object):
                         value or "Button"
                     )
 
-    def checkbox(self, name="checkbox", value="1", _id="", checked=False, disabled=False, html=None):
-        html = html or {}
-        d = oDict()
-        name = name or "checkbox"
-        d['id'] = _id or name
-        d['name'] = name
-        d['type'] = "checkbox"
-        d['value'] = value
-        if checked:
-            d['checked'] = "checked"
-        if disabled:
-            d['disabled'] = "disabled"
-
-        d.update(html)
-        return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
-
     def text_field(self, name, value=None, _id='', tp='text', size='', maxlength='', disabled=False, _class='', html=None, autoid=True):
         html = html or {}
         d = oDict()
@@ -161,6 +145,16 @@ class Form(object):
             html['checked'] = 'checked'
 
         return self.text_field(name=name, value=value, _id=_id, tp="radio", disabled=disabled, _class=_class, html=html)
+
+    def checkbox(self, name="checkbox", value="1", _id="", checked=False, disabled=False, _class='', html=None):
+        html = html or {}
+        d = oDict()
+        name = name or "checkbox"
+        if checked is True and 'checked' not in html: 
+            d['checked'] = "checked"
+        d.update(html)
+        return self.text_field(name=name, value=value, _id=_id, tp="checkbox", disabled=disabled, _class=_class, html=d)
+
 
     def range_field(self, name, value=None, _id='', _in=None, step='', disabled=False, _class='', html=None):
         html = html or {}
