@@ -81,9 +81,7 @@ unit_tests = [
     PresenceValidatorTest,
 ]
 
-
-
-
+# template unit tests
 unit_tests += [
     LoaderTest,
     ExtendsTest,
@@ -93,7 +91,10 @@ unit_tests += [
     IncludeTest,
     ComplexTest,
     UsingTest,
+]
 
+# form tests
+unit_tests += [
     FormTest,
     ButtonTest,
     CheckboxTest,
