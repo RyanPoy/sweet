@@ -1,9 +1,5 @@
 # coding: utf8
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
-
-from tests.__init__ import TestCase
+from sweet.tests.unit import TestCase
 import unittest
 from template import Template
 
