@@ -5,7 +5,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from tests.__init__ import TestCase
 import unittest
-import os
 from template import Template
 from datetime import date, datetime
 
