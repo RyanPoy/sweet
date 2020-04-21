@@ -127,6 +127,9 @@ steps:
 
 ---
 # Form helper
+
+the form helper looks like form_helper of rails
+
 ## form
 ```
   <%= using form(action="/user/new", method="POST", multipart=True, remote=False) do f %>
