@@ -390,7 +390,7 @@ SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id`
 ### write_lock
 
 ```
-db.records('users)
+db.records('users')
   .select('user.id')
   .select('cars.name')
   .left_join('cars', 'users.id=cars.user_id')
