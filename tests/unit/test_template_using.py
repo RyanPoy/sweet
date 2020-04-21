@@ -2,7 +2,7 @@
 from __init__ import TestCase, UserForTest
 import unittest
 import os
-from template import Template, FormatError
+from sweet.template import Template, FormatError
 
 
 class FakeTag(object):
@@ -39,4 +39,5 @@ class UsingTest(TestCase):
 
 
 if __name__ == '__main__':
+    import unittest
     unittest.main()

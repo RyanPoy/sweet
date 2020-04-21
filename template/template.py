@@ -1,9 +1,9 @@
 # coding: utf8
 import os
-from parse import parse
-from libs import Scanner, CodeGen
-from nodes import Extends, Block, Text
-from form import Form
+from sweet.template.parse import parse
+from sweet.template.libs import Scanner, CodeGen
+from sweet.template.nodes import Extends, Block, Text
+from sweet.template.form import Form
 
 normpath = os.path.normpath
 dirname = os.path.dirname

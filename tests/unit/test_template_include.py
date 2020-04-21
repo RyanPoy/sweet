@@ -49,4 +49,5 @@ class IncludeTest(TestCase):
         self.assertEqual("not_exist.html is not exist on index.html at line 1", str(err.exception))
 
 if __name__ == '__main__':
+    import unittest
     unittest.main()

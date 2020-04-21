@@ -2,7 +2,7 @@
 from __init__ import TestCase
 import unittest
 import os
-from template import Template, FormatError
+from sweet.template import Template, FormatError
 
 
 class IfTest(TestCase):
@@ -89,4 +89,5 @@ class IfTest(TestCase):
 
         
 if __name__ == '__main__':
+    import unittest
     unittest.main()

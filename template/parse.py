@@ -1,5 +1,5 @@
 #coding: utf8
-from nodes import Text, Expression, Comment, If, EndIf, Elif, Else, For, EndFor,\
+from sweet.template.nodes import Text, Expression, Comment, If, EndIf, Elif, Else, For, EndFor,\
     Include, Extends, EndBlock, Block, Continue, Break, Pass, Using, EndUsing
 
 
@@ -153,12 +153,12 @@ def parse(template, parent_tag=''):
     return nodes.data
 
 
-if __name__ == '__main__':
-    from cProfile import Profile
-    from template import Template
-    n = 30000
-    s = """<h1><%= user.name %></h1><h2><%= user.age %></h2>"""*n
-    t = Template(s)
-    p = Profile()
-    p.run("parse(t)")
-    p.print_stats()
+# if __name__ == '__main__':
+#     from cProfile import Profile
+#     from sweet.template import Template
+#     n = 30000
+#     s = """<h1><%= user.name %></h1><h2><%= user.age %></h2>"""*n
+#     t = Template(s)
+#     p = Profile()
+#     p.run("parse(t)")
+#     p.print_stats()

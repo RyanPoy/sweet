@@ -2,7 +2,7 @@
 from __init__ import TestCase
 import unittest
 import os
-from template import Template, FormatError
+from sweet.template import Template, FormatError
 
 
 class BasicTest(TestCase):
@@ -47,4 +47,5 @@ this is a string 3
 
 
 if __name__ == '__main__':
+    import unittest
     unittest.main()

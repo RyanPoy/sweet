@@ -1,7 +1,7 @@
 # coding: utf8
 from sweet.tests.unit import TestCase
 import unittest
-from template import Template
+from sweet.template import Template
 
 
 class EmailTest(TestCase):
@@ -52,4 +52,5 @@ class EmailTest(TestCase):
 """, t.render())
 
 if __name__ == '__main__':
+    import unittest
     unittest.main()

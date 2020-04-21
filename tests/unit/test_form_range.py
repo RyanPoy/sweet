@@ -1,7 +1,7 @@
 # coding: utf8
 from sweet.tests.unit import TestCase
 import unittest
-from template import Template
+from sweet.template import Template
 
 
 class RangeTest(TestCase):
@@ -75,4 +75,5 @@ class RangeTest(TestCase):
         
 
 if __name__ == '__main__':
+    import unittest
     unittest.main()
