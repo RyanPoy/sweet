@@ -1,4 +1,4 @@
-# a simple templement engine in python3.
+# a simple template engine in python3.
 
 ## Basic usage
 ```
