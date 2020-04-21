@@ -46,34 +46,12 @@ class NumberTest(TestCase):
 
         t = Template("""
 <%= using form(action="/user/new") do f %>
-    <%= f.number('quantity', _class='special_input') %>
-<% end %>
-""")
-        self.assertEqual("""
-<form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="number" class="special_input" />
-</form>
-""", t.render())
-
-        t = Template("""
-<%= using form(action="/user/new") do f %>
     <%= f.number('quantity', _min=1) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
     <input id="quantity" name="quantity" type="number" min="1" />
-</form>
-""", t.render())
-
-        t = Template("""
-<%= using form(action="/user/new") do f %>
-    <%= f.number('quantity', _max=9) %>
-<% end %>
-""")
-        self.assertEqual("""
-<form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="number" max="9" />
 </form>
 """, t.render())
 
