@@ -8,4 +8,5 @@ python web framework looks like rails
 # orm
 [orm](./documents/orm.md)
 
-
+# template
+[template](./documents/template.md)
