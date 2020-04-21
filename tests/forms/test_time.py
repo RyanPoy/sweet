@@ -12,7 +12,7 @@ class TimeTest(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.time('created_at') %>
 <% end %>
 """)
@@ -23,7 +23,7 @@ class TimeTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.time('created_at', '1') %>
 <% end %>
 """)
@@ -34,7 +34,7 @@ class TimeTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.time('created_at', _class='special_input') %>
 <% end %>
 """)
@@ -45,7 +45,7 @@ class TimeTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.time('created_at', _class='special_input') %>
 <% end %>
 """)
@@ -56,7 +56,7 @@ class TimeTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.time('created_at', _min=1) %>
 <% end %>
 """)
@@ -67,7 +67,7 @@ class TimeTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.time('created_at', _max=9) %>
 <% end %>
 """)
@@ -78,7 +78,7 @@ class TimeTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.time('created_at', _max=9) %>
 <% end %>
 """)
@@ -89,7 +89,7 @@ class TimeTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.time('created_at', _min=1, _max=9) %>
 <% end %>
 """)
@@ -100,7 +100,7 @@ class TimeTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.time('created_at', _min=1, _max=9, step=2) %>
 <% end %>
 """)
@@ -111,7 +111,7 @@ class TimeTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.time('created_at', '1', _class='special_input', disabled=True) %>
 <% end %>
 """)

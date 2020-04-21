@@ -5,8 +5,8 @@ from datetime import datetime, date
 
 class Form(object):
     
-    def __init__(self, url='', model=None, method="GET", _id="", multipart=False, remote=False, charset="UTF8", html=None):
-        self.url = url
+    def __init__(self, action='', model=None, method="GET", _id="", multipart=False, remote=False, charset="UTF8", html=None):
+        self.action = action
         self.model = model
         self.method = method
         self.multipart = multipart
@@ -18,7 +18,7 @@ class Form(object):
     def begin_render(self):
         d = oDict()
         if self.id: d['id'] = self.id
-        d['action'] = self.url
+        d['action'] = self.action
         d['method'] = self.method
         d['accept-charset'] = self.charset
         if self.method.upper() == 'POST' and self.multipart:
@@ -84,7 +84,7 @@ class Form(object):
     def color(self, name, value=None, _id='', placeholder='', disabled=False, _class='', html=None):
         return self.text(name=name, value=value, _id=_id, placeholder=placeholder, tp="color", disabled=disabled, _class=_class, html=html)
 
-    def url_field(self, name, value=None, _id='', placeholder='', disabled=False, _class='', html=None):
+    def url(self, name, value=None, _id='', placeholder='', disabled=False, _class='', html=None):
         return self.text(name=name, value=value, _id=_id, placeholder=placeholder, tp="url", disabled=disabled, _class=_class, html=html)
 
     def file(self, name, value=None, _id='', placeholder='', accept=None, multiple=False, disabled=False, _class='', html=None):

@@ -12,7 +12,7 @@ class TelTest(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.tel('name') %>
 <% end %>
 """)
@@ -23,7 +23,7 @@ class TelTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.tel('tel', '0123456789') %>
 <% end %>
 """)
@@ -34,7 +34,7 @@ class TelTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.tel('tel', _class='special_input') %>
 <% end %>
 """)
@@ -45,7 +45,7 @@ class TelTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.tel('tel', '0123456789', _class='special_input', disabled=True) %>
 <% end %>
 """)

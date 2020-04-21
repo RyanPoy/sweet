@@ -12,7 +12,7 @@ class PasswordTest(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.password('pass') %>
 <% end %>
 """)
@@ -23,7 +23,7 @@ class PasswordTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.password('secret', 'Your secret here') %>
 <% end %>
 """)
@@ -34,7 +34,7 @@ class PasswordTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.password('masked', _class='masked_input_field') %>
 <% end %>
 """)
@@ -45,7 +45,7 @@ class PasswordTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.password('token', '', size=15) %>
 <% end %>
 """)
@@ -56,7 +56,7 @@ class PasswordTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.password('key', maxlength=16) %>
 <% end %>
 """)
@@ -67,7 +67,7 @@ class PasswordTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.password('confirm_pass', disabled=True) %>
 <% end %>
 """)
@@ -78,7 +78,7 @@ class PasswordTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.password('pin', '1234', maxlength=4, size=6, _class="pin_input") %>
 <% end %>
 """)

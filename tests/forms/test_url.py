@@ -13,8 +13,8 @@ class UrlTest(TestCase):
     def test_for_tag(self):
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
-    <%= f.url_field('name') %>
+<%= using form(action="/user/new") do f %>
+    <%= f.url('name') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -24,8 +24,8 @@ class UrlTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
-    <%= f.url_field('url', 'http://www.baidu.com') %>
+<%= using form(action="/user/new") do f %>
+    <%= f.url('url', 'http://www.baidu.com') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -35,8 +35,8 @@ class UrlTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
-    <%= f.url_field('url', _class='special_input') %>
+<%= using form(action="/user/new") do f %>
+    <%= f.url('url', _class='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -46,8 +46,8 @@ class UrlTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
-    <%= f.url_field('url', 'http://www.baidu.com', _class='special_input', disabled=True) %>
+<%= using form(action="/user/new") do f %>
+    <%= f.url('url', 'http://www.baidu.com', _class='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""

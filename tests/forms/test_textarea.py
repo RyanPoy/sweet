@@ -13,7 +13,7 @@ class TextareaTest(TestCase):
     def test_for_tag(self):
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.textarea('post') %>
 <% end %>
 """)
@@ -24,7 +24,7 @@ class TextareaTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.textarea('bio', 'This is my biography.') %>
 <% end %>
 """)
@@ -35,7 +35,7 @@ class TextareaTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.textarea('body', rows=10, cols=25) %>
 <% end %>
 """)
@@ -46,7 +46,7 @@ class TextareaTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.textarea('description', "Description goes here.", disabled=True) %>
 <% end %>
 """)
@@ -57,7 +57,7 @@ class TextareaTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.textarea('comment', _class='comment_input') %>
 <% end %>
 """)

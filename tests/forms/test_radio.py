@@ -12,7 +12,7 @@ class RadioTest(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.radio('favorite_color', 'maroon') %>
 <% end %>
 """)
@@ -23,7 +23,7 @@ class RadioTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.radio('receive_updates', 'no', checked=True) %>
 <% end %>
 """)
@@ -34,7 +34,7 @@ class RadioTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.radio('time_slot', "3:00 p.m.", checked=False, disabled=True) %>
 <% end %>
 """)
@@ -45,7 +45,7 @@ class RadioTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.radio('color', "green", checked=True, _class="color_input") %>
 <% end %>
 """)

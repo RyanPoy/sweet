@@ -12,7 +12,7 @@ class FormTest(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(url="/user/new", method="POST", multipart=True, remote=False) do f %>
+<%= using form(action="/user/new", method="POST", multipart=True, remote=False) do f %>
 <% end %>
 """)
         self.assertEqual("""
@@ -22,7 +22,7 @@ class FormTest(TestCase):
 
     def test_form_with_url_and_ignore_multipart_if_method_is_not_POST(self):
         t = Template("""
-<%= using form(url="/user/new", _id="user_new_id", method="GET", multipart=True, remote=False) do f %>
+<%= using form(action="/user/new", _id="user_new_id", method="GET", multipart=True, remote=False) do f %>
 <% end %>
 """)
         self.assertEqual("""
@@ -32,7 +32,7 @@ class FormTest(TestCase):
 
     def test_form_with_url_and_html_id(self):
         t = Template("""
-<%= using form(url="/user/new", method="POST", multipart=True, remote=False, html={"data-index": 10}) do f %>
+<%= using form(action="/user/new", method="POST", multipart=True, remote=False, html={"data-index": 10}) do f %>
 <% end %>
 """)
         self.assertEqual("""

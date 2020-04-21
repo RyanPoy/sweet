@@ -12,7 +12,7 @@ class SubmitTest(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.submit() %>
 <% end %>
 """)
@@ -23,7 +23,7 @@ class SubmitTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.submit("Edit this article") %>
 <% end %>
 """)
@@ -34,7 +34,7 @@ class SubmitTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.submit( "Save edits", disabled=True) %>
 <% end %>
 """)
@@ -45,7 +45,7 @@ class SubmitTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.submit("Edit", _class="edit_button") %>
 <% end %>
 """)
@@ -57,7 +57,7 @@ class SubmitTest(TestCase):
 
 # @todo:
 #         t = Template("""
-# <%= using form(url="/user/new") do f %>
+# <%= using form(action="/user/new") do f %>
 #     <%= f.submit( "Save", data: { confirm: "Are you sure?" }) %>
 # <% end %>
 # """)
@@ -69,7 +69,7 @@ class SubmitTest(TestCase):
 
 # @todo:
 #         t = Template("""
-# <%= using form(url="/user/new") do f %>
+# <%= using form(action="/user/new") do f %>
 #     <%= f.submit( "Complete sale", data: { disable_with: "Submitting..." }) %>
 # <% end %>
 # """)

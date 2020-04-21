@@ -13,7 +13,7 @@ class FileTest(TestCase):
     def test_for_tag(self):
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.file('attachment') %>
 <% end %>
 """)
@@ -24,7 +24,7 @@ class FileTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.file('avatar', _class='profile_input') %>
 <% end %>
 """)
@@ -35,7 +35,7 @@ class FileTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.file('picture', disabled=True) %>
 <% end %>
 """)
@@ -46,7 +46,7 @@ class FileTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.file('resume', value='~/resume.doc') %>
 <% end %>
 """)
@@ -57,7 +57,7 @@ class FileTest(TestCase):
 """, t.render())
         
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.file('user_pic', accept='image/png,image/gif,image/jpeg') %>
 <% end %>
 """)
@@ -68,7 +68,7 @@ class FileTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.file('file', accept='text/html', _class='upload', value='index.html') %>
 <% end %>
 """)

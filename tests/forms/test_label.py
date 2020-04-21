@@ -13,7 +13,7 @@ class LabelTest(TestCase):
     def test_for_tag(self):
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.label('name') %>
 <% end %>
 """)
@@ -24,7 +24,7 @@ class LabelTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.label('name', 'Your Name') %>
 <% end %>
 """)
@@ -35,7 +35,7 @@ class LabelTest(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(url="/user/new") do f %>
+<%= using form(action="/user/new") do f %>
     <%= f.label('name', _class='small_label') %>
 <% end %>
 """)
