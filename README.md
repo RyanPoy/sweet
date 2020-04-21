@@ -1,4 +1,4 @@
-> the project has been merged into `sweet`, and the update is stopped 
+> the project has been merged into [sweet](https://github.com/RyanPoy/sweet), and the update is stopped 
 >
 >
 
