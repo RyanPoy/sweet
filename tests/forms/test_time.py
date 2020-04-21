@@ -46,34 +46,12 @@ class TimeTest(TestCase):
 
         t = Template("""
 <%= using form(action="/user/new") do f %>
-    <%= f.time('created_at', _class='special_input') %>
-<% end %>
-""")
-        self.assertEqual("""
-<form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="created_at" name="created_at" type="time" class="special_input" />
-</form>
-""", t.render())
-
-        t = Template("""
-<%= using form(action="/user/new") do f %>
     <%= f.time('created_at', _min=1) %>
 <% end %>
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
     <input id="created_at" name="created_at" type="time" min="1" />
-</form>
-""", t.render())
-
-        t = Template("""
-<%= using form(action="/user/new") do f %>
-    <%= f.time('created_at', _max=9) %>
-<% end %>
-""")
-        self.assertEqual("""
-<form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="created_at" name="created_at" type="time" max="9" />
 </form>
 """, t.render())
 
