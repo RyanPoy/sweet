@@ -1,5 +1,5 @@
 #coding: utf8
-from sweet.tests.unit import TestCase
+from sweet.tests import TestCase
 from sweet.database.recordset import MySQLRecordset
 from sweet.database import MySQL, Record
 from sweet.utils import Collection

@@ -1,9 +1,9 @@
 #coding: utf8
 from sweet.utils.validation import ConfirmationValidator
-import unittest
+from sweet.tests import TestCase
 
 
-class ConfirmationValidatorTest(unittest.TestCase):
+class ConfirmationValidatorTest(TestCase):
 
     def test_confirmation(self):
         self.assertTrue(ConfirmationValidator().validate(10, 10))  

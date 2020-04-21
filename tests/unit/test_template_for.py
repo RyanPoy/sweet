@@ -1,8 +1,7 @@
 # coding: utf8
-from __init__ import TestCase, UserForTest
-import unittest
-import os
+from sweet.tests import TestCase, UserForTemplateTest
 from sweet.template import Template, FormatError
+import os
 
 
 class ForTest(TestCase):
@@ -10,8 +9,8 @@ class ForTest(TestCase):
     def setUp(self):
         self.dirname = os.path.dirname(os.path.abspath(__file__))
         self.users = [
-            UserForTest("露西", 20),
-            UserForTest("Lily", 10)
+            UserForTemplateTest("露西", 20),
+            UserForTemplateTest("Lily", 10)
         ]
 
     def test_for(self):

@@ -1,6 +1,5 @@
 # coding: utf8
-from sweet.tests.unit import TestCase
-import unittest
+from sweet.tests import TestCase
 from sweet.template import Template
 
 

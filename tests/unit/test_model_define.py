@@ -1,5 +1,5 @@
 #coding: utf8
-from sweet.tests.unit import TestCase
+from sweet.tests import TestCase
 from sweet.orm.model import Model
 
 

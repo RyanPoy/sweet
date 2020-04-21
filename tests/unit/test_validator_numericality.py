@@ -1,9 +1,9 @@
 #coding: utf8
 from sweet.utils.validation import NumericalityValidator
-import unittest
+from sweet.tests import TestCase
 
 
-class NumericalityValidatorTest(unittest.TestCase):
+class NumericalityValidatorTest(TestCase):
         
     def test_numericality_should_return_false_if_value_is_null(self):
         self.assertFalse(NumericalityValidator().validate(None, greater_than = 10))

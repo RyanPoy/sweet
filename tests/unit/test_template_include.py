@@ -1,15 +1,14 @@
 # coding: utf8
-from __init__ import TestCase, UserForTest
+from sweet.tests import TestCase, UserForTemplateTest
 from template import MemLoader, FormatError
-import unittest
 
 
 class IncludeTest(TestCase):
 
     def setUp(self):
         self.users = [
-            UserForTest("露西", 20),
-            UserForTest("Lily", 10)
+            UserForTemplateTest("露西", 20),
+            UserForTemplateTest("Lily", 10)
         ]
  
     def test_include(self):

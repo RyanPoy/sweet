@@ -1,6 +1,5 @@
 #coding: utf8
-from __init__ import TestCase
-import unittest
+from sweet.tests import TestCase
 from template import  MemLoader, FormatError
 
 

@@ -1,9 +1,9 @@
 #coding: utf8
 from sweet.utils.validation import PresenceValidator
-import unittest
+from sweet.tests import TestCase
 
 
-class PresenceValidatorTest(unittest.TestCase):
+class PresenceValidatorTest(TestCase):
 
     def test_presence_validate_if_value_is_none(self):
         self.assertFalse(PresenceValidator().validate(None))

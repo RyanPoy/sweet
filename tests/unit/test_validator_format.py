@@ -1,9 +1,9 @@
 #coding: utf8
 from sweet.utils.validation import FormatValidator
-import unittest
+from sweet.tests import TestCase
 
 
-class FormatValidatorTest(unittest.TestCase):
+class FormatValidatorTest(TestCase):
 
     def test_foramt_with(self):
         self.assertTrue(FormatValidator().validate('abc.abc.abc.', '[(\w+)/.]{3}'))  

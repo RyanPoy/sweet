@@ -1,9 +1,9 @@
 #coding: utf8
 from sweet.utils.validation import AcceptanceValidator
-import unittest
+from sweet.tests import TestCase
 
 
-class AcceptanceValidatorTest(unittest.TestCase):
+class AcceptanceValidatorTest(TestCase):
     
     def test_acceptance(self):
         self.assertTrue(AcceptanceValidator().validate(10))  

@@ -1,8 +1,7 @@
 #coding: utf8
-from __init__ import TestCase
-import os
-import unittest
+from sweet.tests import TestCase
 from template import FileLoader, MemLoader
+import os
 
 
 class LoaderTest(TestCase):

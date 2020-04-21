@@ -1,9 +1,9 @@
 #coding: utf8
 from sweet.utils.validation import InclusionValidator
-import unittest
+from sweet.tests import TestCase
 
 
-class InclusionValidatorTest(unittest.TestCase):
+class InclusionValidatorTest(TestCase):
 
     def test_inclusion_if_value_is_null_and_allow_null(self):
         self.assertTrue(InclusionValidator().validate(None, allow_null=True))

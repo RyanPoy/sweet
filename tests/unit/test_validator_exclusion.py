@@ -1,9 +1,9 @@
 #coding: utf8
 from sweet.utils.validation import ExclusionValidator
-import unittest
+from sweet.tests import TestCase
 
 
-class ExclusionValidatorTest(unittest.TestCase):
+class ExclusionValidatorTest(TestCase):
 
     def test_exclusion_if_value_is_null_and_allow_null(self):
         self.assertTrue(ExclusionValidator().validate(None, allow_null=True))

@@ -1,8 +1,7 @@
 # coding: utf8
-from __init__ import TestCase
-import unittest
-import os
+from sweet.tests import TestCase
 from sweet.template import Template, FormatError
+import os
 
 
 class IfTest(TestCase):
