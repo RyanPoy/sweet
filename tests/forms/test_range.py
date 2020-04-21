@@ -46,17 +46,6 @@ class RangeTest(TestCase):
 
         t = Template("""
 <%= using form(action="/user/new") do f %>
-    <%= f.range('quantity', _class='special_input') %>
-<% end %>
-""")
-        self.assertEqual("""
-<form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="quantity" name="quantity" type="range" class="special_input" />
-</form>
-""", t.render())
-
-        t = Template("""
-<%= using form(action="/user/new") do f %>
     <%= f.range('quantity', _in=[1, 9]) %>
 <% end %>
 """)

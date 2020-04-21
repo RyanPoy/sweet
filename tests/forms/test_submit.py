@@ -55,29 +55,27 @@ class SubmitTest(TestCase):
 </form>
 """, t.render())
 
-# @todo:
-#         t = Template("""
-# <%= using form(action="/user/new") do f %>
-#     <%= f.submit( "Save", data: { confirm: "Are you sure?" }) %>
-# <% end %>
-# """)
-#         self.assertEqual("""
-# <form action="/user/new" method="GET" accept-charset="UTF8">
-#     <input name='commit' type='submit' value='Save' data-disable-with="Save" data-confirm="Are you sure?" />
-# </form>
-# """, t.render())
+        t = Template("""
+<%= using form(action="/user/new") do f %>
+    <%= f.submit( "Save", html={ 'data-confirm': "Are you sure?" }) %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input name="commit" type="submit" value="Save" data-confirm="Are you sure?" data-disable-with="Save" />
+</form>
+""", t.render())
 
-# @todo:
-#         t = Template("""
-# <%= using form(action="/user/new") do f %>
-#     <%= f.submit( "Complete sale", data: { disable_with: "Submitting..." }) %>
-# <% end %>
-# """)
-#         self.assertEqual("""
-# <form action="/user/new" method="GET" accept-charset="UTF8">
-#     <input name="commit" data-disable-with="Submitting..." type="submit" value="Complete sale" />
-# </form>
-# """, t.render())
+        t = Template("""
+<%= using form(action="/user/new") do f %>
+    <%= f.submit( "Complete sale", html={ 'data-disable-with': "Submitting..." }) %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input name="commit" type="submit" value="Complete sale" data-disable-with="Submitting..." />
+</form>
+""", t.render())
 
 
 
