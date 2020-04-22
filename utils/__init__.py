@@ -197,11 +197,7 @@ class InvalidArg(Exception): pass
 #     def __init__(self, msg, *args, **kwargs):
 #         super(ColumnNotInColumns, self).__init__(*args, **kwargs)
 #         self.msg = msg
-    
-#     def __unicode__(self):
-#         return selflo.msg
 
-#     __str__ = __unicode__
 
 class mydict(dict):
 

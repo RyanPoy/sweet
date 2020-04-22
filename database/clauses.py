@@ -2,7 +2,8 @@
 from sweet.utils import is_array, is_str, is_hash
 from sweet.database.filters import Filter
 
-aqm = lambda s, qutotation, : s if s == '*' or not s else '.'.join([ '%s%s%s' % (qutotation, x.strip(qutotation), qutotation) for x in s.split('.') ])
+aqm = lambda s, qutotation : s if s == '*' or not s \
+                                else '.'.join([ '%s%s%s' % (qutotation, x.strip(qutotation), qutotation) for x in s.split('.') ])
 
 
 class Clause(object):
@@ -276,5 +277,3 @@ class InsertClause(object):
             values_sql=', '.join(values_sql)
         )
         return self
-
-
