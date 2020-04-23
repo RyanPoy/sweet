@@ -5,7 +5,7 @@ from sweet.database import MySQL
 from sweet.utils import Collection, mydict
 
 
-class MySQLTest(TestCase):
+class MySQLCRUDTest(TestCase):
     
     def setUp(self):
         self.db = MySQL('sweet_test')
@@ -25,9 +25,9 @@ class MySQLTest(TestCase):
         self.db.raw("insert into mobiles (id, name, user_id) values (2, 'xiaomi', 1) ")
         self.db.raw("insert into mobiles (id, name, user_id) values (3, 'iphone', 2) ")
 
-        # self.db.raw('select * from mobiles where name is %s', None)
-        # self.db.raw('select * from mobiles join users on users.id = %s where users.name is %s', 'mobiles.user_id', None)
-        # self.db.raw('select * from mobiles join users as u1 on u1.id = %s join users as u2 on u2.id=mobiles.user_id where u1.name is %s', 'mobiles.user_id', None)
+        self.db.raw('select * from mobiles where name is %s', None)
+        self.db.raw('select * from mobiles join users on users.id = %s where users.name is %s', 'mobiles.user_id', None)
+        self.db.raw('select * from mobiles join users as u1 on u1.id = %s join users as u2 on u2.id=mobiles.user_id where u1.name is %s', 'mobiles.user_id', None)
 
     def remove_record(self):
         self.db.execute("delete from mobiles")
