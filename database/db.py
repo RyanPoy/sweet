@@ -6,10 +6,6 @@ import MySQLdb
 import time
 
 
-class Record(mydict):
-    pass
-
-
 class MySQL(object):
     
     rset_class = MySQLRecordset
@@ -34,7 +30,7 @@ class MySQL(object):
         cursor = self._cursor()
         try:
             self._execute(cursor, sql, *params)
-            return Collection([ Record(row) for row in cursor ])
+            return Collection([ mydict(row) for row in cursor ])
         finally:
             cursor.close()
 
@@ -80,6 +76,26 @@ class MySQL(object):
                     param_buff.append(p)
                 print ((time.time() - btime), '\t|', sql, '\t|', ', '.join(param_buff))
         return self
+
+    def get_columns(self, table_name):
+        list_column_sql = '''
+SELECT 
+    COLUMN_NAME AS field, 
+    COLUMN_TYPE AS type, 
+    IS_NULLABLE AS `null`, 
+    COLUMN_KEY AS `key`, 
+    COLUMN_DEFAULT AS `default`, 
+    EXTRA AS extra, 
+    COLUMN_COMMENT AS comment, 
+    CHARACTER_SET_NAME AS character_set, 
+    COLLATION_NAME AS collation
+FROM 
+    information_schema.COLUMNS 
+WHERE 
+    TABLE_SCHEMA = "%s" 
+AND 
+    TABLE_NAME = "%s"''' % (self._db_args['db'], table_name)
+        return self.fetchall(list_column_sql)
 
 #     def get_table_by(self, name):
 #         sql = 'SHOW FULL COLUMNS FROM %s' % name

@@ -1,6 +1,6 @@
 #coding: utf8
-from .db import MySQL, Record
-from .db_manager import DBManager
+from .db import MySQL
+from .manager import DBManager
 
 __all__ = [DBManager, MySQL]
 

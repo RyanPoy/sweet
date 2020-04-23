@@ -8,7 +8,6 @@ class Filter(object):
         self.name = name
         self.operator = operator
         self.value = value
-        self.valid()
         self.sql = ''
         self.params = []
         self.qutotation = '`'
