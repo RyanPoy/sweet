@@ -1,8 +1,8 @@
 #coding: utf8
 from sweet.tests import TestCase
 from sweet.database.recordset import MySQLRecordset
-from sweet.database.db import Record
 from sweet.database.clauses import WhereClause, HavingClause
+from sweet.utils import mydict
 
 
 class MySQLRecordsetQueryTest(TestCase):
@@ -337,7 +337,7 @@ class MySQLRecordsetQueryTest(TestCase):
         def _(sql, *params):
             self.assertEqual('SELECT COUNT(*) AS aggregate FROM `users` WHERE `name` <> %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return Record({'aggregate': 2})
+            return mydict({'aggregate': 2})
         tb = self.get_recordset()
         tb.db.fetchone = _
         cnt = tb.where(name__not='Lily').count()
@@ -347,7 +347,7 @@ class MySQLRecordsetQueryTest(TestCase):
         def _(sql, *params):
             self.assertEqual('SELECT COUNT(`id`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return Record({'aggregate': 2})
+            return mydict({'aggregate': 2})
         tb = self.get_recordset()
         tb.db.fetchone = _
         cnt = tb.where(name__not='Lily').count('id')
@@ -357,7 +357,7 @@ class MySQLRecordsetQueryTest(TestCase):
         def _(sql, *params):
             self.assertEqual('SELECT COUNT(*) AS aggregate FROM `users` WHERE `name` <> %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return Record({'aggregate': 2})
+            return mydict({'aggregate': 2})
         tb = self.get_recordset()
         tb.db.fetchone = _
         cnt = tb.where(name__not='Lily').count(distinct=True)
@@ -367,7 +367,7 @@ class MySQLRecordsetQueryTest(TestCase):
         def _(sql, *params):
             self.assertEqual('SELECT COUNT(DISTINCT `id`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return Record({'aggregate': 2})
+            return mydict({'aggregate': 2})
         tb = self.get_recordset()
         tb.db.fetchone = _
         cnt = tb.where(name__not='Lily').count('id', True)
@@ -377,7 +377,7 @@ class MySQLRecordsetQueryTest(TestCase):
         def _(sql, *params):
             self.assertEqual('SELECT MAX(`id`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return Record({'aggregate': 1024})
+            return mydict({'aggregate': 1024})
         tb = self.get_recordset()
         tb.db.fetchone = _
         max_value = tb.where(name__not='Lily').max('id')
@@ -387,7 +387,7 @@ class MySQLRecordsetQueryTest(TestCase):
         def _(sql, *params):
             self.assertEqual('SELECT MAX(DISTINCT `id`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return Record({'aggregate': 1024})
+            return mydict({'aggregate': 1024})
         tb = self.get_recordset()
         tb.db.fetchone = _
         max_value = tb.where(name__not='Lily').max('id', True)
@@ -397,7 +397,7 @@ class MySQLRecordsetQueryTest(TestCase):
         def _(sql, *params):
             self.assertEqual('SELECT MIN(`id`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return Record({'aggregate': 1})
+            return mydict({'aggregate': 1})
         tb = self.get_recordset()
         tb.db.fetchone = _
         min_value = tb.where(name__not='Lily').min('id')
@@ -407,7 +407,7 @@ class MySQLRecordsetQueryTest(TestCase):
         def _(sql, *params):
             self.assertEqual('SELECT MIN(DISTINCT `id`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return Record({'aggregate': 1})
+            return mydict({'aggregate': 1})
         tb = self.get_recordset()
         tb.db.fetchone = _
         min_value = tb.where(name__not='Lily').min('id', True)
@@ -417,7 +417,7 @@ class MySQLRecordsetQueryTest(TestCase):
         def _(sql, *params):
             self.assertEqual('SELECT AVG(`age`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return Record({'aggregate': 32})
+            return mydict({'aggregate': 32})
         tb = self.get_recordset()
         tb.db.fetchone = _
         avg = tb.where(name__not='Lily').avg('age')
@@ -427,7 +427,7 @@ class MySQLRecordsetQueryTest(TestCase):
         def _(sql, *params):
             self.assertEqual('SELECT AVG(DISTINCT `age`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return Record({'aggregate': 32})
+            return mydict({'aggregate': 32})
         tb = self.get_recordset()
         tb.db.fetchone = _
         avg = tb.where(name__not='Lily').avg('age', True)
@@ -437,7 +437,7 @@ class MySQLRecordsetQueryTest(TestCase):
         def _(sql, *params):
             self.assertEqual('SELECT SUM(`age`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return Record({'aggregate': 2048})
+            return mydict({'aggregate': 2048})
         tb = self.get_recordset()
         tb.db.fetchone = _
         sum_value = tb.where(name__not='Lily').sum('age')
@@ -447,7 +447,7 @@ class MySQLRecordsetQueryTest(TestCase):
         def _(sql, *params):
             self.assertEqual('SELECT SUM(DISTINCT `age`) AS aggregate FROM `users` WHERE `name` <> %s', sql)
             self.assertEqual(['Lily'], list(params))
-            return Record({'aggregate': 2048})
+            return mydict({'aggregate': 2048})
         tb = self.get_recordset()
         tb.db.fetchone = _
         sum_value = tb.where(name__not='Lily').sum('age', True)

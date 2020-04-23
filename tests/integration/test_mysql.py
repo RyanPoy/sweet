@@ -1,8 +1,8 @@
 #coding: utf8
 from sweet.tests import TestCase
 from sweet.database.recordset import MySQLRecordset
-from sweet.database import MySQL, Record
-from sweet.utils import Collection
+from sweet.database import MySQL
+from sweet.utils import Collection, mydict
 
 
 class MySQLTest(TestCase):
@@ -39,14 +39,12 @@ class MySQLTest(TestCase):
 
     def test_first(self):
         r = self.db.records('users').first()
-        self.assertTrue(isinstance(r, Record))
         self.assertEqual(1, r.id)
         self.assertEqual('jack', r.name)
         self.assertEqual(25, r.age)
 
     def test_last(self):
         r = self.db.records('users').last()
-        self.assertTrue(isinstance(r, Record))
         self.assertEqual(4, r.id)
         self.assertEqual('lily', r.name)
         self.assertEqual(26, r.age)
