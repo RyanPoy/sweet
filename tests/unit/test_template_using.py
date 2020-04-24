@@ -1,5 +1,5 @@
 # coding: utf8
-from sweet.tests import TestCase, UserForTemplateTest
+from sweet.tests import TestCase
 from sweet.template import Template, FormatError
 import os
 

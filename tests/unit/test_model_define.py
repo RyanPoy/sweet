@@ -12,6 +12,11 @@ class ModelCustomerStub(Model):
     __timestamp__ = False
 
 
+# class ModelHasError(Model):
+#     __fields__ = {'age': IntField('age', length=10, default=10, null=False)}
+#     __pk__ = 'id'
+
+
 class ModelDefineTest(TestCase):
 
     def test_auto_tablename(self):

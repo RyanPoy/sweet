@@ -15,12 +15,15 @@ class ModelMetaClass(type):
             if not hasattr(cls, '__tablename__'):
                 setattr(cls, '__tablename__', tableize(cls.__name__))
 
-            if not hasattr(cls, '__pk__'):
-                setattr(cls, '__pk__', 'id')
-
             if not hasattr(cls, '__field_dict__'):
                 setattr(cls, '__field_dict__', {})
                 cls._init_fields()
+
+            if not hasattr(cls, '__pk__'):
+                setattr(cls, '__pk__', 'id')
+
+            # if cls.__pk__ not in cls.__field_dict__:
+            #     raise Exception('%s field of %s does not exist' % (cls.__pk__, cls.__name__))
 
             if getattr(cls, '__timestamp__', True):
                 setattr(cls, 'created_at', None)
