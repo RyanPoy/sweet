@@ -19,6 +19,7 @@ class UserForTemplateTest(object):
         self.age = age
 
 
+
 Model.db_manager = DBManager({
     'driver': 'mysql',
     'host': 'localhost',
@@ -28,6 +29,13 @@ Model.db_manager = DBManager({
     'password': '',
     'show_sql': True,
 })
+
+class Foo(Model):
+    pass
+
 class User(Model):
+    pass
+
+class Mobile(Model):
     pass
 

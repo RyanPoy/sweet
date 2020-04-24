@@ -18,9 +18,9 @@ class ModelMetaClass(type):
             if not hasattr(cls, '__pk__'):
                 setattr(cls, '__pk__', 'id')
 
-            if not hasattr(cls, '__columns__'):
-                setattr(cls, '__columns__', [])
-                cls._init_columns()
+            if not hasattr(cls, '__field_dict__'):
+                setattr(cls, '__field_dict__', {})
+                cls._init_fields()
 
             if getattr(cls, '__timestamp__', True):
                 setattr(cls, 'created_at', None)
@@ -31,7 +31,7 @@ class ModelMetaClass(type):
             #     relation.inject(cls)
 
             # # id column must in columns validate
-            # if cls.__pk__ not in cls.__columns__:
+            # if cls.__pk__ not in cls.__field_dict__:
             #     raise PKColumnNotInColumns()
             # for c, err in [
             #     (cls.__pk__, PKColumnNotInColumns),
@@ -40,7 +40,7 @@ class ModelMetaClass(type):
             #     (cls.__created_on__, CreatedOnColumnNotInColumns),
             #     (cls.__updated_on__, UpdatedOnColumnNotInColumns),
             # ]:
-            #     if c and  c not in cls.__columns__:
+            #     if c and  c not in cls.__field_dict__:
             #         raise err()
         return model
 
@@ -102,6 +102,9 @@ class Model(metaclass=ModelMetaClass):
         return db.recordset(self.__tablename__)
 
     @classmethod
-    def _init_columns(cls):
-        columns = cls.db_manager.new_db().get_columns(cls.__tablename__)
+    def _init_fields(cls):
+        for c in cls.db_manager.new_db().get_columns(cls.__tablename__):
+            cls.__field_dict__[c.name] = c
+        return cls
+
 

@@ -6,6 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import unittest
 # from sweet.tests import helper
 from sweet.tests.integration.test_mysql_crud import MySQLCRUDTest
+from sweet.tests.integration.test_mysql_struct import MySQLStructTest
 
 from sweet.tests.unit.test_filter import FilterTest
 from sweet.tests.unit.test_clauses import ClausesTest
@@ -121,7 +122,8 @@ unit_tests += [
 ]
 
 integration_tests = [
-    MySQLCRUDTest
+    MySQLCRUDTest,
+    MySQLStructTest
 ]
 
 

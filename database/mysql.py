@@ -1,14 +1,43 @@
 #coding: utf8
-from sweet.utils import *
-from contextlib import contextmanager
 from sweet.database.recordset import MySQLRecordset
+from contextlib import contextmanager
+from sweet.orm.fields import *
+from sweet.utils import *
 import MySQLdb
 import time
 
 
 class MySQL(object):
     
-    rset_class = MySQLRecordset
+    RECORDSET_CLASS = MySQLRecordset
+
+    COLUMN_FIELD_MAPPING = {
+        'integer': IntField, 
+        'int': IntField, 
+        
+        'smallint': IntField,
+        'bigint': IntField,
+
+        'real': FloatField, 
+        'double': FloatField,
+        'numeric': DecimalField,
+        'decimal': DecimalField,
+
+        'varchar': CharField,
+        'char': CharField,
+
+        'bool': BoolField, 
+        'tinyint': BoolField,
+
+        'blob': BlobField,
+        'varbinary': BlobField,
+
+        'text': TextField,
+        
+        'date': DateField, 
+        'datetime': DatetimeField,
+        'time': DatetimeField,
+    }
 
     def __init__(self, dbname, user='root', password='', host='localhost', port=3306, charset='utf8', show_sql=False):
         self._db_args = dict(db=dbname, user=user, passwd=password, host=host, port=port, charset=charset,
@@ -78,9 +107,8 @@ class MySQL(object):
         return self
 
     def get_columns(self, table_name):
-        list_column_sql = '''
-SELECT 
-    COLUMN_NAME AS field, 
+        list_column_sql = '''SELECT 
+    COLUMN_NAME AS name, 
     COLUMN_TYPE AS type, 
     IS_NULLABLE AS `null`, 
     COLUMN_KEY AS `key`, 
@@ -95,7 +123,51 @@ WHERE
     TABLE_SCHEMA = "%s" 
 AND 
     TABLE_NAME = "%s"''' % (self._db_args['db'], table_name)
-        return self.fetchall(list_column_sql)
+
+        columns = self.fetchall(list_column_sql)
+        fields = []
+        for c in columns:
+            has_length, has_precision = False, False
+            length, precision, scale = None, None, None,
+
+            # type_str looks like: 
+            #   bigint(20)
+            #   decimal(10,0)
+            #   blob
+            type_str = c.type
+            vs = type_str.split('(')
+            column_type = vs[0].split()[0]
+
+            if '(' in type_str and ',' in type_str:
+                has_precision = True
+                precision, scale = vs[1][:-1].split(',') # 10,0
+
+            elif '(' in type_str:
+                has_length = True 
+                length = vs[1][:-1] # 20
+
+            field_class = self.COLUMN_FIELD_MAPPING.get(column_type, None)
+            if field_class is None:
+                raise Exception('Can not support %s field type !' % column_type)
+
+            kwargs = {}
+            kwargs['name'] = c.name
+            kwargs['default'] = c.default
+            kwargs['null'] = c.null
+            if has_length:
+                kwargs['length'] = int(length)
+            if has_precision:
+                kwargs['precision'] = int(precision)
+                kwargs['scale'] = int(scale)
+
+            try:
+                fields.append(field_class(**kwargs))
+            except:
+                # print('?'*10, c.name, field_class, c)
+                raise
+
+        return fields
+
 
 #     def get_table_by(self, name):
 #         sql = 'SHOW FULL COLUMNS FROM %s' % name
@@ -170,4 +242,4 @@ AND
         return self
 
     def records(self, tbname):
-        return self.rset_class(self, tbname)
+        return self.RECORDSET_CLASS(self, tbname)

@@ -8,7 +8,7 @@ import re
 
 
 # data type transfer variables and functions
-FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE')
+FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE', 'No', 'no', 'NO')
 ISO_DATE = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
 ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
 
