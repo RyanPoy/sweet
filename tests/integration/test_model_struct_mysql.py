@@ -9,7 +9,7 @@ from sweet.orm.fields import *
 class ModelStructMySQLTest(TestCase):
     
     def test_table_columns(self):
-        field_dict = Foo.__field_dict__
+        field_dict = Foo.__field_define_dict__
 
         f = field_dict.get('c_bigint')
         self.assertEqual(IntField, type(f))

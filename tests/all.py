@@ -7,6 +7,7 @@ import unittest
 # from sweet.tests import helper
 from sweet.tests.integration.test_recordset_crud_mysql import RecordsetCRUDMySQLTest
 from sweet.tests.integration.test_model_struct_mysql import ModelStructMySQLTest
+from sweet.tests.integration.test_model_crud_mysql import ModelCRUDMySQLTest
 
 from sweet.tests.unit.test_filter import FilterTest
 from sweet.tests.unit.test_clauses import ClausesTest
@@ -124,6 +125,7 @@ unit_tests += [
 integration_tests = [
     RecordsetCRUDMySQLTest,
     ModelStructMySQLTest,
+    ModelCRUDMySQLTest,
 ]
 
 
