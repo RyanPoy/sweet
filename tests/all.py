@@ -5,37 +5,37 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import unittest
 # from sweet.tests import helper
-from sweet.tests.integration.test_recordset_crud_mysql import RecordsetCRUDMySQLTest
-from sweet.tests.integration.test_model_struct_mysql import ModelStructMySQLTest
-from sweet.tests.integration.test_model_crud_mysql import ModelCRUDMySQLTest
+from sweet.tests.integration.test_recordset_crud_mysql import TestRecordsetCRUDMySQL
+from sweet.tests.integration.test_model_struct_mysql import TestModelStructMySQL
+from sweet.tests.integration.test_model_crud_mysql import TestModelCRUDMySQL
 
-from sweet.tests.unit.test_filter import FilterTest
-from sweet.tests.unit.test_clauses import ClausesTest
+from sweet.tests.unit.test_filter import TestFilter
+from sweet.tests.unit.test_clauses import TestClauses
 
-from sweet.tests.unit.test_recordset_query_for_mysql import MySQLRecordsetQueryTest
-from sweet.tests.unit.test_recordset_insert_for_mysql import MySQLRecordsetInsertTest
-from sweet.tests.unit.test_recordset_delete_for_mysql import MySQLRecordsetDeleteTest
-from sweet.tests.unit.test_recordset_update_for_mysql import MySQLRecordsetUpdateTest
+from sweet.tests.unit.test_recordset_query_for_mysql import TestRecordsetQueryForMySQL
+from sweet.tests.unit.test_recordset_insert_for_mysql import TestRecordsetInsertForMySQL
+from sweet.tests.unit.test_recordset_delete_for_mysql import TestRecordsetDeleteForMysql
+from sweet.tests.unit.test_recordset_update_for_mysql import TestRecordsetUpdateMySQL
 
-from sweet.tests.unit.test_model_define import ModelDefineTest
+from sweet.tests.unit.test_model_define import TestModelDefine
 
-from sweet.tests.unit.test_validator_acceptance import AcceptanceValidatorTest
-from sweet.tests.unit.test_validator_confirmation import ConfirmationValidatorTest
-from sweet.tests.unit.test_validator_exclusion import ExclusionValidatorTest
-from sweet.tests.unit.test_validator_format import FormatValidatorTest
-from sweet.tests.unit.test_validator_inclusion import InclusionValidatorTest
-from sweet.tests.unit.test_validator_length import LengthValidatorTest
-from sweet.tests.unit.test_validator_numericality import NumericalityValidatorTest
-from sweet.tests.unit.test_validator_presence import PresenceValidatorTest
+from sweet.tests.unit.test_validator_acceptance import TestValidatorAcceptance
+from sweet.tests.unit.test_validator_confirmation import TestValidatorConfirmation
+from sweet.tests.unit.test_validator_exclusion import TestValidatorExclusion
+from sweet.tests.unit.test_validator_format import TestValidatorFormat
+from sweet.tests.unit.test_validator_inclusion import TestValidatorInclusion
+from sweet.tests.unit.test_validator_length import TestValidatorLength
+from sweet.tests.unit.test_validator_numericality import TestValidatorNumericality
+from sweet.tests.unit.test_validator_presence import TestValidatorPresence
 
-from sweet.tests.unit.test_template_loader import LoaderTest
-from sweet.tests.unit.test_template_basic import BasicTest
-from sweet.tests.unit.test_template_if import IfTest
-from sweet.tests.unit.test_template_for import ForTest
-from sweet.tests.unit.test_template_include import IncludeTest
-from sweet.tests.unit.test_template_extends import ExtendsTest
-from sweet.tests.unit.test_template_complex import ComplexTest
-from sweet.tests.unit.test_template_using import UsingTest
+from sweet.tests.unit.test_template_basic import TestTemplateBasic
+from sweet.tests.unit.test_template_complex import TestTemplateComplex
+from sweet.tests.unit.test_template_extends import TestTemplateExtends
+from sweet.tests.unit.test_template_for import TestTemplateFor
+from sweet.tests.unit.test_template_if import TestTemplateIf
+from sweet.tests.unit.test_template_include import TestTemplateInclude
+from sweet.tests.unit.test_template_loader import TestTemplateLoader
+from sweet.tests.unit.test_template_using import TestTemplateUsing
 
 from sweet.tests.unit.test_form import TestForm
 from sweet.tests.unit.test_form_button import TestFormButton
@@ -63,36 +63,36 @@ from sweet.tests.unit.test_form_week import TestFormWeek
 
 
 unit_tests = [
-    FilterTest,
-    ClausesTest,
+    TestFilter,
+    TestClauses,
 
-    MySQLRecordsetQueryTest,
-    MySQLRecordsetInsertTest,
-    MySQLRecordsetDeleteTest,
-    MySQLRecordsetUpdateTest,
+    TestRecordsetQueryForMySQL,
+    TestRecordsetInsertForMySQL,
+    TestRecordsetDeleteForMysql,
+    TestRecordsetUpdateMySQL,
 
-    ModelDefineTest,
+    TestModelDefine,
     
-    AcceptanceValidatorTest,
-    ConfirmationValidatorTest,
-    ExclusionValidatorTest,
-    FormatValidatorTest,
-    InclusionValidatorTest,
-    LengthValidatorTest,
-    NumericalityValidatorTest,
-    PresenceValidatorTest,
+    TestValidatorAcceptance,
+    TestValidatorConfirmation,
+    TestValidatorExclusion,
+    TestValidatorFormat,
+    TestValidatorInclusion,
+    TestValidatorLength,
+    TestValidatorNumericality,
+    TestValidatorPresence,
 ]
 
 # template unit tests
 unit_tests += [
-    LoaderTest,
-    ExtendsTest,
-    BasicTest,
-    IfTest,
-    ForTest,
-    IncludeTest,
-    ComplexTest,
-    UsingTest,
+    TestTemplateExtends,
+    TestTemplateBasic,
+    TestTemplateComplex,
+    TestTemplateFor,
+    TestTemplateIf,
+    TestTemplateInclude,
+    TestTemplateLoader,
+    TestTemplateUsing,
 ]
 
 # form tests
@@ -123,9 +123,9 @@ unit_tests += [
 ]
 
 integration_tests = [
-    RecordsetCRUDMySQLTest,
-    ModelStructMySQLTest,
-    ModelCRUDMySQLTest,
+    TestRecordsetCRUDMySQL,
+    TestModelStructMySQL,
+    TestModelCRUDMySQL,
 ]
 
 

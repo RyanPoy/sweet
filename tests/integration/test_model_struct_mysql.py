@@ -6,7 +6,7 @@ from sweet.utils import Collection, mydict
 from sweet.orm.fields import *
 
 
-class ModelStructMySQLTest(TestCase):
+class TestModelStructMySQL(TestCase):
     
     def test_table_columns(self):
         field_dict = Foo.__field_define_dict__

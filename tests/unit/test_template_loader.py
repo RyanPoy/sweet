@@ -4,7 +4,7 @@ from template import FileLoader, MemLoader
 import os
 
 
-class LoaderTest(TestCase):
+class TestTemplateLoader(TestCase):
     
     def setUp(self):
         self.abs_dir = os.path.dirname(os.path.abspath(__file__))

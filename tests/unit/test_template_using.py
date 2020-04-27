@@ -13,7 +13,7 @@ class FakeTag(object):
         return "</fake-tag>"
 
 
-class UsingTest(TestCase):
+class TestTemplateUsing(TestCase):
 
     def setUp(self):
         self.dirname = os.path.dirname(os.path.abspath(__file__))

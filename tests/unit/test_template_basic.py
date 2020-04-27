@@ -4,7 +4,7 @@ import os
 from sweet.template import Template, FormatError
 
 
-class BasicTest(TestCase):
+class TestTemplateBasic(TestCase):
 
     def setUp(self):
         self.dirname = os.path.dirname(os.path.abspath(__file__))

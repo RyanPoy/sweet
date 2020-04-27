@@ -3,7 +3,7 @@ from sweet.utils.validation import LengthValidator
 from sweet.tests import TestCase
 
 
-class LengthValidatorTest(TestCase):
+class TestValidatorLength(TestCase):
 
     def test_length_is_5(self):
         self.assertTrue(LengthValidator().validate('hello', _is = 5))  

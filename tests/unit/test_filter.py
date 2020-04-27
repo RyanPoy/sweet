@@ -3,7 +3,7 @@ from sweet.tests import TestCase
 from sweet.database.filters import Filter
 
 
-class FilterTest(TestCase):
+class TestFilter(TestCase):
     
     def get_filter(self, name, value):
         return Filter.new(name, value, '`', '%s').compile()

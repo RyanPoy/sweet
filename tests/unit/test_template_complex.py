@@ -4,7 +4,7 @@ from template import MemLoader, FileLoader
 import os
 
 
-class ComplexTest(TestCase):
+class TestTemplateComplex(TestCase):
 
     def setUp(self):
         self.users = [

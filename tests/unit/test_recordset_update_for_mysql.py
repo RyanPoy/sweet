@@ -3,7 +3,7 @@ from sweet.tests import TestCase
 from sweet.database.recordset import MySQLRecordset
 
 
-class MySQLRecordsetUpdateTest(TestCase):
+class TestRecordsetUpdateMySQL(TestCase):
 
     def get_recordset(self):
         class FakeDB(object): pass

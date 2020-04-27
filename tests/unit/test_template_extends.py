@@ -3,7 +3,7 @@ from sweet.tests import TestCase
 from template import  MemLoader, FormatError
 
 
-class ExtendsTest(TestCase):
+class TestTemplateExtends(TestCase):
     
     def test_should_ignore_not_block_tag_if_template_is_extends(self):
         loader = MemLoader({

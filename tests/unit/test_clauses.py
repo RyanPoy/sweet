@@ -7,7 +7,7 @@ from sweet.database.clauses import WhereClause, HavingClause, \
                                     SelectClause
 
 
-class ClausesTest(TestCase):
+class TestClauses(TestCase):
 
     def setUp(self):
         self.where_clause = WhereClause('`', '%s')

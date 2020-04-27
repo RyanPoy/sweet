@@ -5,7 +5,7 @@ from sweet.database.clauses import WhereClause, HavingClause
 from sweet.utils import mydict
 
 
-class MySQLRecordsetQueryTest(TestCase):
+class TestRecordsetQueryForMySQL(TestCase):
 
     def get_recordset(self, name="users"):
         class FakeDB(object): pass

@@ -3,7 +3,7 @@ from sweet.utils.validation import AcceptanceValidator
 from sweet.tests import TestCase
 
 
-class AcceptanceValidatorTest(TestCase):
+class TestValidatorAcceptance(TestCase):
     
     def test_acceptance(self):
         self.assertTrue(AcceptanceValidator().validate(10))  

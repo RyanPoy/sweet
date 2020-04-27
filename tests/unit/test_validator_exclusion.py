@@ -3,7 +3,7 @@ from sweet.utils.validation import ExclusionValidator
 from sweet.tests import TestCase
 
 
-class ExclusionValidatorTest(TestCase):
+class TestValidatorExclusion(TestCase):
 
     def test_exclusion_if_value_is_null_and_allow_null(self):
         self.assertTrue(ExclusionValidator().validate(None, allow_null=True))

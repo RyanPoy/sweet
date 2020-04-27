@@ -17,7 +17,7 @@ class ModelCustomerStub(Model):
 #     __pk__ = 'id'
 
 
-class ModelDefineTest(TestCase):
+class TestModelDefine(TestCase):
 
     def test_auto_tablename(self):
         self.assertEqual('model_auto_stubs', ModelAutoStub.__tablename__)

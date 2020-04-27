@@ -3,7 +3,7 @@ from sweet.utils.validation import PresenceValidator
 from sweet.tests import TestCase
 
 
-class PresenceValidatorTest(TestCase):
+class TestValidatorPresence(TestCase):
 
     def test_presence_validate_if_value_is_none(self):
         self.assertFalse(PresenceValidator().validate(None))

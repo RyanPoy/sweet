@@ -3,7 +3,7 @@ from sweet.tests import TestCase, UserForTemplateTest
 from template import MemLoader, FormatError
 
 
-class IncludeTest(TestCase):
+class TestTemplateInclude(TestCase):
 
     def setUp(self):
         self.users = [

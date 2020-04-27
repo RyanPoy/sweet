@@ -5,7 +5,7 @@ from sweet.database import MySQL
 from sweet.utils import Collection, mydict
 
 
-class RecordsetCRUDMySQLTest(TestCase):
+class TestRecordsetCRUDMySQL(TestCase):
     
     def setUp(self):
         self.db = MySQL('sweet_test')

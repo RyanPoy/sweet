@@ -3,7 +3,7 @@ from sweet.utils.validation import FormatValidator
 from sweet.tests import TestCase
 
 
-class FormatValidatorTest(TestCase):
+class TestValidatorFormat(TestCase):
 
     def test_foramt_with(self):
         self.assertTrue(FormatValidator().validate('abc.abc.abc.', '[(\w+)/.]{3}'))  

@@ -3,7 +3,7 @@ from sweet.utils.validation import ConfirmationValidator
 from sweet.tests import TestCase
 
 
-class ConfirmationValidatorTest(TestCase):
+class TestValidatorConfirmation(TestCase):
 
     def test_confirmation(self):
         self.assertTrue(ConfirmationValidator().validate(10, 10))  
