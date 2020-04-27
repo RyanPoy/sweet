@@ -74,11 +74,25 @@ class ModelCRUDMySQLTest(TestCase):
         User.delete_all()
         self.assertEqual(0, User.count())
 
-    # def test_first(self):
-    #     r = self.db.records('users').first()
-    #     self.assertEqual(1, r.id)
-    #     self.assertEqual('jack', r.name)
-    #     self.assertEqual(25, r.age)
+    def test_delete_all_with_attrs(self):
+        User.create(name='jack', age=25)
+        User.create(name='jon', age=30)
+        User.create(name='Lucy', age=35)
+        User.create(name='Lily', age=40)
+        self.assertEqual(4, User.count())
+
+        User.delete_all(age__gte=30)
+        self.assertEqual(1, User.count())
+        u = User.where(name='jack', age=25)
+        self.assertTrue(u is not None)
+
+    def test_first(self):
+        User.create(name='jack', age=25)
+        User.create(name='jon', age=30)
+        User.create(name='Lucy', age=35)
+        u = User.first()
+        self.assertEqual('jack', u.name)
+        self.assertEqual(25, u.age)
 
     # def test_last(self):
     #     r = self.db.records('users').last()

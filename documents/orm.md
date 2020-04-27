@@ -1,61 +1,79 @@
 # ORM
 =======
 
-## list
 - Introduction
-- define
+- Define
+- create
 - save
 - update
 - delete
 
-==
-- Introduction
+----
+
+## Introduction
 the orm which implement ActiveRecord
 
-- define
-
 ```
-class User(Model):
-  pass
-```
-
-User would be add column named created_at, updated_at, id auto. 
-And created_at, updated_at are datetime type, id is a integer auto increament
-
-if you don't create created_at and updated_at, you can set __timestamp__ is False in User.
-Just like this:
-
-```
-class User(Model):
-  __timestamp__ = False
-
+  -- create the table
+  
+  create table users (
+    id int auto_increment primary key ,
+    name varchar(32) not null default '',
+    age int not null default 20
+  );
 ```
 
-
-- save / create
-
-```  
-User(name='jim', age=20).save()
-
-User.create(name='jim', age=20)
-```
-
-- update
+## Define
 
 ```
-u = User.where(name="jim")
-u.update(name="lily", age=20)
+  class User(Model):
+    pass
+```
 
-u = User.where(name='jim')
-u.name = 'lily'
-u.age = 20
-u.save()
+User would be add column named `created_at`, `updated_at`, `id` auto. And `created_at`, `updated_at` are datetime type, id is a integer auto increament
+
+if you won't create `created_at` and `updated_at`, you can set `__timestamp__` is False in User. Just like this:
+
+```
+  class User(Model):
+    __timestamp__ = False
+
 ```
 
 
+## create
+```
+  User.create(name='jim', age=25)
+```
 
+## save
+```
+  u = User(name='jim', age=25)
+  u.save()
+```
 
+## update
+```
+  u = User.find(1)   # find the user which id = 1
+  u.update(name="lily", age=20)
+```
 
+## update_all
+```
+  User.update_all(name='lily', age=20) # udpate all users set name = 'lily' and age = 20
+```
+
+## delete
+```
+  u = User.find(1)
+  u.delete()
+```
+
+## delete_all
+```
+  User.delete_all()  # delete all users
+  User.delete_all(age=20) # delete all users which age = 20
+```
 
 
 ==

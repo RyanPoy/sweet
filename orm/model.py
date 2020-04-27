@@ -83,7 +83,7 @@ class Model(metaclass=ModelMetaClass):
         if self.persisted():
             self.update()
         else:
-            _id = self._rs.insert_getid(**self.column_dict())
+            _id = self.objects.insert_getid(**self.column_dict())
             self.set_pk(_id)
         return self
 
@@ -103,18 +103,18 @@ class Model(metaclass=ModelMetaClass):
         if not self.persisted():
             raise ModelHasNotBeenPersisted()
         if attrs:
-            self._rs.update(**attrs)
+            self.objects.update(**attrs)
             for k, v in attrs.items():
                 setattr(self, k, v)
         else:
-            self._rs.update(**self.column_dict())
+            self.objects.update(**self.column_dict())
         return self
 
     @classmethod
     def update_all(cls, **attrs):
         """ delete all record
         """
-        cls._rs.update(**attrs)
+        cls.objects.update(**attrs)
         return cls
 
     def delete(self):
@@ -123,15 +123,18 @@ class Model(metaclass=ModelMetaClass):
         """
         if self.persisted():
             pk = self.__pk__
-            self._rs.where(**{self.__pk__: self.get_pk()}).delete()
+            self.objects.where(**{self.__pk__: self.get_pk()}).delete()
             self.set_pk(None)
         return self
 
     @classmethod
-    def delete_all(cls):
+    def delete_all(cls, **attrs):
         """ delete all record
         """
-        cls._rs.delete()
+        if attrs:
+            cls.objects.where(**attrs).delete()
+        else:
+            cls.objects.delete()
         return cls
 
     def set_pk(self, value):
@@ -145,53 +148,53 @@ class Model(metaclass=ModelMetaClass):
 
     @classmethod
     def count(cls):
-        return cls._rs.count()
+        return cls.objects.count()
 
     @classmethod
     def truncate(self):
-        return cls._rs.truncate()
+        return cls.objects.truncate()
 
     @classmethod
     def exists(self):
-        return cls._rs.exists()
+        return cls.objects.exists()
 
     @classmethod
     def max(self, column, distinct=False):
-        return cls._rs.max(column, distinct)
+        return cls.objects.max(column, distinct)
 
     @classmethod
     def min(self, column, distinct=False):
-        return cls._rs.min(column, distinct)
+        return cls.objects.min(column, distinct)
 
     @classmethod
     def avg(self, column, distinct=False):
-        return cls._rs.avg(column, distinct)
+        return cls.objects.avg(column, distinct)
 
     @classmethod
     def sum(self, column, distinct=False):
-        return cls._rs.sum(column, distinct)
+        return cls.objects.sum(column, distinct)
 
     @classmethod
     def all(cls):
-        return cls._rs.all()
+        return cls.objects.all()
 
     @classmethod
     def first(cls):
-        return cls._rs.first()
+        return cls.objects.first()
 
     @classmethod
     def last(self):
-        return self._rs.last()
+        return self.objects.last()
 
     @classmethod
     def find(cls, *ids):
         if len(ids) == 1:
-            return cls._rs.where(id=ids).first()
+            return cls.objects.where(id=ids).first()
         else:
-            return cls._rs.where(id=ids).all()
+            return cls.objects.where(id=ids).all()
 
     @classproperty
-    def _rs(cls):
+    def objects(cls):
         db = cls.db_manager.new_db()
         return db.records(cls.__tablename__)
 
@@ -200,3 +203,7 @@ class Model(metaclass=ModelMetaClass):
         for c in cls.db_manager.new_db().get_columns(cls.__tablename__):
             cls.__field_define_dict__[c.name] = c
         return cls
+
+    @classmethod
+    def where(cls, **filters):
+        return cls.objects.where(**filters)
