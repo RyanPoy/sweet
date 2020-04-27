@@ -4,7 +4,7 @@ from sweet.template import Template
 from datetime import date, datetime
 
 
-class DatetimeTest(TestCase):
+class TestFormDatetime(TestCase):
 
     def test_for_tag(self):
         t = Template("""

@@ -3,7 +3,7 @@ from sweet.tests import TestCase
 from sweet.template import Template
 
 
-class TelTest(TestCase):
+class TestFormTel(TestCase):
 
     def test_for_tag(self):
         t = Template("""

@@ -3,7 +3,7 @@ from sweet.tests import TestCase
 from sweet.template import Template
 
 
-class RadioTest(TestCase):
+class TestFormRadio(TestCase):
 
     def test_for_tag(self):
         t = Template("""

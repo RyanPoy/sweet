@@ -37,29 +37,29 @@ from sweet.tests.unit.test_template_extends import ExtendsTest
 from sweet.tests.unit.test_template_complex import ComplexTest
 from sweet.tests.unit.test_template_using import UsingTest
 
-from sweet.tests.unit.test_form import FormTest
-from sweet.tests.unit.test_form_button import ButtonTest
-from sweet.tests.unit.test_form_checkbox import CheckboxTest
-from sweet.tests.unit.test_form_color import ColorTest
-from sweet.tests.unit.test_form_date import DateTest
-from sweet.tests.unit.test_form_datetime import DatetimeTest
-from sweet.tests.unit.test_form_email import EmailTest
-from sweet.tests.unit.test_form_file import FileTest
-from sweet.tests.unit.test_form_hidden import HiddenTest
-from sweet.tests.unit.test_form_label import LabelTest
-from sweet.tests.unit.test_form_month import MonthTest
-from sweet.tests.unit.test_form_number import NumberTest
-from sweet.tests.unit.test_form_password import PasswordTest
-from sweet.tests.unit.test_form_text import TextTest
-from sweet.tests.unit.test_form_tel import TelTest
-from sweet.tests.unit.test_form_radio import RadioTest
-from sweet.tests.unit.test_form_range import RangeTest
-from sweet.tests.unit.test_form_search import SearchTest
-from sweet.tests.unit.test_form_submit import SubmitTest
-from sweet.tests.unit.test_form_textarea import TextareaTest
-from sweet.tests.unit.test_form_time import TimeTest
-from sweet.tests.unit.test_form_url import UrlTest
-from sweet.tests.unit.test_form_week import WeekTest
+from sweet.tests.unit.test_form import TestForm
+from sweet.tests.unit.test_form_button import TestFormButton
+from sweet.tests.unit.test_form_checkbox import TestFormCheckbox
+from sweet.tests.unit.test_form_color import TestFormColor
+from sweet.tests.unit.test_form_date import TestFormDate
+from sweet.tests.unit.test_form_datetime import TestFormDatetime
+from sweet.tests.unit.test_form_email import TestFormEmail
+from sweet.tests.unit.test_form_file import TestFormFile
+from sweet.tests.unit.test_form_hidden import TestFormHidden
+from sweet.tests.unit.test_form_label import TestFormLabel
+from sweet.tests.unit.test_form_month import TestFormMonth
+from sweet.tests.unit.test_form_number import TestFormNumber
+from sweet.tests.unit.test_form_password import TestFormPassword
+from sweet.tests.unit.test_form_radio import TestFormRadio
+from sweet.tests.unit.test_form_range import TestFormRange
+from sweet.tests.unit.test_form_search import TestFormSearch
+from sweet.tests.unit.test_form_submit import TestFormSubmit
+from sweet.tests.unit.test_form_tel import TestFormTel
+from sweet.tests.unit.test_form_text import TestFormText
+from sweet.tests.unit.test_form_textarea import TestFormTextarea
+from sweet.tests.unit.test_form_time import TestFormTime
+from sweet.tests.unit.test_form_url import TestFormUrl
+from sweet.tests.unit.test_form_week import TestFormWeek
 
 
 unit_tests = [
@@ -97,29 +97,29 @@ unit_tests += [
 
 # form tests
 unit_tests += [
-    FormTest,
-    ButtonTest,
-    CheckboxTest,
-    ColorTest,
-    DateTest,
-    DatetimeTest,
-    EmailTest,
-    FileTest,
-    HiddenTest,
-    LabelTest,
-    MonthTest,
-    NumberTest,
-    PasswordTest,
-    TelTest,
-    RadioTest,
-    RangeTest,
-    SearchTest,
-    SubmitTest,
-    TextareaTest,
-    TextTest,
-    TimeTest,
-    UrlTest,
-    WeekTest,
+    TestForm,
+    TestFormButton,
+    TestFormCheckbox,
+    TestFormColor,
+    TestFormDate,
+    TestFormDatetime,
+    TestFormEmail,
+    TestFormFile,
+    TestFormHidden,
+    TestFormLabel,
+    TestFormMonth,
+    TestFormNumber,
+    TestFormPassword,
+    TestFormRadio,
+    TestFormRange,
+    TestFormSearch,
+    TestFormSubmit,
+    TestFormTel,
+    TestFormText,
+    TestFormTextarea,
+    TestFormTime,
+    TestFormUrl,
+    TestFormWeek,
 ]
 
 integration_tests = [
