@@ -183,6 +183,24 @@ class TestModelCRUDMySQL(TestCase):
         self.assertEqual('jon', us[0].name)
         self.assertEqual(30, us[0].age)
 
+    def test_find(self):
+        ids = [ 
+            User.create(name='jon', age=30).id,
+            User.create(name='jack', age=25).id,
+            User.create(name='Lucy', age=35).id
+        ]
+        us = User.find(*ids)
+        self.assertEqual(3, len(us))
+        self.assertEqual(ids[0], us[0].id)
+        self.assertEqual(ids[1], us[1].id)
+        self.assertEqual(ids[2], us[2].id)
+
+    def test_find_or_create(self):
+        self.assertEqual(0, User.count())
+        u = User.find_or_create(name='jon', age=30)
+        self.assertEqual(1, User.count())
+        self.assertEqual(u.id, User.first().id)
+
     # def test_join(self):
     #     coll = self.db.records('users').join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
     #     self.assertEqual(2, len(coll))

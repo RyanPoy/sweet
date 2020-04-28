@@ -194,10 +194,21 @@ class Model(metaclass=ModelMetaClass):
 
     @classmethod
     def find(cls, *ids):
+        """ find by ids. there are 2 cases.
+        case 1: one id，should return model instance if found else None
+        case 2: multiple ids, should return the model list
+        """
         if len(ids) == 1:
             return cls.objects.where(id=ids).first()
         else:
             return cls.objects.where(id=ids).all()
+
+    @classmethod
+    def find_or_create(cls, **kwargs):
+        model = cls.objects.where(**kwargs).limit(1).first()
+        if not model:
+            model = cls.create(**kwargs)
+        return model
 
     @classproperty
     def objects(cls):
