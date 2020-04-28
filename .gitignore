@@ -1,12 +1,6 @@
 *.pyc
-temp/
 __pycache__
-tests/tornado_template.py
 .DS_Store
 .project
 .pydevproject
 .settings/
-test_sql_builder的副本.py
-tmp_test_sql_builder.py
-_sweet
-utils/collection.py
