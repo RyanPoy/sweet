@@ -23,6 +23,14 @@ class TestModelCRUDMySQL(TestCase):
         self.assertTrue('jack', u.name)
         self.assertTrue(25, u.age)
 
+    def test_create_all(self):
+        self.assertEqual(3, User.create_all(
+            dict(name='jack', age=25),
+            dict(name='jon', age=30),
+            dict(name='Lucy', age=3)
+        ))
+        self.assertEqual(3, User.count())
+
     def test_save_successful_when_model_has_not_been_persisted(self):
         self.assertEqual(0, User.count())
         u = User(name='jack', age=25)
@@ -94,94 +102,86 @@ class TestModelCRUDMySQL(TestCase):
         self.assertEqual('jack', u.name)
         self.assertEqual(25, u.age)
 
-    # def test_last(self):
-    #     r = self.db.records('users').last()
-    #     self.assertEqual(4, r.id)
-    #     self.assertEqual('lily', r.name)
-    #     self.assertEqual(26, r.age)
+    def test_last(self):
+        User.create(name='jack', age=25)
+        User.create(name='jon', age=30)
+        User.create(name='Lucy', age=35)
+        u = User.last()
+        self.assertEqual('Lucy', u.name)
+        self.assertEqual(35, u.age)
 
-    # def test_all(self):
-    #     coll = self.db.records('users').all()
-    #     self.assertTrue(isinstance(coll, Collection))
-    #     self.assertEqual(4, len(coll))
-        
-    #     self.assertEqual(1, coll[0].id)
-    #     self.assertEqual('jack', coll[0].name)
-    #     self.assertEqual(25, coll[0].age)
+    def test_all(self):
+        User.create(name='jack', age=25)
+        User.create(name='jon', age=30)
+        User.create(name='Lucy', age=35)
+        us = User.all()
+        self.assertEqual(3, len(us))
+        self.assertEqual(25, us[0].age)
+        self.assertEqual(30, us[1].age)
+        self.assertEqual(35, us[2].age)
 
-    #     self.assertEqual(2, coll[1].id)
-    #     self.assertEqual('lucy', coll[1].name)
-    #     self.assertEqual(22, coll[1].age)
+    def test_count(self):
+        User.create(name='jack', age=25)
+        User.create(name='jon', age=30)
+        User.create(name='Lucy', age=35)
+        self.assertEqual(3, User.count())
+        self.assertEqual(3, User.count('name'))
 
-    # def test_count(self):
-    #     r = self.db.records('users').count()
-    #     self.assertEqual(4, r)
+    def test_max(self):
+        User.create(name='jack', age=25)
+        User.create(name='jon', age=30)
+        User.create(name='Lucy', age=35)
+        self.assertEqual(35, User.max('age'))
 
-    # def test_count_with_column(self):
-    #     r = self.db.records('users').count('age')
-    #     self.assertEqual(4, r)
+    def test_min(self):
+        User.create(name='jon', age=30)
+        User.create(name='jack', age=25)
+        User.create(name='Lucy', age=35)
+        self.assertEqual(25, User.min('age'))
 
-    # def test_max(self):
-    #     r = self.db.records('users').max('age')
-    #     self.assertEqual(27, r)
+    def test_avg(self):
+        User.create(name='jon', age=30)
+        User.create(name='jack', age=25)
+        User.create(name='Lucy', age=35)
+        self.assertEqual(30, User.avg('age'))
 
-    # def test_min(self):
-    #     r = self.db.records('users').min('age')
-    #     self.assertEqual(22, r)
+    def test_sum(self):
+        User.create(name='jon', age=30)
+        User.create(name='jack', age=25)
+        User.create(name='Lucy', age=35)
+        self.assertEqual(90, User.sum('age'))
 
-    # def test_avg(self):
-    #     r = self.db.records('users').avg('age')
-    #     self.assertEqual(25, r)
+    def test_exists(self):
+        User.create(name='jon', age=30)
+        User.create(name='jack', age=25)
+        User.create(name='Lucy', age=35)
+        self.assertTrue(User.where(age=30).exists())
 
-    # def test_sum(self):
-    #     r = self.db.records('users').sum('age')
-    #     self.assertEqual(100, r)
+    def test_not_exists(self):
+        User.create(name='jon', age=30)
+        User.create(name='jack', age=25)
+        User.create(name='Lucy', age=35)
+        self.assertFalse(User.where(age=27).exists())
 
-    # def test_exists(self):
-    #     r = self.db.records('users').where(age=27).exists()
-    #     self.assertTrue(r)
+    def test_select(self):
+        User.create(name='jon', age=30)
+        User.create(name='jack', age=25)
+        User.create(name='Lucy', age=35)
+        us = User.select('name').where(age=25).all()
+        self.assertEqual(1, len(us))
 
-    # def test_not_exists(self):
-    #     r = self.db.records('users').where(age=100).exists()
-    #     self.assertFalse(r)
+        u = us[0]
+        self.assertTrue('name' in u.keys())
+        self.assertTrue('age' not in u.keys())
+        self.assertEqual('jack', u.name)
 
-    # def test_select(self):
-    #     coll = self.db.records('users').select('name').where(age=22).all()
-    #     self.assertEqual(1, len(coll))
-    #     r = coll[0]
-
-    #     self.assertEqual(1, len(r.keys()))
-    #     self.assertTrue('name' in r.keys())
-    #     self.assertFalse('age' in r.keys())
-    #     self.assertEqual('lucy', r.name)
-
-    # def test_select_with_multiple_columns(self):
-    #     coll = self.db.records('users').select('name', 'age').where(age=22).all()
-    #     self.assertEqual(1, len(coll))
-    #     r = coll[0]
-    #     self.assertEqual(2, len(r.keys()))
-    #     self.assertTrue('age' in r.keys())
-    #     self.assertTrue('name' in r.keys())
-    #     self.assertEqual('lucy', r.name)
-    #     self.assertEqual(22, r.age)
-
-    # def test_select_twice(self):
-    #     coll = self.db.records('users').select('name').select('age').where(age=22).all()
-    #     self.assertEqual(1, len(coll))
-    #     r = coll[0]
-    #     self.assertEqual(2, len(r.keys()))
-    #     self.assertTrue('age' in r.keys())
-    #     self.assertTrue('name' in r.keys())
-    #     self.assertEqual('lucy', r.name)
-    #     self.assertEqual(22, r.age)
-
-    # def test_where(self):
-    #     coll = self.db.records('users').where(age=22).all()
-    #     self.assertEqual(1, len(coll))
-    #     r = coll[0]
-    #     self.assertEqual(2, r.id)
-    #     self.assertEqual('lucy', r.name)
-    #     self.assertEqual(22, r.age)
+    def test_where(self):
+        u = User.create(name='jon', age=30)
+        us = User.where(name='jon').all()
+        self.assertEqual(1, len(us))
+        self.assertEqual(u.id, us[0].id)
+        self.assertEqual('jon', us[0].name)
+        self.assertEqual(30, us[0].age)
 
     # def test_join(self):
     #     coll = self.db.records('users').join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
@@ -203,74 +203,6 @@ class TestModelCRUDMySQL(TestCase):
     #     self.assertEqual(1, coll[0].id)
     #     self.assertEqual(2, coll[1].id)
 
-    # def test_cross_join(self):
-    #     coll = self.db.records('users').cross_join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
-    #     self.assertEqual(2, len(coll))
-    #     self.assertEqual(1, coll[0].id)
-    #     self.assertEqual(2, coll[1].id)
-
-    # def test_insert_getid(self):
-    #     tb = self.db.records('users')
-    #     user_id = tb.insert_getid(id=300, name="Poy", age=33)
-    #     self.assertEqual(300, user_id)
-
-    #     rs = tb.where(id=300).all()
-    #     self.assertEqual(1, len(rs))
-
-    #     r = rs[0]
-    #     self.assertEqual(300, r.id)
-    #     self.assertEqual('Poy', r.name)
-    #     self.assertEqual(33, r.age)
-
-    # def test_insert_getid_with_autoincrementid(self):
-    #     tb = self.db.records('users')
-    #     user_id = tb.insert_getid(name="Poy", age=33)
-
-    #     rs = tb.where(name="Poy").where(age=33).all()
-    #     self.assertEqual(1, len(rs))
-
-    #     r = rs[0]
-    #     self.assertEqual(user_id, r.id)
-    #     self.assertEqual('Poy', r.name)
-    #     self.assertEqual(33, r.age)
-
-    # def test_insert(self):
-    #     tb = self.db.records('users')
-    #     cnt = tb.insert(id=300, name="Poy", age=33)
-    #     self.assertEqual(1, cnt)
-    #     rs = tb.where(id=300).all()
-    #     self.assertEqual(1, len(rs))
-
-    #     r = rs[0]
-    #     self.assertEqual(300, r.id)
-    #     self.assertEqual('Poy', r.name)
-    #     self.assertEqual(33, r.age)
-
-    # def test_multple_insert(self):
-    #     tb = self.db.records('users')
-    #     tb.insert([
-    #         dict(id=300, name="Poy", age=33),
-    #         dict(id=400, name="Ryan", age=44),
-    #     ])
-    #     rs = tb.where(age__gt=30).all()
-    #     self.assertEqual(2, len(rs))
-
-    #     self.assertEqual(300, rs[0].id)
-    #     self.assertEqual('Poy', rs[0].name)
-    #     self.assertEqual(33, rs[0].age)
-
-    #     self.assertEqual(400, rs[1].id)
-    #     self.assertEqual('Ryan', rs[1].name)
-    #     self.assertEqual(44, rs[1].age)
-
-    # def test_delete(self):
-    #     tb = self.db.records('mobiles')
-    #     r = tb.where(id=[1, 3]).delete()
-    #     c = tb.where(id=[1, 2, 3]).all()
-    #     self.assertEqual(2, r)
-    #     self.assertEqual(1, len(c))
-    #     self.assertEqual(2, c[0].id)
-
     # def test_delete_with_join(self):
     #     r = self.db.records('mobiles').join('users', on="users.id=mobiles.user_id").where(users__id=1).delete()
     #     c = self.db.records('mobiles').all()
@@ -282,19 +214,6 @@ class TestModelCRUDMySQL(TestCase):
     #     r = self.db.records('mobiles').truncate()
     #     c = self.db.records('mobiles').all()
     #     self.assertEqual(0, len(c))
-
-    # def test_update(self):
-    #     c = self.db.records('mobiles').where(name='iphone').all()
-    #     self.assertEqual(2, len(c))
-
-    #     r = self.db.records("mobiles").where(name='iphone').update(name='aphone')
-    #     self.assertEqual(2, r)
-
-    #     c = self.db.records('mobiles').where(name='iphone').all()
-    #     self.assertEqual(0, len(c))
-        
-    #     c = self.db.records('mobiles').where(name='aphone').all()
-    #     self.assertEqual(2, len(c))
 
     # def test_update_with_join(self):
     #     u = self.db.records('users').where(age=25).first()

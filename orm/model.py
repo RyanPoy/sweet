@@ -96,6 +96,12 @@ class Model(metaclass=ModelMetaClass):
         model.save()
         return model
 
+    @classmethod
+    def create_all(cls, *items):
+        """ batch create and return how many insert successful
+        """
+        return cls.objects.insert(items)
+
     def update(self, **attrs):
         """ update a record in db, 
         should raise ModelHasNotBeenPersisted if it has not been persisted
@@ -147,31 +153,31 @@ class Model(metaclass=ModelMetaClass):
         return True if self.get_pk() else False
 
     @classmethod
-    def count(cls):
-        return cls.objects.count()
+    def count(cls, column=None, distinct=False):
+        return cls.objects.count(column, distinct)
 
     @classmethod
-    def truncate(self):
+    def truncate(cls):
         return cls.objects.truncate()
 
     @classmethod
-    def exists(self):
+    def exists(cls):
         return cls.objects.exists()
 
     @classmethod
-    def max(self, column, distinct=False):
+    def max(cls, column, distinct=False):
         return cls.objects.max(column, distinct)
 
     @classmethod
-    def min(self, column, distinct=False):
+    def min(cls, column, distinct=False):
         return cls.objects.min(column, distinct)
 
     @classmethod
-    def avg(self, column, distinct=False):
+    def avg(cls, column, distinct=False):
         return cls.objects.avg(column, distinct)
 
     @classmethod
-    def sum(self, column, distinct=False):
+    def sum(cls, column, distinct=False):
         return cls.objects.sum(column, distinct)
 
     @classmethod
@@ -203,6 +209,10 @@ class Model(metaclass=ModelMetaClass):
         for c in cls.db_manager.new_db().get_columns(cls.__tablename__):
             cls.__field_define_dict__[c.name] = c
         return cls
+
+    @classmethod
+    def select(cls, *columns):
+        return cls.objects.select(*columns)
 
     @classmethod
     def where(cls, **filters):
