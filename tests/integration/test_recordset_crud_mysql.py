@@ -2,7 +2,7 @@
 from sweet.tests import TestCase
 from sweet.database.recordset import MySQLRecordset
 from sweet.database import MySQL
-from sweet.utils import Collection, mydict
+from sweet.utils import mydict
 
 
 class TestRecordsetCRUDMySQL(TestCase):
@@ -51,7 +51,6 @@ class TestRecordsetCRUDMySQL(TestCase):
 
     def test_all(self):
         coll = self.db.records('users').all()
-        self.assertTrue(isinstance(coll, Collection))
         self.assertEqual(4, len(coll))
         
         self.assertEqual(1, coll[0].id)

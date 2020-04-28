@@ -1,5 +1,4 @@
 #coding: utf8
-from backpack import Collection as BaseCollection
 from sweet.utils.inflection import *
 from datetime import datetime, date
 from decimal import Decimal
@@ -123,7 +122,6 @@ is_set      = lambda obj: isinstance(obj, set)
 # other functions
 
 def xflatten(sequnce):
-#     from .collection import Collection
     for x in sequnce:
         if isinstance(x, (list, tuple)):
             for y in xflatten(x):
@@ -204,10 +202,4 @@ class mydict(dict):
         if k in self:
             return self[k]
         return super().__getattribute__(k)
-
-
-class Collection(BaseCollection):
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 

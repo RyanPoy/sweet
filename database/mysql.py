@@ -48,18 +48,20 @@ class MySQL(object):
 
     def fetchone(self, sql, *params):
         """Returns the first row returned for the given query."""
-        return self.fetchall(sql, *params).first()
+        vs = self.fetchall(sql, *params)
+        return vs[0] if vs else None
 
     def fetchlastone(self, sql, *params):
         """Returns the last row returned for the given query."""
-        return self.fetchall(sql, *params).last()
+        vs = self.fetchall(sql, *params)
+        return vs[-1] if vs else None
     
     def fetchall(self, sql, *params):
         """Returns a row list for the given query and parameters."""
         cursor = self._cursor()
         try:
             self._execute(cursor, sql, *params)
-            return Collection([ mydict(row) for row in cursor ])
+            return [ mydict(row) for row in cursor ]
         finally:
             cursor.close()
 

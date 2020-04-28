@@ -18,7 +18,7 @@ class Recordset(object):
 
     LOCK = namedtuple("Lock", ['NILL', 'READ', 'WRITE'])._make([0, 1, 2])
 
-    def __init__(self, db, tbname):
+    def __init__(self, db, tbname, model_class=None):
         self.db = db
         self.tbname = tbname
         self.select_clause = SelectClause(self.qutotation_marks)
@@ -32,6 +32,7 @@ class Recordset(object):
         self._lock = self.LOCK.NILL
         self._exists_tables = []
         self.unions = []
+        self.model_class = model_class
 
     def __deepcopy__(self, memo):
         """ Deep copy """

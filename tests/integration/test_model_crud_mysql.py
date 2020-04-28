@@ -2,7 +2,7 @@
 from sweet.tests import TestCase, User
 from sweet.database.recordset import MySQLRecordset
 from sweet.database import MySQL
-from sweet.utils import Collection, mydict
+from sweet.utils import mydict
 
 
 class TestModelCRUDMySQL(TestCase):
