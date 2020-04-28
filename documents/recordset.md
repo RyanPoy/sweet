@@ -2,7 +2,6 @@
 =======
 - Introduction
 - Retrieving Results
-  - Chunking Results
   - Aggregates
 - Selects
 - Raw Expressions
@@ -49,9 +48,6 @@ SELECT * FROM `users`
 ```
 > note: then get last record
 
-
-### Chunking Results
-> 待补充
 
 ### Aggregates
 db.records('users').count()

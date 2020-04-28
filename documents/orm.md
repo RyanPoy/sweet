@@ -3,10 +3,18 @@
 
 - Introduction
 - Define
-- create
-- save
-- update
-- delete
+- Create
+  - Create single model
+  - Create multiple models
+- Update
+  - Update single model
+  - Update multiple models
+- Save
+- Delete
+  - Delete single model
+  - Delete multiple models
+- Retrieving Modles
+  - Aggregates
 
 ----
 
@@ -40,40 +48,74 @@ if you won't create `created_at` and `updated_at`, you can set `__timestamp__` i
 
 ```
 
-
-## create
+## Create
+### Create single model
 ```
   User.create(name='jim', age=25)
 ```
 
-## save
+### Create multiple models
 ```
-  u = User(name='jim', age=25)
-  u.save()
+  User.create_all(
+    dict(name='jim', age=25),
+    dict(name='jon', age=35),
+    dict(name='lily', age=20),
+  )
 ```
 
-## update
+## Update
+### Update single model
 ```
   u = User.find(1)   # find the user which id = 1
   u.update(name="lily", age=20)
 ```
 
-## update_all
+### Update multiple models
 ```
   User.update_all(name='lily', age=20) # udpate all users set name = 'lily' and age = 20
 ```
 
-## delete
+## Save
+```
+  u = User(name='jim', age=25)
+  u.save() # will be create a model
+
+  u = User.find(1)
+  u.name = 'jon'
+  u.age = 30
+  u.save() # will be update
+```
+
+
+## Delete
+### Delete single model
 ```
   u = User.find(1)
   u.delete()
 ```
 
-## delete_all
+### Delete multiple models
 ```
   User.delete_all()  # delete all users
   User.delete_all(age=20) # delete all users which age = 20
 ```
+
+## Retrieving Modles
+```
+  User.first()
+  User.last()
+  User.all()
+```
+
+### Aggregates
+```
+  User.count()
+  User.max('age')
+  User.min('age')
+  User.avg('age')
+  User.sum('age')
+```
+> just support: count、max、min、avg、sum
 
 
 ==
