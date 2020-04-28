@@ -324,13 +324,22 @@ class Recordset(object):
         return self.db.execute_rowcount('TRUNCATE {}'.format(self.tablename))
 
     def first(self):
-        return self.db.fetchone(self.sql, *self.bindings)
+        r = self.db.fetchone(self.sql, *self.bindings)
+        if not r or not self.model_class:
+            return r
+        return self.model_class(**r)
 
     def last(self):
-        return self.db.fetchlastone(self.sql, *self.bindings)
+        r = self.db.fetchlastone(self.sql, *self.bindings)
+        if not r or not self.model_class:
+            return r
+        return self.model_class(**r)                
 
     def all(self):
-        return self.db.fetchall(self.sql, *self.bindings)
+        rs = self.db.fetchall(self.sql, *self.bindings)
+        if not rs or not self.model_class:
+            return rs
+        return [ self.model_class(**r) for r in rs ]
 
     def exists(self):
         return True if self.first() else False

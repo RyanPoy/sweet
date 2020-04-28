@@ -213,7 +213,9 @@ class Model(metaclass=ModelMetaClass):
     @classproperty
     def objects(cls):
         db = cls.db_manager.new_db()
-        return db.records(cls.__tablename__)
+        rs = db.records(cls.__tablename__)
+        rs.model_class = cls
+        return rs
 
     @classmethod
     def _init_fields(cls):

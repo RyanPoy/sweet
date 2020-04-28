@@ -170,11 +170,6 @@ class TestModelCRUDMySQL(TestCase):
         us = User.select('name').where(age=25).all()
         self.assertEqual(1, len(us))
 
-        u = us[0]
-        self.assertTrue('name' in u.keys())
-        self.assertTrue('age' not in u.keys())
-        self.assertEqual('jack', u.name)
-
     def test_where(self):
         u = User.create(name='jon', age=30)
         us = User.where(name='jon').all()
@@ -191,6 +186,7 @@ class TestModelCRUDMySQL(TestCase):
         ]
         us = User.find(*ids)
         self.assertEqual(3, len(us))
+        self.assertEqual(User, type(us[0]))
         self.assertEqual(ids[0], us[0].id)
         self.assertEqual(ids[1], us[1].id)
         self.assertEqual(ids[2], us[2].id)
