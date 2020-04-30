@@ -29,7 +29,7 @@ class BelongsTo(Relation):
         """ owner attribute name
         """
         if not self._attr_name:
-            self._attr_name = pythonize(self._get_target_name()).split('.')[-1]
+            self._attr_name = pythonize(self._get_target_name())
         return self._attr_name
 
     @property
@@ -38,7 +38,7 @@ class BelongsTo(Relation):
         """
         if not self._fk:
             self._fk = '{target_name}_{target_pk}'.format(
-                target_name=pythonize(self._get_target_name()).split('.')[-1],
+                target_name=pythonize(self._get_target_name()),
                 target_pk=self.target.__pk__
             )
         return self._fk
@@ -53,8 +53,10 @@ class BelongsTo(Relation):
         """ get the target class name 
         """
         if isinstance(self._target_cls_or_target_name, str):
-            return self._target_cls_or_target_name.split('.')[-1],
-        return self.target.__name__.split('.')[-1],
+            name = self._target_cls_or_target_name.split('.')[-1]
+        else:
+            name = self.target.__name__.split('.')[-1]
+        return singularize(name)
 
     @property
     def target(self):
