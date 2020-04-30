@@ -6,17 +6,9 @@ class TestRelationBelongsToMysql(TestCase):
     
     def setUp(self):
         self.remove_record()
-        # self.create_record()
 
     def tearDown(self):
         self.remove_record()
-
-    # def create_record(self):
-    #     u1 = User.create(name="Jon", age=31)
-    #     u2 = User.create(name="Lily", age=21)
-    #     m1 = Mobile.create(name="Nokia", user_id=u1.id)
-    #     m2 = Mobile.create(name="IPhone", user_id=u1.id)
-    #     m3 = Mobile.create(name="Vivo", user_id=u2.id)
 
     def remove_record(self):
         Mobile.delete_all()

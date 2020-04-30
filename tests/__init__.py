@@ -33,8 +33,13 @@ class Foo(Model):
 
 
 class User(Model):
-    pass
+    has_many('sweet.tests.Mobile')
+    # has_one('sweet.tests.Father')
 
 
 class Mobile(Model):
     belongs_to(User)
+
+
+class Father(Model):
+    has_many(User)

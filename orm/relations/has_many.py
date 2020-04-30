@@ -1,6 +1,7 @@
 #coding: utf8
 from sweet.orm.relations.relation import Relation, relation_q
 from sweet.utils.inflection import *
+from sweet.utils import *
 
 
 class HasMany(Relation):
@@ -78,9 +79,10 @@ class HasMany(Relation):
         """ eg. user has many mobiles
             Mobile.where(user_id=user.id)
         """
-        return self.target.where(**{self.fk: self.get_pk()})
+        return self.target.where(**{self.fk: owner_obj.get_pk()})
 
 
 def has_many(class_or_name, attr_name=None, fk=None, pk=None):
     r = HasMany(target=class_or_name, attr_name=attr_name, fk=fk, pk=pk)
     relation_q.put(r)
+

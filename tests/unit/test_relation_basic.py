@@ -73,6 +73,40 @@ class TestRelationBasic(TestCase):
         self.assertEqual('user_id', r.fk)
         self.assertEqual('id', r.pk)
 
+    def test_has_one_without_argument(self):
+
+        class Phone(Model):
+            __table_name__ = 'mobiles'
+        
+        class Member(Model):
+            __table_name__ = 'users'
+            has_one(Phone)
+
+        r = Member.__relations__.get('phone')
+        self.assertEqual(HasOne, type(r))
+
+        self.assertEqual(Member, r.owner)
+        self.assertEqual(Phone, r.target)
+        self.assertEqual('member_id', r.fk)
+        self.assertEqual('id', r.pk)
+
+    def test_has_one_with_argument(self):
+
+        class Phone(Model):
+            __table_name__ = 'mobiles'
+        
+        class Member(Model):
+            __table_name__ = 'users'
+            has_one(Phone, fk='user_id')
+
+        r = Member.__relations__.get('phone')
+        self.assertEqual(HasOne, type(r))
+
+        self.assertEqual(Member, r.owner)
+        self.assertEqual(Phone, r.target)
+        self.assertEqual('user_id', r.fk)
+        self.assertEqual('id', r.pk)
+
 
 if __name__ == '__main__':
     import unittest
