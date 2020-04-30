@@ -5,19 +5,17 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import unittest
 from sweet.database import DBManager
 from sweet.orm.model import Model
+from sweet.orm.relation import *
 
 
 class TestCase(unittest.TestCase):
-    
     pass
 
 
 class UserForTemplateTest(object):
-
     def __init__(self, name, age):
         self.name = name
         self.age = age
-
 
 
 Model.db_manager = DBManager({
@@ -33,9 +31,10 @@ Model.db_manager = DBManager({
 class Foo(Model):
     pass
 
+
 class User(Model):
     pass
 
-class Mobile(Model):
-    pass
 
+class Mobile(Model):
+    belongs_to(User)

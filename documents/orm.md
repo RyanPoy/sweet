@@ -105,6 +105,8 @@ if you won't create `created_at` and `updated_at`, you can set `__timestamp__` i
   User.first()
   User.last()
   User.all()
+  User.where(name='jon').first()
+  User.where(age__lt=30).all()
 ```
 
 ### Aggregates

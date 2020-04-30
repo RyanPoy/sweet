@@ -8,6 +8,7 @@ import unittest
 from sweet.tests.integration.test_recordset_crud_mysql import TestRecordsetCRUDMySQL
 from sweet.tests.integration.test_model_struct_mysql import TestModelStructMySQL
 from sweet.tests.integration.test_model_crud_mysql import TestModelCRUDMySQL
+from sweet.tests.integration.test_relation_belongs_to_mysql import TestRelationBelongsToMysql
 
 from sweet.tests.unit.test_filter import TestFilter
 from sweet.tests.unit.test_clauses import TestClauses
@@ -60,6 +61,9 @@ from sweet.tests.unit.test_form_textarea import TestFormTextarea
 from sweet.tests.unit.test_form_time import TestFormTime
 from sweet.tests.unit.test_form_url import TestFormUrl
 from sweet.tests.unit.test_form_week import TestFormWeek
+
+from sweet.tests.unit.test_relation_basic import TestRelationBasic
+
 
 
 unit_tests = [
@@ -122,10 +126,16 @@ unit_tests += [
     TestFormWeek,
 ]
 
+# relation tests
+unit_tests += [
+    TestRelationBasic
+]
+
 integration_tests = [
     TestRecordsetCRUDMySQL,
     TestModelStructMySQL,
     TestModelCRUDMySQL,
+    TestRelationBelongsToMysql,
 ]
 
 

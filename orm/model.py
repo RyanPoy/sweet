@@ -1,6 +1,8 @@
 #coding: utf8
 from sweet.utils import *
 from sweet.utils.inflection import *
+from sweet.orm.relation import relation_q
+
 
 class ModelHasBeenPersisted(Exception): pass
 class ModelHasNotBeenPersisted(Exception): pass
@@ -9,14 +11,10 @@ class ModelHasNotBeenPersisted(Exception): pass
 class ModelMetaClass(type):
 
     def __init__(cls, name, bases, attr):
-        model = type.__init__(cls, name, bases, attr)
-        assert model is None
+        # print ("^"*5, " meta class init ", "^"*5, cls, name, bases, attr)
+
         if name != 'Model':
-
-            
-            # assert model is not None
-
-            # set __tablename__ to Record Class
+            # set __tablename__ to model Class
             if not hasattr(cls, '__tablename__'):
                 setattr(cls, '__tablename__', tableize(cls.__name__))
 
@@ -27,6 +25,9 @@ class ModelMetaClass(type):
             if not hasattr(cls, '__pk__'):
                 setattr(cls, '__pk__', 'id')
 
+            if not hasattr(cls, '__relations__'):
+                setattr(cls, '__relations__', {})
+
             # if cls.__pk__ not in cls.__field_define_dict__:
             #     raise Exception('%s field of %s does not exist' % (cls.__pk__, cls.__name__))
 
@@ -35,6 +36,10 @@ class ModelMetaClass(type):
                 setattr(cls, 'updated_at', None)
 
             # from sweet.relation import Relation
+            r = relation_q.get()
+            if r:
+                r.inject(cls)
+
             # for relation in Relation.iter():
             #     relation.inject(cls)
 
@@ -51,7 +56,7 @@ class ModelMetaClass(type):
             #     if c and  c not in cls.__field_define_dict__:
             #         raise err()
 
-        return model
+        return type.__init__(cls, name, bases, attr)
 
 
 class Model(metaclass=ModelMetaClass):
@@ -60,6 +65,25 @@ class Model(metaclass=ModelMetaClass):
         for k, v in attrs.items():
             setattr(self, k, v)
         self._init_field_default_value() # !Very Important
+
+    def __getattribute__(self, name):
+        try:
+            return super().__getattribute__(name)
+        except AttributeError as ex:
+            if name in self.__relations__:
+                r = self.__relations__[name]
+                return r.get_real_value(self)
+            raise ex
+
+    def __setattr__(self, name, value):
+        cls = self.__class__
+        relt = super().__setattr__(name, value)
+        if name in cls.__relations__:
+            relation = cls.__relations__[name]
+            fk = relation.fk
+            fk_value = value.get_pk()
+            setattr(self, fk, fk_value)
+        return relt
 
     def _init_field_default_value(self):
         """ set default value of field which does not init 
@@ -71,10 +95,11 @@ class Model(metaclass=ModelMetaClass):
         return self
 
     def column_dict(self):
-        return { 
+        d = {
             name:getattr(self, name, field.default) \
                 for name, field in self.__field_define_dict__.items() 
         }
+        return d
 
     def save(self):
         """ save object. 
@@ -109,9 +134,12 @@ class Model(metaclass=ModelMetaClass):
         if not self.persisted():
             raise ModelHasNotBeenPersisted()
         if attrs:
-            self.objects.update(**attrs)
+            old_values = { 
+                k: getattr(self, k) for k, v in attrs.items() if hasattr(self, k)
+            }
             for k, v in attrs.items():
                 setattr(self, k, v)
+            self.objects.update(**self.column_dict())
         else:
             self.objects.update(**self.column_dict())
         return self
@@ -222,6 +250,10 @@ class Model(metaclass=ModelMetaClass):
         for c in cls.db_manager.new_db().get_columns(cls.__tablename__):
             cls.__field_define_dict__[c.name] = c
         return cls
+
+    @classmethod
+    def _register_relation(cls, name, r):
+        cls.__relations__[name] = r
 
     @classmethod
     def select(cls, *columns):
