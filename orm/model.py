@@ -1,7 +1,7 @@
 #coding: utf8
 from sweet.utils import *
 from sweet.utils.inflection import *
-from sweet.orm.relation import relation_q
+from sweet.orm.relations import relation_q
 
 
 class ModelHasBeenPersisted(Exception): pass

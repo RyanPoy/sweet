@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import unittest
 from sweet.database import DBManager
 from sweet.orm.model import Model
-from sweet.orm.relation import *
+from sweet.orm.relations import *
 
 
 class TestCase(unittest.TestCase):

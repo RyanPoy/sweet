@@ -1,7 +1,7 @@
 #coding: utf8
 from sweet.tests import TestCase
 from sweet.orm.model import Model
-from sweet.orm.relation import *
+from sweet.orm.relations import *
 
 
 class TestRelationBasic(TestCase):
@@ -38,6 +38,24 @@ class TestRelationBasic(TestCase):
         self.assertEqual(Member, r.target)
         self.assertEqual('owner_id', r.fk)
         self.assertEqual('member_id', r.pk)    
+
+    # def test_has_many_without_argument(self):
+
+    #     class Member(Model):
+    #         __table_name__ = 'users'
+    #         has_many(Phone)
+
+    #     class Phone(Model):
+    #         __table_name__ = 'mobiles'
+    #         belongs_to(Member)
+
+    #     r = Member.__relations__.get('phones')
+    #     self.assertEqual(HasMany, type(r))
+
+        # self.assertEqual(Phone, r.owner)
+        # self.assertEqual(Member, r.target)
+        # self.assertEqual('member_id', r.fk)
+        # self.assertEqual('id', r.pk)
 
 
 if __name__ == '__main__':
