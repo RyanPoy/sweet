@@ -39,22 +39,39 @@ class TestRelationBasic(TestCase):
         self.assertEqual('owner_id', r.fk)
         self.assertEqual('member_id', r.pk)    
 
-    # def test_has_many_without_argument(self):
+    def test_has_many_without_argument(self):
 
-    #     class Phone(Model):
-    #         __table_name__ = 'mobiles'
+        class Phone(Model):
+            __table_name__ = 'mobiles'
         
-    #     class Member(Model):
-    #         __table_name__ = 'users'
-    #         has_many(Phone)
+        class Member(Model):
+            __table_name__ = 'users'
+            has_many(Phone)
 
-    #     r = Member.__relations__.get('phones')
-    #     self.assertEqual(HasMany, type(r))
+        r = Member.__relations__.get('phones')
+        self.assertEqual(HasMany, type(r))
 
-    #     self.assertEqual(Member, r.owner)
-    #     self.assertEqual(Phone, r.target)
-    #     self.assertEqual('member_id', r.fk)
-    #     self.assertEqual('id', r.pk)
+        self.assertEqual(Member, r.owner)
+        self.assertEqual(Phone, r.target)
+        self.assertEqual('member_id', r.fk)
+        self.assertEqual('id', r.pk)
+
+    def test_has_many_with_argument(self):
+
+        class Phone(Model):
+            __table_name__ = 'mobiles'
+        
+        class Member(Model):
+            __table_name__ = 'users'
+            has_many(Phone, fk='user_id')
+
+        r = Member.__relations__.get('phones')
+        self.assertEqual(HasMany, type(r))
+
+        self.assertEqual(Member, r.owner)
+        self.assertEqual(Phone, r.target)
+        self.assertEqual('user_id', r.fk)
+        self.assertEqual('id', r.pk)
 
 
 if __name__ == '__main__':

@@ -3,19 +3,19 @@ from sweet.orm.relations.relation import Relation, relation_q
 from sweet.utils.inflection import *
 
 
-class BelongsTo(Relation):
-    """owner model belongs to target model
+class HasMany(Relation):
+    """owner model has many target model
     :param owner: model class
     :param target: model class
     :param attr_name: attribute name of owner.
-    :param fk: foreign key of owner
-    :param pk: primary key of target
-    eg. Mobile belongs to User
-      owner = Mobile
-      target = User
-      attr_name = 'user'    # can retrive use Mobile().user
+    :param fk: foreign key of target
+    :param pk: primary key of owner
+    eg. User has many Mobile
+      owner = User
+      target = Mobile
+      attr_name = 'mobiles' # can retrive use User().mobiles
       fk = 'user_id'        # can retrive use Mobile().user_id
-      pk = 'id'             # it means that user's priamry key named id
+      pk = 'id'             # User().pk
     """
     def __init__(self, owner=None, target=None, attr_name=None, fk=None, pk=None):
         self.owner = owner
@@ -26,7 +26,7 @@ class BelongsTo(Relation):
 
     @property
     def attr_name(self):
-        """ owner attribute name
+        """ return owner attribute name
         """
         if not self._attr_name:
             self._attr_name = pythonize(self._get_target_name())
@@ -34,24 +34,25 @@ class BelongsTo(Relation):
 
     @property
     def fk(self):
-        """ return owner foreign key
-        eg. mobile is belongs to user
+        """ return target foreign key
+        eg. user has many mobiles
             fk equals 'user_id', which composition is ： 'user' + '_'+ user.pk
         """
         if not self._fk:
-            self._fk = '{target_name}_{target_pk}'.format(
-                target_name=pythonize(self._get_target_name()),
-                target_pk=self.target.__pk__
+            name = self.owner.__name__.split('.')[-1]
+            self._fk = '{owner_name}_{owner_pk}'.format(
+                owner_name=pythonize(name),
+                owner_pk=self.owner.__pk__
             )
         return self._fk
 
     @property
     def pk(self):
-        """ return target primary key
-        eg. mobile is belongs to user
-            pk equals 'id', which composition is ：mobile.pk
+        """ return owner foreign key
+        eg. user has many mobile
+            pk equals 'id', which composition is：user.pk
         """
-        return self.target.__pk__
+        return self.owner.__pk__
 
     def _get_target_name(self):
         """ get the target class name 
@@ -60,12 +61,10 @@ class BelongsTo(Relation):
             name = self._target_cls_or_target_name.split('.')[-1]
         else:
             name = self.target.__name__.split('.')[-1]
-        return singularize(name)
+        return pluralize(name)
 
     @property
     def target(self):
-        """ return target class
-        """
         if isinstance(self._target_cls_or_target_name, str):
             self._target_cls_or_target_name = import_object(self._target_cls_or_target_name)
         return self._target_cls_or_target_name
@@ -76,12 +75,12 @@ class BelongsTo(Relation):
         return self
 
     def get_real_value(self, owner_obj):
-        """ eg. if mobile belongs to user.
-            User.find(mobile.user_id)
+        """ eg. user has many mobiles
+            Mobile.where(user_id=user.id)
         """
-        return self.target.find(getattr(owner_obj, self.fk))
+        return self.target.where(**{self.fk: self.get_pk()})
 
 
-def belongs_to(class_or_name, attr_name=None, fk=None, pk=None):
-    r = BelongsTo(target=class_or_name, attr_name=attr_name, fk=fk, pk=pk)
+def has_many(class_or_name, attr_name=None, fk=None, pk=None):
+    r = HasMany(target=class_or_name, attr_name=attr_name, fk=fk, pk=pk)
     relation_q.put(r)
