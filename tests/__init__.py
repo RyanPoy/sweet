@@ -34,7 +34,7 @@ class Foo(Model):
 
 class User(Model):
     has_many('sweet.tests.Mobile')
-    # has_one('sweet.tests.Father')
+    has_one('sweet.tests.Father')
 
 
 class Mobile(Model):
