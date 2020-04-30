@@ -13,9 +13,9 @@ class BelongsTo(Relation):
     eg. Mobile belongs to User
       owner = Mobile
       target = User
-      attr_name = user    # can retrive use Mobile.user
-      fk = user_id        # can retrive use Mobile.user_id
-      pk = id             # it means that user's priamry key named id
+      attr_name = 'user'    # can retrive use Mobile().user
+      fk = 'user_id'        # can retrive use Mobile().user_id
+      pk = 'id'             # it means that user's priamry key named id
     """
     def __init__(self, owner=None, target=None, attr_name=None, fk=None, pk=None):
         self.owner = owner
@@ -26,12 +26,16 @@ class BelongsTo(Relation):
 
     @property
     def attr_name(self):
+        """ owner attribute name
+        """
         if not self._attr_name:
             self._attr_name = pythonize(self._get_target_name()).split('.')[-1]
         return self._attr_name
 
     @property
     def fk(self):
+        """ return owner foreign key
+        """
         if not self._fk:
             self._fk = '{target_name}_{target_pk}'.format(
                 target_name=pythonize(self._get_target_name()).split('.')[-1],
@@ -41,6 +45,8 @@ class BelongsTo(Relation):
 
     @property
     def pk(self):
+        """ return target primary key
+        """
         return self.target.__pk__
 
     def _get_target_name(self):
@@ -52,6 +58,8 @@ class BelongsTo(Relation):
 
     @property
     def target(self):
+        """ return target class
+        """
         if isinstance(self._target_cls_or_target_name, str):
             self._target_cls_or_target_name = import_object(self._target_cls_or_target_name)
         return self._target_cls_or_target_name
