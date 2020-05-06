@@ -36,9 +36,12 @@ class ModelMetaClass(type):
                 setattr(cls, 'updated_at', None)
 
             # from sweet.relation import Relation
-            r = relation_q.get()
-            if r:
-                r.inject(cls)
+            while True:
+                r = relation_q.get()
+                if r:
+                    r.inject(cls)
+                else:
+                    break
 
             # for relation in Relation.iter():
             #     relation.inject(cls)

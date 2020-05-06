@@ -1,8 +1,8 @@
 #coding: utf8
-from sweet.tests import TestCase, User, Mobile
+from sweet.tests import TestCase, User, Mobile, Car
 
 
-class TestHasManyToMysql(TestCase):
+class TestHasOneToMysql(TestCase):
     
     def setUp(self):
         self.remove_record()
@@ -11,27 +11,50 @@ class TestHasManyToMysql(TestCase):
         self.remove_record()
 
     def remove_record(self):
-        Mobile.delete_all()
+        Car.delete_all()
         User.delete_all()
 
     def test_query(self):
         u = User.create(name="Jon", age=31)
-        Mobile.create(name="Nokia", user_id=u.id)
-        Mobile.create(name="IPhone", user_id=u.id)
+        Car.create(name="Benz", user_id=u.id)
+        Car.create(name="Mazda", user_id=u.id)
 
-        ms = u.mobiles.all()
-        self.assertEqual(2, len(ms))
+        c = u.car
+        self.assertEqual(Car, type(c))
+        self.assertEqual('Benz', c.name)
+        self.assertEqual(u.id, c.user_id)
 
-        m = ms[0]
-        self.assertEqual(Mobile, type(m))
-        self.assertEqual('Nokia', m.name)
-        self.assertEqual(u.id, m.user_id)
+    def test_create(self):
+        u = User.create(name="Jon", age=31)
+        car_id = Car.create(name="Benz", user=u).id
+        c = Car.find(car_id)
+        self.assertEqual(u.id, c.user_id)
 
-        m = ms[1]
-        self.assertEqual(Mobile, type(m))
-        self.assertEqual('IPhone', m.name)
-        self.assertEqual(u.id, m.user_id)
+        u = c.user
+        self.assertEqual("Jon", u.name)
+        self.assertEqual(31, u.age)
 
+    def test_save(self):
+        u = User.create(name="Jon", age=31)
+        car_id = Car(name="Benz", user=u).save().id
+
+        c = Car.find(car_id)
+        self.assertEqual(u.id, c.user_id)
+
+        u = c.user
+        self.assertEqual("Jon", u.name)
+        self.assertEqual(31, u.age)
+
+    def test_update(self):
+        u1 = User.create(name="Jon", age=31)
+        u2 = User.create(name="Lily", age=21)
+        c = Car(name="Benz", user=u1).save()
+        self.assertEqual(u1.id, c.user_id)
+
+        c.update(user=u2)
+        self.assertEqual(u2.id, c.user_id)
+        c = Car.where(name='Benz').first()
+        self.assertEqual(u2.id, c.user_id)
 
 
 if __name__ == '__main__':

@@ -143,7 +143,7 @@ class Template(object):
             _my_temp_exec = all_kwargs['_my_temp_exec']
             return _my_temp_exec()
         except:
-            print (self.compiled)
+            # print (self.compiled)
             raise
         
     def format_error(self, msg):

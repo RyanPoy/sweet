@@ -34,7 +34,7 @@ create table mobiles (
     foreign key (user_id) references users(id)
 );
 
-create table fathers (
+create table cars (
     id int auto_increment primary key ,
     name varchar(32) not null default '',
     user_id int not null,
