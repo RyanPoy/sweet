@@ -158,9 +158,7 @@ class Model(metaclass=ModelMetaClass):
         """ delete a record in db and set id is None.
         would do nothing if it has not been persisted
         """
-        cls = self.__class__
-        for name, r in cls.__relations__.items():
-            r.delete_real_value(self)
+        self.__class__._delete_relations([self])
 
         if self.persisted():
             pk = self.__pk__
@@ -178,11 +176,16 @@ class Model(metaclass=ModelMetaClass):
             objs = cls.objects
 
         rs = objs.all() if cls.__relations__ else []
-        for name, r in cls.__relations__.items():
-            r.delete_all_real_value(rs)
+        cls._delete_relations(rs)
 
         objs.delete()
         return cls
+
+    @classmethod
+    def _delete_relations(cls, owner_models):
+        for name, r in cls.__relations__.items():
+            r.delete_all_real_value(owner_models)
+
 
     def set_pk(self, value):
         return setattr(self, self.__pk__, value)

@@ -314,6 +314,10 @@ class Recordset(object):
         return self.db.execute_rowcount(sql, *bindings)
 
     def delete(self):
+        if self.model_class:
+            # mean that: User.where(age__gt=30).delete()
+            self.model_class._delete_relations(self.all())
+
         bindings = []
         from_sql = self.__from_sql(bindings)
         if not self._joins_clauses: # needn't join

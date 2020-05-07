@@ -31,8 +31,24 @@ class TestHasManyToMysql(TestCase):
         self.assertEqual(Mobile, type(m))
         self.assertEqual('IPhone', m.name)
         self.assertEqual(u.id, m.user_id)
- 
+    
     def test_delete_cascade(self):
+        user_id1 = User.create(name="Jon", age=31).id
+        Mobile.create(name="Nokia", user_id=user_id1)
+        Mobile.create(name="WinPhone", user_id=user_id1)
+
+        user_id2 = User.create(name="Jon", age=31).id
+        Mobile.create(name="IPhone", user_id=user_id2)
+        Mobile.create(name="Vivo", user_id=user_id2)
+
+        self.assertEqual(4, Mobile.count())
+        User.where(id=user_id1).delete()
+        self.assertEqual(2, Mobile.count())
+
+        User.find(user_id2).delete()
+        self.assertEqual(0, Mobile.count())
+
+    def test_delete_all_cascade(self):
         user_id1 = User.create(name="Jon", age=31).id
         Mobile.create(name="Nokia", user_id=user_id1)
 

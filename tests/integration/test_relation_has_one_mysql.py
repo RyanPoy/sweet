@@ -56,6 +56,31 @@ class TestHasOneToMysql(TestCase):
         c = Car.where(name='Benz').first()
         self.assertEqual(u2.id, c.user_id)
 
+    def test_delete_cascade(self):
+        user_id1 = User.create(name="Jon", age=31).id
+        Car.create(name="Benz", user_id=user_id1)
+
+        user_id2 = User.create(name="Jon", age=31).id
+        Car.create(name="Mazda", user_id=user_id2)
+
+        self.assertEqual(2, Car.count())
+        User.where(id=user_id1).delete()
+        self.assertEqual(1, Car.count())
+
+        User.find(user_id2).delete()
+        self.assertEqual(0, Car.count())
+
+    def test_delete_all_cascade(self):
+        user_id1 = User.create(name="Jon", age=31).id
+        Car.create(name="Benz", user_id=user_id1)
+
+        user_id2 = User.create(name="Jon", age=31).id
+        Car.create(name="Mazda", user_id=user_id2)
+
+        self.assertEqual(2, Car.count())
+        User.delete_all()
+        self.assertEqual(0, Car.count())
+
 
 if __name__ == '__main__':
     import unittest

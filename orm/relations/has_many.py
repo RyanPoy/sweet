@@ -81,17 +81,12 @@ class HasMany(Relation):
         """
         return self.target.where(**{self.fk: owner_obj.get_pk()})
 
-    def delete_real_value(self, owner_obj):
-        """ eg. user has many mobiles
-            u = User.first()
-            u.delete()  # should be delete mobiles which belongs to u
-        """
-        self.target.delete_all(**{self.fk: owner_obj.get_pk()})
-        return self
-
     def delete_all_real_value(self, owner_objs):
         """ eg. user has many mobiles
-            User.delete_all() # should be delete all mobiles which belongs to users
+            1) User.delete_all() # should be delete all mobiles which belongs to users
+
+            2) u = User.first()
+               u.delete()  # should be delete mobiles which belongs to u
         """
         pks = [ o.get_pk() for o in owner_objs ]
         if pks:
