@@ -9,38 +9,38 @@ class TestRecordsetDeleteForMysql(TestCase):
         class FakeDB(object): pass
         return MySQLRecordset(db=FakeDB(), tbname="users")
 
-#     def test_delete(self):
-#         def _(sql, *params):
-#             self.assertEqual('DELETE FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` = %s AND `age` >= %s', sql)
-#             self.assertEqual([1, 2, 3, "ryanpoy", 30], list(params))
-#             return 3
-#         tb = self.get_recordset()
-#         tb.db.execute_rowcount = _
-#         
-#         r = tb.where(id=[1, 2, 3], name='ryanpoy', age__gte=30).delete()
-#         self.assertEqual(3, r)
-# 
-#     def test_delete_with_join(self):
-#         def _(sql, *params):
-#             self.assertEqual('DELETE `users` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', sql)
-#             self.assertEqual([1, 2, 3, 'ryanpoy'], list(params))
-#             return 3
-#         tb = self.get_recordset()
-#         tb.db.execute_rowcount = _
-# 
-#         r = tb.where(id=[1,2,3]).or_where(name="ryanpoy").join('cars', on='users.id=cars.user_id').delete()
-#         self.assertEqual(3, r)
-# 
-#     def test_truncate(self):
-#         def _(sql, *params):
-#             self.assertEqual('TRUNCATE `users`', sql)
-#             self.assertTrue(not params)
-#             return 10
-#         tb = self.get_recordset()
-#         tb.db.execute_rowcount = _
-# 
-#         r = tb.where(id=[1, 2, 3]).truncate()
-#         self.assertEqual(10, r)
+    def test_delete(self):
+        def _(sql, *params):
+            self.assertEqual('DELETE FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` = %s AND `age` >= %s', sql)
+            self.assertEqual([1, 2, 3, "ryanpoy", 30], list(params))
+            return 3
+        tb = self.get_recordset()
+        tb.db.execute_rowcount = _
+        
+        r = tb.where(id=[1, 2, 3], name='ryanpoy', age__gte=30).delete()
+        self.assertEqual(3, r)
+
+    def test_delete_with_join(self):
+        def _(sql, *params):
+            self.assertEqual('DELETE `users` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', sql)
+            self.assertEqual([1, 2, 3, 'ryanpoy'], list(params))
+            return 3
+        tb = self.get_recordset()
+        tb.db.execute_rowcount = _
+
+        r = tb.where(id=[1,2,3]).or_where(name="ryanpoy").join('cars', on='users.id=cars.user_id').delete()
+        self.assertEqual(3, r)
+
+    def test_truncate(self):
+        def _(sql, *params):
+            self.assertEqual('TRUNCATE `users`', sql)
+            self.assertTrue(not params)
+            return 10
+        tb = self.get_recordset()
+        tb.db.execute_rowcount = _
+
+        r = tb.where(id=[1, 2, 3]).truncate()
+        self.assertEqual(10, r)
 
     def test_delete_after_find_all(self):
 
