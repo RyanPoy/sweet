@@ -8,8 +8,6 @@ class Filter(object):
         self.name = name
         self.operator = operator
         self.value = value
-        self.sql = ''
-        self.params = []
         self.qutotation = '`'
         self.paramstyle = '?'
 
@@ -94,39 +92,38 @@ class JoinOnFilter(Filter):
 class SimpleFilter(Filter):
     
     def compile(self):
-        self.sql = '%s %s %s' % (self.aqm_name, self.operator, self.paramstyle)
-        self.params.append(self.value)
-        return self
+        params = []
+        sql = '%s %s %s' % (self.aqm_name, self.operator, self.paramstyle)
+        params.append(self.value)
+        return sql, params
 
 
 class InFilter(Filter):
 
     def compile(self):
+        params = []
         ps = ', '.join([self.paramstyle]*len(self.value))
-        self.sql = '%s %s (%s)' % (self.aqm_name, self.operator, ps)
-        self.params.extend(self.value)
-        return self
+        sql = '%s %s (%s)' % (self.aqm_name, self.operator, ps)
+        params.extend(self.value)
+        return sql, params
 
 
 class NullFilter(Filter):
 
     def compile(self):
-        self.sql = '%s %s NULL' % (self.aqm_name, self.operator)
-        return self
+        return '%s %s NULL' % (self.aqm_name, self.operator), []
 
 
 class BetweenFilter(Filter):
     
     def compile(self):
-        self.sql = '%s %s %s AND %s' % (self.aqm_name, self.operator, self.paramstyle, self.paramstyle)
-        self.params.append(self.value[0])
-        self.params.append(self.value[1])
-        return self
+        params = []
+        sql = '%s %s %s AND %s' % (self.aqm_name, self.operator, self.paramstyle, self.paramstyle)
+        params.append(self.value[0])
+        params.append(self.value[1])
+        return sql, params
 
     def valid(self):
         if not is_array(self.value) or len(self.value) != 2:
             raise TypeError("%s just support a array which has 2 elements" % self.value) 
         return True
-
-
-

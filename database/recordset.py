@@ -24,7 +24,6 @@ class Recordset(object):
         self.select_clause = SelectClause(self.qutotation_marks)
         self.where_clause = WhereClause(self.qutotation_marks, self.paramstyle_marks)
         self.having_clause = HavingClause(self.qutotation_marks, self.paramstyle_marks)
-        self._bindings = []
         self.group_clause = GroupClause(self.qutotation_marks)
         self.order_clause = OrderClause(self.qutotation_marks)
         self._joins_clauses = []
@@ -61,10 +60,6 @@ class Recordset(object):
     def select(self, *columns):
         self.select_clause.select(*columns)
         return self
-
-    @property
-    def bindings(self):
-        return self._bindings
 
     @dcp
     def where(self, *where_clauses, **kwargs):
@@ -159,13 +154,17 @@ class Recordset(object):
     def __aqm(self, s):
         return aqm(s, self.qutotation_marks)
 
-    @property
     def sql(self):
-        return '{select_sql} {from_sql}{lock_sql}'.format(
-            select_sql= self.select_clause.compile().sql,
-            from_sql=self.__from_sql,
+        bindings = []
+        from_sql = self.__from_sql(bindings)
+        select_sql, select_bindings = self.select_clause.compile()
+        sql = '{select_sql} {from_sql}{lock_sql}'.format(
+            select_sql= select_sql,
+            from_sql=from_sql,
             lock_sql=self.__lock_sql()
         )
+        bindings.extend(select_bindings)
+        return sql, bindings
 
     @property
     def tablename(self):
@@ -179,11 +178,12 @@ class Recordset(object):
             lock = ' FOR UPDATE'
         return lock
 
-    def __push_exist_sql(self, where_sql, sql):
+    def __push_exist_sql(self, where_sql, sql, bindings):
         sqls = []
         for or_and, t in self._exists_tables:
-            sqls.append('%s EXISTS (%s)' % (or_and, t.sql))
-            self.bindings.extend(t.bindings)
+            tmp_sql, tmp_bindings = t.sql()
+            sqls.append('%s EXISTS (%s)' % (or_and, tmp_sql))
+            bindings.extend(tmp_bindings)
         exists_tables_sql = ' '.join(sqls)
 
         if exists_tables_sql:
@@ -197,74 +197,75 @@ class Recordset(object):
                 sql = '%s %s' % (sql, exists_tables_sql)
         return sql
 
-    @property
-    def __from_sql(self):
+    def __from_sql(self, bindings):
         sql = 'FROM {tablename}'.format(tablename=self.tablename)
-        join_sql = self.__join_sql
+        join_sql = self.__join_sql(bindings)
         if join_sql:
             sql = '%s %s' % (sql, join_sql)
-        return self.__core_sql(sql)
+        return self.__core_sql(sql, bindings)
 
-    def __core_sql(self, sql):
-        where_sql = self.where_clause.compile().sql
+    def __core_sql(self, sql, bindings):
+        where_sql, where_bindings = self.where_clause.compile()
         if where_sql:
             sql = '%s %s' % (sql, where_sql)
-            self.bindings.extend(self.where_clause.bindings)
+            bindings.extend(where_bindings)
 
-        sql = self.__push_exist_sql(where_sql, sql)
-        group_sql = self.group_clause.compile().sql
+        sql = self.__push_exist_sql(where_sql, sql, bindings)
+        group_sql, group_bindings = self.group_clause.compile()
         if group_sql:
             sql = '%s %s' % (sql, group_sql)
+            bindings.extend(group_bindings)
 
-        having_sql = self.having_clause.compile().sql
+        having_sql, having_bindings = self.having_clause.compile()
         if having_sql:
             sql = '%s %s' % (sql, having_sql)
-            self.bindings.extend(self.having_clause.bindings)
+            bindings.extend(having_bindings)
 
-        union_sql = self.__union_sql
+        union_sql = self.__union_sql(bindings)
         if union_sql:
             sql = '%s %s' % (sql, union_sql)
 
-        order_sql = self.order_clause.compile().sql
+        order_sql, order_bindings = self.order_clause.compile()
         if order_sql:
             sql = '%s %s' % (sql, order_sql)
+            bindings.extend(order_bindings)
 
-        limit_and_offset_sql = self.page_clause.compile().sql
+        limit_and_offset_sql, limit_and_offset_bindings = self.page_clause.compile()
         if limit_and_offset_sql:
             sql = '%s %s' % (sql, limit_and_offset_sql)
+            bindings.extend(limit_and_offset_bindings)
 
         return sql
 
-    @property
-    def __union_sql(self):
+    def __union_sql(self, bindings):
         sqls = []
         for u, _all in self.unions:
             sqls.append( 'UNION ALL' if _all else 'UNION' )
-            sqls.append(u.sql)
-            self.bindings.extend(u.bindings)
+            tmp_sql, tmp_bindings = u.sql()
+            sqls.append(tmp_sql)
+            bindings.extend(tmp_bindings)
         return ' '.join(sqls)
 
-    @property
-    def __join_sql(self):
+    def __join_sql(self, bindings):
         sqls = []
         for j in self._joins_clauses:
-            j.compile()
-            if j.sql:
-                sqls.append(j.sql)
-            self.bindings.extend(j.bindings)
+            tmp_sql, tmp_bindings = j.compile()
+            if tmp_sql:
+                sqls.append(tmp_sql)
+            bindings.extend(tmp_bindings)
         return ' '.join(sqls)
 
     def insert_getid(self, record=None, **kwargs):
         record = record or {}
         if kwargs: record.update(kwargs)
         insert_clause = InsertClause(self.qutotation_marks, self.paramstyle_marks, self.tbname)
-        insert_clause.insert(record).compile()
-        return self.db.execute_lastrowid(insert_clause.sql, *insert_clause.bindings)
+        sql, bindings = insert_clause.insert(record).compile()
+        return self.db.execute_lastrowid(sql, *bindings)
 
     def insert(self, records=None, **kwargs):
         insert_clause = InsertClause(self.qutotation_marks, self.paramstyle_marks, self.tbname)
-        insert_clause.insert(records, **kwargs).compile()
-        return self.db.execute_rowcount(insert_clause.sql, *insert_clause.bindings)
+        sql, bindings = insert_clause.insert(records, **kwargs).compile()
+        return self.db.execute_rowcount(sql, *bindings)
 
     @dcp
     def update(self, **kwargs):
@@ -273,17 +274,18 @@ class Recordset(object):
             update_columns.append('%s = %%s' % self.__aqm(k))
             update_bindings.append(v)
 
-        sql = 'UPDATE %s' % self.tablename 
-        join_sql = self.__join_sql
+        sql = 'UPDATE %s' % self.tablename
+        bindings = [] 
+        join_sql = self.__join_sql(bindings)
         if join_sql:
             sql = '%s %s' % (sql, join_sql)
 
         sql = '%s SET %s' % (sql, ', '.join(update_columns))
-        self.bindings.extend(update_bindings)
+        bindings.extend(update_bindings)
 
-        sql = self.__core_sql(sql)
+        sql = self.__core_sql(sql, bindings)
 
-        return self.db.execute_rowcount(sql, *self.bindings)
+        return self.db.execute_rowcount(sql, *bindings)
 
     def increase(self, **kwargs):
         return self.__in_or_decrease('+', **kwargs)
@@ -298,45 +300,51 @@ class Recordset(object):
             update_columns.append('{name} = {name} {flag} %s'.format(name=self.__aqm(k), flag=flag))
             update_bindings.append(v)
 
+        bindings = []
         sql = 'UPDATE %s' % self.tablename 
-        join_sql = self.__join_sql
+        join_sql = self.__join_sql(bindings)
         if join_sql:
             sql = '%s %s' % (sql, join_sql)
 
         sql = '%s SET %s' % (sql, ', '.join(update_columns))
-        self.bindings.extend(update_bindings)
+        bindings.extend(update_bindings)
 
-        sql = self.__core_sql(sql)
+        sql = self.__core_sql(sql, bindings)
 
-        return self.db.execute_rowcount(sql, *self.bindings)
+        return self.db.execute_rowcount(sql, *bindings)
 
     def delete(self):
+        bindings = []
+        from_sql = self.__from_sql(bindings)
         if not self._joins_clauses: # needn't join
-            sql = "DELETE {from_sql}".format(from_sql=self.__from_sql)
+            sql = "DELETE {from_sql}".format(from_sql=from_sql)
         else:
             sql = "DELETE {tablename} {from_sql}".format(
                 tablename=self.tablename,
-                from_sql=self.__from_sql
+                from_sql=from_sql
             )
-        return self.db.execute_rowcount(sql, *self.bindings)
+        return self.db.execute_rowcount(sql, *bindings)
 
     def truncate(self):
         return self.db.execute_rowcount('TRUNCATE {}'.format(self.tablename))
 
     def first(self):
-        r = self.db.fetchone(self.sql, *self.bindings)
+        sql, bindings = self.sql()
+        r = self.db.fetchone(sql, *bindings)
         if not r or not self.model_class:
             return r
         return self.model_class(**r)
 
     def last(self):
-        r = self.db.fetchlastone(self.sql, *self.bindings)
+        sql, bindings = self.sql()
+        r = self.db.fetchlastone(sql, *bindings)
         if not r or not self.model_class:
             return r
         return self.model_class(**r)                
 
     def all(self):
-        rs = self.db.fetchall(self.sql, *self.bindings)
+        sql, bindings = self.sql()
+        rs = self.db.fetchall(sql, *bindings)
         if not rs or not self.model_class:
             return rs
         return [ self.model_class(**r) for r in rs ]
@@ -369,12 +377,15 @@ class Recordset(object):
             distinct = False
 
         column_name = self.__aqm(column)
+
+        bindings = []
+        from_sql = self.__from_sql(bindings)
         sql = 'SELECT {func_name}({column_name}) AS aggregate {from_sql}'.format(
             func_name=func_name,
             column_name=column_name if not distinct else 'DISTINCT %s' % column_name,
-            from_sql=self.__from_sql
+            from_sql=from_sql
         )
-        vs = self.db.fetchone(sql, *self.bindings)
+        vs = self.db.fetchone(sql, *bindings)
         return vs.aggregate
 
 

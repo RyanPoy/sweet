@@ -20,8 +20,6 @@ class WhereClause(Clause):
         self.qutotation = qutotation
         self.paramstyle = paramstyle
         self.filters = []
-        self.sql = ''
-        self.bindings = []
 
     def and_(self, *other_clauses, **kwargs):
         return self.__and_or(self.AND, *other_clauses, **kwargs)
@@ -40,14 +38,11 @@ class WhereClause(Clause):
         return self
 
     def compile(self, with_prefix=True):
-        s = self._compile()
-        s = self._ltrip_and_or(s)
-        if s:
-            if with_prefix:
-                self.sql = '%s %s' % (self.PREFIX, s)
-            else:
-                self.sql = s
-        return self
+        sql, bindings = self._compile()
+        sql = self._ltrip_and_or(sql)
+        if sql and with_prefix:
+            sql = '%s %s' % (self.PREFIX, sql)
+        return sql, bindings
 
     def _ltrip_and_or(self, s):
         if s.startswith(self.AND):
@@ -57,21 +52,21 @@ class WhereClause(Clause):
         return s
 
     def _compile(self):
-        sqls = []
+        sqls, bindings = [], []
         for and_or, f in self.filters:
             if isinstance(f, Clause):
-                f.compile(False)
+                tmp_sql, tmp_bindings = f.compile(False)
                 sqls.append(and_or)
                 sqls.append("(")
-                sqls.append(f.sql)
+                sqls.append(tmp_sql)
                 sqls.append(")")
-                self.bindings.extend(f.bindings)
+                bindings.extend(tmp_bindings)
             else:
-                f.compile()
+                tmp_sql, tmp_params = f.compile()
                 sqls.append(and_or)
-                sqls.append(f.sql)
-                self.bindings.extend(f.params)
-        return ' '.join(sqls) if sqls else ''
+                sqls.append(tmp_sql)
+                bindings.extend(tmp_params)
+        return ' '.join(sqls) if sqls else '', bindings
 
 
 class HavingClause(WhereClause):
@@ -103,19 +98,19 @@ class JoinClause(WhereClause):
         return self
 
     def compile(self):
-        s = self._compile()
+        sql, bindings = self._compile()
         on = self._ltrip_and_or(' '.join(self._ons).strip())
 
-        if on and s:
-            self.sql = '%s JOIN %s ON %s %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), on, s)
+        if on and sql:
+            sql = '%s JOIN %s ON %s %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), on, sql)
         elif on:
-            self.sql = '%s JOIN %s ON %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), on)
-        elif s:
-            s = self._ltrip_and_or(s)
-            self.sql = '%s JOIN %s ON %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), s)
+            sql = '%s JOIN %s ON %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), on)
+        elif sql:
+            sql = self._ltrip_and_or(sql)
+            sql = '%s JOIN %s ON %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), sql)
         else:
-            self.sql = '%s JOIN %s' % (self.PREFIX, aqm(self.tbname, self.qutotation))
-        return self
+            sql = '%s JOIN %s' % (self.PREFIX, aqm(self.tbname, self.qutotation))
+        return sql, bindings
 
 
 class LeftJoinClause(JoinClause):
@@ -140,12 +135,11 @@ class ByClause(object):
     def __init__(self, qutotation):
         self.qutotation = qutotation
         self._bys = []
-        self.sql = ''
 
     def compile(self):
-        if self._bys:
-            self.sql = '%s %s' % (self.PREFIX, ', '.join(self._bys))
-        return self
+        if not self._bys:
+            return '', []
+        return '%s %s' % (self.PREFIX, ', '.join(self._bys)), []
 
 
 class OrderClause(ByClause):
@@ -195,8 +189,8 @@ class PageClause(object):
             sqls.append('LIMIT %s' % self._limit)
         if self._offset:
             sqls.append('OFFSET %s' % self._offset)
-        self.sql = ' '.join(sqls)
-        return self
+        sql = ' '.join(sqls)
+        return sql, []
 
 
 ##################################
@@ -205,7 +199,6 @@ class SelectClause(object):
 
     def __init__(self, qutotation):
         self.qutotation = qutotation
-        self.sql = ''
         self.columns = []
         self._distinct = False
 
@@ -220,16 +213,15 @@ class SelectClause(object):
         return self
 
     def compile(self):
-
         sql = '*'
         if self.columns:
             sql = ', '.join([ aqm(c, self.qutotation) for c in self.columns ])
 
         if self._distinct:
-            self.sql = 'SELECT DISTINCT %s' % sql
+            sql = 'SELECT DISTINCT %s' % sql
         else:
-            self.sql = 'SELECT %s' % sql
-        return self
+            sql = 'SELECT %s' % sql
+        return sql, []
 
 
 #################################
@@ -239,10 +231,8 @@ class InsertClause(object):
     def __init__(self, qutotation, paramstyle, tbname):
         self.qutotation = qutotation
         self.paramstyle = paramstyle
-        self.sql = ''
         self.tbname = tbname
         self.list_records = []
-        self.bindings = []
 
     def insert(self, records=None, **kwargs):
         if records:
@@ -258,7 +248,7 @@ class InsertClause(object):
 
     def compile(self):
         if not self.list_records:
-            return self # nothing insert
+            return '', [] # nothing insert
 
         if len(self.list_records) > 1:
             keys = self.list_records[0].keys()
@@ -266,14 +256,14 @@ class InsertClause(object):
                 if r.keys() != keys:
                     raise Exception("multiple insert only support same keys records")
 
-        values_sql = []
+        values_sql, bindings = [], []
         for r in self.list_records:
             values_sql.append('(%s)' % ', '.join([self.paramstyle]*len(r)))
-            self.bindings.extend(r.values())
+            bindings.extend(r.values())
         
-        self.sql = 'INSERT INTO {tablename} ({columns}) VALUES {values_sql}'.format(
+        sql = 'INSERT INTO {tablename} ({columns}) VALUES {values_sql}'.format(
             tablename=aqm(self.tbname, self.qutotation),
             columns=', '.join([ aqm(c, self.qutotation) for c in self.list_records[0].keys() ]),
             values_sql=', '.join(values_sql)
         )
-        return self
+        return sql, bindings
