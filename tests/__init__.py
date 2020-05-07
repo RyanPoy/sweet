@@ -33,8 +33,8 @@ class Foo(Model):
 
 
 class User(Model):
-    has_many('sweet.tests.Mobile')
-    has_one('sweet.tests.Car')
+    has_many('sweet.tests.Mobile', cascade=True)
+    has_one('sweet.tests.Car', cascade=True)
 
 
 class Mobile(Model):

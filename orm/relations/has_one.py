@@ -21,20 +21,7 @@ class HasOne(HasMany):
         """
         return self.target.where(**{self.fk: owner_obj.get_pk()}).first()
 
-    def delete_all_real_value(self, owner_objs):
-        """ eg. user has one car
-            1) User.delete_all() # should be delete all cars which belongs to users
 
-            2) u = User.first()
-               u.delete()  # should be delete car which belongs to u
-        """
-        pks = [ o.get_pk() for o in owner_objs ]
-        if pks:
-            self.target.delete_all(**{self.fk: pks})
-        return self
-
-
-def has_one(class_or_name, attr_name=None, fk=None, pk=None):
-    r = HasOne(target=class_or_name, attr_name=attr_name, fk=fk, pk=pk)
+def has_one(class_or_name, attr_name=None, fk=None, pk=None, cascade=False):
+    r = HasOne(target=class_or_name, attr_name=attr_name, fk=fk, pk=pk, cascade=cascade)
     relation_q.put(r)
-

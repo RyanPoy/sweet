@@ -18,8 +18,9 @@ class HasMany(Relation):
       fk = 'user_id'        # can retrive use Mobile().user_id
       pk = 'id'             # User().pk
     """
-    def __init__(self, owner=None, target=None, attr_name=None, fk=None, pk=None):
+    def __init__(self, owner=None, target=None, attr_name=None, fk=None, pk=None, cascade=False):
         self.owner = owner
+        self.cascade = cascade
         self._target_cls_or_target_name = target
         self._attr_name = attr_name
         self._fk = fk
@@ -88,13 +89,14 @@ class HasMany(Relation):
             2) u = User.first()
                u.delete()  # should be delete mobiles which belongs to u
         """
-        pks = [ o.get_pk() for o in owner_objs ]
-        if pks:
-            self.target.delete_all(**{self.fk: pks})
+        if self.cascade:
+            pks = [ o.get_pk() for o in owner_objs ]
+            if pks:
+                self.target.delete_all(**{self.fk: pks})
         return self
 
 
-def has_many(class_or_name, attr_name=None, fk=None, pk=None):
-    r = HasMany(target=class_or_name, attr_name=attr_name, fk=fk, pk=pk)
+def has_many(class_or_name, attr_name=None, fk=None, pk=None, cascade=False):
+    r = HasMany(target=class_or_name, attr_name=attr_name, fk=fk, pk=pk, cascade=cascade)
     relation_q.put(r)
 
