@@ -14,6 +14,11 @@ relation_q = RelationQ()
 
 class Relation(object):
 
-    pass
+    def get_real_value(self, owner_obj):
+        pass
 
+    def delete_real_value(self, owner_obj):
+        pass
 
+    def delete_all_real_value(self, owner_objs):
+        pass

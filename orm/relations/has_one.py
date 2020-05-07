@@ -16,10 +16,27 @@ class HasOne(HasMany):
         return singularize(name)
 
     def get_real_value(self, owner_obj):
-        """ eg. user has many mobiles
-            Mobile.where(user_id=user.id)
+        """ eg. user has one car
+            Car.where(user_id=user.id)
         """
         return self.target.where(**{self.fk: owner_obj.get_pk()}).first()
+
+    # def delete_real_value(self, owner_obj):
+    #     """ eg. user has one car
+    #         u = User.first()
+    #         u.delete()  # should be delete car which belongs to u
+    #     """
+    #     self.target.delete_all(**{self.fk: owner_obj.get_pk()})
+    #     return self
+
+    # def delete_all_real_value(self, owner_objs):
+    #     """ eg. user has one car
+    #         User.delete_all() # should be delete all cars which belongs to users
+    #     """
+    #     pks = [ o.get_pk() for o in owner_objs ]
+    #     if pks:
+    #         self.target.delete_all(**{self.fk: pks})
+    #     return self
 
 
 def has_one(class_or_name, attr_name=None, fk=None, pk=None):

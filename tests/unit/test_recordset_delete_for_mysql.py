@@ -42,6 +42,24 @@ class TestRecordsetDeleteForMysql(TestCase):
         r = tb.where(id=[1, 2, 3]).truncate()
         self.assertEqual(10, r)
 
+    # def test_delete_after_find_all(self):
+
+    #     def fetchall(sql, *params):
+    #         self.assertEqual('SELECT * FROM `users` WHERE `id` = %s AND `name` = %s', sql)
+    #         self.assertEqual([1, 'ryanpoy'], list(params))
+
+    #     def execute_rowcount(sql, *params):
+    #         self.assertEqual('DELETE FROM `users` WHERE `id` = %s AND `name` = %s', sql)
+    #         self.assertEqual([1, 'ryanpoy'], list(params))
+
+    #     tb = self.get_recordset()
+    #     tb.db.fetchall = fetchall        
+    #     tb.db.execute_rowcount = execute_rowcount
+        
+    #     tb = tb.where(id=1, name='ryanpoy')
+    #     tb.all()
+    #     tb.delete()
+
 
 if __name__ == '__main__':
     import unittest

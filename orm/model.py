@@ -1,7 +1,7 @@
 #coding: utf8
 from sweet.utils import *
 from sweet.utils.inflection import *
-from sweet.orm.relations import relation_q
+from sweet.orm.relations import *
 
 
 class ModelHasBeenPersisted(Exception): pass
@@ -158,6 +158,10 @@ class Model(metaclass=ModelMetaClass):
         """ delete a record in db and set id is None.
         would do nothing if it has not been persisted
         """
+        cls = self.__class__
+        # for name, r in cls.__relations__.items():
+        #     r.delete_real_value(self)
+
         if self.persisted():
             pk = self.__pk__
             self.objects.where(**{self.__pk__: self.get_pk()}).delete()
@@ -169,9 +173,18 @@ class Model(metaclass=ModelMetaClass):
         """ delete all record
         """
         if attrs:
-            cls.objects.where(**attrs).delete()
+            objs = cls.objects.where(**attrs)
         else:
-            cls.objects.delete()
+            objs = cls.objects
+
+        rs = None
+        # for name, r in cls.__relations__.items():
+        #     if isinstance(r, (HasMany, HasOne)):
+        #         if rs is None:
+        #             rs = objs.all()
+        #         r.delete_all_real_value(rs)
+
+        objs.delete()
         return cls
 
     def set_pk(self, value):
