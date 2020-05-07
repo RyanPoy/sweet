@@ -159,8 +159,8 @@ class Model(metaclass=ModelMetaClass):
         would do nothing if it has not been persisted
         """
         cls = self.__class__
-        # for name, r in cls.__relations__.items():
-        #     r.delete_real_value(self)
+        for name, r in cls.__relations__.items():
+            r.delete_real_value(self)
 
         if self.persisted():
             pk = self.__pk__
@@ -177,12 +177,9 @@ class Model(metaclass=ModelMetaClass):
         else:
             objs = cls.objects
 
-        rs = None
-        # for name, r in cls.__relations__.items():
-        #     if isinstance(r, (HasMany, HasOne)):
-        #         if rs is None:
-        #             rs = objs.all()
-        #         r.delete_all_real_value(rs)
+        rs = objs.all() if cls.__relations__ else []
+        for name, r in cls.__relations__.items():
+            r.delete_all_real_value(rs)
 
         objs.delete()
         return cls

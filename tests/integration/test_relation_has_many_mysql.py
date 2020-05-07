@@ -32,16 +32,16 @@ class TestHasManyToMysql(TestCase):
         self.assertEqual('IPhone', m.name)
         self.assertEqual(u.id, m.user_id)
  
-    # def test_delete_cascade(self):
-    #     user_id1 = User.create(name="Jon", age=31).id
-    #     Mobile.create(name="Nokia", user_id=user_id1)
+    def test_delete_cascade(self):
+        user_id1 = User.create(name="Jon", age=31).id
+        Mobile.create(name="Nokia", user_id=user_id1)
 
-    #     user_id2 = User.create(name="Jon", age=31).id
-    #     Mobile.create(name="IPhone", user_id=user_id2)
+        user_id2 = User.create(name="Jon", age=31).id
+        Mobile.create(name="IPhone", user_id=user_id2)
 
-    #     self.assertEqual(2, Mobile.count())
-    #     User.delete_all()
-    #     self.assertEqual(0, Mobile.count())
+        self.assertEqual(2, Mobile.count())
+        User.delete_all()
+        self.assertEqual(0, Mobile.count())
 
 
 if __name__ == '__main__':
