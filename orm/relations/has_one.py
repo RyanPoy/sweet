@@ -22,6 +22,6 @@ class HasOne(HasMany):
         return self.target.where(**{self.fk: owner_obj.get_pk()}).first()
 
 
-def has_one(class_or_name, attr_name=None, fk=None, pk=None, cascade=False):
-    r = HasOne(target=class_or_name, attr_name=attr_name, fk=fk, pk=pk, cascade=cascade)
+def has_one(class_or_classname, name=None, fk=None, pk=None, cascade=False):
+    r = HasOne(target=class_or_classname, name=name, fk=fk, pk=pk, cascade=cascade)
     relation_q.put(r)

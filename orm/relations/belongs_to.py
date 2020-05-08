@@ -7,30 +7,30 @@ class BelongsTo(Relation):
     """owner model belongs to target model
     :param owner: model class
     :param target: model class
-    :param attr_name: attribute name of owner.
+    :param name: attribute name of owner.
     :param fk: foreign key of owner
     :param pk: primary key of target
     eg. Mobile belongs to User
       owner = Mobile
       target = User
-      attr_name = 'user'    # can retrive use Mobile().user
+      name = 'user'    # can retrive use Mobile().user
       fk = 'user_id'        # can retrive use Mobile().user_id
       pk = 'id'             # it means that user's priamry key named id
     """
-    def __init__(self, owner=None, target=None, attr_name=None, fk=None, pk=None):
+    def __init__(self, owner=None, target=None, name=None, fk=None, pk=None):
         self.owner = owner
         self._target_cls_or_target_name = target
-        self._attr_name = attr_name
+        self._name = name
         self._fk = fk
         self._pk = pk
 
     @property
-    def attr_name(self):
+    def name(self):
         """ owner attribute name
         """
-        if not self._attr_name:
-            self._attr_name = pythonize(self._get_target_name())
-        return self._attr_name
+        if not self._name:
+            self._name = pythonize(self._get_target_name())
+        return self._name
 
     @property
     def fk(self):
@@ -72,7 +72,7 @@ class BelongsTo(Relation):
 
     def inject(self, owner):
         self.owner = owner
-        self.owner._register_relation(self.attr_name, self)
+        self.owner._register_relation(self.name, self)
         return self
 
     def get_real_value(self, owner_obj):
@@ -82,6 +82,6 @@ class BelongsTo(Relation):
         return self.target.find(getattr(owner_obj, self.fk))
 
 
-def belongs_to(class_or_name, attr_name=None, fk=None, pk=None):
-    r = BelongsTo(target=class_or_name, attr_name=attr_name, fk=fk, pk=pk)
+def belongs_to(class_or_classname, name=None, fk=None, pk=None):
+    r = BelongsTo(target=class_or_classname, name=name, fk=fk, pk=pk)
     relation_q.put(r)
