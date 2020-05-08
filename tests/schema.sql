@@ -22,21 +22,40 @@ create table foos (
 
 
 create table users (
-    id int auto_increment primary key ,
+    id int auto_increment primary key,
     name varchar(32) not null default '',
     age int not null default 20
 );
 
 create table mobiles (
-    id int auto_increment primary key ,
+    id int auto_increment primary key,
     name varchar(32) not null default '',
     user_id int not null,
     foreign key (user_id) references users(id)
 );
 
 create table cars (
-    id int auto_increment primary key ,
+    id int auto_increment primary key,
     name varchar(32) not null default '',
     user_id int not null,
     foreign key (user_id) references users(id)
+);
+
+create table articles (
+    id int auto_increment primary key,
+    title varchar(64) not null,
+    content text
+);
+
+create table tags (
+    id int auto_increment primary key,
+    name varchar(32) not null
+);
+
+create table articles_tags (
+    id int auto_increment primary key,
+    article_id int not null,
+    tag_id int not null,
+    foreign key (article_id) references articles(id),
+    foreign key (tag_id) references tags(id)
 );

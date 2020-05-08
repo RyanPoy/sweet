@@ -38,11 +38,11 @@ class WhereClause(Clause):
         return self
 
     def compile(self, with_prefix=True):
-        sql, bindings = self._compile()
+        sql, params = self._compile()
         sql = self._ltrip_and_or(sql)
         if sql and with_prefix:
             sql = '%s %s' % (self.PREFIX, sql)
-        return sql, bindings
+        return sql, params
 
     def _ltrip_and_or(self, s):
         if s.startswith(self.AND):
@@ -52,21 +52,21 @@ class WhereClause(Clause):
         return s
 
     def _compile(self):
-        sqls, bindings = [], []
+        sqls, params = [], []
         for and_or, f in self.filters:
             if isinstance(f, Clause):
-                tmp_sql, tmp_bindings = f.compile(False)
+                tmp_sql, tmp_params = f.compile(False)
                 sqls.append(and_or)
                 sqls.append("(")
                 sqls.append(tmp_sql)
                 sqls.append(")")
-                bindings.extend(tmp_bindings)
+                params.extend(tmp_params)
             else:
                 tmp_sql, tmp_params = f.compile()
                 sqls.append(and_or)
                 sqls.append(tmp_sql)
-                bindings.extend(tmp_params)
-        return ' '.join(sqls) if sqls else '', bindings
+                params.extend(tmp_params)
+        return ' '.join(sqls) if sqls else '', params
 
 
 class HavingClause(WhereClause):
@@ -98,7 +98,7 @@ class JoinClause(WhereClause):
         return self
 
     def compile(self):
-        sql, bindings = self._compile()
+        sql, params = self._compile()
         on = self._ltrip_and_or(' '.join(self._ons).strip())
 
         if on and sql:
@@ -110,7 +110,7 @@ class JoinClause(WhereClause):
             sql = '%s JOIN %s ON %s' % (self.PREFIX, aqm(self.tbname, self.qutotation), sql)
         else:
             sql = '%s JOIN %s' % (self.PREFIX, aqm(self.tbname, self.qutotation))
-        return sql, bindings
+        return sql, params
 
 
 class LeftJoinClause(JoinClause):
@@ -256,14 +256,14 @@ class InsertClause(object):
                 if r.keys() != keys:
                     raise Exception("multiple insert only support same keys records")
 
-        values_sql, bindings = [], []
+        values_sql, params = [], []
         for r in self.list_records:
             values_sql.append('(%s)' % ', '.join([self.paramstyle]*len(r)))
-            bindings.extend(r.values())
+            params.extend(r.values())
         
         sql = 'INSERT INTO {tablename} ({columns}) VALUES {values_sql}'.format(
             tablename=aqm(self.tbname, self.qutotation),
             columns=', '.join([ aqm(c, self.qutotation) for c in self.list_records[0].keys() ]),
             values_sql=', '.join(values_sql)
         )
-        return sql, bindings
+        return sql, params

@@ -3,22 +3,21 @@ from sweet.orm.relations.relation import Relation, relation_q
 from sweet.utils.inflection import *
 
 
-class BelongsTo(Relation):
-    
+class HasAndBelongsToMany(Relation):
+    """owner model belongs to target model
+    :param owner: model class
+    :param target: model class
+    :param name: attribute name of owner.
+    :param fk: foreign key of owner
+    :param pk: primary key of target
+    eg. Mobile belongs to User
+      owner = Mobile
+      target = User
+      name = 'user'    # can retrive use Mobile().user
+      fk = 'user_id'        # can retrive use Mobile().user_id
+      pk = 'id'             # it means that user's priamry key named id
+    """
     def __init__(self, owner=None, target=None, name=None, fk=None, pk=None):
-        """ owner model belongs to target model
-        :param owner: model class
-        :param target: model class
-        :param name: attribute name of owner.
-        :param fk: foreign key of owner
-        :param pk: primary key of target
-        eg. Mobile belongs to User
-          owner = Mobile
-          target = User
-          name = 'user'    # can retrive use Mobile().user
-          fk = 'user_id'        # can retrive use Mobile().user_id
-          pk = 'id'             # it means that user's priamry key named id
-        """
         self.owner = owner
         self._target_cls_or_target_name = target
         self._name = name
@@ -83,6 +82,6 @@ class BelongsTo(Relation):
         return self.target.find(getattr(owner_obj, self.fk))
 
 
-def belongs_to(class_or_classname, name=None, fk=None, pk=None):
-    r = BelongsTo(target=class_or_classname, name=name, fk=fk, pk=pk)
+def has_and_belongs_to_many(class_or_classname, name=None, fk=None, pk=None):
+    r = HasAndBelongsToMany(target=class_or_classname, name=name, fk=fk, pk=pk)
     relation_q.put(r)

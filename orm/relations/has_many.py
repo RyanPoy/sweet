@@ -5,20 +5,21 @@ from sweet.utils import *
 
 
 class HasMany(Relation):
-    """owner model has many target model
-    :param owner: model class
-    :param target: model class
-    :param name: attribute name of owner.
-    :param fk: foreign key of target
-    :param pk: primary key of owner
-    eg. User has many Mobile
-      owner = User
-      target = Mobile
-      name = 'mobiles' # can retrive use User().mobiles
-      fk = 'user_id'        # can retrive use Mobile().user_id
-      pk = 'id'             # User().pk
-    """
+    
     def __init__(self, owner=None, target=None, name=None, fk=None, pk=None, cascade=False):
+        """ owner model has many target model
+        :param owner: model class
+        :param target: model class
+        :param name: attribute name of owner.
+        :param fk: foreign key of target
+        :param pk: primary key of owner
+        eg. User has many Mobile
+          owner = User
+          target = Mobile
+          name = 'mobiles' # can retrive use User().mobiles
+          fk = 'user_id'        # can retrive use Mobile().user_id
+          pk = 'id'             # User().pk
+        """
         self.owner = owner
         self.cascade = cascade
         self._target_cls_or_target_name = target

@@ -6,9 +6,9 @@ from sweet.utils.inflection import *
 
 class RelationQ(Q):
     def get(self, block=True, timeout=None):
-        if self.qsize() > 0:
-            return super().get(block=block, timeout=timeout)
-        return None
+        if self.qsize() <= 0:
+            return None
+        return super().get(block=block, timeout=timeout)
 relation_q = RelationQ()
 
 

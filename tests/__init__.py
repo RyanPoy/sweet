@@ -43,3 +43,12 @@ class Mobile(Model):
 
 class Car(Model):
     belongs_to(User)
+
+
+class Article(Model):
+    has_and_belongs_to_many('sweet.tests.Tag')
+
+
+class Tag(Model):
+    has_and_belongs_to_many(Article)
+
