@@ -28,14 +28,6 @@ class HasMany(Relation):
         self._pk = pk
 
     @property
-    def name(self):
-        """ return owner attribute name
-        """
-        if not self._name:
-            self._name = pythonize(self._get_target_name())
-        return self._name
-
-    @property
     def fk(self):
         """ return target foreign key
         eg. user has many mobiles

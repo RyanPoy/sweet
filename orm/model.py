@@ -35,16 +35,12 @@ class ModelMetaClass(type):
                 setattr(cls, 'created_at', None)
                 setattr(cls, 'updated_at', None)
 
-            # from sweet.relation import Relation
             while True:
                 r = relation_q.get()
                 if r:
                     r.inject(cls)
                 else:
                     break
-
-            # for relation in Relation.iter():
-            #     relation.inject(cls)
 
             # # id column must in columns validate
             # if cls.__pk__ not in cls.__field_define_dict__:
