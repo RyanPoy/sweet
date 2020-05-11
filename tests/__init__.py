@@ -52,3 +52,9 @@ class Article(Model):
 class Tag(Model):
     has_and_belongs_to_many('articles', Article)
 
+
+class Category(Model):
+    has_many('children', 'sweet.tests.Category', fk='parent_id')
+    belongs_to('parent', 'sweet.tests.Category', fk='parent_id')
+
+

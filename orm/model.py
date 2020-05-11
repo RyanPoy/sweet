@@ -133,14 +133,12 @@ class Model(metaclass=ModelMetaClass):
         if not self.persisted():
             raise ModelHasNotBeenPersisted()
         if attrs:
-            old_values = { 
-                k: getattr(self, k) for k, v in attrs.items() if hasattr(self, k)
-            }
+            # old_values = { 
+            #     k: getattr(self, k) for k, v in attrs.items() if hasattr(self, k)
+            # }
             for k, v in attrs.items():
                 setattr(self, k, v)
-            self.objects.update(**self.column_dict())
-        else:
-            self.objects.update(**self.column_dict())
+        self.objects.where(**{self.__pk__: self.get_pk()}).update(**self.column_dict())
         return self
 
     @classmethod
@@ -181,7 +179,6 @@ class Model(metaclass=ModelMetaClass):
     def _delete_relations(cls, owner_models):
         for name, r in cls.__relations__.items():
             r.delete_all_real_value(owner_models)
-
 
     def set_pk(self, value):
         return setattr(self, self.__pk__, value)

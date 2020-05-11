@@ -52,14 +52,23 @@ class TestRelationBelongsToMysql(TestCase):
     def test_update(self):
         u1 = User.create(name="Jon", age=31)
         u2 = User.create(name="Lily", age=21)
+        u3 = User.create(name="Lucy", age=11)
+
         m = Mobile(name="Nokia", user=u1).save()
         self.assertEqual(u1.id, m.user_id)
 
         m.update(user=u2)
         self.assertEqual(u2.id, m.user_id)
+        
         m = Mobile.where(name='Nokia').first()
         self.assertEqual(u2.id, m.user_id)
 
+        m.user = u3
+        m.save()
+        self.assertEqual(u3.id, m.user_id)
+
+        m = Mobile.where(name='Nokia').first()
+        self.assertEqual(u3.id, m.user_id)
 
 
 if __name__ == '__main__':

@@ -62,7 +62,7 @@ class HasMany(Relation):
 
     def get_real_value(self, owner_obj):
         """ eg. user has many mobiles
-            Mobile.where(user_id=user.id)
+            Mobile.where(user_id=user.id).all()
         """
         return self.target.where(**{self.fk: owner_obj.get_pk()})
 

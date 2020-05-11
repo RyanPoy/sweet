@@ -59,3 +59,10 @@ create table articles_tags (
     foreign key (article_id) references articles(id),
     foreign key (tag_id) references tags(id)
 );
+
+create table categories (
+    id int auto_increment primary key,
+    name varchar(32) not null default '',
+    parent_id int default null,
+    index(parent_id)
+);
