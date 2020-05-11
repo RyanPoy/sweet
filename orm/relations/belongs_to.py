@@ -21,7 +21,7 @@ class BelongsTo(Relation):
         """
         self.owner = owner
         self._target_cls_or_target_name = target
-        self._name = name
+        self.name = name
         self._fk = fk
         self._pk = pk
 
@@ -33,7 +33,7 @@ class BelongsTo(Relation):
         """
         if not self._fk:
             self._fk = '{target_name}_{target_pk}'.format(
-                target_name=pythonize(self._get_target_name()),
+                target_name=self.name,
                 target_pk=self.target.__pk__
             )
         return self._fk
@@ -45,15 +45,6 @@ class BelongsTo(Relation):
             pk equals 'id', which composition is ：mobile.pk
         """
         return self.target.__pk__
-
-    def _get_target_name(self):
-        """ get the target class name 
-        """
-        if isinstance(self._target_cls_or_target_name, str):
-            name = self._target_cls_or_target_name.split('.')[-1]
-        else:
-            name = self.target.__name__.split('.')[-1]
-        return singularize(name)
 
     @property
     def target(self):
@@ -75,6 +66,6 @@ class BelongsTo(Relation):
         return self.target.find(getattr(owner_obj, self.fk))
 
 
-def belongs_to(class_or_classname, name=None, fk=None, pk=None):
-    r = BelongsTo(target=class_or_classname, name=name, fk=fk, pk=pk)
+def belongs_to(name, clazz, fk=None, pk=None):
+    r = BelongsTo(target=clazz, name=name, fk=fk, pk=pk)
     relation_q.put(r)

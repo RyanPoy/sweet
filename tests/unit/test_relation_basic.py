@@ -14,7 +14,7 @@ class TestRelationBasic(TestCase):
 
         class Phone(Model):
             __tablename__ = 'mobiles'
-            belongs_to(Member)
+            belongs_to('member', Member)
 
         r = Phone.__relations__.get('member')
         self.assertEqual(BelongsTo, type(r))
@@ -32,7 +32,7 @@ class TestRelationBasic(TestCase):
 
         class Phone(Model):
             __tablename__ = 'mobiles'
-            belongs_to(Member, fk='owner_id')
+            belongs_to('member', Member, fk='owner_id')
 
         r = Phone.__relations__.get('member')
         self.assertEqual(BelongsTo, type(r))
@@ -49,7 +49,7 @@ class TestRelationBasic(TestCase):
         
         class Member(Model):
             __tablename__ = 'users'
-            has_many(Phone)
+            has_many('phones', Phone)
 
         r = Member.__relations__.get('phones')
         self.assertEqual(HasMany, type(r))
@@ -67,7 +67,7 @@ class TestRelationBasic(TestCase):
         
         class Member(Model):
             __tablename__ = 'users'
-            has_many(Phone, fk='user_id')
+            has_many('phones', Phone, fk='user_id')
 
         r = Member.__relations__.get('phones')
         self.assertEqual(HasMany, type(r))
@@ -85,7 +85,7 @@ class TestRelationBasic(TestCase):
         
         class Member(Model):
             __tablename__ = 'users'
-            has_one(Phone)
+            has_one('phone', Phone)
 
         r = Member.__relations__.get('phone')
         self.assertEqual(HasOne, type(r))
@@ -103,7 +103,7 @@ class TestRelationBasic(TestCase):
         
         class Member(Model):
             __tablename__ = 'users'
-            has_one(Phone, fk='user_id')
+            has_one('phone', Phone, fk='user_id')
 
         r = Member.__relations__.get('phone')
         self.assertEqual(HasOne, type(r))
@@ -120,9 +120,9 @@ class TestRelationBasic(TestCase):
             pass
 
         class Teacher(Model):
-            has_and_belongs_to_many(Student)
+            has_and_belongs_to_many('students', Student)
 
-        HasAndBelongsToMany(target=Teacher).inject(Student)
+        HasAndBelongsToMany(name='teachers', target=Teacher).inject(Student)
 
         r = Teacher.__relations__.get('students')
         self.assertEqual(HasAndBelongsToMany, type(r))
@@ -151,9 +151,9 @@ class TestRelationBasic(TestCase):
             pass
 
         class Teacher(Model):
-            has_and_belongs_to_many(Student, through=StudentAndTeacher)
+            has_and_belongs_to_many('students', Student, through=StudentAndTeacher)
 
-        HasAndBelongsToMany(target=Teacher, through=StudentAndTeacher).inject(Student)
+        HasAndBelongsToMany(name='teachers', target=Teacher, through=StudentAndTeacher).inject(Student)
 
         r = Teacher.__relations__.get('students')
         self.assertEqual(HasAndBelongsToMany, type(r))

@@ -21,7 +21,7 @@ class HasAndBelongsToMany(Relation):
     def __init__(self, owner=None, target=None, name=None, fk=None, pk=None, through=None):
         self.owner = owner
         self._target_cls_or_target_name = target
-        self._name = name
+        self.name = name
         self._fk = fk
         self._pk = pk
         self._through = through
@@ -61,15 +61,6 @@ class HasAndBelongsToMany(Relation):
         target_table_name = self.target.__tablename__
         return '_'.join(sorted([owner_table_name, target_table_name]))
 
-    def _get_target_name(self):
-        """ get the target class name 
-        """
-        if isinstance(self._target_cls_or_target_name, str):
-            name = self._target_cls_or_target_name.split('.')[-1]
-        else:
-            name = self.target.__name__.split('.')[-1]
-        return pluralize(name)
-
     def _get_owner_name(self):
         return pythonize(singularize(self.owner.__name__.split('.')[-1]))
 
@@ -93,6 +84,6 @@ class HasAndBelongsToMany(Relation):
         return self.target.find(getattr(owner_obj, self.fk))
 
 
-def has_and_belongs_to_many(class_or_classname, name=None, fk=None, pk=None, through=None):
-    r = HasAndBelongsToMany(target=class_or_classname, name=name, fk=fk, pk=pk, through=through)
+def has_and_belongs_to_many(name, clazz, fk=None, pk=None, through=None):
+    r = HasAndBelongsToMany(target=clazz, name=name, fk=fk, pk=pk, through=through)
     relation_q.put(r)

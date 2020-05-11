@@ -23,7 +23,7 @@ class HasMany(Relation):
         self.owner = owner
         self.cascade = cascade
         self._target_cls_or_target_name = target
-        self._name = name
+        self.name = name
         self._fk = fk
         self._pk = pk
 
@@ -48,15 +48,6 @@ class HasMany(Relation):
             pk equals 'id', which composition is：user.pk
         """
         return self.owner.__pk__
-
-    def _get_target_name(self):
-        """ get the target class name 
-        """
-        if isinstance(self._target_cls_or_target_name, str):
-            name = self._target_cls_or_target_name.split('.')[-1]
-        else:
-            name = self.target.__name__.split('.')[-1]
-        return pluralize(name)
 
     @property
     def target(self):
@@ -89,7 +80,7 @@ class HasMany(Relation):
         return self
 
 
-def has_many(class_or_classname, name=None, fk=None, pk=None, cascade=False):
-    r = HasMany(target=class_or_classname, name=name, fk=fk, pk=pk, cascade=cascade)
+def has_many(name, clazz, fk=None, pk=None, cascade=False):
+    r = HasMany(target=clazz, name=name, fk=fk, pk=pk, cascade=cascade)
     relation_q.put(r)
 

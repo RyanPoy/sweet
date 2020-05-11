@@ -33,22 +33,22 @@ class Foo(Model):
 
 
 class User(Model):
-    has_many('sweet.tests.Mobile', cascade=True)
-    has_one('sweet.tests.Car', cascade=True)
+    has_many('mobiles', 'sweet.tests.Mobile', cascade=True)
+    has_one('car', 'sweet.tests.Car', cascade=True)
 
 
 class Mobile(Model):
-    belongs_to(User)
+    belongs_to('user', User)
 
 
 class Car(Model):
-    belongs_to(User)
+    belongs_to('user', User)
 
 
 class Article(Model):
-    has_and_belongs_to_many('sweet.tests.Tag')
+    has_and_belongs_to_many('tags', 'sweet.tests.Tag')
 
 
 class Tag(Model):
-    has_and_belongs_to_many(Article)
+    has_and_belongs_to_many('articles', Article)
 
