@@ -47,6 +47,11 @@ class TestRecordsetQueryForMySQL(TestCase):
         self.assertEqual('SELECT `id`, `name` FROM `users`', sql)
         self.assertEqual([], params)
 
+    def test_where_2(self):
+        sql, params = self.get_recordset().select('*').where(users__id=1, users__name='ryanpoy').sql()
+        self.assertEqual('SELECT * FROM `users` WHERE `users`.`id` = %s AND `users`.`name` = %s', sql)
+        self.assertEqual([1, 'ryanpoy'], params)
+
     def test_where(self):
         sql, params = self.get_recordset().select('*').where(id=1, name='ryanpoy').sql()
         self.assertEqual('SELECT * FROM `users` WHERE `id` = %s AND `name` = %s', sql)

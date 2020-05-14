@@ -14,17 +14,72 @@ class TestRelationHasAndBelongsToManyMysql(TestCase):
         Article.delete_all()
         Tag.delete_all()
 
-    # def test_create(self):
-    #     u = User.create(name="Jon", age=31)
-    #     mobile_id = Mobile.create(name="Nokia", user=u).id
-    #     m = Mobile.find(mobile_id)
-    #     self.assertEqual(u.id, m.user_id)
+    def test_associate(self):
+        t1 = Tag.create(name='cartoon')
+        t2 = Tag.create(name='movie')
 
-    #     u = m.user
-    #     self.assertEqual("Jon", u.name)
-    #     self.assertEqual(31, u.age)
+        a1 = Article.create(title='title-1', content='content—1')
+        a2 = Article.create(title='title-2', content='content—2')
+        a3 = Article.create(title='title-3', content='content—3')
+        a4 = Article.create(title='title-4', content='content—4')
 
-    
+        t1.associate_with_articles(a1)
+        t1.associate_with_articles(a2, a3, a4)
+
+        articles = t1.articles.all()
+        self.assertEqual(4, len(articles))
+        self.assertEqual('title-1', articles[0].title)
+        self.assertEqual('title-2', articles[1].title)
+        self.assertEqual('title-3', articles[2].title)
+        self.assertEqual('title-4', articles[3].title)
+
+        a1.associate_with_tags(t2)
+        a2.associate_with_tags(t2)
+        a3.associate_with_tags(t2)
+        a4.associate_with_tags(t2)
+
+        tags = a1.tags.all()
+        self.assertEqual(2, len(tags))
+        self.assertEqual('cartoon', tags[0].name)
+        self.assertEqual('movie', tags[1].name)
+        self.assertEqual(2, len(a2.tags.all()))
+        self.assertEqual(2, len(a3.tags.all()))
+        self.assertEqual(2, len(a4.tags.all()))
+
+    def test_should_associate_one_time_when_same_association_create_more_times(self):
+        t1 = Tag.create(name='cartoon')
+
+        a1 = Article.create(title='title-1', content='content—1')
+        a2 = Article.create(title='title-2', content='content—2')
+        a3 = Article.create(title='title-3', content='content—3')
+        a4 = Article.create(title='title-4', content='content—4')
+
+        for x in range(10):
+            t1.associate_with_articles(a1, a2, a3, a4)
+
+        articles = t1.articles.all()
+        self.assertEqual(4, len(articles))
+        self.assertEqual('title-1', articles[0].title)
+        self.assertEqual('title-2', articles[1].title)
+        self.assertEqual('title-3', articles[2].title)
+        self.assertEqual('title-4', articles[3].title)
+
+    def test_dissociate(self):
+        t1 = Tag.create(name='cartoon')
+
+        a1 = Article.create(title='title-1', content='content—1')
+        a2 = Article.create(title='title-2', content='content—2')
+        a3 = Article.create(title='title-3', content='content—3')
+        a4 = Article.create(title='title-4', content='content—4')
+
+        t1.associate_with_articles(a1, a2, a3, a4)
+        self.assertEqual(4, len(t1.articles.all()))
+        
+        t1.dissociate_with_articles(a1)
+        self.assertEqual(3, len(t1.articles.all()))
+
+        t1.dissociate_with_articles(a2, a3, a4)
+        self.assertEqual(0, len(t1.articles.all()))
 
 
 if __name__ == '__main__':

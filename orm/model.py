@@ -2,10 +2,7 @@
 from sweet.utils import *
 from sweet.utils.inflection import *
 from sweet.orm.relations import *
-
-
-class ModelHasBeenPersisted(Exception): pass
-class ModelHasNotBeenPersisted(Exception): pass
+from sweet.orm.method_missing import *
 
 
 class ModelMetaClass(type):
@@ -42,23 +39,12 @@ class ModelMetaClass(type):
                 else:
                     break
 
-            # # id column must in columns validate
-            # if cls.__pk__ not in cls.__field_define_dict__:
-            #     raise PKColumnNotInColumns()
-            # for c, err in [
-            #     (cls.__pk__, PKColumnNotInColumns),
-            #     (cls.__created_at__, CreatedAtColumnNotInColumns), 
-            #     (cls.__updated_at__, UpdatedAtColumnNotInColumns),
-            #     (cls.__created_on__, CreatedOnColumnNotInColumns),
-            #     (cls.__updated_on__, UpdatedOnColumnNotInColumns),
-            # ]:
-            #     if c and  c not in cls.__field_define_dict__:
-            #         raise err()
-
         return type.__init__(cls, name, bases, attr)
 
 
 class Model(metaclass=ModelMetaClass):
+
+    class ModelHasNotBeenPersisted(Exception): pass
 
     def __init__(self, **attrs):
         for k, v in attrs.items():
@@ -72,6 +58,10 @@ class Model(metaclass=ModelMetaClass):
             if name in self.__relations__:
                 r = self.__relations__[name]
                 return r.get_real_value(self)
+            else:
+                method = MethodMissing.match(self, name)
+                if method:
+                    return method(self, name)
             raise ex
 
     def __setattr__(self, name, value):
@@ -247,9 +237,13 @@ class Model(metaclass=ModelMetaClass):
             model = cls.create(**kwargs)
         return model
 
+    @classmethod
+    def _new_db(cls):
+        return cls.db_manager.new_db()
+
     @classproperty
     def objects(cls):
-        db = cls.db_manager.new_db()
+        db = cls._new_db()
         rs = db.records(cls.__tablename__)
         rs.model_class = cls
         return rs
