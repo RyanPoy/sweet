@@ -10,9 +10,9 @@ class HasOne(HasMany):
         """ eg. user has one car
             Car.where(user_id=user.id)
         """
-        return self.target.where(**{self.fk: owner_obj.get_pk()}).first()
+        return self.target.where(**{self.target_fk: owner_obj.get_pk()}).first()
 
 
-def has_one(name, clazz, fk=None, pk=None, cascade=False):
-    r = HasOne(target=clazz, name=name, fk=fk, pk=pk, cascade=cascade)
+def has_one(name, clazz, fk=None, cascade=False):
+    r = HasOne(target=clazz, name=name, fk=fk, cascade=cascade)
     relation_q.put(r)

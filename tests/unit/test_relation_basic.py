@@ -54,8 +54,7 @@ class TestRelationBasic(TestCase):
 
         self.assertEqual(Member, r.owner)
         self.assertEqual(Phone, r.target)
-        self.assertEqual('member_id', r.fk)
-        self.assertEqual('id', r.pk)
+        self.assertEqual('member_id', r.target_fk)
         self.assertEqual('phones', r.name)
 
     def test_has_many_with_argument(self):
@@ -72,8 +71,7 @@ class TestRelationBasic(TestCase):
 
         self.assertEqual(Member, r.owner)
         self.assertEqual(Phone, r.target)
-        self.assertEqual('user_id', r.fk)
-        self.assertEqual('id', r.pk)
+        self.assertEqual('user_id', r.target_fk)
         self.assertEqual('phones', r.name)
 
     def test_has_one_without_argument(self):
@@ -90,8 +88,7 @@ class TestRelationBasic(TestCase):
 
         self.assertEqual(Member, r.owner)
         self.assertEqual(Phone, r.target)
-        self.assertEqual('member_id', r.fk)
-        self.assertEqual('id', r.pk)
+        self.assertEqual('member_id', r.target_fk)
         self.assertEqual('phone', r.name)
 
     def test_has_one_with_argument(self):
@@ -108,8 +105,7 @@ class TestRelationBasic(TestCase):
 
         self.assertEqual(Member, r.owner)
         self.assertEqual(Phone, r.target)
-        self.assertEqual('user_id', r.fk)
-        self.assertEqual('id', r.pk)
+        self.assertEqual('user_id', r.target_fk)
         self.assertEqual('phone', r.name)
 
     def test_has_and_belongs_to_many_without_argument(self):

@@ -6,7 +6,7 @@ from sweet.utils import *
 
 class HasMany(Relation):
     
-    def __init__(self, owner=None, target=None, name=None, fk=None, pk=None, cascade=False):
+    def __init__(self, owner=None, target=None, name=None, fk=None, cascade=False):
         """ owner model has many target model
         :param owner: model class
         :param target: model class
@@ -16,38 +16,28 @@ class HasMany(Relation):
         eg. User has many Mobile
           owner = User
           target = Mobile
-          name = 'mobiles' # can retrive use User().mobiles
+          name = 'mobiles'      # can retrive use User().mobiles
           fk = 'user_id'        # can retrive use Mobile().user_id
-          pk = 'id'             # User().pk
         """
         self.owner = owner
         self.cascade = cascade
         self._target_cls_or_target_name = target
         self.name = name
-        self._fk = fk
-        self._pk = pk
+        self._target_fk = fk
 
     @property
-    def fk(self):
+    def target_fk(self):
         """ return target foreign key
         eg. user has many mobiles
             fk equals 'user_id', which composition is ： 'user' + '_'+ user.pk
         """
-        if not self._fk:
+        if not self._target_fk:
             name = self.owner.__name__.split('.')[-1]
-            self._fk = '{owner_name}_{owner_pk}'.format(
+            self._target_fk = '{owner_name}_{owner_pk}'.format(
                 owner_name=pythonize(name),
                 owner_pk=self.owner.__pk__
             )
-        return self._fk
-
-    @property
-    def pk(self):
-        """ return owner foreign key
-        eg. user has many mobile
-            pk equals 'id', which composition is：user.pk
-        """
-        return self.owner.__pk__
+        return self._target_fk
 
     @property
     def target(self):
@@ -59,7 +49,7 @@ class HasMany(Relation):
         """ eg. user has many mobiles
             Mobile.where(user_id=user.id).all()
         """
-        return self.target.where(**{self.fk: owner_obj.get_pk()})
+        return self.target.where(**{self.target_fk: owner_obj.get_pk()})
 
     def delete_all_real_value(self, owner_objs):
         """ eg. user has many mobiles
@@ -71,15 +61,15 @@ class HasMany(Relation):
         if self.cascade:
             pks = [ o.get_pk() for o in owner_objs ]
             if pks:
-                self.target.delete_all(**{self.fk: pks})
+                self.target.delete_all(**{self.target_fk: pks})
         return self
 
     def inject(self, owner_model, target_model):
-        attr_name = self.fk
+        attr_name = self.target_fk
         setattr(owner_model, attr_name, target_model.get_pk())
 
 
 def has_many(name, clazz, fk=None, pk=None, cascade=False):
-    r = HasMany(target=clazz, name=name, fk=fk, pk=pk, cascade=cascade)
+    r = HasMany(target=clazz, name=name, fk=fk, cascade=cascade)
     relation_q.put(r)
 
