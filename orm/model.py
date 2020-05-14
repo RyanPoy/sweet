@@ -67,11 +67,10 @@ class Model(metaclass=ModelMetaClass):
     def __setattr__(self, name, value):
         cls = self.__class__
         relt = super().__setattr__(name, value)
+
         if name in cls.__relations__:
             relation = cls.__relations__[name]
-            fk = relation.fk
-            fk_value = value.get_pk()
-            setattr(self, fk, fk_value)
+            relation.inject(self, value)
         return relt
 
     def _init_field_default_value(self):

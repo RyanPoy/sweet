@@ -74,6 +74,10 @@ class HasMany(Relation):
                 self.target.delete_all(**{self.fk: pks})
         return self
 
+    def inject(self, owner_model, target_model):
+        attr_name = self.fk
+        setattr(owner_model, attr_name, target_model.get_pk())
+
 
 def has_many(name, clazz, fk=None, pk=None, cascade=False):
     r = HasMany(target=clazz, name=name, fk=fk, pk=pk, cascade=cascade)

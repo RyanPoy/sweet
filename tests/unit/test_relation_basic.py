@@ -20,7 +20,7 @@ class TestRelationBasic(TestCase):
         self.assertEqual(BelongsTo, type(r))
         self.assertEqual(Phone, r.owner)
         self.assertEqual(Member, r.target)
-        self.assertEqual('member_id', r.fk)
+        self.assertEqual('member_id', r.owner_fk)
         self.assertEqual('id', r.pk)
         self.assertEqual('member', r.name)
         
@@ -38,7 +38,7 @@ class TestRelationBasic(TestCase):
         self.assertEqual(BelongsTo, type(r))
         self.assertEqual(Phone, r.owner)
         self.assertEqual(Member, r.target)
-        self.assertEqual('owner_id', r.fk)
+        self.assertEqual('owner_id', r.owner_fk)
         self.assertEqual('member_id', r.pk)    
         self.assertEqual('member', r.name)
 

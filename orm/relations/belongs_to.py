@@ -22,21 +22,21 @@ class BelongsTo(Relation):
         self.owner = owner
         self._target_cls_or_target_name = target
         self.name = name
-        self._fk = fk
+        self._owner_fk = fk
         self._pk = pk
 
     @property
-    def fk(self):
+    def owner_fk(self):
         """ return owner foreign key
         eg. mobile is belongs to user
             fk equals 'user_id', which composition is ： 'user' + '_'+ user.pk
         """
-        if not self._fk:
-            self._fk = '{target_name}_{target_pk}'.format(
+        if not self._owner_fk:
+            self._owner_fk = '{target_name}_{target_pk}'.format(
                 target_name=self.name,
                 target_pk=self.target.__pk__
             )
-        return self._fk
+        return self._owner_fk
 
     @property
     def pk(self):
@@ -58,7 +58,11 @@ class BelongsTo(Relation):
         """ eg. if mobile belongs to user.
             User.find(mobile.user_id)
         """
-        return self.target.find(getattr(owner_obj, self.fk))
+        return self.target.find(getattr(owner_obj, self.owner_fk))
+
+    def inject(self, owner_model, target_model):
+        attr_name = self.owner_fk
+        setattr(owner_model, attr_name, target_model.get_pk())
 
 
 def belongs_to(name, clazz, fk=None, pk=None):
