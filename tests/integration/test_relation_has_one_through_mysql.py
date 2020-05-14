@@ -41,7 +41,6 @@ class TestRelationHasOneThroughMysql(TestCase):
         c1 = Course.create(name='math')
         Score.create(student=s1, course=c1, value=100)
 
-
         self.assertEqual(1, len(Score.all()))
 
         s1.dissociate_with_course(c1)
