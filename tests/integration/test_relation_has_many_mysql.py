@@ -1,6 +1,8 @@
 #coding: utf8
 from sweet.tests import TestCase, User, Mobile
-
+from sweet.orm import Model
+from sweet.orm.relations import *
+from MySQLdb import IntegrityError
 
 class TestHasManyToMysql(TestCase):
     
@@ -58,6 +60,26 @@ class TestHasManyToMysql(TestCase):
         self.assertEqual(2, Mobile.count())
         User.delete_all()
         self.assertEqual(0, Mobile.count())
+
+    def test_delete_if_set_not_cascade(self):
+
+        class Member(Model):
+            __tablename__ = 'users'
+
+            has_many('mobiles', 'sweet.tests.Mobile', cascade=False)
+            has_one('car', 'sweet.tests.Car', cascade=False)
+
+        member1 = Member.create(name="Jon", age=31)
+        Mobile.create(name="Nokia", user_id=member1.id)
+
+        member2 = Member.create(name="Jon", age=31)
+        Mobile.create(name="IPhone", user_id=member2.id)
+
+        with self.assertRaises(IntegrityError) as err:
+            Member.delete_all()
+
+        with self.assertRaises(IntegrityError) as err:
+            member1.delete_all()
 
 
 if __name__ == '__main__':
