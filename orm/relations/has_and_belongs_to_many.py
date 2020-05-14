@@ -17,13 +17,13 @@ class HasAndBelongsToMany(Relation):
       name = 'tags'         # can retrive use Article().tags
       fk = 'article_id'     # can retrive use Article().user_id
     """
-    def __init__(self, owner=None, target=None, name=None, fk=None, through=None):
+    def __init__(self, owner=None, target=None, name=None, through=None, through_fk=None, through_fk_on_target=None):
         self.owner = owner
         self._target_cls_or_target_name = target
         self.name = name
-        self._fk = fk
+        self._through_fk = through_fk
         self._through = through
-        self._target_fk = None
+        self._through_fk_on_target = through_fk_on_target
 
     @property
     def through_fk_on_owner(self):
@@ -31,21 +31,21 @@ class HasAndBelongsToMany(Relation):
         eg. Article is has many and belongs to many User
             fk equals 'article_id', which composition is ： 'article' + '_'+ article.pk
         """
-        if not self._fk:
-            self._fk = '{owner_name}_{owner_pk}'.format(
+        if not self._through_fk:
+            self._through_fk = '{owner_name}_{owner_pk}'.format(
                 owner_name=self._get_owner_name(),
                 owner_pk=self.owner.__pk__
             )
-        return self._fk
+        return self._through_fk
 
     @property
     def through_fk_on_target(self):
-        if not self._target_fk:
-            self._target_fk = '{target_name}_{target_pk}'.format(
+        if not self._through_fk_on_target:
+            self._through_fk_on_target = '{target_name}_{target_pk}'.format(
                 target_name=self._get_target_name(),
                 target_pk=self.target.__pk__
             ) 
-        return self._target_fk
+        return self._through_fk_on_target
 
     @property
     def through_table(self):
@@ -79,14 +79,14 @@ class HasAndBelongsToMany(Relation):
         """ eg. if mobile belongs to user.
             User.find(mobile.user_id)
         """
-        target_and_throught_table_join_on = '{target_table}.{target_pk}={through_table}.{through_fk}'.format(
+        target_and_through_table_join_on = '{target_table}.{target_pk}={through_table}.{through_fk}'.format(
             target_table=self.target.__tablename__,
             target_pk=self.target.__pk__,
             through_table=self.through_table,
             through_fk=self.through_fk_on_target
         )
 
-        owner_and_throught_table_join_on = '{owner_table}.{owner_pk}={through_table}.{through_fk}'.format(
+        owner_and_through_table_join_on = '{owner_table}.{owner_pk}={through_table}.{through_fk}'.format(
             owner_table=self.owner.__tablename__,
             owner_pk=self.owner.__pk__,
             through_table=self.through_table,
@@ -94,8 +94,8 @@ class HasAndBelongsToMany(Relation):
         )
 
         return self.target.objects \
-                          .join(self.through_table, on=target_and_throught_table_join_on) \
-                          .join(self.owner.__tablename__, on=owner_and_throught_table_join_on) \
+                          .join(self.through_table, on=target_and_through_table_join_on) \
+                          .join(self.owner.__tablename__, on=owner_and_through_table_join_on) \
                           .where(**{self.through_table+'__'+self.through_fk_on_owner: owner_obj.get_pk()})
 
     def delete_all_real_value(self, owner_objs):
@@ -152,6 +152,6 @@ class HasAndBelongsToMany(Relation):
         return self
 
 
-def has_and_belongs_to_many(name, clazz, fk=None, through=None):
-    r = HasAndBelongsToMany(target=clazz, name=name, fk=fk, through=through)
+def has_and_belongs_to_many(name, clazz, through=None, through_fk=None, through_fk_on_target=None):
+    r = HasAndBelongsToMany(target=clazz, name=name, through_fk=through_fk, through=through, through_fk_on_target=through_fk_on_target)
     relation_q.put(r)
