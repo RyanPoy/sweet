@@ -38,11 +38,11 @@ class User(Model):
 
 
 class Mobile(Model):
-    belongs_to('user', User)
+    belongs_to(User)
 
 
 class Car(Model):
-    belongs_to('user', User)
+    belongs_to(User, name='user')
 
 
 class Article(Model):
@@ -55,7 +55,7 @@ class Tag(Model):
 
 class Category(Model):
     has_many('children', 'sweet.tests.Category', fk='parent_id')
-    belongs_to('parent', 'sweet.tests.Category', fk='parent_id')
+    belongs_to('sweet.tests.Category', name='parent', fk='parent_id')
 
 
 class Student(Model):
@@ -69,8 +69,8 @@ class Course(Model):
 
 
 class Score(Model):
-    belongs_to('student', Student)
-    belongs_to('course', Course)
+    belongs_to(Student, name='student')
+    belongs_to(Course, name='course')
 
 
 class StudentForHasOneThrough(Model):
@@ -87,5 +87,5 @@ class CourseForHasOneThrough(Model):
 
 class ScoreForHasOneThrough(Model):
     __tablename__ = 'scores'
-    belongs_to('student', StudentForHasOneThrough, fk='student_id')
-    belongs_to('course', CourseForHasOneThrough, fk='course_id')
+    belongs_to(StudentForHasOneThrough, name='student', fk='student_id')
+    belongs_to(CourseForHasOneThrough, name='course', fk='course_id')

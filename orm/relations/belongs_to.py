@@ -20,8 +20,14 @@ class BelongsTo(Relation):
         """
         self.owner = owner
         self._target_cls_or_target_name = target
-        self.name = name
+        self._name = name
         self._owner_fk = fk
+
+    @property
+    def name(self):
+        if not self._name:
+            self._name = pythonize(singularize(self.target.__name__))
+        return self._name
 
     @property
     def owner_fk(self):
@@ -47,6 +53,6 @@ class BelongsTo(Relation):
         setattr(owner_model, attr_name, target_model.get_pk())
 
 
-def belongs_to(name, clazz, fk=None):
+def belongs_to(clazz, name=None, fk=None):
     r = BelongsTo(target=clazz, name=name, fk=fk)
     relation_q.put(r)

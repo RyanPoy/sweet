@@ -14,7 +14,7 @@ class TestRelationBasic(TestCase):
 
         class Phone(Model):
             __tablename__ = 'mobiles'
-            belongs_to('member', Member)
+            belongs_to(Member)
 
         r = Phone.__relations__.get('member')
         self.assertEqual(BelongsTo, type(r))
@@ -31,14 +31,14 @@ class TestRelationBasic(TestCase):
 
         class Phone(Model):
             __tablename__ = 'mobiles'
-            belongs_to('member', Member, fk='owner_id')
+            belongs_to(Member, name='user', fk='owner_id')
 
-        r = Phone.__relations__.get('member')
+        r = Phone.__relations__.get('user')
         self.assertEqual(BelongsTo, type(r))
         self.assertEqual(Phone, r.owner)
         self.assertEqual(Member, r.target)
         self.assertEqual('owner_id', r.owner_fk)
-        self.assertEqual('member', r.name)
+        self.assertEqual('user', r.name)
 
     def test_has_many_without_argument(self):
 
