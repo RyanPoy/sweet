@@ -15,9 +15,8 @@ class BelongsTo(Relation):
         eg. Mobile belongs to User
           owner = Mobile
           target = User
-          name = 'user'    # can retrive use Mobile().user
+          name = 'user'         # can retrive use Mobile().user
           fk = 'user_id'        # can retrive use Mobile().user_id
-          pk = 'id'             # it means that user's priamry key named id
         """
         self.owner = owner
         self._target_cls_or_target_name = target
