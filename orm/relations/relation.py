@@ -4,10 +4,6 @@ from queue import Queue as Q
 from sweet.utils.inflection import *
 
 
-class ModelHasBeenPersisted(Exception): pass
-class ModelHasNotBeenPersisted(Exception): pass
-
-
 class RelationQ(Q):
     def get(self, block=True, timeout=None):
         if self.qsize() <= 0:
