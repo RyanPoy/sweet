@@ -3,13 +3,13 @@
 python web framework looks like rails
 
 # recordset
-[recordset](./documents/recordset.md)
+[recordset](./_docs/recordset.md)
 
 # orm
-[orm](./documents/orm.md)
+[orm](./_docs/orm.md)
 
 # template
-[template](./documents/template.md)
+[template](./_docs/template.md)
 
 # form helper
-[form](./documents/form_helper.md)
+[form](./_docs/form_helper.md)
