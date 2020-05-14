@@ -1,5 +1,4 @@
-# ORM
-=======
+# ORM Relations
 
 - belongs_to
   - create

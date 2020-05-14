@@ -1,5 +1,5 @@
-# recordset
-=======
+# Recordset
+
 - Introduction
 - Retrieving Results
   - Aggregates

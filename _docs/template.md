@@ -1,5 +1,5 @@
 # Template
-=======
+
 - Basic usage
 - Basic template
 - Syntax
