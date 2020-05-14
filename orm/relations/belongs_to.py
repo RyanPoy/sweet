@@ -5,7 +5,7 @@ from sweet.utils.inflection import *
 
 class BelongsTo(Relation):
     
-    def __init__(self, owner=None, target=None, name=None, fk=None, pk=None):
+    def __init__(self, owner=None, target=None, name=None, fk=None):
         """ owner model belongs to target model
         :param owner: model class
         :param target: model class
@@ -23,7 +23,6 @@ class BelongsTo(Relation):
         self._target_cls_or_target_name = target
         self.name = name
         self._owner_fk = fk
-        self._pk = pk
 
     @property
     def owner_fk(self):
@@ -37,14 +36,6 @@ class BelongsTo(Relation):
                 target_pk=self.target.__pk__
             )
         return self._owner_fk
-
-    @property
-    def pk(self):
-        """ return target primary key
-        eg. mobile is belongs to user
-            pk equals 'id', which composition is ：mobile.pk
-        """
-        return self.target.__pk__
 
     @property
     def target(self):
@@ -65,6 +56,6 @@ class BelongsTo(Relation):
         setattr(owner_model, attr_name, target_model.get_pk())
 
 
-def belongs_to(name, clazz, fk=None, pk=None):
-    r = BelongsTo(target=clazz, name=name, fk=fk, pk=pk)
+def belongs_to(name, clazz, fk=None):
+    r = BelongsTo(target=clazz, name=name, fk=fk)
     relation_q.put(r)
