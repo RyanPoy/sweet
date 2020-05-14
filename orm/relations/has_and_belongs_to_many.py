@@ -33,7 +33,7 @@ class HasAndBelongsToMany(Relation):
         """
         if not self._through_fk:
             self._through_fk = '{owner_name}_{owner_pk}'.format(
-                owner_name=self._get_owner_name(),
+                owner_name=pythonize(singularize(self.owner.__name__)),
                 owner_pk=self.owner.__pk__
             )
         return self._through_fk
@@ -42,7 +42,7 @@ class HasAndBelongsToMany(Relation):
     def through_fk_on_target(self):
         if not self._through_fk_on_target:
             self._through_fk_on_target = '{target_name}_{target_pk}'.format(
-                target_name=self._get_target_name(),
+                target_name=pythonize(singularize(self.target.__name__)),
                 target_pk=self.target.__pk__
             ) 
         return self._through_fk_on_target
@@ -53,27 +53,8 @@ class HasAndBelongsToMany(Relation):
             if self._through:
                 self._through_table = self._through.__tablename__
             else:
-                self._through_table = self._get_through_table()
+                self._through_table = '_'.join(sorted([self.owner.__tablename__, self.target.__tablename__]))
         return self._through_table
-
-    def _get_through_table(self):
-        owner_table_name = self.owner.__tablename__
-        target_table_name = self.target.__tablename__
-        return '_'.join(sorted([owner_table_name, target_table_name]))
-
-    def _get_owner_name(self):
-        return pythonize(singularize(self.owner.__name__.split('.')[-1]))
-
-    def _get_target_name(self):
-        return pythonize(singularize(self.target.__name__.split('.')[-1]))
-
-    @property
-    def target(self):
-        """ return target class
-        """
-        if isinstance(self._target_cls_or_target_name, str):
-            self._target_cls_or_target_name = import_object(self._target_cls_or_target_name)
-        return self._target_cls_or_target_name
 
     def get_real_value(self, owner_obj):
         """ eg. if mobile belongs to user.

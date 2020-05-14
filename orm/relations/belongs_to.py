@@ -36,14 +36,6 @@ class BelongsTo(Relation):
             )
         return self._owner_fk
 
-    @property
-    def target(self):
-        """ return target class
-        """
-        if isinstance(self._target_cls_or_target_name, str):
-            self._target_cls_or_target_name = import_object(self._target_cls_or_target_name)
-        return self._target_cls_or_target_name
-
     def get_real_value(self, owner_obj):
         """ eg. if mobile belongs to user.
             User.find(mobile.user_id)

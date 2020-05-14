@@ -3,7 +3,8 @@ import re
 
 
 class AssociateMethod(object):
-
+    """ for HasAndBelongsToMany relation
+    """
     pattern = re.compile(r'^(di|a)ssociate_with_([_a-zA-Z]\w*)$')
 
     def __init__(self, model, method_name):

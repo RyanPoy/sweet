@@ -39,12 +39,6 @@ class HasMany(Relation):
             )
         return self._target_fk
 
-    @property
-    def target(self):
-        if isinstance(self._target_cls_or_target_name, str):
-            self._target_cls_or_target_name = import_object(self._target_cls_or_target_name)
-        return self._target_cls_or_target_name
-
     def get_real_value(self, owner_obj):
         """ eg. user has many mobiles
             Mobile.where(user_id=user.id).all()
