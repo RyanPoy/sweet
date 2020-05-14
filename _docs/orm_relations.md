@@ -144,7 +144,7 @@
     belongs_to(User)  # name does not required. should be auto set
 ```
 
-- query
+### query
 
 ```
   u = User.create(name="jon", age=20)
@@ -202,7 +202,7 @@
     has_many(Student, through=Score)
 ```
 
-- query
+### query
 
 ```
   s1 = Student.create(name='lily')
@@ -223,7 +223,7 @@
   c2.students.all()
 ```
 
-- dissociate
+### dissociate
 
 ```
   s1 = Student.create(name='lily')
@@ -244,9 +244,6 @@
 ```
 
 ## has_one
-
-`has_one` is a special relation looks like `has_many`
-
 
 ```
 -- create tables
@@ -279,7 +276,7 @@
     belongs_to(User)  # name does not required. should be auto set
 ```
 
-- query
+### query
 
 ```
   u = User.create(name="jon", age=20)
@@ -290,6 +287,7 @@
 
 
 ## has_one with through
+
 ```
 -- create tables
 
@@ -333,7 +331,7 @@
     has_one(Student, through=Score)
 ```
 
-- query
+### query
 
 ```
   s1 = Student.create(name='lily')
@@ -352,7 +350,7 @@
   c2.student
 ```
 
-- dissociate
+### dissociate
 
 ```
   s1 = Student.create(name='lily')
@@ -407,7 +405,7 @@
 
 ```
 
-- associate
+### associate
 
 ```
   t1 = Tag.create(name='cartoon')
@@ -423,7 +421,7 @@
   a1.associate_with_tags(t1, t2)               # associate_with_tags is a dynamic method
 ```
 
-- dissociate
+### dissociate
 
 ```
   t1 = Tag.create(name='cartoon')
@@ -442,7 +440,7 @@
   a1.dissociate_with_tags(t1, t2)              # dissociate_with_tags is a dynamic method
 ```
 
-- query
+### query
 
 ```
   t = Tag.first()
