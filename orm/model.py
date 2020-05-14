@@ -35,7 +35,7 @@ class ModelMetaClass(type):
             while True:
                 r = relation_q.get()
                 if r:
-                    r.inject(cls)
+                    r.set_owner(cls)
                 else:
                     break
 

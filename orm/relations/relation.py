@@ -19,3 +19,8 @@ class Relation(object):
 
     def delete_all_real_value(self, owner_objs):
         pass
+
+    def set_owner(self, owner):
+        self.owner = owner
+        self.owner._register_relation(self.name, self)
+        return self

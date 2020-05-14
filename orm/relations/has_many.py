@@ -55,11 +55,6 @@ class HasMany(Relation):
             self._target_cls_or_target_name = import_object(self._target_cls_or_target_name)
         return self._target_cls_or_target_name
 
-    def inject(self, owner):
-        self.owner = owner
-        self.owner._register_relation(self.name, self)
-        return self
-
     def get_real_value(self, owner_obj):
         """ eg. user has many mobiles
             Mobile.where(user_id=user.id).all()

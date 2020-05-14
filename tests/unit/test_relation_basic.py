@@ -122,7 +122,7 @@ class TestRelationBasic(TestCase):
         class Teacher(Model):
             has_and_belongs_to_many('students', Student)
 
-        HasAndBelongsToMany(name='teachers', target=Teacher).inject(Student)
+        HasAndBelongsToMany(name='teachers', target=Teacher).set_owner(Student)
 
         r = Teacher.__relations__.get('students')
         self.assertEqual(HasAndBelongsToMany, type(r))
@@ -153,7 +153,7 @@ class TestRelationBasic(TestCase):
         class Teacher(Model):
             has_and_belongs_to_many('students', Student, through=StudentAndTeacher)
 
-        HasAndBelongsToMany(name='teachers', target=Teacher, through=StudentAndTeacher).inject(Student)
+        HasAndBelongsToMany(name='teachers', target=Teacher, through=StudentAndTeacher).set_owner(Student)
 
         r = Teacher.__relations__.get('students')
         self.assertEqual(HasAndBelongsToMany, type(r))
