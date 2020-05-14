@@ -117,17 +117,13 @@ class HasAndBelongsToMany(HasManyThrough):
         return self
 
     def unbinding(self, model1, *model2s):
-        if model2s:
-            # 1. check all model2 has been persisted
-            for m in model2s:
-                if not m.persisted():
-                    raise model2.ModelHasNotBeenPersisted()
-
+        pks = [ m2.get_pk() for m2 in model2s if m2.persisted() ]
+        if pks:
             db = model1.__class__._new_db()
-            model2s_binded = db.records(self.through_table) \
-                               .where(**{self.through_fk_on_owner : model1.get_pk()}) \
-                               .where(**{self.through_fk_on_target: [ m2.get_pk() for m2 in model2s ]}) \
-                               .delete()
+            db.records(self.through_table) \
+              .where(**{self.through_fk_on_owner : model1.get_pk()}) \
+              .where(**{self.through_fk_on_target: pks }) \
+              .delete()
         return self
 
 

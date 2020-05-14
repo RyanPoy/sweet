@@ -46,24 +46,24 @@ class TestRelationHasManyThroughMysql(TestCase):
         self.assertEqual(1, len(ss))
         self.assertEqual('lily', ss[0].name)
 
-    # def test_dissociate(self):
-    #     s1 = Student.create(name='lily')
+    def test_dissociate(self):
+        s1 = Student.create(name='lily')
 
-    #     c1 = Course.create(name='math')
-    #     c2 = Course.create(name='swim')
-    #     c3 = Course.create(name='boxing')
+        c1 = Course.create(name='math')
+        c2 = Course.create(name='swim')
+        c3 = Course.create(name='boxing')
 
-    #     Score.create(student=s1, course=c1, value=100)
-    #     Score.create(student=s1, course=c2, value=90)
-    #     Score.create(student=s1, course=c3, value=95)
+        Score.create(student=s1, course=c1, value=100)
+        Score.create(student=s1, course=c2, value=90)
+        Score.create(student=s1, course=c3, value=95)
 
-    #     self.assertEqual(3, len(Score.all()))
-    #     self.assertEqual(3, len(s1.scores.all()))
+        self.assertEqual(3, len(Score.all()))
+        self.assertEqual(3, len(s1.courses.all()))
 
-    #     s1.dissociate_with_courses(c1, c2)
-    #     self.assertEqual(1, len(Score.all()))
-    #     self.assertEqual(1, len(s1.scores.all()))
-    #     self.assertEqual('boxing', s1.scores.first().name)
+        s1.dissociate_with_courses(c1, c2)
+        self.assertEqual(1, len(Score.all()))
+        self.assertEqual(1, len(s1.courses.all()))
+        self.assertEqual('boxing', s1.courses.first().name)
 
 
 if __name__ == '__main__':

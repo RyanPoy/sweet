@@ -24,7 +24,10 @@ class AssociateMethod(object):
         if not relation:
             return False
 
-        if not hasattr(relation, 'binding') or not hasattr(relation, 'unbinding'):
+        if not diss and not hasattr(relation, 'binding'):
+            return False
+
+        if diss and not hasattr(relation, 'unbinding'):
             return False
 
         return True

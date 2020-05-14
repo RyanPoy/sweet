@@ -94,6 +94,15 @@ class HasManyThrough(Relation):
             self.through.delete_all(**{self.through_fk_on_owner:pks})
         return self
 
+    def unbinding(self, model1, *model2s):
+        pks = [ m2.get_pk() for m2 in model2s if m2.persisted() ]
+        if pks:
+            self.through.delete_all(**{
+                self.through_fk_on_owner : model1.get_pk(),
+                self.through_fk_on_target: pks
+            })
+        return self
+
 
 def has_many(name, clazz, fk=None, cascade=False):
     r = HasMany(target=clazz, name=name, fk=fk, cascade=cascade)
