@@ -4,7 +4,7 @@ from sweet.orm import Model
 from sweet.orm.relations import *
 from MySQLdb import IntegrityError
 
-class TestHasManyToMysql(TestCase):
+class TestRelationHasManyToMysql(TestCase):
     
     def setUp(self):
         self.remove_record()

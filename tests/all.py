@@ -9,11 +9,13 @@ from sweet.tests.integration.test_recordset_crud_mysql import TestRecordsetCRUDM
 from sweet.tests.integration.test_model_struct_mysql import TestModelStructMySQL
 from sweet.tests.integration.test_model_crud_mysql import TestModelCRUDMySQL
 from sweet.tests.integration.test_relation_belongs_to_mysql import TestRelationBelongsToMysql
-from sweet.tests.integration.test_relation_has_many_mysql import TestHasManyToMysql
-from sweet.tests.integration.test_relation_has_one_mysql import TestHasOneToMysql
-from sweet.tests.integration.test_relation_has_and_belongs_to_many_mysql import TestRelationHasAndBelongsToManyMysql
-from sweet.tests.integration.test_relation_has_many_through_mysql import TestRelationHasManyThroughMysql
 from sweet.tests.integration.test_relation_reference_myself_mysql import TestRelationReferenceMysqlMysql
+from sweet.tests.integration.test_relation_has_many_mysql import TestRelationHasManyToMysql
+from sweet.tests.integration.test_relation_has_many_through_mysql import TestRelationHasManyThroughMysql
+from sweet.tests.integration.test_relation_has_one_mysql import TestHasOneToMysql
+from sweet.tests.integration.test_relation_has_one_through_mysql import TestRelationHasOneThroughMysql
+from sweet.tests.integration.test_relation_has_and_belongs_to_many_mysql import TestRelationHasAndBelongsToManyMysql
+
 
 from sweet.tests.unit.test_filter import TestFilter
 from sweet.tests.unit.test_clauses import TestClauses
@@ -140,12 +142,17 @@ integration_tests = [
     TestRecordsetCRUDMySQL,
     TestModelStructMySQL,
     TestModelCRUDMySQL,
+
     TestRelationBelongsToMysql,
-    TestHasManyToMysql,
-    TestHasOneToMysql,
-    TestRelationHasAndBelongsToManyMysql,
+    TestRelationReferenceMysqlMysql,
+
+    TestRelationHasManyToMysql,
     TestRelationHasManyThroughMysql,
-    TestRelationReferenceMysqlMysql
+
+    TestHasOneToMysql,
+    TestRelationHasOneThroughMysql,
+
+    TestRelationHasAndBelongsToManyMysql
 ]
 
 

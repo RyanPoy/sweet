@@ -72,3 +72,20 @@ class Score(Model):
     belongs_to('student', Student)
     belongs_to('course', Course)
 
+
+class StudentForHasOneThrough(Model):
+    __tablename__ = 'students'
+    has_one('score', 'sweet.tests.Score')
+    has_one('course', 'sweet.tests.Course', through="sweet.tests.Score", through_fk_on_owner='student_id', through_fk_on_target='course_id')
+
+
+class CourseForHasOneThrough(Model):
+    __tablename__ = 'courses'
+    has_one('score', 'sweet.tests.Score')
+    has_one('student', 'sweet.tests.Student', through="sweet.tests.Score", through_fk_on_owner='course_id', through_fk_on_target='student_id')
+
+
+class ScoreForHasOneThrough(Model):
+    __tablename__ = 'scores'
+    belongs_to('student', StudentForHasOneThrough, fk='student_id')
+    belongs_to('course', CourseForHasOneThrough, fk='course_id')
