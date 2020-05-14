@@ -58,19 +58,20 @@ class Category(Model):
     belongs_to('sweet.tests.Category', name='parent', fk='parent_id')
 
 
+class Score(Model):
+    belongs_to('sweet.tests.Student')
+    belongs_to('sweet.tests.Course')
+
+
 class Student(Model):
-    has_many('sweet.tests.Score')
-    has_many('sweet.tests.Course', through="sweet.tests.Score")
+    has_many(Score)
+    has_many('sweet.tests.Course', through=Score)
 
 
 class Course(Model):
-    has_many('sweet.tests.Score')
-    has_many('sweet.tests.Student', through="sweet.tests.Score")
+    has_many(Score)
+    has_many(Student, through=Score)
 
-
-class Score(Model):
-    belongs_to(Student)
-    belongs_to(Course)
 
 
 class StudentForHasOneThrough(Model):
