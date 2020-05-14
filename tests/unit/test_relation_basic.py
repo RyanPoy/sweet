@@ -125,6 +125,7 @@ class TestRelationBasic(TestCase):
         self.assertEqual('teacher_id', r.through_fk_on_owner)
         self.assertEqual('students', r.name)
         self.assertEqual('students_teachers', r.through_table)
+        self.assertEqual('student_id', r.through_fk_on_target)
 
         r = Student.__relations__.get('teachers')
         self.assertEqual(HasAndBelongsToMany, type(r))
@@ -133,6 +134,7 @@ class TestRelationBasic(TestCase):
         self.assertEqual('student_id', r.through_fk_on_owner)
         self.assertEqual('teachers', r.name)
         self.assertEqual('students_teachers', r.through_table)
+        self.assertEqual('teacher_id', r.through_fk_on_target)
 
     def test_has_and_belongs_to_many_with_argument(self):
 
@@ -154,6 +156,7 @@ class TestRelationBasic(TestCase):
         self.assertEqual('teacher_id', r.through_fk_on_owner)
         self.assertEqual('students', r.name)
         self.assertEqual('student_teacher_relation', r.through_table)
+        self.assertEqual('student_id', r.through_fk_on_target)
 
         r = Student.__relations__.get('teachers')
         self.assertEqual(HasAndBelongsToMany, type(r))
@@ -162,6 +165,7 @@ class TestRelationBasic(TestCase):
         self.assertEqual('student_id', r.through_fk_on_owner)
         self.assertEqual('teachers', r.name)
         self.assertEqual('student_teacher_relation', r.through_table)
+        self.assertEqual('teacher_id', r.through_fk_on_target)
 
 
 if __name__ == '__main__':
