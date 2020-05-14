@@ -110,62 +110,59 @@ class TestRelationBasic(TestCase):
 
     def test_has_and_belongs_to_many_without_argument(self):
 
-        class Student(Model):
+        class Role(Model):
             pass
 
-        class Teacher(Model):
-            has_and_belongs_to_many('students', Student)
+        class Group(Model):
+            has_and_belongs_to_many('roles', Role)
 
-        HasAndBelongsToMany(name='teachers', target=Teacher).set_owner(Student)
+        HasAndBelongsToMany(name='groups', target=Group).set_owner(Role)
 
-        r = Teacher.__relations__.get('students')
+        r = Role.__relations__.get('groups')
         self.assertEqual(HasAndBelongsToMany, type(r))
-        self.assertEqual(Teacher, r.owner)
-        self.assertEqual(Student, r.target)
-        self.assertEqual('teacher_id', r.through_fk_on_owner)
-        self.assertEqual('students', r.name)
-        self.assertEqual('students_teachers', r.through_table)
-        self.assertEqual('student_id', r.through_fk_on_target)
+        self.assertEqual(Role, r.owner)
+        self.assertEqual(Group, r.target)
+        self.assertEqual('role_id', r.through_fk_on_owner)
+        self.assertEqual('groups', r.name)
+        self.assertEqual('groups_roles', r.through_table)
+        self.assertEqual('group_id', r.through_fk_on_target)
 
-        r = Student.__relations__.get('teachers')
+        r = Group.__relations__.get('roles')
         self.assertEqual(HasAndBelongsToMany, type(r))
-        self.assertEqual(Student, r.owner)
-        self.assertEqual(Teacher, r.target)
-        self.assertEqual('student_id', r.through_fk_on_owner)
-        self.assertEqual('teachers', r.name)
-        self.assertEqual('students_teachers', r.through_table)
-        self.assertEqual('teacher_id', r.through_fk_on_target)
+        self.assertEqual(Group, r.owner)
+        self.assertEqual(Role, r.target)
+        self.assertEqual('group_id', r.through_fk_on_owner)
+        self.assertEqual('roles', r.name)
+        self.assertEqual('groups_roles', r.through_table)
+        self.assertEqual('role_id', r.through_fk_on_target)
 
     def test_has_and_belongs_to_many_with_argument(self):
 
-        class StudentAndTeacher(Model):
-            __tablename__ = 'student_teacher_relation'
-
-        class Student(Model):
+        class Role(Model):
             pass
 
-        class Teacher(Model):
-            has_and_belongs_to_many('students', Student, through=StudentAndTeacher)
+        class Group(Model):
+            has_and_belongs_to_many('roles', Role, through_fk_on_owner="gid", through_fk_on_target="rid")
 
-        HasAndBelongsToMany(name='teachers', target=Teacher, through=StudentAndTeacher).set_owner(Student)
+        HasAndBelongsToMany(name='groups', target=Group, through_fk_on_owner="rid", through_fk_on_target="gid").set_owner(Role)
 
-        r = Teacher.__relations__.get('students')
+        r = Role.__relations__.get('groups')
         self.assertEqual(HasAndBelongsToMany, type(r))
-        self.assertEqual(Teacher, r.owner)
-        self.assertEqual(Student, r.target)
-        self.assertEqual('teacher_id', r.through_fk_on_owner)
-        self.assertEqual('students', r.name)
-        self.assertEqual('student_teacher_relation', r.through_table)
-        self.assertEqual('student_id', r.through_fk_on_target)
+        self.assertEqual(Role, r.owner)
+        self.assertEqual(Group, r.target)
+        self.assertEqual('rid', r.through_fk_on_owner)
+        self.assertEqual('groups', r.name)
+        self.assertEqual('groups_roles', r.through_table)
+        self.assertEqual('gid', r.through_fk_on_target)
 
-        r = Student.__relations__.get('teachers')
+        r = Group.__relations__.get('roles')
         self.assertEqual(HasAndBelongsToMany, type(r))
-        self.assertEqual(Student, r.owner)
-        self.assertEqual(Teacher, r.target)
-        self.assertEqual('student_id', r.through_fk_on_owner)
-        self.assertEqual('teachers', r.name)
-        self.assertEqual('student_teacher_relation', r.through_table)
-        self.assertEqual('teacher_id', r.through_fk_on_target)
+        self.assertEqual(Group, r.owner)
+        self.assertEqual(Role, r.target)
+        self.assertEqual('gid', r.through_fk_on_owner)
+        self.assertEqual('roles', r.name)
+        self.assertEqual('groups_roles', r.through_table)
+        self.assertEqual('rid', r.through_fk_on_target)
 
 
 if __name__ == '__main__':

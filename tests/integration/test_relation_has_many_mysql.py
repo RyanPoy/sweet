@@ -18,9 +18,9 @@ class TestHasManyToMysql(TestCase):
 
     def test_query(self):
         u = User.create(name="Jon", age=31)
-        Mobile.create(name="Nokia", user_id=u.id)
+        m1 = Mobile.create(name="Nokia", user_id=u.id)
         Mobile.create(name="IPhone", user_id=u.id)
- 
+
         ms = u.mobiles.all()
         self.assertEqual(2, len(ms))
  

@@ -24,6 +24,9 @@ class AssociateMethod(object):
         if not relation:
             return False
 
+        if not hasattr(relation, 'binding') or not hasattr(relation, 'unbinding'):
+            return False
+
         return True
 
     @classmethod
@@ -31,7 +34,7 @@ class AssociateMethod(object):
         groups = cls.pattern.match(name).groups()
         diss, relation_name = groups[0], groups[1]
         if relation_name not in model.__relations__:
-            return None
+            return None, None
 
         diss = True if diss == 'di' else False
         return diss, model.__relations__.get(relation_name)

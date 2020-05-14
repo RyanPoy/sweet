@@ -1,11 +1,10 @@
 #coding: utf8
 from sweet.orm.relations.relation import Relation, relation_q
-from sweet.orm.relations.has_many_through import HasManyThrough
 from sweet.utils.inflection import *
 from sweet.utils import *
 
 
-class HasAndBelongsToMany(HasManyThrough):
+class HasManyThrough(Relation):
     """owner model belongs to target model
     :param owner: model class
     :param target: model class
@@ -18,12 +17,12 @@ class HasAndBelongsToMany(HasManyThrough):
       name = 'tags'         # can retrive use Article().tags
       fk = 'article_id'     # can retrive use Article().user_id
     """
-    def __init__(self, owner=None, target=None, name=None, through_table=None, through_fk_on_owner=None, through_fk_on_target=None):
+    def __init__(self, owner=None, target=None, name=None, through=None, through_fk_on_owner=None, through_fk_on_target=None):
         self.owner = owner
         self._target_cls_or_target_name = target
         self.name = name
         self._through_fk_one_owner = through_fk_on_owner
-        self._through_table = through_table
+        self._through_cls_or_through_name = through
         self._through_fk_on_target = through_fk_on_target
 
     @property
@@ -49,10 +48,16 @@ class HasAndBelongsToMany(HasManyThrough):
         return self._through_fk_on_target
 
     @property
+    def through(self):
+        """ return through class
+        """
+        if isinstance(self._through_cls_or_through_name, str):
+            self._through_cls_or_through_name = import_object(self._through_cls_or_through_name)
+        return self._through_cls_or_through_name
+
+    @property
     def through_table(self):
-        if not self._through_table:
-            self._through_table = '_'.join(sorted([self.owner.__tablename__, self.target.__tablename__]))
-        return self._through_table
+        return self.through.__tablename__
 
     def get_real_value(self, owner_obj):
         """ eg. if mobile belongs to user.
@@ -86,51 +91,15 @@ class HasAndBelongsToMany(HasManyThrough):
         """
         pks = [ o.get_pk() for o in owner_objs ]
         if pks:
-            owner_objs[0].__class__._new_db().records(self.through_table).where(**{self.through_fk_on_owner: pks}).delete()
-        return self
-
-    def binding(self, model1, *model2s):
-        if model2s:
-            # 1. check all model2 has been persisted
-            for m in model2s:
-                if not m.persisted():
-                    raise model2.ModelHasNotBeenPersisted()
-
-            # 2. get model2 which has been binded on model1
-            db = model1.__class__._new_db()
-            model2s_binded = db.records(self.through_table) \
-                               .where(**{self.through_fk_on_owner : model1.get_pk()}) \
-                               .where(**{self.through_fk_on_target: [ m2.get_pk() for m2 in model2s ]}) \
-                               .all()
-            model2_ids_binded = set([ getattr(e, self.through_fk_on_target) for e in model2s_binded ])
-
-            # 3. insert record which has not been binding in through table
-            record_dict_list = [
-                {
-                    self.through_fk_on_target: m2.get_pk(),
-                    self.through_fk_on_owner: model1.get_pk()
-                } for m2 in model2s if m2.get_pk() not in model2_ids_binded
-            ]
-            if record_dict_list:
-                db.records(self.through_table).insert(records=record_dict_list)
-
-        return self
-
-    def unbinding(self, model1, *model2s):
-        if model2s:
-            # 1. check all model2 has been persisted
-            for m in model2s:
-                if not m.persisted():
-                    raise model2.ModelHasNotBeenPersisted()
-
-            db = model1.__class__._new_db()
-            model2s_binded = db.records(self.through_table) \
-                               .where(**{self.through_fk_on_owner : model1.get_pk()}) \
-                               .where(**{self.through_fk_on_target: [ m2.get_pk() for m2 in model2s ]}) \
-                               .delete()
+            self.through.delete_all(**{self.through_fk_on_owner:pks})
         return self
 
 
-def has_and_belongs_to_many(name, clazz, through_table=None, through_fk_on_owner=None, through_fk_on_target=None):
-    r = HasAndBelongsToMany(target=clazz, name=name, through_fk_on_owner=through_fk_on_owner, through_table=through_table, through_fk_on_target=through_fk_on_target)
+def has_many(name, clazz, fk=None, cascade=False):
+    r = HasMany(target=clazz, name=name, fk=fk, cascade=cascade)
+    relation_q.put(r)
+
+
+def has_many_through(name, clazz, through=None, through_fk_on_owner=None, through_fk_on_target=None):
+    r = HasManyThrough(target=clazz, name=name, through=through, through_fk_on_owner=through_fk_on_owner, through_fk_on_target=through_fk_on_target)
     relation_q.put(r)

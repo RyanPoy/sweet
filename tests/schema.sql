@@ -66,3 +66,22 @@ create table categories (
     parent_id int default null,
     index(parent_id)
 );
+
+create table students (
+    id int auto_increment primary key,
+    name varchar(32) not null default ''
+);
+
+create table courses (
+    id int auto_increment primary key,
+    name varchar(32) not null default ''
+);
+
+create table scores (
+    id int auto_increment primary key,
+    student_id int not null,
+    course_id int not null,
+    value int not null default 0,
+    foreign key (student_id) references students(id),
+    foreign key (course_id) references courses(id)    
+);

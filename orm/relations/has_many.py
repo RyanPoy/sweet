@@ -1,5 +1,6 @@
 #coding: utf8
 from sweet.orm.relations.relation import Relation, relation_q
+from sweet.orm.relations.has_many_through import HasManyThrough
 from sweet.utils.inflection import *
 from sweet.utils import *
 
@@ -63,7 +64,10 @@ class HasMany(Relation):
         setattr(owner_model, attr_name, target_model.get_pk())
 
 
-def has_many(name, clazz, fk=None, pk=None, cascade=False):
-    r = HasMany(target=clazz, name=name, fk=fk, cascade=cascade)
+def has_many(name, clazz, fk=None, cascade=False,
+                    through=None, through_fk_on_owner=None, through_fk_on_target=None):
+    if not through:
+        r = HasMany(target=clazz, name=name, fk=fk, cascade=cascade)
+    else:
+        r = HasManyThrough(target=clazz, name=name, through=through, through_fk_on_owner=through_fk_on_owner, through_fk_on_target=through_fk_on_target)
     relation_q.put(r)
-
