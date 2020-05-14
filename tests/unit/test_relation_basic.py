@@ -122,8 +122,7 @@ class TestRelationBasic(TestCase):
         self.assertEqual(HasAndBelongsToMany, type(r))
         self.assertEqual(Teacher, r.owner)
         self.assertEqual(Student, r.target)
-        self.assertEqual('teacher_id', r.fk)
-        self.assertEqual('id', r.pk)
+        self.assertEqual('teacher_id', r.through_fk_on_owner)
         self.assertEqual('students', r.name)
         self.assertEqual('students_teachers', r.through_table)
 
@@ -131,8 +130,7 @@ class TestRelationBasic(TestCase):
         self.assertEqual(HasAndBelongsToMany, type(r))
         self.assertEqual(Student, r.owner)
         self.assertEqual(Teacher, r.target)
-        self.assertEqual('student_id', r.fk)
-        self.assertEqual('id', r.pk)
+        self.assertEqual('student_id', r.through_fk_on_owner)
         self.assertEqual('teachers', r.name)
         self.assertEqual('students_teachers', r.through_table)
 
@@ -153,8 +151,7 @@ class TestRelationBasic(TestCase):
         self.assertEqual(HasAndBelongsToMany, type(r))
         self.assertEqual(Teacher, r.owner)
         self.assertEqual(Student, r.target)
-        self.assertEqual('teacher_id', r.fk)
-        self.assertEqual('id', r.pk)
+        self.assertEqual('teacher_id', r.through_fk_on_owner)
         self.assertEqual('students', r.name)
         self.assertEqual('student_teacher_relation', r.through_table)
 
@@ -162,8 +159,7 @@ class TestRelationBasic(TestCase):
         self.assertEqual(HasAndBelongsToMany, type(r))
         self.assertEqual(Student, r.owner)
         self.assertEqual(Teacher, r.target)
-        self.assertEqual('student_id', r.fk)
-        self.assertEqual('id', r.pk)
+        self.assertEqual('student_id', r.through_fk_on_owner)
         self.assertEqual('teachers', r.name)
         self.assertEqual('student_teacher_relation', r.through_table)
 
