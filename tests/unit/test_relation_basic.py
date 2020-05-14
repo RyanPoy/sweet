@@ -47,7 +47,9 @@ class TestRelationBasic(TestCase):
         
         class Member(Model):
             __tablename__ = 'users'
-            has_many('phones', Phone)
+            has_many(Phone)
+
+        print ("*"*10, Member.__relations__)
 
         r = Member.__relations__.get('phones')
         self.assertEqual(HasMany, type(r))
@@ -64,15 +66,15 @@ class TestRelationBasic(TestCase):
         
         class Member(Model):
             __tablename__ = 'users'
-            has_many('phones', Phone, fk='user_id')
+            has_many(Phone, name='mobiles', fk='user_id')
 
-        r = Member.__relations__.get('phones')
+        r = Member.__relations__.get('mobiles')
         self.assertEqual(HasMany, type(r))
 
         self.assertEqual(Member, r.owner)
         self.assertEqual(Phone, r.target)
         self.assertEqual('user_id', r.target_fk)
-        self.assertEqual('phones', r.name)
+        self.assertEqual('mobiles', r.name)
 
     def test_has_one_without_argument(self):
 
@@ -81,7 +83,7 @@ class TestRelationBasic(TestCase):
         
         class Member(Model):
             __tablename__ = 'users'
-            has_one('phone', Phone)
+            has_one(Phone)
 
         r = Member.__relations__.get('phone')
         self.assertEqual(HasOne, type(r))
@@ -98,15 +100,15 @@ class TestRelationBasic(TestCase):
         
         class Member(Model):
             __tablename__ = 'users'
-            has_one('phone', Phone, fk='user_id')
+            has_one(Phone, name='mobile', fk='user_id')
 
-        r = Member.__relations__.get('phone')
+        r = Member.__relations__.get('mobile')
         self.assertEqual(HasOne, type(r))
 
         self.assertEqual(Member, r.owner)
         self.assertEqual(Phone, r.target)
         self.assertEqual('user_id', r.target_fk)
-        self.assertEqual('phone', r.name)
+        self.assertEqual('mobile', r.name)
 
     def test_has_and_belongs_to_many_without_argument(self):
 
@@ -114,9 +116,9 @@ class TestRelationBasic(TestCase):
             pass
 
         class Group(Model):
-            has_and_belongs_to_many('roles', Role)
+            has_and_belongs_to_many(Role)
 
-        HasAndBelongsToMany(name='groups', target=Group).set_owner(Role)
+        HasAndBelongsToMany(target=Group).set_owner(Role)
 
         r = Role.__relations__.get('groups')
         self.assertEqual(HasAndBelongsToMany, type(r))
@@ -142,9 +144,9 @@ class TestRelationBasic(TestCase):
             pass
 
         class Group(Model):
-            has_and_belongs_to_many('roles', Role, through_fk_on_owner="gid", through_fk_on_target="rid")
+            has_and_belongs_to_many(Role, name='roles', through_fk_on_owner="gid", through_fk_on_target="rid")
 
-        HasAndBelongsToMany(name='groups', target=Group, through_fk_on_owner="rid", through_fk_on_target="gid").set_owner(Role)
+        HasAndBelongsToMany(target=Group, name='groups', through_fk_on_owner="rid", through_fk_on_target="gid").set_owner(Role)
 
         r = Role.__relations__.get('groups')
         self.assertEqual(HasAndBelongsToMany, type(r))

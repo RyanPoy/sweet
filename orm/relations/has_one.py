@@ -7,6 +7,12 @@ from sweet.utils.inflection import *
 
 class HasOne(HasMany):
 
+    @property
+    def name(self):
+        if not self._name:
+            self._name = pythonize(singularize(self.target_name))
+        return self._name
+
     def get_real_value(self, owner_obj):
         """ eg. user has one car
             Car.where(user_id=user.id)
@@ -16,6 +22,12 @@ class HasOne(HasMany):
 
 class HasOneThrough(HasManyThrough):
 
+    @property
+    def name(self):
+        if not self._name:
+            self._name = pythonize(singularize(self.target_name))
+        return self._name
+
     def get_real_value(self, owner_obj):
         """ eg. user has one car
             Car.where(user_id=user.id)
@@ -23,7 +35,7 @@ class HasOneThrough(HasManyThrough):
         return super().get_real_value(owner_obj).first()
 
 
-def has_one(name, clazz, fk=None, cascade=False,
+def has_one(clazz, name=None, fk=None, cascade=False,
                     through=None, through_fk_on_owner=None, through_fk_on_target=None):
     if not through:
         r = HasOne(target=clazz, name=name, fk=fk, cascade=cascade)

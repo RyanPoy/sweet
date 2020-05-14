@@ -30,3 +30,9 @@ class Relation(object):
         if isinstance(self._target_cls_or_target_name, str):
             self._target_cls_or_target_name = import_object(self._target_cls_or_target_name)
         return self._target_cls_or_target_name
+
+    @property
+    def target_name(self):
+        if isinstance(self._target_cls_or_target_name, str):
+            return self._target_cls_or_target_name.split('.')[-1]
+        return self._target_cls_or_target_name.__name__

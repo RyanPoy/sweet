@@ -20,7 +20,7 @@ class HasManyThrough(Relation):
     def __init__(self, owner=None, target=None, name=None, through=None, through_fk_on_owner=None, through_fk_on_target=None):
         self.owner = owner
         self._target_cls_or_target_name = target
-        self.name = name
+        self._name = name
         self._through_fk_one_owner = through_fk_on_owner
         self._through_cls_or_through_name = through
         self._through_fk_on_target = through_fk_on_target
@@ -37,6 +37,12 @@ class HasManyThrough(Relation):
                 owner_pk=self.owner.__pk__
             )
         return self._through_fk_one_owner
+
+    @property
+    def name(self):
+        if not self._name:
+            self._name = pythonize(pluralize(self.target_name))
+        return self._name
 
     @property
     def through_fk_on_target(self):
@@ -103,12 +109,3 @@ class HasManyThrough(Relation):
             })
         return self
 
-
-def has_many(name, clazz, fk=None, cascade=False):
-    r = HasMany(target=clazz, name=name, fk=fk, cascade=cascade)
-    relation_q.put(r)
-
-
-def has_many_through(name, clazz, through=None, through_fk_on_owner=None, through_fk_on_target=None):
-    r = HasManyThrough(target=clazz, name=name, through=through, through_fk_on_owner=through_fk_on_owner, through_fk_on_target=through_fk_on_target)
-    relation_q.put(r)

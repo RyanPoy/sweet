@@ -26,7 +26,7 @@ class BelongsTo(Relation):
     @property
     def name(self):
         if not self._name:
-            self._name = pythonize(singularize(self.target.__name__))
+            self._name = pythonize(singularize(self.target_name))
         return self._name
 
     @property

@@ -23,8 +23,14 @@ class HasMany(Relation):
         self.owner = owner
         self.cascade = cascade
         self._target_cls_or_target_name = target
-        self.name = name
+        self._name = name
         self._target_fk = fk
+
+    @property
+    def name(self):
+        if not self._name:
+            self._name = pythonize(pluralize(self.target_name))
+        return self._name
 
     @property
     def target_fk(self):
@@ -33,9 +39,8 @@ class HasMany(Relation):
             fk equals 'user_id', which composition is ： 'user' + '_'+ user.pk
         """
         if not self._target_fk:
-            name = self.owner.__name__.split('.')[-1]
             self._target_fk = '{owner_name}_{owner_pk}'.format(
-                owner_name=pythonize(name),
+                owner_name=pythonize(self.owner.__name__),
                 owner_pk=self.owner.__pk__
             )
         return self._target_fk
@@ -64,7 +69,7 @@ class HasMany(Relation):
         setattr(owner_model, attr_name, target_model.get_pk())
 
 
-def has_many(name, clazz, fk=None, cascade=False,
+def has_many(clazz, name=None, fk=None, cascade=False,
                     through=None, through_fk_on_owner=None, through_fk_on_target=None):
     if not through:
         r = HasMany(target=clazz, name=name, fk=fk, cascade=cascade)
