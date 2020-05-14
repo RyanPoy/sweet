@@ -54,29 +54,6 @@ class HasAndBelongsToMany(HasManyThrough):
             self._through_table = '_'.join(sorted([self.owner.__tablename__, self.target.__tablename__]))
         return self._through_table
 
-    def get_real_value(self, owner_obj):
-        """ eg. if mobile belongs to user.
-            User.find(mobile.user_id)
-        """
-        target_and_through_table_join_on = '{target_table}.{target_pk}={through_table}.{through_fk_on_target}'.format(
-            target_table=self.target.__tablename__,
-            target_pk=self.target.__pk__,
-            through_table=self.through_table,
-            through_fk_on_target=self.through_fk_on_target
-        )
-
-        owner_and_through_table_join_on = '{owner_table}.{owner_pk}={through_table}.{through_fk_on_owner}'.format(
-            owner_table=self.owner.__tablename__,
-            owner_pk=self.owner.__pk__,
-            through_table=self.through_table,
-            through_fk_on_owner=self.through_fk_on_owner
-        )
-
-        return self.target.objects \
-                          .join(self.through_table, on=target_and_through_table_join_on) \
-                          .join(self.owner.__tablename__, on=owner_and_through_table_join_on) \
-                          .where(**{self.through_table+'__'+self.through_fk_on_owner: owner_obj.get_pk()})
-
     def delete_all_real_value(self, owner_objs):
         """ eg. article has and belongs many tags
             1) Article.delete_all() # should be delete all mobiles which belongs to users
