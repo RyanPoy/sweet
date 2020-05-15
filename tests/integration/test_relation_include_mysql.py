@@ -1,5 +1,5 @@
 #coding: utf8
-from sweet.tests import TestCase, User, Mobile
+from sweet.tests import TestCase, User, Mobile, Car
 from sweet.orm import Model
 from sweet.database import MySQL
 from contextlib import contextmanager
@@ -27,7 +27,7 @@ def chg_new_db():
     )
 
 
-class TestRelationIncludeQueryMysql(TestCase):
+class TestRelationIncludeMysql(TestCase):
     
     def setUp(self):
         self.remove_record()
@@ -38,6 +38,7 @@ class TestRelationIncludeQueryMysql(TestCase):
     def remove_record(self):
         Mobile.delete_all()
         User.delete_all()
+        Car.delete_all()
 
     @contextmanager
     def mock_db(self):
@@ -61,14 +62,7 @@ class TestRelationIncludeQueryMysql(TestCase):
         Mobile.create(name="Xiaomi", user=user2)
 
         with self.mock_db():
-            ms = Mobile.include("user").all()
-            for m in ms:
-                m.user.name
-            self.assertEqual(2, len(FakeDB.SQLS))
-            self.assertEqual('SELECT * FROM `mobiles`', FakeDB.SQLS[0])
-            self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s)', FakeDB.SQLS[1])
-
-        with self.mock_db():
+            # not use include
             ms = Mobile.all()
             for m in ms:
                 m.user.name
@@ -79,6 +73,15 @@ class TestRelationIncludeQueryMysql(TestCase):
             self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s)', FakeDB.SQLS[3])
             self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s)', FakeDB.SQLS[4])
 
+        with self.mock_db():
+            # include
+            ms = Mobile.include("user").all()
+            for m in ms:
+                m.user.name
+            self.assertEqual(2, len(FakeDB.SQLS))
+            self.assertEqual('SELECT * FROM `mobiles`', FakeDB.SQLS[0])
+            self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s)', FakeDB.SQLS[1])
+
     def test_include_has_many(self):
         user1 = User.create(name="Jon", age=31)
         user2 = User.create(name="Lily", age=20)
@@ -88,22 +91,51 @@ class TestRelationIncludeQueryMysql(TestCase):
         Mobile.create(name="Xiaomi", user=user2)
 
         with self.mock_db():
-            us = User.include("mobiles").all()
-            for u in us:
-                u.mobiles.all()
-            self.assertEqual(2, len(FakeDB.SQLS))
-            self.assertEqual('SELECT * FROM `users`', FakeDB.SQLS[0])
-            self.assertEqual('SELECT * FROM `mobiles` WHERE `user_id` IN (%s, %s)', FakeDB.SQLS[1])
-
-        with self.mock_db():
+            # not use include
             us = User.all()
             for u in us:
-                u.mobiles.all()
-            print ("FakeDB.SQLS = ", FakeDB.SQLS)
+                for m in u.mobiles.all():
+                    m.name
             self.assertEqual(3, len(FakeDB.SQLS))
             self.assertEqual('SELECT * FROM `users`', FakeDB.SQLS[0])
             self.assertEqual('SELECT * FROM `mobiles` WHERE `user_id` = %s', FakeDB.SQLS[1])
             self.assertEqual('SELECT * FROM `mobiles` WHERE `user_id` = %s', FakeDB.SQLS[2])
+
+        with self.mock_db():
+            # include
+            us = User.include("mobiles").all()
+            for u in us:
+                for m in u.mobiles.all():
+                    m.name
+            self.assertEqual(2, len(FakeDB.SQLS))
+            self.assertEqual('SELECT * FROM `users`', FakeDB.SQLS[0])
+            self.assertEqual('SELECT * FROM `mobiles` WHERE `user_id` IN (%s, %s)', FakeDB.SQLS[1])
+
+    def test_include_has_one(self):
+        user1 = User.create(name="Jon", age=31)
+        user2 = User.create(name="Lily", age=20)
+
+        Car.create(name="Benz", user=user1)
+        Car.create(name="Mazda", user=user2)
+
+        with self.mock_db():
+            # not use include
+            us = User.all()
+            for u in us:
+                u.car.name
+            self.assertEqual(3, len(FakeDB.SQLS))
+            self.assertEqual('SELECT * FROM `users`', FakeDB.SQLS[0])
+            self.assertEqual('SELECT * FROM `cars` WHERE `user_id` = %s', FakeDB.SQLS[1])
+            self.assertEqual('SELECT * FROM `cars` WHERE `user_id` = %s', FakeDB.SQLS[2])
+
+        with self.mock_db():
+            # not use include
+            us = User.include('car').all()
+            for u in us:
+                u.car.name
+            self.assertEqual(2, len(FakeDB.SQLS))
+            self.assertEqual('SELECT * FROM `users`', FakeDB.SQLS[0])
+            self.assertEqual('SELECT * FROM `cars` WHERE `user_id` IN (%s, %s)', FakeDB.SQLS[1])
 
 
 if __name__ == '__main__':

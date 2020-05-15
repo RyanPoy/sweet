@@ -17,7 +17,6 @@ class TestHasOneToMysql(TestCase):
     def test_query(self):
         u = User.create(name="Jon", age=31)
         Car.create(name="Benz", user_id=u.id)
-        Car.create(name="Mazda", user_id=u.id)
 
         c = u.car
         self.assertEqual(Car, type(c))
