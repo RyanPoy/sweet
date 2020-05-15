@@ -61,7 +61,7 @@ class Model(metaclass=ModelMetaClass):
                 if not hasattr(self, cache_key): # can not get cache of relation
                     r = self.__relations__[name]
                     real_value = r.get_real_value(self)
-                    setattr(self, cache_key, real_value) # set cache
+                    self._set_relation_cache(cache_key, real_value, False) # set cache
                 return getattr(self, cache_key)
             else:
                 method = MethodMissing.match(self, name)
@@ -71,12 +71,16 @@ class Model(metaclass=ModelMetaClass):
 
     def __setattr__(self, name, value):
         cls = self.__class__
-        relt = super().__setattr__(name, value)
-
         if name in cls.__relations__:
             relation = cls.__relations__[name]
             relation.inject(self, value)
-        return relt
+            self._set_relation_cache(self, name, value)
+        super().__setattr__(name, value)
+
+    def _set_relation_cache(self, name, value, should_build_key=True):
+        cache_key = self._build_relation_cache_key(name) if should_build_key else name
+        setattr(self, cache_key, value)
+        return self
 
     def _delete_relation_cache(self, name):
         key = self._build_relation_cache_key(name)
