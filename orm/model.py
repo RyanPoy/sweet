@@ -47,6 +47,9 @@ class Model(metaclass=ModelMetaClass):
     class HasNotBeenPersisted(Exception): 
         pass
 
+    class RelationNotFound(Exception):
+        pass
+
     def __init__(self, **attrs):
         for k, v in attrs.items():
             setattr(self, k, v)
@@ -253,6 +256,23 @@ class Model(metaclass=ModelMetaClass):
         if not model:
             model = cls.create(**kwargs)
         return model
+
+    @classmethod
+    def include(cls, *relation_names):
+        objs = cls.objects
+        for rn in relation_names:
+            if rn not in cls.__relations__:
+                raise RelationNotFound("Relation named %s not found" % rn)
+            objs._includes.append(rn)
+        return objs
+
+    @classmethod
+    def _get_include(cls, models, relation_names):
+        if not models or not relation_names:
+            return
+        for rn in relation_names:
+            r = cls.__relations__[rn]
+            r.preload(models)
 
     @classmethod
     def _new_db(cls):

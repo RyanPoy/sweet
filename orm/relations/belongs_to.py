@@ -48,6 +48,16 @@ class BelongsTo(Relation):
         """
         return self.target.find(getattr(owner_obj, self.owner_fk))
 
+    def preload(self, owner_objs):
+        pks = list(set([ getattr(o, self.owner_fk) for o in owner_objs ]))
+        if pks:
+            target_objs = { t.get_pk(): t for t in self.target.where(**{ self.target.__pk__ : pks}).all() }
+            for o in owner_objs:
+                fk = getattr(o, self.owner_fk)
+                setattr(o, self.name, target_objs.get(fk, None))
+
+        return self
+
     def inject(self, owner_model, target_model):
         attr_name = self.owner_fk
         setattr(owner_model, attr_name, target_model.get_pk())

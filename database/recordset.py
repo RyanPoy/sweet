@@ -32,6 +32,7 @@ class Recordset(object):
         self._exists_tables = []
         self.unions = []
         self.model_class = model_class
+        self._includes = []
 
     def __deepcopy__(self, memo):
         """ Deep copy """
@@ -337,21 +338,27 @@ class Recordset(object):
         r = self.db.fetchone(sql, *params)
         if not r or not self.model_class:
             return r
-        return self.model_class(**r)
+        m = self.model_class(**r)
+        self.model_class._get_include(m, self._includes)
+        return m
 
     def last(self):
         sql, params = self.sql()
         r = self.db.fetchlastone(sql, *params)
         if not r or not self.model_class:
             return r
-        return self.model_class(**r)                
+        m = self.model_class(**r)
+        self.model_class._get_include(m, self._includes)
+        return m
 
     def all(self):
         sql, params = self.sql()
         rs = self.db.fetchall(sql, *params)
         if not rs or not self.model_class:
             return rs
-        return [ self.model_class(**r) for r in rs ]
+        ms = [ self.model_class(**r) for r in rs ]
+        self.model_class._get_include(ms, self._includes)
+        return ms
 
     def exists(self):
         return True if self.first() else False
