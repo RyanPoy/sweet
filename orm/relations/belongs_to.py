@@ -49,9 +49,9 @@ class BelongsTo(Relation):
         return self.target.find(getattr(owner_obj, self.owner_fk))
 
     def preload(self, owner_objs):
-        pks = list(set([ getattr(o, self.owner_fk) for o in owner_objs ]))
-        if pks:
-            target_objs = { t.get_pk(): t for t in self.target.where(**{ self.target.__pk__ : pks}).all() }
+        target_pks = list(set([ getattr(o, self.owner_fk) for o in owner_objs ]))
+        if target_pks:
+            target_objs = { t.get_pk(): t for t in self.target.where(**{ self.target.__pk__ : target_pks}).all() }
             for o in owner_objs:
                 fk = getattr(o, self.owner_fk)
                 setattr(o, self.name, target_objs.get(fk, None))

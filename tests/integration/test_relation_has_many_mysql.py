@@ -4,6 +4,7 @@ from sweet.orm import Model
 from sweet.orm.relations import *
 from MySQLdb import IntegrityError
 
+
 class TestRelationHasManyToMysql(TestCase):
     
     def setUp(self):

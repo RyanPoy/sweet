@@ -2,6 +2,7 @@
 from sweet.orm.relations.relation import Relation, relation_q
 from sweet.orm.relations.has_many_through import HasManyThrough
 from sweet.utils.inflection import *
+from sweet.utils.collection import *
 from sweet.utils import *
 
 
@@ -62,6 +63,19 @@ class HasMany(Relation):
             pks = [ o.get_pk() for o in owner_objs ]
             if pks:
                 self.target.delete_all(**{self.target_fk: pks})
+        return self
+
+    def preload(self, owner_objs):
+        target_fks = list(set([ o.get_pk() for o in owner_objs ]))
+        if target_fks:
+            target_groups = {}
+            for t in self.target.where(**{ self.target_fk : target_fks}).all():
+                fk = getattr(t, self.target_fk)
+                target_groups.setdefault(fk, []).append(t)
+
+            for o in owner_objs:
+                group = target_groups.get(o.get_pk(), [])
+                o._set_relation_cache(self.name, Collection(*group))
         return self
 
     def inject(self, owner_model, target_model):

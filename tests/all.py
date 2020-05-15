@@ -4,7 +4,6 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import unittest
-# from sweet.tests import helper
 from sweet.tests.integration.test_recordset_crud_mysql import TestRecordsetCRUDMySQL
 from sweet.tests.integration.test_model_struct_mysql import TestModelStructMySQL
 from sweet.tests.integration.test_model_crud_mysql import TestModelCRUDMySQL
@@ -15,8 +14,9 @@ from sweet.tests.integration.test_relation_has_many_through_mysql import TestRel
 from sweet.tests.integration.test_relation_has_one_mysql import TestHasOneToMysql
 from sweet.tests.integration.test_relation_has_one_through_mysql import TestRelationHasOneThroughMysql
 from sweet.tests.integration.test_relation_has_and_belongs_to_many_mysql import TestRelationHasAndBelongsToManyMysql
+from sweet.tests.integration.test_relation_include_query_mysql import TestRelationIncludeQueryMysql
 
-
+from sweet.tests.unit.test_collection import TestCollection
 from sweet.tests.unit.test_filter import TestFilter
 from sweet.tests.unit.test_clauses import TestClauses
 
@@ -74,6 +74,7 @@ from sweet.tests.unit.test_relation_basic import TestRelationBasic
 
 
 unit_tests = [
+    TestCollection,
     TestFilter,
     TestClauses,
 
@@ -152,7 +153,9 @@ integration_tests = [
     TestHasOneToMysql,
     TestRelationHasOneThroughMysql,
 
-    TestRelationHasAndBelongsToManyMysql
+    TestRelationHasAndBelongsToManyMysql,
+
+    TestRelationIncludeQueryMysql
 ]
 
 
