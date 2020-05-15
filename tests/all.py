@@ -14,7 +14,7 @@ from sweet.tests.integration.test_relation_has_many_through_mysql import TestRel
 from sweet.tests.integration.test_relation_has_one_mysql import TestHasOneToMysql
 from sweet.tests.integration.test_relation_has_one_through_mysql import TestRelationHasOneThroughMysql
 from sweet.tests.integration.test_relation_has_and_belongs_to_many_mysql import TestRelationHasAndBelongsToManyMysql
-from sweet.tests.integration.test_relation_include_query_mysql import TestRelationIncludeQueryMysql
+from sweet.tests.integration.test_relation_include_mysql import TestRelationIncludeMysql
 
 from sweet.tests.unit.test_collection import TestCollection
 from sweet.tests.unit.test_filter import TestFilter
@@ -155,7 +155,7 @@ integration_tests = [
 
     TestRelationHasAndBelongsToManyMysql,
 
-    TestRelationIncludeQueryMysql
+    TestRelationIncludeMysql
 ]
 
 
