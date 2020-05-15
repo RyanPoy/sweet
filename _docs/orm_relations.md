@@ -22,6 +22,8 @@
   - dissociate
   - query
 
+- Relation self
+
 ----
 
 ## belongs_to
@@ -448,4 +450,76 @@
   
   a = Article.find(1)
   a.tags.all()
+```
+
+## Relation self
+
+```
+-- create tables
+
+  create table categories (
+    id int auto_increment primary key,
+    name varchar(32) not null default '',
+    parent_id int default null,
+    index(parent_id)
+  );
+
+--------------------------------------------------------
+# model define: demo.py
+  
+  from sweet.orm import Model
+  from sweet.relations import *
+
+  class Category(Model):
+    has_many('demo.Category', name='children', fk='parent_id')
+    belongs_to('demo.Category', name='parent', fk='parent_id')
+```
+
+### create
+
+```
+  c_root = Category.create(name="category-root")
+  c_1 = Category.create(parent=c_root, name='category-1')
+  c_1_1 = Category.create(parent=c_1, name='category-1-1')
+  c_1_2 = Category.create(parent=c_1, name='category-1-2')
+
+  c_2 = Category.create(parent=c_root, name='category-1')
+  c_2_1 = Category.create(parent=c_2, name='category-2-1')
+  c_2_2 = Category.create(parent=c_2, name='category-2-2')
+```
+
+### update
+
+```
+  c_root = Category.create(name="category-root")
+  c_1 = Category.create(parent=c_root, name='category-1')
+  c_1_1 = Category.create(parent=c_1, name='category-1-1')
+  c_1_2 = Category.create(parent=c_1, name='category-1-2')
+
+  c_2 = Category.create(parent=c_root, name='category-1')
+  c_2_1 = Category.create(parent=c_2, name='category-2-1')
+  c_2_2 = Category.create(parent=c_2, name='category-2-2')
+  
+  c_2_1.parent = c_1
+  c_2_1.save()
+
+  c_2_2.update(parent=c_1)
+```
+
+### query
+
+```
+  c_root = Category.create(name="category-root")
+  
+  c_1 = Category.create(parent=c_root, name='category-1')
+  c_1_1 = Category.create(parent=c_1, name='category-1-1')
+  c_1_2 = Category.create(parent=c_1, name='category-1-2')
+
+  c_2 = Category.create(parent=c_root, name='category-1')
+  c_2_1 = Category.create(parent=c_2, name='category-2-1')
+  c_2_2 = Category.create(parent=c_2, name='category-2-2')
+
+  children = c_root.children.all()
+  children = children[0].children.all()
+  children = children[1].children.all()
 ```
