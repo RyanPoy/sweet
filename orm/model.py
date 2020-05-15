@@ -44,7 +44,8 @@ class ModelMetaClass(type):
 
 class Model(metaclass=ModelMetaClass):
 
-    class ModelHasNotBeenPersisted(Exception): pass
+    class HasNotBeenPersisted(Exception): 
+        pass
 
     def __init__(self, **attrs):
         for k, v in attrs.items():
@@ -55,9 +56,13 @@ class Model(metaclass=ModelMetaClass):
         try:
             return super().__getattribute__(name)
         except AttributeError as ex:
-            if name in self.__relations__:
-                r = self.__relations__[name]
-                return r.get_real_value(self)
+            if name in self.__relations__: # it does means a relation
+                cache_key = self._build_relation_cache_key(name) 
+                if not hasattr(self, cache_key): # can not get cache of relation
+                    r = self.__relations__[name]
+                    real_value = r.get_real_value(self)
+                    setattr(self, cache_key, real_value) # set cache
+                return getattr(self, cache_key)
             else:
                 method = MethodMissing.match(self, name)
                 if method:
@@ -72,6 +77,15 @@ class Model(metaclass=ModelMetaClass):
             relation = cls.__relations__[name]
             relation.inject(self, value)
         return relt
+
+    def _delete_relation_cache(self, name):
+        key = self._build_relation_cache_key(name)
+        if hasattr(self, key):
+            delattr(self, key)
+        return self
+
+    def _build_relation_cache_key(self, name):
+        return '_cached_relation_which_named_%s' % name
 
     def _init_field_default_value(self):
         """ set default value of field which does not init 
@@ -117,10 +131,10 @@ class Model(metaclass=ModelMetaClass):
 
     def update(self, **attrs):
         """ update a record in db, 
-        should raise ModelHasNotBeenPersisted if it has not been persisted
+        should raise HasNotBeenPersisted if it has not been persisted
         """
         if not self.persisted():
-            raise ModelHasNotBeenPersisted()
+            raise HasNotBeenPersisted()
         if attrs:
             # old_values = { 
             #     k: getattr(self, k) for k, v in attrs.items() if hasattr(self, k)

@@ -77,7 +77,7 @@ class HasAndBelongsToMany(HasManyThrough):
             # 1. check all model2 has been persisted
             for m in model2s:
                 if not m.persisted():
-                    raise model2.ModelHasNotBeenPersisted()
+                    raise model2.HasNotBeenPersisted()
 
             # 2. get model2 which has been binded on model1
             db = model1.__class__._new_db()

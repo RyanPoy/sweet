@@ -3,12 +3,14 @@ import re
 
 
 class AssociateMethod(object):
-    """ for HasAndBelongsToMany relation
+    """ for a relation.
+    if the relation has a binding method, it can support associate_with_xxxx
+    if the relation has a unbinding method, it can support dissociate_with_xxxx
     """
     pattern = re.compile(r'^(di|a)ssociate_with_([_a-zA-Z]\w*)$')
 
     def __init__(self, model, method_name):
-        self.method_name = str(method_name)
+        self.method_name = method_name
         self.model = model
 
         diss, relation = self.__class__._get_diss_and_relation(model, method_name)
@@ -48,10 +50,28 @@ class AssociateMethod(object):
         return self.relation.binding(self.model, *args)
 
 
+class ReloadCacheMethod(object):
+    """ for Model
+    """
+    pattern = re.compile(r'^reload_([_a-zA-Z]\w*)$')
+
+    def __init__(self, model, method_name):
+        self.method_name = method_name
+        self.model = model
+
+    @classmethod
+    def match(cls, model, name):
+        return True if cls.pattern.match(name) else False
+
+    def __call__(self):
+        name = self.__class__.pattern.match(self.method_name).groups()[0]
+        return self.model._delete_relation_cache(name)
+
+
 class MethodMissing(object):
 
     methods = [
-        AssociateMethod
+        AssociateMethod, ReloadCacheMethod
     ]
 
     @classmethod
