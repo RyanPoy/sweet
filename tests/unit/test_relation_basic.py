@@ -49,8 +49,6 @@ class TestRelationBasic(TestCase):
             __tablename__ = 'users'
             has_many(Phone)
 
-        print ("*"*10, Member.__relations__)
-
         r = Member.__relations__.get('phones')
         self.assertEqual(HasMany, type(r))
 
