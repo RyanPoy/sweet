@@ -48,6 +48,42 @@ class HasOneThrough(HasManyThrough):
         """
         return super().get_real_value(owner_obj).first()
 
+    def preload(self, owner_objs):
+        owner_pks = list(set([ o.get_pk() for o in owner_objs ]))
+        if not owner_pks:
+            return self
+
+        # 1. found the through objects
+        through_objs = self.through.objects.where(**{self.through_fk_on_owner: owner_pks}).all()
+        if not through_objs:
+            return self
+
+        # 2. found the target objects
+        target_pks = [ getattr(t, self.through_fk_on_target) for t in through_objs ]
+        if not target_pks:
+            return self
+
+        target_objs = self.target.find(*target_pks)
+        if not target_objs:
+            return self
+        
+        target_id_and_obj = { t_obj.get_pk(): t_obj for t_obj in target_objs }
+
+        # 3. set targets to owner
+        groups = {}
+        for t in through_objs:
+            through_fk_on_owner = getattr(t, self.through_fk_on_owner)
+            through_fk_on_target = getattr(t, self.through_fk_on_target)
+            target = target_id_and_obj.get(through_fk_on_target, None)
+            if target:
+                groups.setdefault(through_fk_on_owner, []).append(target)
+
+        for o in owner_objs:
+            through_fk_on_owner = o.get_pk()
+            group = groups.get(through_fk_on_owner, [None])
+            o._set_relation_cache(self.name, group[0])
+
+        return self
 
 def has_one(clazz, name=None, fk=None, cascade=False,
                     through=None, through_fk_on_owner=None, through_fk_on_target=None):

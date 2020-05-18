@@ -1,5 +1,6 @@
 #coding: utf8
 from sweet.orm.relations.relation import Relation, relation_q
+from sweet.utils.collection import Collection
 from sweet.utils.inflection import *
 from sweet.utils import *
 
@@ -17,13 +18,20 @@ class HasManyThrough(Relation):
       name = 'tags'         # can retrive use Article().tags
       fk = 'article_id'     # can retrive use Article().user_id
     """
-    def __init__(self, owner=None, target=None, name=None, through=None, through_fk_on_owner=None, through_fk_on_target=None):
+    def __init__(self, owner=None, target=None, name=None, through=None, through_name=None, through_fk_on_owner=None, through_fk_on_target=None):
         self.owner = owner
         self._target_cls_or_target_name = target
         self._name = name
+        self._through_name = through_name
         self._through_fk_one_owner = through_fk_on_owner
         self._through_cls_or_through_name = through
         self._through_fk_on_target = through_fk_on_target
+
+    @property
+    def through_name(self):
+        if not self._through_name:
+            self._through_name = pythonize(pluralize(self.through.__name__))
+        return self._through_name
 
     @property
     def through_fk_on_owner(self):
@@ -98,6 +106,43 @@ class HasManyThrough(Relation):
         pks = [ o.get_pk() for o in owner_objs ]
         if pks:
             self.through.delete_all(**{self.through_fk_on_owner:pks})
+        return self
+
+    def preload(self, owner_objs):
+        owner_pks = list(set([ o.get_pk() for o in owner_objs ]))
+        if not owner_pks:
+            return self
+
+        # 1. found the through objects
+        through_objs = self.through.objects.where(**{self.through_fk_on_owner: owner_pks}).all()
+        if not through_objs:
+            return self
+
+        # 2. found the target objects
+        target_pks = [ getattr(t, self.through_fk_on_target) for t in through_objs ]
+        if not target_pks:
+            return self
+
+        target_objs = self.target.find(*target_pks)
+        if not target_objs:
+            return self
+        
+        target_id_and_obj = { t_obj.get_pk(): t_obj for t_obj in target_objs }
+
+        # 3. set targets to owner
+        groups = {}
+        for t in through_objs:
+            through_fk_on_owner = getattr(t, self.through_fk_on_owner)
+            through_fk_on_target = getattr(t, self.through_fk_on_target)
+            target = target_id_and_obj.get(through_fk_on_target, None)
+            if target:
+                groups.setdefault(through_fk_on_owner, []).append(target)
+
+        for o in owner_objs:
+            through_fk_on_owner = o.get_pk()
+            group = groups.get(through_fk_on_owner, [])
+            o._set_relation_cache(self.name, Collection(*group))
+
         return self
 
     def unbinding(self, model1, *model2s):

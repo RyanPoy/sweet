@@ -339,7 +339,7 @@ class Recordset(object):
         if not r or not self.model_class:
             return r
         m = self.model_class(**r)
-        self.model_class._get_include(m, self._includes)
+        self.model_class._get_include([m], self._includes)
         return m
 
     def last(self):
@@ -348,7 +348,7 @@ class Recordset(object):
         if not r or not self.model_class:
             return r
         m = self.model_class(**r)
-        self.model_class._get_include(m, self._includes)
+        self.model_class._get_include([m], self._includes)
         return m
 
     def all(self):

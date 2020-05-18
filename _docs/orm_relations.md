@@ -23,7 +23,12 @@
   - query
 
 - Relation self
-
+- N + 1
+  - belongs_to
+  - has_many
+  - has_one
+  - has_many with through
+  - has_and_belongs_to_many
 ----
 
 ## belongs_to
@@ -523,3 +528,17 @@
   children = children[0].children.all()
   children = children[1].children.all()
 ```
+
+
+## N + 1 
+
+### belongs_to
+```
+
+```
+- N + 1
+
+  - has_many
+  - has_one
+  - has_many with through
+  - has_and_belongs_to_many

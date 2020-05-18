@@ -1,6 +1,7 @@
 #coding: utf8
 from sweet.orm.relations.relation import Relation, relation_q
 from sweet.orm.relations.has_many_through import HasManyThrough
+from sweet.utils.collection import Collection
 from sweet.utils.inflection import *
 from sweet.utils import *
 
@@ -70,6 +71,44 @@ class HasAndBelongsToMany(HasManyThrough):
         pks = [ o.get_pk() for o in owner_objs ]
         if pks:
             owner_objs[0].__class__._new_db().records(self.through_table).where(**{self.through_fk_on_owner: pks}).delete()
+        return self
+
+    def preload(self, owner_objs):
+        owner_pks = list(set([ o.get_pk() for o in owner_objs ]))
+        if not owner_pks:
+            return self
+
+        # 1. found the through objects
+        db = self.owner._new_db()
+        through_objs = db.records(self.through_table).where(**{self.through_fk_on_owner: owner_pks}).all()
+        if not through_objs:
+            return self
+
+        # 2. found the target objects
+        target_pks = [ getattr(t, self.through_fk_on_target) for t in through_objs ]
+        if not target_pks:
+            return self
+
+        target_objs = self.target.find(*target_pks)
+        if not target_objs:
+            return self
+        
+        target_id_and_obj = { t_obj.get_pk(): t_obj for t_obj in target_objs }
+
+        # 3. set targets to owner
+        groups = {}
+        for t in through_objs:
+            through_fk_on_owner = getattr(t, self.through_fk_on_owner)
+            through_fk_on_target = getattr(t, self.through_fk_on_target)
+            target = target_id_and_obj.get(through_fk_on_target, None)
+            if target:
+                groups.setdefault(through_fk_on_owner, []).append(target)
+
+        for o in owner_objs:
+            through_fk_on_owner = o.get_pk()
+            group = groups.get(through_fk_on_owner, [])
+            o._set_relation_cache(self.name, Collection(*group))
+
         return self
 
     def binding(self, model1, *model2s):
