@@ -63,7 +63,7 @@ class HasOneThrough(HasManyThrough):
         if not target_pks:
             return self
 
-        target_objs = self.target.find(*target_pks)
+        target_objs = self.target.where(**{self.target.__pk__: target_pks}).all()
         if not target_objs:
             return self
         

@@ -46,6 +46,37 @@ class TestRelationHasManyThroughMysql(TestCase):
         self.assertEqual(1, len(ss))
         self.assertEqual('lily', ss[0].name)
 
+    def test_query_with_include(self):
+        s1 = Student.create(name='lily')
+        s2 = Student.create(name='jon')
+
+        c1 = Course.create(name='math')
+        c2 = Course.create(name='sport')
+
+        Score.create(student=s1, course=c1, value=100)
+        Score.create(student=s1, course=c2, value=90)
+        Score.create(student=s2, course=c1, value=95)
+
+        self.assertEqual(3, len(Score.include('student', 'course').all()))
+
+        cs = Student.include('courses').where(name='lily').first().courses.all()
+        self.assertEqual(2, len(cs))
+        self.assertEqual('math', cs[0].name)
+        self.assertEqual('sport', cs[1].name)
+
+        cs = Student.include('courses').where(name='jon').first().courses.all()
+        self.assertEqual(1, len(cs))
+        self.assertEqual('math', cs[0].name)
+
+        ss = Course.include('students').where(name='math').first().students.all()
+        self.assertEqual(2, len(ss))
+        self.assertEqual('lily', ss[0].name)
+        self.assertEqual('jon', ss[1].name)
+
+        ss = Course.include('students').where(name='sport').first().students.all()
+        self.assertEqual(1, len(ss))
+        self.assertEqual('lily', ss[0].name)
+
     def test_dissociate(self):
         s1 = Student.create(name='lily')
 

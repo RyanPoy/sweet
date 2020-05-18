@@ -41,6 +41,20 @@ class TestRelationBelongsToMysql(TestCase):
         m = Mobile.where(name='IPhone', user_id=user_id).first()
         self.assertEqual(u.id, m.user.id)
 
+    def test_query_with_include(self):
+        user_id = User.create(name="Jon", age=31).id
+        Mobile.create(name="Nokia", user_id=user_id)
+        Mobile.create(name="IPhone", user_id=user_id)
+
+        m = Mobile.include('user').where(name='Nokia').first()
+        u = m.user
+        self.assertEqual(User, type(u))
+        self.assertEqual('Jon', u.name)
+        self.assertEqual(31, u.age)
+
+        m = Mobile.include('user').where(name='IPhone', user_id=user_id).first()
+        self.assertEqual(u.id, m.user.id)
+
     def test_create(self):
         u = User.create(name="Jon", age=31)
         mobile_id = Mobile.create(name="Nokia", user=u).id

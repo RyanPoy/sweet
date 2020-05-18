@@ -73,17 +73,16 @@ class Course(Model):
     has_many(Student, through=Score)
 
 
-
 class StudentForHasOneThrough(Model):
     __tablename__ = 'students'
-    has_one('sweet.tests.Score')
-    has_one('sweet.tests.CourseForHasOneThrough', name="course", through="sweet.tests.Score", through_fk_on_owner='student_id', through_fk_on_target='course_id')
+    has_one('sweet.tests.ScoreForHasOneThrough', name='score', fk='student_id')
+    has_one('sweet.tests.CourseForHasOneThrough', name="course", through="sweet.tests.ScoreForHasOneThrough", through_fk_on_owner='student_id', through_fk_on_target='course_id')
 
 
 class CourseForHasOneThrough(Model):
     __tablename__ = 'courses'
-    has_one('sweet.tests.Score')
-    has_one(StudentForHasOneThrough, name="student", through="sweet.tests.Score", through_fk_on_owner='course_id', through_fk_on_target='student_id')
+    has_one('sweet.tests.ScoreForHasOneThrough', name='score', fk='course_id')
+    has_one(StudentForHasOneThrough, name="student", through="sweet.tests.ScoreForHasOneThrough", through_fk_on_owner='course_id', through_fk_on_target='student_id')
 
 
 class ScoreForHasOneThrough(Model):

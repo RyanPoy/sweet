@@ -18,7 +18,16 @@ class TestHasOneToMysql(TestCase):
         u = User.create(name="Jon", age=31)
         Car.create(name="Benz", user_id=u.id)
 
-        c = u.car
+        c = User.first().car
+        self.assertEqual(Car, type(c))
+        self.assertEqual('Benz', c.name)
+        self.assertEqual(u.id, c.user_id)
+
+    def test_query_with_include(self):
+        u = User.create(name="Jon", age=31)
+        Car.create(name="Benz", user_id=u.id)
+
+        c = User.include('car').first().car
         self.assertEqual(Car, type(c))
         self.assertEqual('Benz', c.name)
         self.assertEqual(u.id, c.user_id)

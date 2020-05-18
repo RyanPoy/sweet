@@ -18,20 +18,13 @@ class HasManyThrough(Relation):
       name = 'tags'         # can retrive use Article().tags
       fk = 'article_id'     # can retrive use Article().user_id
     """
-    def __init__(self, owner=None, target=None, name=None, through=None, through_name=None, through_fk_on_owner=None, through_fk_on_target=None):
+    def __init__(self, owner=None, target=None, name=None, through=None, through_fk_on_owner=None, through_fk_on_target=None):
         self.owner = owner
         self._target_cls_or_target_name = target
         self._name = name
-        self._through_name = through_name
         self._through_fk_one_owner = through_fk_on_owner
         self._through_cls_or_through_name = through
         self._through_fk_on_target = through_fk_on_target
-
-    @property
-    def through_name(self):
-        if not self._through_name:
-            self._through_name = pythonize(pluralize(self.through.__name__))
-        return self._through_name
 
     @property
     def through_fk_on_owner(self):
@@ -123,7 +116,7 @@ class HasManyThrough(Relation):
         if not target_pks:
             return self
 
-        target_objs = self.target.find(*target_pks)
+        target_objs = self.target.where(**{self.target.__pk__: target_pks}).all()
         if not target_objs:
             return self
         

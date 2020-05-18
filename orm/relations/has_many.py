@@ -84,11 +84,10 @@ class HasMany(Relation):
 
 
 def has_many(clazz, name=None, fk=None, cascade=False,
-             through=None, through_name=None, through_fk_on_owner=None, through_fk_on_target=None):
+             through=None, through_fk_on_owner=None, through_fk_on_target=None):
     if not through:
         r = HasMany(target=clazz, name=name, fk=fk, cascade=cascade)
     else:
-        r = HasManyThrough(target=clazz, name=name, 
-                            through=through, through_name=through_name, 
+        r = HasManyThrough(target=clazz, name=name, through=through, 
                             through_fk_on_owner=through_fk_on_owner, through_fk_on_target=through_fk_on_target)
     relation_q.put(r)
