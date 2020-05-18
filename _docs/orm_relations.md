@@ -532,13 +532,97 @@
 
 ## N + 1 
 
-### belongs_to
-```
+You can use `include` method to optimizate the N + 1 problem
+
+### `belongs_to` 、`has_one`、`has_many`
 
 ```
-- N + 1
+# model define
+  
+  from sweet.orm import Model
+  from sweet.relations import *
 
-  - has_many
-  - has_one
-  - has_many with through
-  - has_and_belongs_to_many
+  class User(Model):
+    has_many('demo.Mobile')
+    has_one('demo.Car')
+
+  class Mobile(Model):
+    belongs_to(User, name='user')
+
+  class Car(Model):
+    belongs_to(User)
+
+  ######### N + 1 Example #########
+  for m in Mobile.all(): # N + 1
+    print (m.user)
+
+  for u in User.all(): # N + 1
+    print (u.car)
+    print (u.mobiles.all())
+
+  ######### Solution to N + 1  #########
+  for m in Mobile.include("user").all(): # use include
+    print (m.user)
+
+  for u in User.include('car', 'mobiles').all(): # user include
+    print (u.car)
+    print (u.mobiles.all())
+```
+
+> Note:
+> use include method should return a Collection. 
+
+```
+u = User.first()
+u.mobiles # return a Recordset
+
+u = User.include('mobiles').first()
+u.mobiles # return a Collection
+```
+
+### `has_one` with through、`has_many` with through
+
+```
+  from sweet.orm import Model
+  from sweet.relations import *
+
+  class Score(Model):
+    belongs_to('demo.Student')
+    belongs_to('demo.Course')
+
+
+  class Student(Model):
+    has_many(Score)
+    has_many('demo.Course', through=Score)
+
+
+  class Course(Model):
+    has_many(Score)
+    has_many(Student, through=Score)
+    
+  for s in Student.include("courses").all():
+    print (s.courses.all())
+```
+
+> Note
+> 
+> `has_one` with through looks like `has_many` with through
+> 
+
+
+### `has_and_belongs_to_many`
+
+```
+  from sweet.orm import Model
+  from sweet.relations import *
+
+  class Article(Model):
+    has_and_belongs_to_many('sweet.tests.Tag')
+
+
+  class Tag(Model):
+    has_and_belongs_to_many(Article)
+
+  for t in Tag.include('articles').all():
+    print (t.articles.all())
+```
