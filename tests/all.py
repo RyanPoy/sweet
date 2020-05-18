@@ -3,6 +3,12 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+import logging
+logging.basicConfig(
+    level=logging.DEBUG, 
+    format="%(asctime)s - %(name)s [%(levelname)s]: %(message)s",
+)
+
 import unittest
 from sweet.tests.integration.test_recordset_crud_mysql import TestRecordsetCRUDMySQL
 from sweet.tests.integration.test_model_struct_mysql import TestModelStructMySQL

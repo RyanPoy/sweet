@@ -5,6 +5,10 @@ from sweet.orm.fields import *
 from sweet.utils import *
 import MySQLdb
 import time
+import logging
+
+
+logger = logging.getLogger('MySQL')
 
 
 class MySQL(object):
@@ -105,7 +109,7 @@ class MySQL(object):
                     else:
                         p = str(p)
                     param_buff.append(p)
-                print ((time.time() - btime), '\t|', sql, '\t|', ', '.join(param_buff))
+                logger.debug ('%s\t|%s\t|%s', time.time() - btime, sql, ', '.join(param_buff))
         return self
 
     def get_columns(self, table_name):

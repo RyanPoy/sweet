@@ -8,7 +8,6 @@ from sweet.orm.method_missing import *
 class ModelMetaClass(type):
 
     def __init__(cls, name, bases, attr):
-        # print ("^"*5, " meta class init ", "^"*5, cls, name, bases, attr)
 
         if name != 'Model':
             # set __tablename__ to model Class
@@ -141,7 +140,7 @@ class Model(metaclass=ModelMetaClass):
         should raise HasNotBeenPersisted if it has not been persisted
         """
         if not self.persisted():
-            raise HasNotBeenPersisted()
+            raise self.HasNotBeenPersisted()
         if attrs:
             # old_values = { 
             #     k: getattr(self, k) for k, v in attrs.items() if hasattr(self, k)
@@ -262,7 +261,7 @@ class Model(metaclass=ModelMetaClass):
         objs = cls.objects
         for rn in relation_names:
             if rn not in cls.__relations__:
-                raise RelationNotFound("Relation named %s not found" % rn)
+                raise cls.RelationNotFound("Can not include '%s', because relation named '%s' not found" % (rn, rn))
             objs._includes.append(rn)
         return objs
 
