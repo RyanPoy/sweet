@@ -100,16 +100,22 @@ class MySQL(object):
         try:
             btime = time.time()
             cursor.execute(sql, params)
-        finally:
             if self.show_sql:
-                param_buff = []
-                for p in params:
-                    if is_str(p):
-                        p = "'%s'" % p
-                    else:
-                        p = str(p)
-                    param_buff.append(p)
-                logger.debug ('%s\t|%s\t|%s', time.time() - btime, sql, ', '.join(param_buff))
+                self._log_msg(logger.debug, btime, sql, *params)
+        except:
+            self._log_msg(logger.error, btime, sql, *params)
+            raise
+        return self
+
+    def _log_msg(self, log_func, btime, sql, *params):
+        param_buff = []
+        for p in params:
+            if is_str(p):
+                p = "'%s'" % p
+            else:
+                p = str(p)
+            param_buff.append(p)
+        log_func('%s\t|%s\t|%s', time.time() - btime, sql, ', '.join(param_buff))
         return self
 
     def get_columns(self, table_name):

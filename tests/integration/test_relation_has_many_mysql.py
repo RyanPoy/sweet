@@ -95,10 +95,10 @@ class TestRelationHasManyToMysql(TestCase):
         Mobile.create(name="IPhone", user_id=member2.id)
 
         with self.assertRaises(IntegrityError) as err:
-            Member.delete_all()
+            member1.delete_all()
 
         with self.assertRaises(IntegrityError) as err:
-            member1.delete_all()
+            Member.delete_all()
 
 
 if __name__ == '__main__':
