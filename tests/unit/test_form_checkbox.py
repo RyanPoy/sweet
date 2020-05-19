@@ -85,8 +85,8 @@ class TestFormCheckbox(TestCase):
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="user-role-admin" name="user['role']" type="checkbox" value="admin" checked="checked" />
-    <input id="user-role-normal" name="user['role']" type="checkbox" value="normal" />
+    <input id="user_role_admin" name="user['role']" type="checkbox" value="admin" checked="checked" />
+    <input id="user_role_normal" name="user['role']" type="checkbox" value="normal" />
 </form>
 """, t.render(user=User(id=1, name="Ryan", age=20, sex='F', role="admin")))
 
@@ -99,8 +99,8 @@ class TestFormCheckbox(TestCase):
 """)
         self.assertEqual("""
 <form action="/user/new" method="GET" accept-charset="UTF8">
-    <input id="user-role-admin" name="user['role']" type="checkbox" value="admin" checked="checked" />
-    <input id="user-role-normal" name="user['role']" type="checkbox" value="normal" />
+    <input id="user_role_admin" name="user['role']" type="checkbox" value="admin" checked="checked" />
+    <input id="user_role_normal" name="user['role']" type="checkbox" value="normal" />
 </form>
 """, t.render(user=User(id=1, name="Ryan", age=20, sex='F', role="admin")))
 

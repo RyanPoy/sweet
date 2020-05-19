@@ -1,5 +1,5 @@
 # coding: utf8
-from sweet.tests import TestCase
+from sweet.tests import TestCase, User
 from sweet.template import Template
 
 
@@ -49,6 +49,19 @@ class TestFormColor(TestCase):
     <input id="color" name="color" type="color" value="#DEF726" disabled="disabled" class="special_input" />
 </form>
 """, t.render())
+
+    def test_for_tag(self):
+        t = Template("""
+<%= using form(action="/user/new", model=user) do f %>
+    <%= f.color('like_color') %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="user_like_color" name="user['like_color']" type="color" value="#FFF" />
+</form>
+""", t.render(user=User(name="Jon", age=20, like_color="#FFF")))
+
 
 if __name__ == '__main__':
     import unittest

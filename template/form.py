@@ -46,14 +46,16 @@ class Form(object):
     def text(self, name, value=None, _id='', tp='text', placeholder='', size='', maxlength='', disabled=False, _class='', html=None, autoid=True):
         html = html or {}
         d = oDict()
+        _id = self._build_id(_id, autoid, name)
         if _id:
             d['id'] = _id
-        elif autoid:
-            d['id'] = name
-        d['name'] = name
+        d['name'] = self._build_name(name)
+
         d['type'] = tp or 'text'
         if value or value == '':
             d['value'] = value
+        elif self.model:
+            d['value'] = self._get_model_value(name)
         if placeholder:
             d['placeholder'] = placeholder
         if size or size == 0:
@@ -163,13 +165,10 @@ class Form(object):
                 d['checked'] = "checked"
             d.update(html)
         else:
-            origin_name = name
-            name = self._build_name(name)
-            current_value = getattr(self.model, origin_name, '')
-            if str(current_value) == str(value):
+            if str(self._get_model_value(name)) == str(value):
                 d['checked'] = "checked"
             if not _id:
-                _id = '%s-%s-%s' % (self.model.name_for_view(), origin_name, value)
+                _id = '%s_%s_%s' % (self.model.name_for_view(), name, value)
             d.update(html)
 
         return self.text(name=name, value=value, _id=_id, tp="checkbox", disabled=disabled, _class=_class, html=d)
@@ -213,4 +212,18 @@ class Form(object):
                 )
 
     def _build_name(self, name):
-        return name if self.model is None else "%s['%s']" % (self.model.name_for_view(), name)
+        if self.model:
+            return "%s['%s']" % (self.model.name_for_view(), name)
+        return name
+
+    def _build_id(self, _id, autoid, name):
+        if _id:
+            return _id
+        if self.model:
+            return '%s_%s' % (self.model.name_for_view(), name)
+        if autoid:
+            return name
+        return ''
+
+    def _get_model_value(self, name):
+        return getattr(self.model, name, '')
