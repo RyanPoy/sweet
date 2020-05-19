@@ -138,10 +138,14 @@ class Form(object):
                 return date.strftime(v, '%Y-%m-%dT00:00:00')
 
         html = html or {}
+        if value is None and self.model:
+            value = self._get_model_value(name)
+
         if value: value = _(value)
         if _min and 'min' not in html: html['min'] = _(_min)
         if _max and 'max' not in html: html['max'] = _(_max)
         if step and 'step' not in html: html['step'] = step
+
         return self.text(name=name, value=value, _id=_id, placeholder=placeholder, tp="datetime-local", disabled=disabled, _class=_class, html=html)
 
     def radio(self, name, value, _id='', checked=False, disabled=False, _class='', html=None):
@@ -226,4 +230,7 @@ class Form(object):
         return ''
 
     def _get_model_value(self, name):
-        return getattr(self.model, name, '')
+        if self.model:
+            return getattr(self.model, name, '')
+        return None
+

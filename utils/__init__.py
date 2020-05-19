@@ -72,8 +72,16 @@ def str2datetime(s):
                 microsec = microseconds(iso_string[pos:])
             else:
                 microsec = 0
-    
-            tm_struct = time.strptime(string, '%Y-%m-%d %H:%M:%S')
+
+            tm_struct, err = None, None
+            for format_str in ['%Y-%m-%d %H:%M:%S', '%Y/%m/%d %H:%M:%S', '%Y-%m-%d', '%Y/%m/%d']:
+                try:
+                    tm_struct = time.strptime(string, format_str)
+                    break
+                except ValueError as ex:
+                    err = ex
+            if tm_struct is None:
+                raise err
             return datetime(tm_struct.tm_year, tm_struct.tm_mon, tm_struct.tm_mday, tm_struct.tm_hour, tm_struct.tm_min, tm_struct.tm_sec, microsec)
     
     if s is None:     return None
@@ -92,7 +100,17 @@ def str2date(s):
     def __fallback_str2date(string):
         string = string.strip()
         string = string.split()[0]
-        tm_struct = time.strptime(string, '%Y-%m-%d')
+
+        tm_struct, err = None, None
+        for format_str in ['%Y-%m-%d', '%Y/%m/%d', '%Y-%m-%d %H:%M:%S', '%Y/%m/%d %H:%M:%S']:
+            try:
+                tm_struct = time.strptime(string, format_str)
+                break
+            except ValueError as ex:
+                err = ex
+
+        if tm_struct is None:
+            raise err
         return date(tm_struct.tm_year, tm_struct.tm_mon, tm_struct.tm_mday)
     
 
