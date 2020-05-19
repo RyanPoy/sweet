@@ -12,38 +12,38 @@ class TestRecordsetUpdateMySQL(TestCase):
     def test_update(self):
         def _(sql, *params):
             self.assertEqual('UPDATE `users` SET `age` = %s, `name` = %s WHERE `age` >= %s OR `name` = %s', sql)
-            self.assertEqual([20, 'nothing', 40, 'ryanpoy'], list(params))
+            self.assertEqual([20, 'nothing', 40, 'Ryan'], list(params))
             return 3
-        tb = self.get_recordset().where(age__gte=40).or_where(name="ryanpoy")
+        tb = self.get_recordset().where(age__gte=40).or_where(name="Ryan")
         tb.db.execute_rowcount = _
         self.assertEqual(3, tb.update(age=20, name='nothing'))
 
     def test_update_with_join(self):
         def _(sql, *params):
             self.assertEqual('UPDATE `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` SET `name` = %s WHERE `id` IN (%s, %s, %s) OR `name` = %s', sql)
-            self.assertEqual([ 'nothing', 1, 2, 3, 'ryanpoy'], list(params))
+            self.assertEqual([ 'nothing', 1, 2, 3, 'Ryan'], list(params))
             return 3
         tb = self.get_recordset()
         tb.db.execute_rowcount = _
 
-        r = tb.where(id=[1,2,3]).or_where(name="ryanpoy").join('cars', "users.id=cars.user_id").update(name='nothing')
+        r = tb.where(id=[1,2,3]).or_where(name="Ryan").join('cars', "users.id=cars.user_id").update(name='nothing')
         self.assertEqual(3, r)
 
     def test_increase(self):
         def _(sql, *params):
             self.assertEqual('UPDATE `users` SET `age` = `age` + %s, `score` = `score` + %s WHERE `age` >= %s OR `name` = %s', sql)
-            self.assertEqual([10, 20, 40, 'ryanpoy'], list(params))
+            self.assertEqual([10, 20, 40, 'Ryan'], list(params))
             return 3
-        tb = self.get_recordset().where(age__gte=40).or_where(name="ryanpoy")
+        tb = self.get_recordset().where(age__gte=40).or_where(name="Ryan")
         tb.db.execute_rowcount = _
         self.assertEqual(3, tb.increase(age=10, score=20))
 
     def test_decrease(self):
         def _(sql, *params):
             self.assertEqual('UPDATE `users` SET `age` = `age` - %s, `score` = `score` - %s WHERE `age` >= %s OR `name` = %s', sql)
-            self.assertEqual([10, 20, 40, 'ryanpoy'], list(params))
+            self.assertEqual([10, 20, 40, 'Ryan'], list(params))
             return 3
-        tb = self.get_recordset().where(age__gte=40).or_where(name="ryanpoy")
+        tb = self.get_recordset().where(age__gte=40).or_where(name="Ryan")
         tb.db.execute_rowcount = _
         self.assertEqual(3, tb.decrease(age=10, score=20))
 

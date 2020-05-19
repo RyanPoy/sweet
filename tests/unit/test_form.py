@@ -23,7 +23,7 @@ class TestForm(TestCase):
         self.assertEqual("""
 <form action="/user/new" method="POST" accept-charset="UTF8" enctype="multipart/form-data">
 </form>
-""", t.render(user=User(id=1, name="ryanpoy", age=20, sex='F')))
+""", t.render(user=User(id=1, name="Ryan", age=20, sex='F')))
 
     def test_form_with_url_and_ignore_multipart_if_method_is_not_POST(self):
         t = Template("""

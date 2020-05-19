@@ -9,11 +9,11 @@ class TestFilter(TestCase):
         return Filter.new(name, value, '`', '%s')
 
     def test_filter(self):
-        f = self.get_filter('name', 'ryanpoy')
+        f = self.get_filter('name', 'Ryan')
         sql, params = f.compile()
         self.assertEqual('name', f.name)
-        self.assertEqual('ryanpoy', f.value)
-        self.assertEqual(['ryanpoy'], params)
+        self.assertEqual('Ryan', f.value)
+        self.assertEqual(['Ryan'], params)
         self.assertEqual('=', f.operator)
         self.assertEqual('`name` = %s', sql)
 
@@ -103,38 +103,38 @@ class TestFilter(TestCase):
         self.assertRaises(TypeError, self.get_filter, 'age__bt', 'abc')
 
     def test_filter_gt(self):
-        f = self.get_filter('name__gt', 'ryanpoy')
+        f = self.get_filter('name__gt', 'Ryan')
         sql, params = f.compile()
         self.assertEqual('name', f.name)
-        self.assertEqual('ryanpoy', f.value)
-        self.assertEqual(['ryanpoy'], params)
+        self.assertEqual('Ryan', f.value)
+        self.assertEqual(['Ryan'], params)
         self.assertEqual('>', f.operator)
         self.assertEqual('`name` > %s', sql)
 
     def test_filter_gte(self):
-        f = self.get_filter('name__gte', 'ryanpoy')
+        f = self.get_filter('name__gte', 'Ryan')
         sql, params = f.compile()
         self.assertEqual('name', f.name)
-        self.assertEqual('ryanpoy', f.value)
-        self.assertEqual(['ryanpoy'], params)
+        self.assertEqual('Ryan', f.value)
+        self.assertEqual(['Ryan'], params)
         self.assertEqual('>=', f.operator)
         self.assertEqual('`name` >= %s', sql)
 
     def test_filter_lt(self):
-        f = self.get_filter('name__lt', 'ryanpoy')
+        f = self.get_filter('name__lt', 'Ryan')
         sql, params = f.compile()
         self.assertEqual('name', f.name)
-        self.assertEqual('ryanpoy', f.value)
-        self.assertEqual(['ryanpoy'], params)
+        self.assertEqual('Ryan', f.value)
+        self.assertEqual(['Ryan'], params)
         self.assertEqual('<', f.operator)
         self.assertEqual('`name` < %s', sql)
 
     def test_filter_lte(self):
-        f = self.get_filter('name__lte', 'ryanpoy')
+        f = self.get_filter('name__lte', 'Ryan')
         sql, params = f.compile()
         self.assertEqual('name', f.name)
-        self.assertEqual('ryanpoy', f.value)
-        self.assertEqual(['ryanpoy'], params)
+        self.assertEqual('Ryan', f.value)
+        self.assertEqual(['Ryan'], params)
         self.assertEqual('<=', f.operator)
         self.assertEqual('`name` <= %s', sql)
 

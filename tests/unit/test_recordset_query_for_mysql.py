@@ -17,10 +17,10 @@ class TestRecordsetQueryForMySQL(TestCase):
         self.assertEqual('SELECT `id`, `name` FROM `users`', sql)
         self.assertEqual([], params)
 
-        tb = tb.select('*').where(id=1, name='ryanpoy')
+        tb = tb.select('*').where(id=1, name='Ryan')
         sql, params = tb.sql()
         self.assertEqual('SELECT * FROM `users` WHERE `id` = %s AND `name` = %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_basic_select(self):
         sql, params = self.get_recordset().select('*').sql()
@@ -48,29 +48,29 @@ class TestRecordsetQueryForMySQL(TestCase):
         self.assertEqual([], params)
 
     def test_where_2(self):
-        sql, params = self.get_recordset().select('*').where(users__id=1, users__name='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').where(users__id=1, users__name='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` WHERE `users`.`id` = %s AND `users`.`name` = %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_where(self):
-        sql, params = self.get_recordset().select('*').where(id=1, name='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').where(id=1, name='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` WHERE `id` = %s AND `name` = %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_where_not(self):
-        sql, params = self.get_recordset().select('*').where(id__not=1, name__not='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').where(id__not=1, name__not='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` WHERE `id` <> %s AND `name` <> %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_where_in(self):
-        sql, params = self.get_recordset().select('*').where(id=[1, 2, 3], name='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').where(id=[1, 2, 3], name='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` = %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
 
     def test_where_not_in(self):
-        sql, params = self.get_recordset().select('*').where(id__not=[1, 2, 3], name__not='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').where(id__not=[1, 2, 3], name__not='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` WHERE `id` NOT IN (%s, %s, %s) AND `name` <> %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
 
     def test_where_like(self):
         sql, params = self.get_recordset().select('*').where(id=[1, 2, 3], name__like='%yanpo%').sql()
@@ -83,14 +83,14 @@ class TestRecordsetQueryForMySQL(TestCase):
         self.assertEqual([1, 2, 3, '%yanpo%'], params)
 
     def test_where_in_empty(self):
-        sql, params = self.get_recordset().select('*').where(id=[], name='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').where(id=[], name='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` WHERE `id` IN () AND `name` = %s', sql)
-        self.assertEqual(['ryanpoy'], params)
+        self.assertEqual(['Ryan'], params)
 
     def test_where_in_none(self):
-        sql, params = self.get_recordset().select('*').where(id=[None, None], name='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').where(id=[None, None], name='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s) AND `name` = %s', sql)
-        self.assertEqual([None, None, 'ryanpoy'], params)
+        self.assertEqual([None, None, 'Ryan'], params)
 
     def test_where_null(self):
         sql, params = self.get_recordset().select('*').where(id=[1, 2, 3], name=None).sql()
@@ -145,34 +145,34 @@ class TestRecordsetQueryForMySQL(TestCase):
         self.assertEqual([1, 2, 'jim', 'lucy', 10], params)
 
     def test_or(self):
-        sql, params = self.get_recordset().select('*').or_where(id=1, name='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').or_where(id=1, name='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` WHERE `id` = %s OR `name` = %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_or_not(self):
-        sql, params = self.get_recordset().select('*').or_where(id__not=1, name__not='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').or_where(id__not=1, name__not='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` WHERE `id` <> %s OR `name` <> %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_or_between(self):
-        sql, params = self.get_recordset().select('*').where(name='ryanpoy').or_where(id__bt=[1, 2]).sql()
+        sql, params = self.get_recordset().select('*').where(name='Ryan').or_where(id__bt=[1, 2]).sql()
         self.assertEqual('SELECT * FROM `users` WHERE `name` = %s OR `id` BETWEEN %s AND %s', sql)
-        self.assertEqual(['ryanpoy', 1, 2], params)
+        self.assertEqual(['Ryan', 1, 2], params)
 
     def test_or_not_between(self):
-        sql, params = self.get_recordset().select('*').where(name='ryanpoy').or_where(id__not_bt=[1, 2]).sql()
+        sql, params = self.get_recordset().select('*').where(name='Ryan').or_where(id__not_bt=[1, 2]).sql()
         self.assertEqual('SELECT * FROM `users` WHERE `name` = %s OR `id` NOT BETWEEN %s AND %s', sql)
-        self.assertEqual(['ryanpoy', 1, 2], params)
+        self.assertEqual(['Ryan', 1, 2], params)
 
     def test_or_in(self):
-        sql, params = self.get_recordset().select('*').or_where(id=[1, 2, 3], name='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').or_where(id=[1, 2, 3], name='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` WHERE `id` IN (%s, %s, %s) OR `name` = %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
 
     def test_or_not_in(self):
-        sql, params = self.get_recordset().select('*').or_where(id__not=[1, 2, 3], name__not='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').or_where(id__not=[1, 2, 3], name__not='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` WHERE `id` NOT IN (%s, %s, %s) OR `name` <> %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
     
     def test_or_null(self):
         sql, params = self.get_recordset().select('*').or_where(id=[1, 2, 3], name=None).sql()
@@ -195,21 +195,21 @@ class TestRecordsetQueryForMySQL(TestCase):
         self.assertEqual([], params)
 
     def test_where_group_parameters(self):
-        sql, params = self.get_recordset().select('*').having(id=1, name='ryanpoy').or_having(
+        sql, params = self.get_recordset().select('*').having(id=1, name='Ryan').or_having(
             WhereClause('`', '%s').and_(name='jim').or_(name='lucy')
         ).sql()
         self.assertEqual('SELECT * FROM `users` HAVING `id` = %s AND `name` = %s OR ( `name` = %s OR `name` = %s )', sql)
-        self.assertEqual([1, 'ryanpoy', 'jim', 'lucy'], params)
+        self.assertEqual([1, 'Ryan', 'jim', 'lucy'], params)
 
     def test_having(self):
-        sql, params = self.get_recordset().select('*').having(id=1, name='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').having(id=1, name='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` HAVING `id` = %s AND `name` = %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_having_in(self):
-        sql, params = self.get_recordset().select('*').having(id=[1, 2, 3], name='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').having(id=[1, 2, 3], name='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) AND `name` = %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
 
     def test_having_null(self):
         sql, params = self.get_recordset().select('*').having(id=[1, 2, 3], name=None).sql()
@@ -247,9 +247,9 @@ class TestRecordsetQueryForMySQL(TestCase):
             tb.having(id__bt=[1, 2, 3])
 
     def test_having_not(self):
-        sql, params = self.get_recordset().select('*').having(id__not=1, name__not='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').having(id__not=1, name__not='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` HAVING `id` <> %s AND `name` <> %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_having_not_null(self):
         sql, params = self.get_recordset().select('*').having(id=[1, 2, 3]).having(name__not=None).sql()
@@ -257,9 +257,9 @@ class TestRecordsetQueryForMySQL(TestCase):
         self.assertEqual([1, 2, 3], params)
 
     def test_having_not_in(self):
-        sql, params = self.get_recordset().select('*').having(id__not=[1, 2, 3], name__not='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').having(id__not=[1, 2, 3], name__not='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` HAVING `id` NOT IN (%s, %s, %s) AND `name` <> %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
 
     def test_having_not_between(self):
         sql, params = self.get_recordset().select('*').having(id__not_bt=[1, 2]).sql()
@@ -267,19 +267,19 @@ class TestRecordsetQueryForMySQL(TestCase):
         self.assertEqual([1, 2], params)
 
     def test_or_having(self):
-        sql, params = self.get_recordset().select('*').or_having(id=1, name='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').or_having(id=1, name='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` HAVING `id` = %s OR `name` = %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_or_having_between(self):
-        sql, params = self.get_recordset().select('*').having(name='ryanpoy').or_having(id__bt=[1, 2]).sql()
+        sql, params = self.get_recordset().select('*').having(name='Ryan').or_having(id__bt=[1, 2]).sql()
         self.assertEqual('SELECT * FROM `users` HAVING `name` = %s OR `id` BETWEEN %s AND %s', sql)
-        self.assertEqual(['ryanpoy', 1, 2], params)
+        self.assertEqual(['Ryan', 1, 2], params)
 
     def test_or_having_in(self):
-        sql, params = self.get_recordset().select('*').or_having(id=[1, 2, 3], name='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').or_having(id=[1, 2, 3], name='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` HAVING `id` IN (%s, %s, %s) OR `name` = %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
 
     def test_or_having_null(self):
         sql, params = self.get_recordset().select('*').or_having(id=[1, 2, 3], name=None).sql()
@@ -287,14 +287,14 @@ class TestRecordsetQueryForMySQL(TestCase):
         self.assertEqual([1, 2, 3], params)
 
     def test_or_having_not_between(self):
-        sql, params = self.get_recordset().select('*').having(name='ryanpoy').or_having(id__not_bt=[1, 2]).sql()
+        sql, params = self.get_recordset().select('*').having(name='Ryan').or_having(id__not_bt=[1, 2]).sql()
         self.assertEqual('SELECT * FROM `users` HAVING `name` = %s OR `id` NOT BETWEEN %s AND %s', sql)
-        self.assertEqual(['ryanpoy', 1, 2], params)
+        self.assertEqual(['Ryan', 1, 2], params)
 
     def test_or_having_not(self):
-        sql, params = self.get_recordset().select('*').or_having(id__not=1, name__not='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').or_having(id__not=1, name__not='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` HAVING `id` <> %s OR `name` <> %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_or_having_not_null(self):
         sql, params = self.get_recordset().select('*').or_having(id=[1, 2, 3]).or_having(name__not=None).sql()
@@ -302,9 +302,9 @@ class TestRecordsetQueryForMySQL(TestCase):
         self.assertEqual([1, 2, 3], params)
 
     def test_or_having_not_in(self):
-        sql, params = self.get_recordset().select('*').or_having(id__not=[1, 2, 3], name__not='ryanpoy').sql()
+        sql, params = self.get_recordset().select('*').or_having(id__not=[1, 2, 3], name__not='Ryan').sql()
         self.assertEqual('SELECT * FROM `users` HAVING `id` NOT IN (%s, %s, %s) OR `name` <> %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
 
     def test_limits_and_offsets(self):
         sql, params = self.get_recordset().select('*').offset(5).limit(10).sql()
@@ -317,15 +317,15 @@ class TestRecordsetQueryForMySQL(TestCase):
         self.assertEqual([], params)
 
     def test_join(self):
-        sql, params = self.get_recordset().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_where(name="ryanpoy")\
+        sql, params = self.get_recordset().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_where(name="Ryan")\
           .join('cars', "users.id=cars.user_id").where(cars__name='focus').sql()
         self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s AND `cars`.`name` = %s', sql)
-        self.assertEqual([ 1, 2, 3, 'ryanpoy', 'focus'], params)
+        self.assertEqual([ 1, 2, 3, 'Ryan', 'focus'], params)
 
     def test_join_without_select(self):
-        sql, params = self.get_recordset().where(id=[1,2,3]).or_where(name="ryanpoy").join('cars', "users.id=cars.user_id").where(cars__name='focus').sql()
+        sql, params = self.get_recordset().where(id=[1,2,3]).or_where(name="Ryan").join('cars', "users.id=cars.user_id").where(cars__name='focus').sql()
         self.assertEqual('SELECT * FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s AND `cars`.`name` = %s', sql)
-        self.assertEqual([ 1, 2, 3, 'ryanpoy', 'focus'], params)
+        self.assertEqual([ 1, 2, 3, 'Ryan', 'focus'], params)
 
     def test_join_with_function(self):
         def complex(join):
@@ -336,19 +336,19 @@ class TestRecordsetQueryForMySQL(TestCase):
         self.assertEqual([10, 100], params)
 
     def test_left_join(self):
-        sql, params = self.get_recordset().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_where(name="ryanpoy").left_join('cars', "users.id=cars.user_id").sql()
+        sql, params = self.get_recordset().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_where(name="Ryan").left_join('cars', "users.id=cars.user_id").sql()
         self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', sql)
-        self.assertEqual([ 1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([ 1, 2, 3, 'Ryan'], params)
 
     def test_right_join(self):
-        sql, params = self.get_recordset().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_where(name="ryanpoy").right_join('cars', "users.id=cars.user_id").sql()
+        sql, params = self.get_recordset().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_where(name="Ryan").right_join('cars', "users.id=cars.user_id").sql()
         self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` RIGHT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', sql)
-        self.assertEqual([ 1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([ 1, 2, 3, 'Ryan'], params)
 
     def test_cross_join(self):
-        sql, params = self.get_recordset().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_where(name="ryanpoy").cross_join('cars', "users.id=cars.user_id").sql()
+        sql, params = self.get_recordset().select('users.id').select('users.name').select('cars.name').where(id=[1,2,3]).or_where(name="Ryan").cross_join('cars', "users.id=cars.user_id").sql()
         self.assertEqual('SELECT `users`.`id`, `users`.`name`, `cars`.`name` FROM `users` CROSS JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', sql)
-        self.assertEqual([ 1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([ 1, 2, 3, 'Ryan'], params)
 
     def test_count(self):
         def _(sql, *params):
@@ -478,17 +478,17 @@ class TestRecordsetQueryForMySQL(TestCase):
     
     def test_read_lock(self):
         sql, params = self.get_recordset().select('users.id').select('cars.name')\
-                 .where(id=[1,2,3]).or_where(name="ryanpoy")\
+                 .where(id=[1,2,3]).or_where(name="Ryan")\
                  .left_join('cars', "users.id=cars.user_id").read_lock().sql()
         self.assertEqual('SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s LOCK IN SHARE MODE', sql)
-        self.assertEqual([ 1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([ 1, 2, 3, 'Ryan'], params)
 
     def test_write_lock(self):
         sql, params = self.get_recordset().select('users.id').select('cars.name')\
-                 .where(id=[1,2,3]).or_where(name="ryanpoy")\
+                 .where(id=[1,2,3]).or_where(name="Ryan")\
                  .left_join('cars', "users.id=cars.user_id").write_lock().sql()
         self.assertEqual('SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s FOR UPDATE', sql)
-        self.assertEqual([ 1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([ 1, 2, 3, 'Ryan'], params)
 
     def test_where_exists(self):
         users = self.get_recordset()

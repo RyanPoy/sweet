@@ -26,29 +26,29 @@ class TestClauses(TestCase):
         self.assertEqual([], params)
 
     def test_where_and(self):
-        sql, params = self.where_clause.and_(id=1).and_(name='ryanpoy').compile()
+        sql, params = self.where_clause.and_(id=1).and_(name='Ryan').compile()
         self.assertEqual('WHERE `id` = %s AND `name` = %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_where_and_muliple_kv(self):
-        sql, params = self.where_clause.and_(id=1, name='ryanpoy').compile()
+        sql, params = self.where_clause.and_(id=1, name='Ryan').compile()
         self.assertEqual('WHERE `id` = %s AND `name` = %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_where_and_not(self):
-        sql, params = self.where_clause.and_(id__not=1, name__not='ryanpoy').compile()
+        sql, params = self.where_clause.and_(id__not=1, name__not='Ryan').compile()
         self.assertEqual('WHERE `id` <> %s AND `name` <> %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_where_and_in(self):
-        sql, params = self.where_clause.and_(id=[1, 2, 3], name='ryanpoy').compile()
+        sql, params = self.where_clause.and_(id=[1, 2, 3], name='Ryan').compile()
         self.assertEqual('WHERE `id` IN (%s, %s, %s) AND `name` = %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
 
     def test_where_and_not_in(self):
-        sql, params = self.where_clause.and_(id__not=[1, 2, 3], name__not='ryanpoy').compile()
+        sql, params = self.where_clause.and_(id__not=[1, 2, 3], name__not='Ryan').compile()
         self.assertEqual('WHERE `id` NOT IN (%s, %s, %s) AND `name` <> %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
 
     def test_where_and_like(self):
         sql, params = self.where_clause.and_(id=[1, 2, 3], name__like='%yanpo%').compile()
@@ -61,14 +61,14 @@ class TestClauses(TestCase):
         self.assertEqual([1, 2, 3, '%yanpo%'], params)
 
     def test_where_and_in_empty(self):
-        sql, params = self.where_clause.and_(id=[], name='ryanpoy').compile()
+        sql, params = self.where_clause.and_(id=[], name='Ryan').compile()
         self.assertEqual('WHERE `id` IN () AND `name` = %s', sql)
-        self.assertEqual(['ryanpoy'], params)
+        self.assertEqual(['Ryan'], params)
 
     def test_where_and_in_none(self):
-        sql, params = self.where_clause.and_(id=[None, None], name='ryanpoy').compile()
+        sql, params = self.where_clause.and_(id=[None, None], name='Ryan').compile()
         self.assertEqual('WHERE `id` IN (%s, %s) AND `name` = %s', sql)
-        self.assertEqual([None, None, 'ryanpoy'], params)
+        self.assertEqual([None, None, 'Ryan'], params)
 
     def test_where_and_null(self):
         sql, params = self.where_clause.and_(id=[1, 2, 3], name=None).compile()
@@ -114,9 +114,9 @@ class TestClauses(TestCase):
         self.assertRaises(TypeError, self.where_clause.and_, id__bt=[1, 2, 3])
 
     def test_where_or(self):
-        sql, params = self.where_clause.or_(id=1, name='ryanpoy').compile()
+        sql, params = self.where_clause.or_(id=1, name='Ryan').compile()
         self.assertEqual('WHERE `id` = %s OR `name` = %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_basic_having_clause(self):
         sql, params = self.having_clause.compile()
@@ -124,14 +124,14 @@ class TestClauses(TestCase):
         self.assertEqual([], params)
 
     def test_having_and(self):
-        sql, params = self.having_clause.and_(id=1).and_(name='ryanpoy').compile()
+        sql, params = self.having_clause.and_(id=1).and_(name='Ryan').compile()
         self.assertEqual('HAVING `id` = %s AND `name` = %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_having_or(self):
-        sql, params = self.having_clause.or_(id=1, name='ryanpoy').compile()
+        sql, params = self.having_clause.or_(id=1, name='Ryan').compile()
         self.assertEqual('HAVING `id` = %s OR `name` = %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_order_by(self):
         sql, params = self.order_clause.by('email').by('age', desc=True).compile()
@@ -142,14 +142,14 @@ class TestClauses(TestCase):
         self.assertEqual('GROUP BY `id`, `email`', sql)
 
     def test_having(self):
-        sql, params = self.having_clause.and_(id=1, name='ryanpoy').compile()
+        sql, params = self.having_clause.and_(id=1, name='Ryan').compile()
         self.assertEqual('HAVING `id` = %s AND `name` = %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_having_in(self):
-        sql, params = self.having_clause.and_(id=[1, 2, 3], name='ryanpoy').compile()
+        sql, params = self.having_clause.and_(id=[1, 2, 3], name='Ryan').compile()
         self.assertEqual('HAVING `id` IN (%s, %s, %s) AND `name` = %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
 
     def test_having_null(self):
         sql, params = self.having_clause.and_(id=[1, 2, 3], name=None).compile()
@@ -185,9 +185,9 @@ class TestClauses(TestCase):
         self.assertRaises(TypeError, self.having_clause.and_, id__bt=[1, 2, 3])
 
     def test_having_not(self):
-        sql, params = self.having_clause.and_(id__not=1, name__not='ryanpoy').compile()
+        sql, params = self.having_clause.and_(id__not=1, name__not='Ryan').compile()
         self.assertEqual('HAVING `id` <> %s AND `name` <> %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_having_not_null(self):
         sql, params = self.having_clause.and_(id=[1, 2, 3]).and_(name__not=None).compile()
@@ -195,9 +195,9 @@ class TestClauses(TestCase):
         self.assertEqual([1, 2, 3], params)
 
     def test_having_not_in(self):
-        sql, params = self.having_clause.and_(id__not=[1, 2, 3], name__not='ryanpoy').compile()
+        sql, params = self.having_clause.and_(id__not=[1, 2, 3], name__not='Ryan').compile()
         self.assertEqual('HAVING `id` NOT IN (%s, %s, %s) AND `name` <> %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
 
     def test_having_not_between(self):
         sql, params = self.having_clause.and_(id__not_bt=[1, 2]).compile()
@@ -205,19 +205,19 @@ class TestClauses(TestCase):
         self.assertEqual([1, 2], params)
 
     def test_or_having(self):
-        sql, params = self.having_clause.or_(id=1, name='ryanpoy').compile()
+        sql, params = self.having_clause.or_(id=1, name='Ryan').compile()
         self.assertEqual('HAVING `id` = %s OR `name` = %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_or_having_between(self):
-        sql, params = self.having_clause.and_(name='ryanpoy').or_(id__bt=[1, 2]).compile()
+        sql, params = self.having_clause.and_(name='Ryan').or_(id__bt=[1, 2]).compile()
         self.assertEqual('HAVING `name` = %s OR `id` BETWEEN %s AND %s', sql)
-        self.assertEqual(['ryanpoy', 1, 2], params)
+        self.assertEqual(['Ryan', 1, 2], params)
 
     def test_or_having_in(self):
-        sql, params = self.having_clause.or_(id=[1, 2, 3], name='ryanpoy').compile()
+        sql, params = self.having_clause.or_(id=[1, 2, 3], name='Ryan').compile()
         self.assertEqual('HAVING `id` IN (%s, %s, %s) OR `name` = %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
 
     def test_or_having_null(self):
         sql, params = self.having_clause.or_(id=[1, 2, 3], name=None).compile()
@@ -225,14 +225,14 @@ class TestClauses(TestCase):
         self.assertEqual([1, 2, 3], params)
 
     def test_or_having_not_between(self):
-        sql, params = self.having_clause.and_(name='ryanpoy').or_(id__not_bt=[1, 2]).compile()
+        sql, params = self.having_clause.and_(name='Ryan').or_(id__not_bt=[1, 2]).compile()
         self.assertEqual('HAVING `name` = %s OR `id` NOT BETWEEN %s AND %s', sql)
-        self.assertEqual(['ryanpoy', 1, 2], params)
+        self.assertEqual(['Ryan', 1, 2], params)
 
     def test_or_having_not(self):
-        sql, params = self.having_clause.or_(id__not=1, name__not='ryanpoy').compile()
+        sql, params = self.having_clause.or_(id__not=1, name__not='Ryan').compile()
         self.assertEqual('HAVING `id` <> %s OR `name` <> %s', sql)
-        self.assertEqual([1, 'ryanpoy'], params)
+        self.assertEqual([1, 'Ryan'], params)
 
     def test_or_having_not_null(self):
         sql, params = self.having_clause.or_(id=[1, 2, 3]).or_(name__not=None).compile()
@@ -240,9 +240,9 @@ class TestClauses(TestCase):
         self.assertEqual([1, 2, 3], params)
 
     def test_or_having_not_in(self):
-        sql, params = self.having_clause.or_(id__not=[1, 2, 3], name__not='ryanpoy').compile()
+        sql, params = self.having_clause.or_(id__not=[1, 2, 3], name__not='Ryan').compile()
         self.assertEqual('HAVING `id` NOT IN (%s, %s, %s) OR `name` <> %s', sql)
-        self.assertEqual([1, 2, 3, 'ryanpoy'], params)
+        self.assertEqual([1, 2, 3, 'Ryan'], params)
 
     def test_limits_and_offsets(self):
         sql, params = self.page_clause.offset(5).limit(10).compile()

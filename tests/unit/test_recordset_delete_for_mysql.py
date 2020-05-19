@@ -12,23 +12,23 @@ class TestRecordsetDeleteForMysql(TestCase):
     def test_delete(self):
         def _(sql, *params):
             self.assertEqual('DELETE FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` = %s AND `age` >= %s', sql)
-            self.assertEqual([1, 2, 3, "ryanpoy", 30], list(params))
+            self.assertEqual([1, 2, 3, "Ryan", 30], list(params))
             return 3
         tb = self.get_recordset()
         tb.db.execute_rowcount = _
         
-        r = tb.where(id=[1, 2, 3], name='ryanpoy', age__gte=30).delete()
+        r = tb.where(id=[1, 2, 3], name='Ryan', age__gte=30).delete()
         self.assertEqual(3, r)
 
     def test_delete_with_join(self):
         def _(sql, *params):
             self.assertEqual('DELETE `users` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', sql)
-            self.assertEqual([1, 2, 3, 'ryanpoy'], list(params))
+            self.assertEqual([1, 2, 3, 'Ryan'], list(params))
             return 3
         tb = self.get_recordset()
         tb.db.execute_rowcount = _
 
-        r = tb.where(id=[1,2,3]).or_where(name="ryanpoy").join('cars', on='users.id=cars.user_id').delete()
+        r = tb.where(id=[1,2,3]).or_where(name="Ryan").join('cars', on='users.id=cars.user_id').delete()
         self.assertEqual(3, r)
 
     def test_truncate(self):
@@ -46,17 +46,17 @@ class TestRecordsetDeleteForMysql(TestCase):
 
         def fetchall(sql, *params):
             self.assertEqual('SELECT * FROM `users` WHERE `id` = %s AND `name` = %s', sql)
-            self.assertEqual([1, 'ryanpoy'], list(params))
+            self.assertEqual([1, 'Ryan'], list(params))
 
         def execute_rowcount(sql, *params):
             self.assertEqual('DELETE FROM `users` WHERE `id` = %s AND `name` = %s', sql)
-            self.assertEqual([1, 'ryanpoy'], list(params))
+            self.assertEqual([1, 'Ryan'], list(params))
 
         tb = self.get_recordset()
         tb.db.fetchall = fetchall        
         tb.db.execute_rowcount = execute_rowcount
         
-        tb = tb.where(id=1, name='ryanpoy')
+        tb = tb.where(id=1, name='Ryan')
         tb.all()
         tb.delete()
 

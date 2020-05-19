@@ -88,7 +88,7 @@ class TestFormCheckbox(TestCase):
     <input id="user-role-admin" name="user['role']" type="checkbox" value="admin" checked="checked" />
     <input id="user-role-normal" name="user['role']" type="checkbox" value="normal" />
 </form>
-""", t.render(user=User(id=1, name="ryanpoy", age=20, sex='F', role="admin")))
+""", t.render(user=User(id=1, name="Ryan", age=20, sex='F', role="admin")))
 
         t = Template("""
 <%= using form(action="/user/new", model=user) do f %>
@@ -102,7 +102,7 @@ class TestFormCheckbox(TestCase):
     <input id="user-role-admin" name="user['role']" type="checkbox" value="admin" checked="checked" />
     <input id="user-role-normal" name="user['role']" type="checkbox" value="normal" />
 </form>
-""", t.render(user=User(id=1, name="ryanpoy", age=20, sex='F', role="admin")))
+""", t.render(user=User(id=1, name="Ryan", age=20, sex='F', role="admin")))
 
 
 if __name__ == '__main__':
