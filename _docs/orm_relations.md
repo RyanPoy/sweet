@@ -404,7 +404,7 @@
   from sweet.relations import *
 
   class Article(Model):
-    has_and_belongs_to_many('sweet.tests.Tag')
+    has_and_belongs_to_many('demo.Tag')
 
 
   class Tag(Model):
@@ -617,7 +617,7 @@ u.mobiles # return a Collection
   from sweet.relations import *
 
   class Article(Model):
-    has_and_belongs_to_many('sweet.tests.Tag')
+    has_and_belongs_to_many('demo.Tag')
 
 
   class Tag(Model):
