@@ -50,7 +50,7 @@ class TestFormColor(TestCase):
 </form>
 """, t.render())
 
-    def test_for_tag(self):
+    def test_for_model(self):
         t = Template("""
 <%= using form(action="/user/new", model=user) do f %>
     <%= f.color('like_color') %>
