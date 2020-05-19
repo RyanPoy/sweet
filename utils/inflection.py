@@ -17,7 +17,7 @@ singularize_irregular_words = [ [ irregular[1], irregular[0] ] for irregular in 
 
 pluralize_rules = [
     [r'(?i)(quiz)$' , '\\1zes'],
-    [r'^(?i)(ox)$' , '\\1en'],
+    [r'(?i)^(ox)$' , '\\1en'],
     [r'(?i)([m|l])ouse$' , '\\1ice'],
     [r'(?i)(matr|vert|ind)ix|ex$' , '\\1ices'],
     [r'(?i)(x|ch|ss|sh)$' , '\\1es'],
