@@ -301,3 +301,10 @@ class Model(metaclass=ModelMetaClass):
     @classmethod
     def where(cls, **filters):
         return cls.objects.where(**filters)
+
+    @classmethod
+    def name_for_view(cls):
+        if not hasattr(cls, '__name_for_view__'):
+            cls.__name_for_view__ = pythonize(singularize(cls.__name__))
+        return cls.__name_for_view__
+

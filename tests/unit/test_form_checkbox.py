@@ -1,5 +1,5 @@
 # coding: utf8
-from sweet.tests import TestCase
+from sweet.tests import TestCase, User
 from sweet.template import Template
 
 
@@ -60,6 +60,49 @@ class TestFormCheckbox(TestCase):
     <input id="eula" name="eula" type="checkbox" value="accepted" disabled="disabled" />
 </form>
 """, t.render())
+
+        t = Template("""
+<%= using form(action="/user/new") do f %>
+  <% for choice in ['admin', 'normal'] %>
+    <%= f.checkbox('role', choice, _id='role-%s'%choice ) %>
+  <% end %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="role-admin" name="role" type="checkbox" value="admin" />
+    <input id="role-normal" name="role" type="checkbox" value="normal" />
+</form>
+""", t.render())
+
+
+    def test_for_model(self):
+        t = Template("""
+<%= using form("/user/new", model=user) do f %>
+    <%= f.checkbox('role', value='admin') %>
+    <%= f.checkbox('role', value='normal') %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="user-role-admin" name="user['role']" type="checkbox" value="admin" checked="checked" />
+    <input id="user-role-normal" name="user['role']" type="checkbox" value="normal" />
+</form>
+""", t.render(user=User(id=1, name="ryanpoy", age=20, sex='F', role="admin")))
+
+        t = Template("""
+<%= using form(action="/user/new", model=user) do f %>
+  <% for choice in ['admin', 'normal'] %>
+    <%= f.checkbox('role', choice) %>
+  <% end %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="user-role-admin" name="user['role']" type="checkbox" value="admin" checked="checked" />
+    <input id="user-role-normal" name="user['role']" type="checkbox" value="normal" />
+</form>
+""", t.render(user=User(id=1, name="ryanpoy", age=20, sex='F', role="admin")))
 
 
 if __name__ == '__main__':
