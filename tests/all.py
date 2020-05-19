@@ -22,6 +22,7 @@ from sweet.tests.integration.test_relation_has_one_through_mysql import TestRela
 from sweet.tests.integration.test_relation_has_and_belongs_to_many_mysql import TestRelationHasAndBelongsToManyMysql
 from sweet.tests.integration.test_relation_include_mysql import TestRelationIncludeMysql
 
+from sweet.tests.unit.test_utils import TestUtils
 from sweet.tests.unit.test_collection import TestCollection
 from sweet.tests.unit.test_filter import TestFilter
 from sweet.tests.unit.test_clauses import TestClauses
@@ -80,6 +81,7 @@ from sweet.tests.unit.test_relation_basic import TestRelationBasic
 
 
 unit_tests = [
+    TestUtils,
     TestCollection,
     TestFilter,
     TestClauses,
