@@ -5,7 +5,7 @@ from datetime import datetime, date
 
 class Form(object):
     
-    def __init__(self, action='', model=None, method="GET", _id="", multipart=False, remote=False, charset="UTF8", html=None):
+    def __init__(self, action, model=None, method="GET", _id="", multipart=False, remote=False, charset="UTF8", html=None):
         self.action = action
         self.model = model
         self.method = method
