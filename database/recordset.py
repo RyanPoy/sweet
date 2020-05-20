@@ -120,8 +120,8 @@ class Recordset(object):
         return self.__join(RightJoinClause, tbname, on, func)
 
     @dcp
-    def __join(self, join_clause_clazz, tbname, on, func=None):
-        jc = join_clause_clazz(self.qutotation_marks, self.paramstyle_marks, tbname)
+    def __join(self, join_clause_class, tbname, on, func=None):
+        jc = join_clause_class(self.qutotation_marks, self.paramstyle_marks, tbname)
         if on:
             jc.on(on)
 
