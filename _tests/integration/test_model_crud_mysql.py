@@ -197,52 +197,6 @@ class TestModelCRUDMySQL(TestCase):
         self.assertEqual(1, User.count())
         self.assertEqual(u.id, User.first().id)
 
-    # def test_join(self):
-    #     coll = self.db.records('users').join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
-    #     self.assertEqual(2, len(coll))
-    #     self.assertEqual(1, coll[0].id)
-    #     self.assertEqual(2, coll[1].id)
-    #     self.assertEqual(1, coll[0]['mobiles.id'])
-    #     self.assertEqual(3, coll[1]['mobiles.id'])
-
-    # def test_left_join(self):
-    #     coll = self.db.records('users').left_join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
-    #     self.assertEqual(2, len(coll))
-    #     self.assertEqual(1, coll[0].id)
-    #     self.assertEqual(2, coll[1].id)
-
-    # def test_right_join(self):
-    #     coll = self.db.records('users').left_join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name="iphone").all()
-    #     self.assertEqual(2, len(coll))
-    #     self.assertEqual(1, coll[0].id)
-    #     self.assertEqual(2, coll[1].id)
-
-    # def test_delete_with_join(self):
-    #     r = self.db.records('mobiles').join('users', on="users.id=mobiles.user_id").where(users__id=1).delete()
-    #     c = self.db.records('mobiles').all()
-    #     self.assertEqual(2, r)
-    #     self.assertEqual(1, len(c))
-    #     self.assertEqual(3, c[0].id)
-
-    # def test_truncate(self):
-    #     r = self.db.records('mobiles').truncate()
-    #     c = self.db.records('mobiles').all()
-    #     self.assertEqual(0, len(c))
-
-    # def test_update_with_join(self):
-    #     u = self.db.records('users').where(age=25).first()
-    #     self.assertTrue(u is not None)
-
-    #     r = self.db.records('users').join('mobiles', on="users.id=mobiles.user_id").where(mobiles__name='xiaomi').update(age=52)
-    #     self.assertEqual(1, r)
-    
-    #     u = self.db.records('users').where(age=25).first()
-    #     self.assertTrue(u is None)
-
-    #     u = self.db.records('users').where(age=52).first()
-    #     self.assertTrue(u is not None)
-    #     self.assertEqual(1, u.id)
-
 
 if __name__ == '__main__':
     import unittest
