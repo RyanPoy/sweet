@@ -205,8 +205,12 @@ class Form(object):
     def textarea(self, name, value=None, _id='', placeholder='', size=None, rows=None, cols=None, escape=True, disabled=False, _class='', html=None):
         html = html or {}
         d = oDict()
+        _id = self._build_id(_id, False, name)
         d['id'] = _id or name
-        d['name'] = name
+        d['name'] = self._build_name(name)
+        if not value:
+            value = self._get_model_value(name) or ''
+
         if placeholder:
             d['placeholder'] = placeholder
         if size or size == 0:
@@ -223,7 +227,7 @@ class Form(object):
 
         return '<textarea %s>%s</textarea>' % (
                     ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ]),
-                    value or ''
+                    value
                 )
 
     def _build_name(self, name):
