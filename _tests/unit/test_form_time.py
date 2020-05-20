@@ -1,5 +1,5 @@
 # coding: utf8
-from sweet._tests import TestCase
+from sweet._tests import TestCase, User
 from sweet.template import Template
 
 
@@ -94,6 +94,18 @@ class TestFormTime(TestCase):
 </form>
 """, t.render())
         
+    def test_for_tag(self):
+        t = Template("""
+<%= using form(action="/user/new", model=user) do f %>
+    <%= f.time('created_at') %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="user_created_at" name="user['created_at']" type="time" value="1589945183" />
+</form>
+""", t.render(user=User(created_at="1589945183")))
+
 
 if __name__ == '__main__':
     import unittest
