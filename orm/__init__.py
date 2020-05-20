@@ -5,13 +5,6 @@ import functools
 
 def atomic(func_or_db=None):
 
-    if callable(func_or_db):
-        db = Model.db
-    elif func_or_db is None:
-        db = Model.db
-    else:
-        db = func_or_db
-
     def wrapper(func):
 
         @functools.wraps(func)
@@ -27,6 +20,13 @@ def atomic(func_or_db=None):
             finally:
                 db.set_autocommit()
         return _
+
+    if callable(func_or_db):
+        db = Model.db
+    elif func_or_db is None:
+        db = Model.db
+    else:
+        db = func_or_db
 
     if callable(func_or_db):
         return wrapper(func_or_db)
