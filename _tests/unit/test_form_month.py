@@ -1,5 +1,5 @@
 # coding: utf8
-from sweet._tests import TestCase
+from sweet._tests import TestCase, User
 from sweet.template import Template
 
 
@@ -39,7 +39,20 @@ class TestFormMonth(TestCase):
     <input id="user_born_on" name="user_born_on" type="month" min="01" />
 </form>
 """, t.render())
-        
+
+    def test_for_model(self):
+
+        t = Template("""
+<%= using form(action="/user/new", model=user) do f %>
+    <%= f.month("born_month") %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="user_born_month" name="user['born_month']" type="month" value="12" />
+</form>
+""", t.render(user=User(born_month=12)))
+
 
 if __name__ == '__main__':
     import unittest
