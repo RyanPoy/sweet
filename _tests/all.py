@@ -21,6 +21,7 @@ from sweet._tests.integration.test_relation_has_one_mysql import TestHasOneToMys
 from sweet._tests.integration.test_relation_has_one_through_mysql import TestRelationHasOneThroughMysql
 from sweet._tests.integration.test_relation_has_and_belongs_to_many_mysql import TestRelationHasAndBelongsToManyMysql
 from sweet._tests.integration.test_relation_include_mysql import TestRelationIncludeMysql
+from sweet._tests.integration.test_transaction_mysql import TestTransactionMysql
 
 from sweet._tests.unit.test_utils import TestUtils
 from sweet._tests.unit.test_inflection import TestInflection
@@ -150,6 +151,8 @@ unit_tests += [
 ]
 
 integration_tests = [
+    TestTransactionMysql,
+
     TestRecordsetCRUDMySQL,
     TestModelStructMySQL,
     TestModelCRUDMySQL,

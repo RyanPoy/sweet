@@ -70,7 +70,7 @@ class HasAndBelongsToMany(HasManyThrough):
         """
         pks = [ o.get_pk() for o in owner_objs ]
         if pks:
-            owner_objs[0].__class__._new_db().records(self.through_table).where(**{self.through_fk_on_owner: pks}).delete()
+            owner_objs[0].__class__.db.records(self.through_table).where(**{self.through_fk_on_owner: pks}).delete()
         return self
 
     def preload(self, owner_objs):
@@ -79,7 +79,7 @@ class HasAndBelongsToMany(HasManyThrough):
             return self
 
         # 1. found the through objects
-        db = self.owner._new_db()
+        db = self.owner.db
         through_objs = db.records(self.through_table).where(**{self.through_fk_on_owner: owner_pks}).all()
         if not through_objs:
             return self
@@ -119,7 +119,7 @@ class HasAndBelongsToMany(HasManyThrough):
                     raise model2.HasNotBeenPersisted()
 
             # 2. get model2 which has been binded on model1
-            db = model1.__class__._new_db()
+            db = model1.__class__.db
             model2s_binded = db.records(self.through_table) \
                                .where(**{self.through_fk_on_owner : model1.get_pk()}) \
                                .where(**{self.through_fk_on_target: [ m2.get_pk() for m2 in model2s ]}) \
@@ -141,7 +141,7 @@ class HasAndBelongsToMany(HasManyThrough):
     def unbinding(self, model1, *model2s):
         pks = [ m2.get_pk() for m2 in model2s if m2.persisted() ]
         if pks:
-            db = model1.__class__._new_db()
+            db = model1.__class__.db
             db.records(self.through_table) \
               .where(**{self.through_fk_on_owner : model1.get_pk()}) \
               .where(**{self.through_fk_on_target: pks }) \

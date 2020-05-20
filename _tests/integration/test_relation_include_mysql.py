@@ -1,6 +1,7 @@
 #coding: utf8
 from sweet._tests import TestCase, User, Mobile, Car, Tag, Article, Course, Student, Score , \
-                        StudentForHasOneThrough as Student2, CourseForHasOneThrough as Course2, ScoreForHasOneThrough as Score2
+                        StudentForHasOneThrough as Student2, CourseForHasOneThrough as Course2, ScoreForHasOneThrough as Score2, \
+                        db_mgr as mgr
 from sweet.orm import Model
 from sweet.database import MySQL
 from sweet.database.recordset import MySQLRecordset
@@ -13,6 +14,14 @@ class FakeDB(MySQL):
     SQLS = []
 
     @classmethod
+    def instance(cls):
+        return cls(
+            mgr.database, user=mgr.user, password=mgr.password, 
+            host=mgr.host, port=mgr.port, charset='utf8', 
+            show_sql=mgr.show_sql
+        )
+
+    @classmethod
     def clear_sqls(cls):
         cls.SQLS = []
 
@@ -21,14 +30,6 @@ class FakeDB(MySQL):
         # self.__class__.SQLS.append('%s | %s' % (sql, ','.join(map(str, params))))
         self.__class__.SQLS.append(sql)
         return relt
-
-def chg_new_db():
-    mgr = Model.db_manager
-    return FakeDB(
-        mgr.database, user=mgr.user, password=mgr.password, 
-        host=mgr.host, port=mgr.port, charset='utf8', 
-        show_sql=mgr.show_sql
-    )
 
 
 class TestRelationIncludeMysql(TestCase):
@@ -51,14 +52,14 @@ class TestRelationIncludeMysql(TestCase):
 
     @contextmanager
     def mock_db(self):
-        src_new_db = Model.db_manager.new_db
-        Model.db_manager.new_db = chg_new_db
+        src_db = Model.db
+        Model.db = FakeDB.instance()
         try:
             yield self
         except Exception:
             raise
         finally:
-            Model.db_manager.new_db = src_new_db
+            Model.db = src_db
             FakeDB.clear_sqls()
 
     def test_include_belongs_to(self):

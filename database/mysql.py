@@ -239,11 +239,16 @@ AND
         except Exception as e:
             self.rollback()
             raise
+        finally:
+            self.set_autocommit()
+
         try:
             self.commit()
         except Exception:
             self.rollback()
             raise
+        finally:
+            self.set_autocommit()
 
     def begin_transaction(self):
         self.set_autocommit(False)

@@ -18,7 +18,7 @@ class UserForTemplateTest(object):
         self.age = age
 
 
-Model.db_manager = DBManager({
+db_mgr = DBManager({
     'driver': 'mysql',
     'host': 'localhost',
     'port': 3306,
@@ -27,6 +27,7 @@ Model.db_manager = DBManager({
     'password': '',
     'show_sql': True,
 })
+Model.db = db_mgr.new_db()
 
 class Foo(Model):
     pass

@@ -273,20 +273,15 @@ class Model(metaclass=ModelMetaClass):
             r = cls.__relations__[rn]
             r.preload(models)
 
-    @classmethod
-    def _new_db(cls):
-        return cls.db_manager.new_db()
-
     @classproperty
     def objects(cls):
-        db = cls._new_db()
-        rs = db.records(cls.__tablename__)
+        rs = cls.db.records(cls.__tablename__)
         rs.model_class = cls
         return rs
 
     @classmethod
     def _init_fields(cls):
-        for c in cls.db_manager.new_db().get_columns(cls.__tablename__):
+        for c in cls.db.get_columns(cls.__tablename__):
             cls.__field_define_dict__[c.name] = c
         return cls
 
@@ -308,3 +303,6 @@ class Model(metaclass=ModelMetaClass):
             cls.__name_for_view__ = pythonize(singularize(cls.__name__))
         return cls.__name_for_view__
 
+    @classmethod
+    def transaction(cls):
+        return cls.db.transaction()
