@@ -565,3 +565,32 @@ The HTML:
     <input id="user_born_week" name="user_born_week" type="week" min="01" />
   </form>
 ```
+
+
+> note:
+> 
+> form init can accept a argument named `model`. if do that, all form fields can set value automatically 
+> 
+> eg.
+
+```
+  u = User(name="Jon", created_at="Datetime('2009-10-10 20:10:05')", age=30, blog="http://www.jonblog.com", email="jon@email.com")
+  t = Template("""
+  <%= using form("/user/new", model=user) do f %>
+    <%= f.name("name") %>
+    <%= f.datetime("created_at") %>
+    <%= f.number("age") %>
+    <%= f.url("blog") %>
+    <%= f.email("email") %>
+  <% end %>
+  """)
+  t.render(user=u)
+
+  <form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="user_name" name="user['name']" type="text" value="Jon" />
+    <input id="user_created_at" name="user['created_at']" type="datetime" value="2019-10-10T20:10:05" />
+    <input id="user_age" name="user['age']" type="number" value="30" />
+    <input id="user_blog" name="user['blog']" type="url" value="http://www.jonblog.com" />
+    <input id="user_email" name="user['email']" type="email" value="jon@email.com" />
+  </form>
+```
