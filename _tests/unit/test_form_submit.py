@@ -7,7 +7,7 @@ class TestFormSubmit(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.submit() %>
 <% end %>
 """)
@@ -18,7 +18,7 @@ class TestFormSubmit(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.submit("Edit this article") %>
 <% end %>
 """)
@@ -29,7 +29,7 @@ class TestFormSubmit(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.submit( "Save edits", disabled=True) %>
 <% end %>
 """)
@@ -40,7 +40,7 @@ class TestFormSubmit(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.submit("Edit", _class="edit_button") %>
 <% end %>
 """)
@@ -51,7 +51,7 @@ class TestFormSubmit(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.submit( "Save", html={ 'data-confirm': "Are you sure?" }) %>
 <% end %>
 """)
@@ -62,7 +62,7 @@ class TestFormSubmit(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.submit( "Complete sale", html={ 'data-disable-with': "Submitting..." }) %>
 <% end %>
 """)

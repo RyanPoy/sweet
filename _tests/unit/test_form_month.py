@@ -8,7 +8,7 @@ class TestFormMonth(TestCase):
     def test_for_tag(self):
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.month("user_born_on") %>
 <% end %>
 """)
@@ -19,7 +19,7 @@ class TestFormMonth(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.month("user_born_on", "11") %>
 <% end %>
 """)
@@ -30,7 +30,7 @@ class TestFormMonth(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.month("user_born_on", _min="01") %>
 <% end %>
 """)
@@ -43,7 +43,7 @@ class TestFormMonth(TestCase):
     def test_for_model(self):
 
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
     <%= f.month("born_month") %>
 <% end %>
 """)

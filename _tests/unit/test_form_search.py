@@ -7,7 +7,7 @@ class TestFormSearch(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.search('name') %>
 <% end %>
 """)
@@ -18,7 +18,7 @@ class TestFormSearch(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.search('search', 'Enter your search query here') %>
 <% end %>
 """)
@@ -29,7 +29,7 @@ class TestFormSearch(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.search('search', None, _class='special_input') %>
 <% end %>
 """)
@@ -40,7 +40,7 @@ class TestFormSearch(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.search('search', 'Enter your search query here', _class='special_input', disabled=True) %>
 <% end %>
 """)
@@ -53,7 +53,7 @@ class TestFormSearch(TestCase):
 
     def test_for_model(self):
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
     <%= f.search('name') %>
 <% end %>
 """)

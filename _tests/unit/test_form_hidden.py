@@ -8,7 +8,7 @@ class TestFormHidden(TestCase):
     def test_for_tag(self):
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.hidden('tags_list') %>
 <% end %>
 """)
@@ -19,7 +19,7 @@ class TestFormHidden(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.hidden('token', 'VUBJKB23UIVI1UU1VOBVI@') %>
 <% end %>
 """)
@@ -30,7 +30,7 @@ class TestFormHidden(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.hidden('collected_input', html={"onchange": "alert('Input collected!')" }) %>
 <% end %>
 """)
@@ -43,7 +43,7 @@ class TestFormHidden(TestCase):
     def test_for_model(self):
 
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
     <%= f.hidden('id') %>
 <% end %>
 """)

@@ -8,7 +8,7 @@ class TestFormWeek(TestCase):
     def test_for_tag(self):
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.week("user_born_week") %>
 <% end %>
 """)
@@ -19,7 +19,7 @@ class TestFormWeek(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.week("user_born_week", "06") %>
 <% end %>
 """)
@@ -30,7 +30,7 @@ class TestFormWeek(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.week("user_born_week", _min="01") %>
 <% end %>
 """)
@@ -43,7 +43,7 @@ class TestFormWeek(TestCase):
     def test_for_model(self):
 
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
     <%= f.week("born_week") %>
 <% end %>
 """)

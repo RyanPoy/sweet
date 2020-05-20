@@ -8,7 +8,7 @@ class TestFormDate(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.date('name') %>
 <% end %>
 """)
@@ -19,7 +19,7 @@ class TestFormDate(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.date('date', '2020-01-01') %>
 <% end %>
 """)
@@ -30,7 +30,7 @@ class TestFormDate(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.date('date', _class='special_input') %>
 <% end %>
 """)
@@ -41,7 +41,7 @@ class TestFormDate(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.date('date', '2020-01-01', disabled=True, _class='special_input') %>
 <% end %>
 """)
@@ -53,7 +53,7 @@ class TestFormDate(TestCase):
 
     def test_for_model(self):
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
     <%= f.date('birthday') %>
 <% end %>
 """)

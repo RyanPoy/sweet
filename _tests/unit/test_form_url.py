@@ -8,7 +8,7 @@ class TestFormUrl(TestCase):
     def test_for_tag(self):
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.url('name') %>
 <% end %>
 """)
@@ -19,7 +19,7 @@ class TestFormUrl(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.url('url', 'http://www.baidu.com') %>
 <% end %>
 """)
@@ -30,7 +30,7 @@ class TestFormUrl(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.url('url', _class='special_input') %>
 <% end %>
 """)
@@ -41,7 +41,7 @@ class TestFormUrl(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.url('url', 'http://www.baidu.com', _class='special_input', disabled=True) %>
 <% end %>
 """)
@@ -55,7 +55,7 @@ class TestFormUrl(TestCase):
     def test_for_model(self):
 
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
     <%= f.url('blog_address') %>
 <% end %>
 """)

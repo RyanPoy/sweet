@@ -7,7 +7,7 @@ class TestFormEmail(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.email('name') %>
 <% end %>
 """)
@@ -18,7 +18,7 @@ class TestFormEmail(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.email('email', 'xxx@yyy.com') %>
 <% end %>
 """)
@@ -29,7 +29,7 @@ class TestFormEmail(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.email('email', _class='special_input') %>
 <% end %>
 """)
@@ -40,7 +40,7 @@ class TestFormEmail(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.email('email', 'xxx@yyy.com', disabled=True, _class='special_input') %>
 <% end %>
 """)
@@ -52,7 +52,7 @@ class TestFormEmail(TestCase):
 
     def test_for_model(self):
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
     <%= f.email('email') %>
 <% end %>
 """)

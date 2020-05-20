@@ -7,7 +7,7 @@ class TestFormButton(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.button() %>
 <% end %>
 """)
@@ -18,7 +18,7 @@ class TestFormButton(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.button('Reset', tp='reset') %>
 <% end %>
 """)
@@ -29,7 +29,7 @@ class TestFormButton(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.button('Button', tp='button') %>
 <% end %>
 """)
@@ -40,7 +40,7 @@ class TestFormButton(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.button('Reset', tp='reset', disabled=True) %>
 <% end %>
 """)
@@ -51,7 +51,7 @@ class TestFormButton(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.button('Save', html={'data-confirm': 'Are you sure?'}) %>
 <% end %>
 """)
@@ -62,7 +62,7 @@ class TestFormButton(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.button('Checkout', html={"data-disable-with": "Please wait..."}) %>
 <% end %>
 """)

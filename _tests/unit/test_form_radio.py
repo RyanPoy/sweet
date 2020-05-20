@@ -7,7 +7,7 @@ class TestFormRadio(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.radio('favorite_color', 'maroon') %>
 <% end %>
 """)
@@ -18,7 +18,7 @@ class TestFormRadio(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.radio('receive_updates', 'no', checked=True) %>
 <% end %>
 """)
@@ -29,7 +29,7 @@ class TestFormRadio(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.radio('time_slot', "3:00 p.m.", checked=False, disabled=True) %>
 <% end %>
 """)
@@ -40,7 +40,7 @@ class TestFormRadio(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.radio('color', "green", checked=True, _class="color_input") %>
 <% end %>
 """)
@@ -51,7 +51,7 @@ class TestFormRadio(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
   <% for choice in ['M', 'F'] %>
     <%= f.radio('gender', choice) %>
   <% end %>
@@ -66,7 +66,7 @@ class TestFormRadio(TestCase):
 
     def test_for_model(self):
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
     <%= f.radio('gender', 'M') %>
     <%= f.radio('gender', 'F') %>
 <% end %>
@@ -79,7 +79,7 @@ class TestFormRadio(TestCase):
 """, t.render(user=User(gender='M')))
 
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
   <% for choice in ['M', 'F'] %>
     <%= f.radio('gender', choice) %>
   <% end %>

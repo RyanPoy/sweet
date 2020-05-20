@@ -7,7 +7,7 @@ class TestFormColor(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.color('name') %>
 <% end %>
 """)
@@ -18,7 +18,7 @@ class TestFormColor(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.color('color', '#DEF726') %>
 <% end %>
 """)
@@ -29,7 +29,7 @@ class TestFormColor(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.color('color', _class='special_input') %>
 <% end %>
 """)
@@ -40,7 +40,7 @@ class TestFormColor(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.color('color', '#DEF726', disabled=True, _class='special_input') %>
 <% end %>
 """)
@@ -52,7 +52,7 @@ class TestFormColor(TestCase):
 
     def test_for_model(self):
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
     <%= f.color('like_color') %>
 <% end %>
 """)

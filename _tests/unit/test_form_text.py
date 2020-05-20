@@ -8,7 +8,7 @@ class TestFormText(TestCase):
     def test_for_tag(self):
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.text('name') %>
 <% end %>
 """)
@@ -19,7 +19,7 @@ class TestFormText(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.text('query', 'Enter your search query here') %>
 <% end %>
 """)
@@ -30,7 +30,7 @@ class TestFormText(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.text('search', placeholder='Enter search term...') %>
 <% end %>
 """)
@@ -41,7 +41,7 @@ class TestFormText(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.text('request', _class='special_input') %>
 <% end %>
 """)
@@ -52,7 +52,7 @@ class TestFormText(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.text('address', '', size=75) %>
 <% end %>
 """)
@@ -63,7 +63,7 @@ class TestFormText(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.text('zip', maxlength=5) %>
 <% end %>
 """)
@@ -74,7 +74,7 @@ class TestFormText(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.text('payment_amount', '$0.00', disabled=True) %>
 <% end %>
 """)
@@ -85,7 +85,7 @@ class TestFormText(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.text('ip', '0.0.0.0', maxlength=15, size=20, _class="ip-input") %>
 <% end %>
 """)
@@ -98,7 +98,7 @@ class TestFormText(TestCase):
     def test_for_model(self):
 
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
     <%= f.text('name') %>
 <% end %>
 """)

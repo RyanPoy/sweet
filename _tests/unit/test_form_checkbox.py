@@ -7,7 +7,7 @@ class TestFormCheckbox(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.checkbox('accept') %>
 <% end %>
 """)
@@ -18,7 +18,7 @@ class TestFormCheckbox(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.checkbox('rock', 'rock music') %>
 <% end %>
 """)
@@ -29,7 +29,7 @@ class TestFormCheckbox(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.checkbox('receive_email', 'yes', checked=True) %>
 <% end %>
 """)
@@ -40,7 +40,7 @@ class TestFormCheckbox(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.checkbox('tos', 'yes', checked=False, html={"class": 'accept_tos'}) %>
 <% end %>
 """)
@@ -51,7 +51,7 @@ class TestFormCheckbox(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.checkbox('eula', 'accepted', checked=False, disabled=True) %>
 <% end %>
 """)
@@ -62,7 +62,7 @@ class TestFormCheckbox(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
   <% for choice in ['admin', 'normal'] %>
     <%= f.checkbox('role', choice, _id='role-%s'%choice ) %>
   <% end %>
@@ -91,7 +91,7 @@ class TestFormCheckbox(TestCase):
 """, t.render(user=User(id=1, name="Ryan", age=20, sex='F', role="admin")))
 
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
   <% for choice in ['admin', 'normal'] %>
     <%= f.checkbox('role', choice) %>
   <% end %>

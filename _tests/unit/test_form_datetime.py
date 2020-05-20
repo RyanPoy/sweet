@@ -9,7 +9,7 @@ class TestFormDatetime(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.datetime("user_born_on") %>
 <% end %>
 """)
@@ -20,7 +20,7 @@ class TestFormDatetime(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.datetime("user_born_on", date(year=2020, month=1, day=1)) %>
 <% end %>
 """)
@@ -31,7 +31,7 @@ class TestFormDatetime(TestCase):
 """, t.render(date=date))
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.datetime("user_born_on", datetime(year=2020, month=1, day=2, hour=10, minute=20, second=30)) %>
 <% end %>
 """)
@@ -42,7 +42,7 @@ class TestFormDatetime(TestCase):
 """, t.render(datetime=datetime))
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.datetime("user_born_on", _min=date(year=2020, month=1, day=2)) %>
 <% end %>
 """)
@@ -54,7 +54,7 @@ class TestFormDatetime(TestCase):
 
     def test_for_model(self):
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
     <%= f.datetime("born_on") %>
 <% end %>
 """)

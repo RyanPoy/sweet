@@ -7,7 +7,7 @@ class TestFormNumber(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.number('quantity') %>
 <% end %>
 """)
@@ -18,7 +18,7 @@ class TestFormNumber(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.number('quantity', '1') %>
 <% end %>
 """)
@@ -29,7 +29,7 @@ class TestFormNumber(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.number('quantity', _class='special_input') %>
 <% end %>
 """)
@@ -40,7 +40,7 @@ class TestFormNumber(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.number('quantity', _min=1) %>
 <% end %>
 """)
@@ -51,7 +51,7 @@ class TestFormNumber(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.number('quantity', _max=9) %>
 <% end %>
 """)
@@ -62,7 +62,7 @@ class TestFormNumber(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.number('quantity', _min=1, _max=9) %>
 <% end %>
 """)
@@ -73,7 +73,7 @@ class TestFormNumber(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.number('quantity', _min=1, _max=9, step=2) %>
 <% end %>
 """)
@@ -84,7 +84,7 @@ class TestFormNumber(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.number('quantity', '1', _class='special_input', disabled=True) %>
 <% end %>
 """)
@@ -96,7 +96,7 @@ class TestFormNumber(TestCase):
         
     def test_for_model(self):
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
     <%= f.number('age') %>
 <% end %>
 """)

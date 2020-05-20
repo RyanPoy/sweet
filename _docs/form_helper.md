@@ -26,7 +26,7 @@
 
 ## form
 ```
-  <%= using form(action="/user/new", method="POST", multipart=True, remote=False) do f %>
+  <%= using form("/user/new", method="POST", multipart=True, remote=False) do f %>
     ...
   <% end %>
   
@@ -39,7 +39,7 @@
 ```
 
 ```  
-  <%= using form(action="/user/new", _id="user_new_id", method="GET", multipart=True, remote=False) do f %>
+  <%= using form("/user/new", _id="user_new_id", method="GET", multipart=True, remote=False) do f %>
     ...
   <% end %>
 
@@ -52,7 +52,7 @@
 ```
 
 ```
-  <%= using form(action="/user/new", method="POST", multipart=True, remote=False, html={"data-index": 10}) do f %>
+  <%= using form("/user/new", method="POST", multipart=True, remote=False, html={"data-index": 10}) do f %>
     ...
   <% end %>
  
@@ -65,7 +65,7 @@
 
 ## button
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.button() %>
     <%= f.button('Reset', tp='reset') %>
     <%= f.button('Button', tp='button') %>
@@ -90,7 +90,7 @@ The HTML generated:
 
 ## checkbox
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.checkbox('accept') %>
     <%= f.checkbox('rock', 'rock music') %>
     <%= f.checkbox('receive_email', 'yes', checked=True) %>
@@ -113,7 +113,7 @@ The HTML generated:
 
 ## color
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.color('name') %>
     <%= f.color('color', '#DEF726') %>
     <%= f.color('color', _class='special_input') %>
@@ -134,7 +134,7 @@ The HTML generated:
 
 ## date
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.date('name') %>
     <%= f.date('date', '2020-01-01') %>
     <%= f.date('date', _class='special_input') %>
@@ -155,7 +155,7 @@ The HTML generated:
 
 ## datetime
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.datetime("user_born_on") %>
     <%= f.datetime("user_born_on", date(year=2020, month=1, day=1)) %>
     <%= f.datetime("user_born_on", datetime(year=2020, month=1, day=2, hour=10, minute=20, second=30)) %>
@@ -176,7 +176,7 @@ The HTML:
 
 ## email
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.email('name') %>
     <%= f.email('email', 'xxx@yyy.com') %>
     <%= f.email('email', _class='special_input') %>
@@ -197,7 +197,7 @@ The HTML:
 
 ## file
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.file('attachment') %>
     <%= f.file('avatar', _class='profile_input') %>
     <%= f.file('picture', disabled=True) %>
@@ -222,7 +222,7 @@ The HTML:
 
 ## hidden
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.hidden('tags_list') %>
     <%= f.hidden('token', 'VUBJKB23UIVI1UU1VOBVI@') %>
     <%= f.hidden('collected_input', html={"onchange": "alert('Input collected!')" }) %>
@@ -241,7 +241,7 @@ The HTML:
 
 ## label
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.label('name') %>
     <%= f.label('name', 'Your Name') %>
     <%= f.label('name', _class='small_label') %>
@@ -260,7 +260,7 @@ The HTML:
 
 ## month
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.month("user_born_on") %>
     <%= f.month("user_born_on", "11") %>
     <%= f.month("user_born_on", _min="01") %>
@@ -279,7 +279,7 @@ The HTML:
 
 ## number
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.number('quantity') %>
     <%= f.number('quantity', '1') %>
     <%= f.number('quantity', _class='special_input') %>
@@ -308,7 +308,7 @@ The HTML:
 
 ## password
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.password('pass') %>
     <%= f.password('secret', 'Your secret here') %>
     <%= f.password('masked', _class='masked_input_field') %>
@@ -335,7 +335,7 @@ The HTML:
 
 ## radio
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.radio('favorite_color', 'maroon') %>
     <%= f.radio('receive_updates', 'no', checked=True) %>
     <%= f.radio('time_slot', "3:00 p.m.", checked=False, disabled=True) %>
@@ -356,7 +356,7 @@ The HTML:
 
 ## range
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.range('quantity') %>
     <%= f.range('quantity', '1') %>
     <%= f.range('quantity', _class='special_input') %>
@@ -381,7 +381,7 @@ The HTML:
 
 ## search
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.search('name') %>
     <%= f.search('search', 'Enter your search query here') %>
     <%= f.search('search', None, _class='special_input') %>
@@ -403,7 +403,7 @@ The HTML:
 
 ## submit
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.submit() %>
     <%= f.submit("Edit this article") %>
     <%= f.submit( "Save edits", disabled=True) %>
@@ -428,7 +428,7 @@ The HTML:
 
 ## tel
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.tel('name') %>
     <%= f.tel('tel', '0123456789') %>
     <%= f.tel('tel', _class='special_input') %>
@@ -449,7 +449,7 @@ The HTML:
 
 ## text
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.text('name') %>
     <%= f.text('query', 'Enter your search query here') %>
     <%= f.text('search', placeholder='Enter search term...') %>
@@ -478,7 +478,7 @@ The HTML:
 
 ## textarea
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.textarea('post') %>
     <%= f.textarea('bio', 'This is my biography.') %>
     <%= f.textarea('body', rows=10, cols=25) %>
@@ -502,7 +502,7 @@ The HTML:
 
 ## time
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.time('created_at') %>
     <%= f.time('created_at', '1') %>
     <%= f.time('created_at', _class='special_input') %>
@@ -531,7 +531,7 @@ The HTML:
 
 ## url
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.url('name') %>
     <%= f.url('url', 'http://www.baidu.com') %>
     <%= f.url('url', _class='special_input') %>
@@ -553,7 +553,7 @@ The HTML:
 
 ## week
 ```
-  <%= using form(action="/user/new") do f %>
+  <%= using form("/user/new") do f %>
     <%= f.week("user_born_week") %>
     <%= f.week("user_born_week", "06") %>
     <%= f.week("user_born_week", _min="01") %>

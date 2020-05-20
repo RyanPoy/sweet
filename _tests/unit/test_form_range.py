@@ -7,7 +7,7 @@ class TestFormRange(TestCase):
 
     def test_for_tag(self):
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.range('quantity') %>
 <% end %>
 """)
@@ -18,7 +18,7 @@ class TestFormRange(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.range('quantity', '1') %>
 <% end %>
 """)
@@ -29,7 +29,7 @@ class TestFormRange(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.range('quantity', _class='special_input') %>
 <% end %>
 """)
@@ -40,7 +40,7 @@ class TestFormRange(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.range('quantity', _in=[1, 9]) %>
 <% end %>
 """)
@@ -51,7 +51,7 @@ class TestFormRange(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.range('quantity', _in=[1, 9], step=2) %>
 <% end %>
 """)
@@ -62,7 +62,7 @@ class TestFormRange(TestCase):
 """, t.render())
 
         t = Template("""
-<%= using form(action="/user/new") do f %>
+<%= using form("/user/new") do f %>
     <%= f.range('quantity', '1', _class='special_input', disabled=True) %>
 <% end %>
 """)
@@ -74,7 +74,7 @@ class TestFormRange(TestCase):
         
     def test_for_model(self):
         t = Template("""
-<%= using form(action="/user/new", model=user) do f %>
+<%= using form("/user/new", model=user) do f %>
     <%= f.range('age', _in=[16, 36]) %>
 <% end %>
 """)
