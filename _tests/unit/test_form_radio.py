@@ -1,5 +1,5 @@
 # coding: utf8
-from sweet._tests import TestCase
+from sweet._tests import TestCase, User
 from sweet.template import Template
 
 
@@ -50,6 +50,47 @@ class TestFormRadio(TestCase):
 </form>
 """, t.render())
 
+        t = Template("""
+<%= using form(action="/user/new") do f %>
+  <% for choice in ['M', 'F'] %>
+    <%= f.radio('gender', choice) %>
+  <% end %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="gender_M" name="gender" type="radio" value="M" />
+    <input id="gender_F" name="gender" type="radio" value="F" />
+</form>
+""", t.render())
+
+    def test_for_model(self):
+        t = Template("""
+<%= using form(action="/user/new", model=user) do f %>
+    <%= f.radio('gender', 'M') %>
+    <%= f.radio('gender', 'F') %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="user_gender_M" name="user['gender']" type="radio" value="M" checked="checked" />
+    <input id="user_gender_F" name="user['gender']" type="radio" value="F" />
+</form>
+""", t.render(user=User(gender='M')))
+
+        t = Template("""
+<%= using form(action="/user/new", model=user) do f %>
+  <% for choice in ['M', 'F'] %>
+    <%= f.radio('gender', choice) %>
+  <% end %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="user_gender_M" name="user['gender']" type="radio" value="M" />
+    <input id="user_gender_F" name="user['gender']" type="radio" value="F" checked="checked" />
+</form>
+""", t.render(user=User(gender='F')))
 
 if __name__ == '__main__':
     import unittest

@@ -157,11 +157,16 @@ class Form(object):
     def radio(self, name, value, _id='', checked=False, disabled=False, _class='', html=None):
         html = html or {}
         if not _id:
-            _id = '%s_%s' % (name, value.replace(' ', '_'))
+            if self.model is None:
+                _id = '%s_%s' % (name, value.replace(' ', '_'))
+            else:
+                _id = '%s_%s_%s' % (self.model.name_for_view(), name, value)
 
         if disabled:
             html['disabled'] = 'disabled'
         elif checked is True and 'checked' not in html:
+            html['checked'] = 'checked'
+        elif self.model is not None and str(self._get_model_value(name)) == str(value):
             html['checked'] = 'checked'
 
         return self.text(name=name, value=value, _id=_id, tp="radio", disabled=disabled, _class=_class, html=html)
