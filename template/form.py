@@ -1,6 +1,7 @@
 #coding: utf8
 from collections import OrderedDict as oDict
 from datetime import datetime, date
+from sweet.utils.inflection import *
 
 
 class Form(object):
@@ -98,10 +99,15 @@ class Form(object):
     def hidden(self, name, value=None, _id='', tp='text', disabled=False, _class='', html=None):
         return self.text(name=name, value=value, _id=_id, tp="hidden", disabled=disabled, _class=_class, html=html)
 
-    def label(self, name, value='Name', _class='', html=None):
+    def label(self, name, value='', _class='', html=None):
         html = html or {}
         d = oDict()
-        d['for'] = name
+        if self.model:
+            d['for'] = '%s_%s' % (self.model.name_for_view(), name)
+        else:
+            d['for'] = name
+        if not value:
+            value = javaize(name)
         if _class:
             d['class'] = _class
         d.update(html)

@@ -1,5 +1,5 @@
 # coding: utf8
-from sweet._tests import TestCase
+from sweet._tests import TestCase, User
 from sweet.template import Template
 
 
@@ -40,6 +40,18 @@ class TestFormLabel(TestCase):
 </form>
 """, t.render())
         
+    def test_for_model(self):
+
+        t = Template("""
+<%= using form(action="/user/new", model=user) do f %>
+    <%= f.label('name') %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <label for="user_name">Name</label>
+</form>
+""", t.render(user=User(name='Jon')))
 
 if __name__ == '__main__':
     import unittest
