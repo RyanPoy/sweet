@@ -1,5 +1,5 @@
 # coding: utf8
-from sweet._tests import TestCase
+from sweet._tests import TestCase, User
 from sweet.template import Template
 
 
@@ -72,6 +72,18 @@ class TestFormRange(TestCase):
 </form>
 """, t.render())
         
+    def test_for_model(self):
+        t = Template("""
+<%= using form(action="/user/new", model=user) do f %>
+    <%= f.range('age', _in=[16, 36]) %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="user_age" name="user['age']" type="range" value="20" min="16" max="36" />
+</form>
+""", t.render(user=User(age=20)))
+
 
 if __name__ == '__main__':
     import unittest
