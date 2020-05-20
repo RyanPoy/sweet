@@ -30,7 +30,7 @@ class TestFormNumber(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.number('quantity', _class='special_input') %>
+    <%= f.number('quantity', class_='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -85,7 +85,7 @@ class TestFormNumber(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.number('quantity', '1', _class='special_input', disabled=True) %>
+    <%= f.number('quantity', '1', class_='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""

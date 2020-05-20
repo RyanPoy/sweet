@@ -30,7 +30,7 @@ class TestFormSearch(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.search('search', None, _class='special_input') %>
+    <%= f.search('search', None, class_='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -41,7 +41,7 @@ class TestFormSearch(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.search('search', 'Enter your search query here', _class='special_input', disabled=True) %>
+    <%= f.search('search', 'Enter your search query here', class_='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""

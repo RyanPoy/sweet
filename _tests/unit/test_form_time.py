@@ -30,7 +30,7 @@ class TestFormTime(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.time('created_at', _class='special_input') %>
+    <%= f.time('created_at', class_='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -85,7 +85,7 @@ class TestFormTime(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.time('created_at', '1', _class='special_input', disabled=True) %>
+    <%= f.time('created_at', '1', class_='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""

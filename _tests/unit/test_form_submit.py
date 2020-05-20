@@ -41,7 +41,7 @@ class TestFormSubmit(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.submit("Edit", _class="edit_button") %>
+    <%= f.submit("Edit", class_="edit_button") %>
 <% end %>
 """)
         self.assertEqual("""

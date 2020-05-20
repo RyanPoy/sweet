@@ -6,14 +6,14 @@ from sweet.utils.inflection import *
 
 class Form(object):
     
-    def __init__(self, action, model=None, method="GET", _id="", multipart=False, remote=False, charset="UTF8", html=None):
+    def __init__(self, action, model=None, method="GET", id_="", multipart=False, remote=False, charset="UTF8", html=None):
         self.action = action
         self.model = model
         self.method = method
         self.multipart = multipart
         self.remote = remote
         self.charset = (charset or "UTF8").upper()
-        self.id = _id
+        self.id = id_
         self.html = html or {}
 
     def begin_render(self):
@@ -44,12 +44,12 @@ class Form(object):
                         value or "Button"
                     )
 
-    def text(self, name, value=None, _id='', tp='text', placeholder='', size='', maxlength='', disabled=False, _class='', html=None, autoid=True):
+    def text(self, name, value=None, id_='', tp='text', placeholder='', size='', maxlength='', disabled=False, class_='', html=None, autoid=True):
         html = html or {}
         d = oDict()
-        _id = self._build_id(_id, autoid, name)
-        if _id:
-            d['id'] = _id
+        id_ = self._buildid_(id_, autoid, name)
+        if id_:
+            d['id'] = id_
         d['name'] = self._build_name(name)
 
         d['type'] = tp or 'text'
@@ -66,40 +66,40 @@ class Form(object):
 
         if disabled:
             d['disabled'] = "disabled"
-        if _class:
-            d['class'] = _class
+        if class_:
+            d['class'] = class_
         d.update(html)
 
         return '<input %s />' % ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ])
 
-    def password(self, name, value=None, _id='', placeholder='', size='', maxlength='', disabled=False, _class='', html=None):
-        return self.text(name=name, value=value, _id=_id, placeholder=placeholder, tp="password", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
+    def password(self, name, value=None, id_='', placeholder='', size='', maxlength='', disabled=False, class_='', html=None):
+        return self.text(name=name, value=value, id_=id_, placeholder=placeholder, tp="password", size=size, maxlength=maxlength, disabled=disabled, class_=class_, html=html)
 
-    def tel(self, name, value=None, _id='', placeholder='', size='', maxlength='', disabled=False, _class='', html=None):
-        return self.text(name=name, value=value, _id=_id, placeholder=placeholder, tp="tel", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
+    def tel(self, name, value=None, id_='', placeholder='', size='', maxlength='', disabled=False, class_='', html=None):
+        return self.text(name=name, value=value, id_=id_, placeholder=placeholder, tp="tel", size=size, maxlength=maxlength, disabled=disabled, class_=class_, html=html)
 
-    def search(self, name, value=None, _id='', placeholder='', size='', maxlength='', disabled=False, _class='', html=None):
-        return self.text(name=name, value=value, _id=_id, placeholder=placeholder, tp="search", size=size, maxlength=maxlength, disabled=disabled, _class=_class, html=html)
+    def search(self, name, value=None, id_='', placeholder='', size='', maxlength='', disabled=False, class_='', html=None):
+        return self.text(name=name, value=value, id_=id_, placeholder=placeholder, tp="search", size=size, maxlength=maxlength, disabled=disabled, class_=class_, html=html)
 
-    def email(self, name, value=None, _id='', placeholder='', disabled=False, _class='', html=None):
-        return self.text(name=name, value=value, _id=_id, placeholder=placeholder, tp="email", disabled=disabled, _class=_class, html=html)
+    def email(self, name, value=None, id_='', placeholder='', disabled=False, class_='', html=None):
+        return self.text(name=name, value=value, id_=id_, placeholder=placeholder, tp="email", disabled=disabled, class_=class_, html=html)
 
-    def color(self, name, value=None, _id='', placeholder='', disabled=False, _class='', html=None):
-        return self.text(name=name, value=value, _id=_id, placeholder=placeholder, tp="color", disabled=disabled, _class=_class, html=html)
+    def color(self, name, value=None, id_='', placeholder='', disabled=False, class_='', html=None):
+        return self.text(name=name, value=value, id_=id_, placeholder=placeholder, tp="color", disabled=disabled, class_=class_, html=html)
 
-    def url(self, name, value=None, _id='', placeholder='', disabled=False, _class='', html=None):
-        return self.text(name=name, value=value, _id=_id, placeholder=placeholder, tp="url", disabled=disabled, _class=_class, html=html)
+    def url(self, name, value=None, id_='', placeholder='', disabled=False, class_='', html=None):
+        return self.text(name=name, value=value, id_=id_, placeholder=placeholder, tp="url", disabled=disabled, class_=class_, html=html)
 
-    def file(self, name, value=None, _id='', placeholder='', accept=None, multiple=False, disabled=False, _class='', html=None):
+    def file(self, name, value=None, id_='', placeholder='', accept=None, multiple=False, disabled=False, class_='', html=None):
         html = html or {}
         if accept and 'accept' not in html:
             html['accept'] = accept
-        return self.text(name=name, value=value, _id=_id, placeholder=placeholder, tp="file", disabled=disabled, _class=_class, html=html)
+        return self.text(name=name, value=value, id_=id_, placeholder=placeholder, tp="file", disabled=disabled, class_=class_, html=html)
 
-    def hidden(self, name, value=None, _id='', tp='text', disabled=False, _class='', html=None):
-        return self.text(name=name, value=value, _id=_id, tp="hidden", disabled=disabled, _class=_class, html=html)
+    def hidden(self, name, value=None, id_='', tp='text', disabled=False, class_='', html=None):
+        return self.text(name=name, value=value, id_=id_, tp="hidden", disabled=disabled, class_=class_, html=html)
 
-    def label(self, name, value='', _class='', html=None):
+    def label(self, name, value='', class_='', html=None):
         html = html or {}
         d = oDict()
         if self.model:
@@ -108,35 +108,35 @@ class Form(object):
             d['for'] = name
         if not value:
             value = javaize(name)
-        if _class:
-            d['class'] = _class
+        if class_:
+            d['class'] = class_
         d.update(html)
         return '<label %s>%s</label>' % (
                     ' '.join([ '%s="%s"' % (k, v) for k, v in d.items() ]),
                     value
                 )
 
-    def number(self, name, value=None, _id='', placeholder='', tp='', _min='', _max='', step='', disabled=False, _class='', html=None):
+    def number(self, name, value=None, id_='', placeholder='', tp='', _min='', _max='', step='', disabled=False, class_='', html=None):
         html = html or {}
         tp = tp or 'number'
         if _min and 'min' not in html: html['min'] = _min
         if _max and 'max' not in html: html['max'] = _max
         if step and 'step' not in html: html['step'] = step
-        return self.text(name=name, value=value, _id=_id, placeholder=placeholder, tp=tp, disabled=disabled, _class=_class, html=html)
+        return self.text(name=name, value=value, id_=id_, placeholder=placeholder, tp=tp, disabled=disabled, class_=class_, html=html)
 
-    def month(self, name, value=None, _id='', placeholder='', _min='', _max='', step='', disabled=False, _class='', html=None):
-        return self.number(name=name, value=value, _id=_id, placeholder=placeholder, _min=_min, _max=_max, step=step, tp="month", disabled=disabled, _class=_class, html=html)
+    def month(self, name, value=None, id_='', placeholder='', _min='', _max='', step='', disabled=False, class_='', html=None):
+        return self.number(name=name, value=value, id_=id_, placeholder=placeholder, _min=_min, _max=_max, step=step, tp="month", disabled=disabled, class_=class_, html=html)
 
-    def week(self, name, value=None, _id='', placeholder='', _min='', _max='', step='', disabled=False, _class='', html=None):
-        return self.number(name=name, value=value, _id=_id, placeholder=placeholder, _min=_min, _max=_max, step=step, tp="week", disabled=disabled, _class=_class, html=html)
+    def week(self, name, value=None, id_='', placeholder='', _min='', _max='', step='', disabled=False, class_='', html=None):
+        return self.number(name=name, value=value, id_=id_, placeholder=placeholder, _min=_min, _max=_max, step=step, tp="week", disabled=disabled, class_=class_, html=html)
 
-    def date(self, name, value=None, _id='', placeholder='', disabled=False, _class='', html=None):
-        return self.text(name=name, value=value, _id=_id, placeholder=placeholder, tp="date", disabled=disabled, _class=_class, html=html)
+    def date(self, name, value=None, id_='', placeholder='', disabled=False, class_='', html=None):
+        return self.text(name=name, value=value, id_=id_, placeholder=placeholder, tp="date", disabled=disabled, class_=class_, html=html)
 
-    def time(self, name, value=None, _id='', placeholder='', _min='', _max='', step='', disabled=False, _class='', html=None):
-        return self.number(name=name, value=value, _id=_id, placeholder=placeholder, _min=_min, _max=_max, step=step, tp="time", disabled=disabled, _class=_class, html=html)
+    def time(self, name, value=None, id_='', placeholder='', _min='', _max='', step='', disabled=False, class_='', html=None):
+        return self.number(name=name, value=value, id_=id_, placeholder=placeholder, _min=_min, _max=_max, step=step, tp="time", disabled=disabled, class_=class_, html=html)
 
-    def datetime(self, name, value=None, placeholder='', _min='', _max='', _id='', step='', disabled=False, _class='', html=None):
+    def datetime(self, name, value=None, placeholder='', _min='', _max='', id_='', step='', disabled=False, class_='', html=None):
         def _(v):
             if isinstance(v, datetime):
                 return datetime.strftime(v, '%Y-%m-%dT%H:%M:%S')
@@ -152,15 +152,15 @@ class Form(object):
         if _max and 'max' not in html: html['max'] = _(_max)
         if step and 'step' not in html: html['step'] = step
 
-        return self.text(name=name, value=value, _id=_id, placeholder=placeholder, tp="datetime-local", disabled=disabled, _class=_class, html=html)
+        return self.text(name=name, value=value, id_=id_, placeholder=placeholder, tp="datetime-local", disabled=disabled, class_=class_, html=html)
 
-    def radio(self, name, value, _id='', checked=False, disabled=False, _class='', html=None):
+    def radio(self, name, value, id_='', checked=False, disabled=False, class_='', html=None):
         html = html or {}
-        if not _id:
+        if not id_:
             if self.model is None:
-                _id = '%s_%s' % (name, value.replace(' ', '_'))
+                id_ = '%s_%s' % (name, value.replace(' ', '_'))
             else:
-                _id = '%s_%s_%s' % (self.model.name_for_view(), name, value)
+                id_ = '%s_%s_%s' % (self.model.name_for_view(), name, value)
 
         if disabled:
             html['disabled'] = 'disabled'
@@ -169,9 +169,9 @@ class Form(object):
         elif self.model is not None and str(self._get_model_value(name)) == str(value):
             html['checked'] = 'checked'
 
-        return self.text(name=name, value=value, _id=_id, tp="radio", disabled=disabled, _class=_class, html=html)
+        return self.text(name=name, value=value, id_=id_, tp="radio", disabled=disabled, class_=class_, html=html)
 
-    def checkbox(self, name, value="1", _id="", checked=False, disabled=False, _class='', html=None):
+    def checkbox(self, name, value="1", id_="", checked=False, disabled=False, class_='', html=None):
         html = html or {}
         d = oDict()
         if self.model is None:
@@ -182,31 +182,31 @@ class Form(object):
         else:
             if str(self._get_model_value(name)) == str(value):
                 d['checked'] = "checked"
-            if not _id:
-                _id = '%s_%s_%s' % (self.model.name_for_view(), name, value)
+            if not id_:
+                id_ = '%s_%s_%s' % (self.model.name_for_view(), name, value)
             d.update(html)
 
-        return self.text(name=name, value=value, _id=_id, tp="checkbox", disabled=disabled, _class=_class, html=d)
+        return self.text(name=name, value=value, id_=id_, tp="checkbox", disabled=disabled, class_=class_, html=d)
 
-    def range(self, name, value=None, _id='', _in=None, step='', disabled=False, _class='', html=None):
+    def range(self, name, value=None, id_='', _in=None, step='', disabled=False, class_='', html=None):
         html = html or {}
         if _in and len(_in) >= 2:
             if 'min' not in html: html['min'] = _in[0]
             if 'max' not in html: html['max'] = _in[1]
         if step and 'step' not in html: html['step'] = step
-        return self.text(name=name, value=value, _id=_id, tp="range", disabled=disabled, _class=_class, html=html)
+        return self.text(name=name, value=value, id_=id_, tp="range", disabled=disabled, class_=class_, html=html)
 
-    def submit(self, value='Save changes', disabled=False, _class='', html=None):
+    def submit(self, value='Save changes', disabled=False, class_='', html=None):
         html = html or {}
         if 'data-disable-with' not in html:
             html['data-disable-with'] = value
-        return self.text(name='commit', value=value, tp="submit", disabled=disabled, _class=_class, html=html, autoid=False)
+        return self.text(name='commit', value=value, tp="submit", disabled=disabled, class_=class_, html=html, autoid=False)
 
-    def textarea(self, name, value=None, _id='', placeholder='', size=None, rows=None, cols=None, escape=True, disabled=False, _class='', html=None):
+    def textarea(self, name, value=None, id_='', placeholder='', size=None, rows=None, cols=None, escape=True, disabled=False, class_='', html=None):
         html = html or {}
         d = oDict()
-        _id = self._build_id(_id, False, name)
-        d['id'] = _id or name
+        id_ = self._buildid_(id_, False, name)
+        d['id'] = id_ or name
         d['name'] = self._build_name(name)
         if not value:
             value = self._get_model_value(name) or ''
@@ -221,8 +221,8 @@ class Form(object):
             d['cols'] = cols
         if disabled:
             d['disabled'] = "disabled"
-        if _class:
-            d['class'] = _class
+        if class_:
+            d['class'] = class_
         d.update(html)
 
         return '<textarea %s>%s</textarea>' % (
@@ -235,9 +235,9 @@ class Form(object):
             return "%s['%s']" % (self.model.name_for_view(), name)
         return name
 
-    def _build_id(self, _id, autoid, name):
-        if _id:
-            return _id
+    def _buildid_(self, id_, autoid, name):
+        if id_:
+            return id_
         if self.model:
             return '%s_%s' % (self.model.name_for_view(), name)
         if autoid:

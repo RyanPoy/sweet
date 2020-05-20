@@ -31,7 +31,7 @@ class TestFormUrl(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.url('url', _class='special_input') %>
+    <%= f.url('url', class_='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -42,7 +42,7 @@ class TestFormUrl(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.url('url', 'http://www.baidu.com', _class='special_input', disabled=True) %>
+    <%= f.url('url', 'http://www.baidu.com', class_='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""

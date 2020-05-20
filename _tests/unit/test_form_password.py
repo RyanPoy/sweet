@@ -30,7 +30,7 @@ class TestFormPassword(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.password('masked', _class='masked_input_field') %>
+    <%= f.password('masked', class_='masked_input_field') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -74,7 +74,7 @@ class TestFormPassword(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.password('pin', '1234', maxlength=4, size=6, _class="pin_input") %>
+    <%= f.password('pin', '1234', maxlength=4, size=6, class_="pin_input") %>
 <% end %>
 """)
         self.assertEqual("""

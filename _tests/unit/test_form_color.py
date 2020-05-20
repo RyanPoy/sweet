@@ -30,7 +30,7 @@ class TestFormColor(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.color('color', _class='special_input') %>
+    <%= f.color('color', class_='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -41,7 +41,7 @@ class TestFormColor(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.color('color', '#DEF726', disabled=True, _class='special_input') %>
+    <%= f.color('color', '#DEF726', disabled=True, class_='special_input') %>
 <% end %>
 """)
         self.assertEqual("""

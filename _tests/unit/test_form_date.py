@@ -31,7 +31,7 @@ class TestFormDate(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.date('date', _class='special_input') %>
+    <%= f.date('date', class_='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -42,7 +42,7 @@ class TestFormDate(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.date('date', '2020-01-01', disabled=True, _class='special_input') %>
+    <%= f.date('date', '2020-01-01', disabled=True, class_='special_input') %>
 <% end %>
 """)
         self.assertEqual("""

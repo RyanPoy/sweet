@@ -116,8 +116,8 @@ The HTML generated:
   <%= using form("/user/new") do f %>
     <%= f.color('name') %>
     <%= f.color('color', '#DEF726') %>
-    <%= f.color('color', _class='special_input') %>
-    <%= f.color('color', '#DEF726', disabled=True, _class='special_input') %>
+    <%= f.color('color', clazz='special_input') %>
+    <%= f.color('color', '#DEF726', disabled=True, clazz='special_input') %>
   <% end %>
 ```
 
@@ -137,8 +137,8 @@ The HTML generated:
   <%= using form("/user/new") do f %>
     <%= f.date('name') %>
     <%= f.date('date', '2020-01-01') %>
-    <%= f.date('date', _class='special_input') %>
-    <%= f.date('date', '2020-01-01', disabled=True, _class='special_input') %>
+    <%= f.date('date', clazz='special_input') %>
+    <%= f.date('date', '2020-01-01', disabled=True, clazz='special_input') %>
   <% end %>
 ```
 
@@ -179,8 +179,8 @@ The HTML:
   <%= using form("/user/new") do f %>
     <%= f.email('name') %>
     <%= f.email('email', 'xxx@yyy.com') %>
-    <%= f.email('email', _class='special_input') %>
-    <%= f.email('email', 'xxx@yyy.com', disabled=True, _class='special_input') %>
+    <%= f.email('email', clazz='special_input') %>
+    <%= f.email('email', 'xxx@yyy.com', disabled=True, clazz='special_input') %>
   <% end %>
 ```
 
@@ -199,11 +199,11 @@ The HTML:
 ```
   <%= using form("/user/new") do f %>
     <%= f.file('attachment') %>
-    <%= f.file('avatar', _class='profile_input') %>
+    <%= f.file('avatar', clazz='profile_input') %>
     <%= f.file('picture', disabled=True) %>
     <%= f.file('resume', value='~/resume.doc') %>
     <%= f.file('user_pic', accept='image/png,image/gif,image/jpeg') %>
-    <%= f.file('file', accept='text/html', _class='upload', value='index.html') %>
+    <%= f.file('file', accept='text/html', clazz='upload', value='index.html') %>
   <% end %>
 ```
 
@@ -244,7 +244,7 @@ The HTML:
   <%= using form("/user/new") do f %>
     <%= f.label('name') %>
     <%= f.label('name', 'Your Name') %>
-    <%= f.label('name', _class='small_label') %>
+    <%= f.label('name', clazz='small_label') %>
   <% end %>
 ```
 
@@ -282,12 +282,12 @@ The HTML:
   <%= using form("/user/new") do f %>
     <%= f.number('quantity') %>
     <%= f.number('quantity', '1') %>
-    <%= f.number('quantity', _class='special_input') %>
+    <%= f.number('quantity', clazz='special_input') %>
     <%= f.number('quantity', _min=1) %>
     <%= f.number('quantity', _max=9) %>
     <%= f.number('quantity', _min=1, _max=9) %>
     <%= f.number('quantity', _min=1, _max=9, step=2) %>
-    <%= f.number('quantity', '1', _class='special_input', disabled=True) %>
+    <%= f.number('quantity', '1', clazz='special_input', disabled=True) %>
   <% end %>
 ```
 
@@ -311,11 +311,11 @@ The HTML:
   <%= using form("/user/new") do f %>
     <%= f.password('pass') %>
     <%= f.password('secret', 'Your secret here') %>
-    <%= f.password('masked', _class='masked_input_field') %>
+    <%= f.password('masked', clazz='masked_input_field') %>
     <%= f.password('token', '', size=15) %>
     <%= f.password('key', maxlength=16) %>
     <%= f.password('confirm_pass', disabled=True) %>
-    <%= f.password('pin', '1234', maxlength=4, size=6, _class="pin_input") %>
+    <%= f.password('pin', '1234', maxlength=4, size=6, clazz="pin_input") %>
   <% end %>
 ```
 
@@ -339,7 +339,7 @@ The HTML:
     <%= f.radio('favorite_color', 'maroon') %>
     <%= f.radio('receive_updates', 'no', checked=True) %>
     <%= f.radio('time_slot', "3:00 p.m.", checked=False, disabled=True) %>
-    <%= f.radio('color', "green", checked=True, _class="color_input") %>
+    <%= f.radio('color', "green", checked=True, clazz="color_input") %>
   <% end %>
 ```
 
@@ -359,10 +359,10 @@ The HTML:
   <%= using form("/user/new") do f %>
     <%= f.range('quantity') %>
     <%= f.range('quantity', '1') %>
-    <%= f.range('quantity', _class='special_input') %>
+    <%= f.range('quantity', clazz='special_input') %>
     <%= f.range('quantity', _in=[1, 9]) %>
     <%= f.range('quantity', _in=[1, 9], step=2) %>
-    <%= f.range('quantity', '1', _class='special_input', disabled=True) %>
+    <%= f.range('quantity', '1', clazz='special_input', disabled=True) %>
   <% end %>
 ```
 
@@ -384,8 +384,8 @@ The HTML:
   <%= using form("/user/new") do f %>
     <%= f.search('name') %>
     <%= f.search('search', 'Enter your search query here') %>
-    <%= f.search('search', None, _class='special_input') %>
-    <%= f.search('search', 'Enter your search query here', _class='special_input', disabled=True) %>
+    <%= f.search('search', None, clazz='special_input') %>
+    <%= f.search('search', 'Enter your search query here', clazz='special_input', disabled=True) %>
   <% end %>
 ```
 
@@ -407,7 +407,7 @@ The HTML:
     <%= f.submit() %>
     <%= f.submit("Edit this article") %>
     <%= f.submit( "Save edits", disabled=True) %>
-    <%= f.submit("Edit", _class="edit_button") %>
+    <%= f.submit("Edit", clazz="edit_button") %>
     <%= f.submit( "Save", html={ 'data-confirm': "Are you sure?" }) %>
     <%= f.submit( "Complete sale", html={ 'data-disable-with': "Submitting..." }) %>
   <% end %>
@@ -431,8 +431,8 @@ The HTML:
   <%= using form("/user/new") do f %>
     <%= f.tel('name') %>
     <%= f.tel('tel', '0123456789') %>
-    <%= f.tel('tel', _class='special_input') %>
-    <%= f.tel('tel', '0123456789', _class='special_input', disabled=True) %>
+    <%= f.tel('tel', clazz='special_input') %>
+    <%= f.tel('tel', '0123456789', clazz='special_input', disabled=True) %>
   <% end %>
 ```
 
@@ -453,11 +453,11 @@ The HTML:
     <%= f.text('name') %>
     <%= f.text('query', 'Enter your search query here') %>
     <%= f.text('search', placeholder='Enter search term...') %>
-    <%= f.text('request', _class='special_input') %>
+    <%= f.text('request', clazz='special_input') %>
     <%= f.text('address', '', size=75) %>
     <%= f.text('zip', maxlength=5) %>
     <%= f.text('payment_amount', '$0.00', disabled=True) %>
-    <%= f.text('ip', '0.0.0.0', maxlength=15, size=20, _class="ip-input") %>
+    <%= f.text('ip', '0.0.0.0', maxlength=15, size=20, clazz="ip-input") %>
   <% end %>
 ```
 
@@ -483,7 +483,7 @@ The HTML:
     <%= f.textarea('bio', 'This is my biography.') %>
     <%= f.textarea('body', rows=10, cols=25) %>
     <%= f.textarea('description', "Description goes here.", disabled=True) %>
-    <%= f.textarea('comment', _class='comment_input') %>
+    <%= f.textarea('comment', clazz='comment_input') %>
   <% end %>
 ```
 
@@ -505,12 +505,12 @@ The HTML:
   <%= using form("/user/new") do f %>
     <%= f.time('created_at') %>
     <%= f.time('created_at', '1') %>
-    <%= f.time('created_at', _class='special_input') %>
+    <%= f.time('created_at', clazz='special_input') %>
     <%= f.time('created_at', _min=1) %>
     <%= f.time('created_at', _max=9) %>
     <%= f.time('created_at', _min=1, _max=9) %>
     <%= f.time('created_at', _min=1, _max=9, step=2) %>
-    <%= f.time('created_at', '1', _class='special_input', disabled=True) %>
+    <%= f.time('created_at', '1', clazz='special_input', disabled=True) %>
   <% end %>
 ```
 
@@ -534,8 +534,8 @@ The HTML:
   <%= using form("/user/new") do f %>
     <%= f.url('name') %>
     <%= f.url('url', 'http://www.baidu.com') %>
-    <%= f.url('url', _class='special_input') %>
-    <%= f.url('url', 'http://www.baidu.com', _class='special_input', disabled=True) %>
+    <%= f.url('url', clazz='special_input') %>
+    <%= f.url('url', 'http://www.baidu.com', clazz='special_input', disabled=True) %>
   <% end %>
 ```
 

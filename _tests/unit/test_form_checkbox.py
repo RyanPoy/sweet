@@ -64,7 +64,7 @@ class TestFormCheckbox(TestCase):
         t = Template("""
 <%= using form("/user/new") do f %>
   <% for choice in ['admin', 'normal'] %>
-    <%= f.checkbox('role', choice, _id='role-%s'%choice ) %>
+    <%= f.checkbox('role', choice, id_='role-%s'%choice ) %>
   <% end %>
 <% end %>
 """)

@@ -20,7 +20,7 @@ class TestFormFile(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.file('avatar', _class='profile_input') %>
+    <%= f.file('avatar', class_='profile_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -64,7 +64,7 @@ class TestFormFile(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.file('file', accept='text/html', _class='upload', value='index.html') %>
+    <%= f.file('file', accept='text/html', class_='upload', value='index.html') %>
 <% end %>
 """)
         self.assertEqual("""

@@ -30,7 +30,7 @@ class TestFormTel(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.tel('tel', _class='special_input') %>
+    <%= f.tel('tel', class_='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -41,7 +41,7 @@ class TestFormTel(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.tel('tel', '0123456789', _class='special_input', disabled=True) %>
+    <%= f.tel('tel', '0123456789', class_='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""

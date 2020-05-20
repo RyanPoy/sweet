@@ -53,7 +53,7 @@ class TestFormTextarea(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.textarea('comment', _class='comment_input') %>
+    <%= f.textarea('comment', class_='comment_input') %>
 <% end %>
 """)
         self.assertEqual("""

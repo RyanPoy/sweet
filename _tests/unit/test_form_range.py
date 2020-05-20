@@ -30,7 +30,7 @@ class TestFormRange(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.range('quantity', _class='special_input') %>
+    <%= f.range('quantity', class_='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -63,7 +63,7 @@ class TestFormRange(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.range('quantity', '1', _class='special_input', disabled=True) %>
+    <%= f.range('quantity', '1', class_='special_input', disabled=True) %>
 <% end %>
 """)
         self.assertEqual("""

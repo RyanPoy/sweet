@@ -42,7 +42,7 @@ class TestFormText(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.text('request', _class='special_input') %>
+    <%= f.text('request', class_='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -86,7 +86,7 @@ class TestFormText(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.text('ip', '0.0.0.0', maxlength=15, size=20, _class="ip-input") %>
+    <%= f.text('ip', '0.0.0.0', maxlength=15, size=20, class_="ip-input") %>
 <% end %>
 """)
         self.assertEqual("""

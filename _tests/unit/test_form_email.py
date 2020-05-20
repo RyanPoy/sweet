@@ -30,7 +30,7 @@ class TestFormEmail(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.email('email', _class='special_input') %>
+    <%= f.email('email', class_='special_input') %>
 <% end %>
 """)
         self.assertEqual("""
@@ -41,7 +41,7 @@ class TestFormEmail(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.email('email', 'xxx@yyy.com', disabled=True, _class='special_input') %>
+    <%= f.email('email', 'xxx@yyy.com', disabled=True, class_='special_input') %>
 <% end %>
 """)
         self.assertEqual("""

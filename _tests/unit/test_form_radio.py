@@ -41,7 +41,7 @@ class TestFormRadio(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.radio('color', "green", checked=True, _class="color_input") %>
+    <%= f.radio('color', "green", checked=True, class_="color_input") %>
 <% end %>
 """)
         self.assertEqual("""

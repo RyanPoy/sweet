@@ -27,7 +27,7 @@ class TestForm(TestCase):
 
     def test_form_with_url_and_ignore_multipart_if_method_is_not_POST(self):
         t = Template("""
-<%= using form("/user/new", _id="user_new_id", method="GET", multipart=True, remote=False) do f %>
+<%= using form("/user/new", id_="user_new_id", method="GET", multipart=True, remote=False) do f %>
 <% end %>
 """)
         self.assertEqual("""

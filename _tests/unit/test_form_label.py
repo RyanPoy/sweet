@@ -31,7 +31,7 @@ class TestFormLabel(TestCase):
 
         t = Template("""
 <%= using form("/user/new") do f %>
-    <%= f.label('name', _class='small_label') %>
+    <%= f.label('name', class_='small_label') %>
 <% end %>
 """)
         self.assertEqual("""
