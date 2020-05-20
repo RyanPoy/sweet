@@ -1,5 +1,5 @@
 # coding: utf8
-from sweet._tests import TestCase
+from sweet._tests import TestCase, User
 from sweet.template import Template
 
 
@@ -49,6 +49,19 @@ class TestFormEmail(TestCase):
     <input id="email" name="email" type="email" value="xxx@yyy.com" disabled="disabled" class="special_input" />
 </form>
 """, t.render())
+
+    def test_for_model(self):
+        t = Template("""
+<%= using form(action="/user/new", model=user) do f %>
+    <%= f.email('email') %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="user_email" name="user['email']" type="email" value="jon@fake.com" />
+</form>
+""", t.render(user=User(name='Jon', email='jon@fake.com')))
+
 
 if __name__ == '__main__':
     import unittest
