@@ -23,7 +23,7 @@
   - Increment & Decrement
 - Deletes
 - Locking
-
+- Transaction
 
 ## Introduction
 the basic database operate 
@@ -399,3 +399,11 @@ SELECT `users`.`id`, `cars`.`name` FROM `users` LEFT JOIN `cars` ON `users`.`id`
 ```
 
 
+### Transaction
+```
+  with db.transction():
+    db.records('users').insert([
+      dict(id=3, name='jim', age=23),
+      dict(id=5, name='lily', age=32),
+    ])
+```

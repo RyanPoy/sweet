@@ -14,6 +14,7 @@
   - Delete multiple models
 - Retrieving Modles
   - Aggregates
+- Transaction
 
 ----
 
@@ -118,3 +119,29 @@ if you won't create `created_at` and `updated_at`, you can set `__timestamp__` i
 ```
 > just support: count、max、min、avg、sum
 
+
+### Transaction
+
+- atomic
+
+```
+  from sweet.orm import atomic
+
+  @atomic
+  def delete():
+    User.first().delete()
+```
+
+- manual
+
+```
+  from sweet.orm import atomic
+
+  with User.transaction() as t:
+    
+    User.first().delete()
+    t.commit()
+
+    User.delete_all()
+    t.rollback()
+```
