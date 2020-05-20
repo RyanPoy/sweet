@@ -114,6 +114,21 @@ class TestInflection(TestCase):
         for singular, plural in self.singular_and_plural:
             self.assertEqual(singularize(plural), singular)
 
+    def test_javaize(self):
+        self.assertEqual('User', javaize('User'))
+        self.assertEqual('TestModelForTableName', javaize('TestModelForTableName'))
+        self.assertEqual('TestModelForTableName', javaize('Test_model_for_Table_Name'))
+        self.assertEqual('TestModelForTableName', javaize('Test_model_forTableName'))
+        self.assertEqual('TestModelForTableName', javaize('_Test_model_forTableName'))
+        self.assertEqual('TestModelForTableName', javaize('1002_test_model_forTableName'))
+
+    def test_pythonize(self):
+        self.assertEqual('user', pythonize('User'))
+        self.assertEqual('test_model_for_table_name', pythonize('TestModelForTableName'))
+        self.assertEqual('test_model_for_table_name', pythonize('Test_model_for_Table_Name'))
+        self.assertEqual('test_model_for_table_name', pythonize('Test_model_forTableName'))
+        self.assertEqual('create_user', pythonize('CreateUser'))
+
 
 if __name__ == '__main__':
     import unittest
