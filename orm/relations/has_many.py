@@ -83,11 +83,11 @@ class HasMany(Relation):
         setattr(owner_model, attr_name, target_model.get_pk())
 
 
-def has_many(clazz, name=None, fk=None, cascade=False,
+def has_many(class_, name=None, fk=None, cascade=False,
              through=None, through_fk_on_owner=None, through_fk_on_target=None):
     if not through:
-        r = HasMany(target=clazz, name=name, fk=fk, cascade=cascade)
+        r = HasMany(target=class_, name=name, fk=fk, cascade=cascade)
     else:
-        r = HasManyThrough(target=clazz, name=name, through=through, 
+        r = HasManyThrough(target=class_, name=name, through=through, 
                             through_fk_on_owner=through_fk_on_owner, through_fk_on_target=through_fk_on_target)
     relation_q.put(r)

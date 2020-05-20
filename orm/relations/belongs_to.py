@@ -63,6 +63,6 @@ class BelongsTo(Relation):
         setattr(owner_model, attr_name, target_model.get_pk())
 
 
-def belongs_to(clazz, name=None, fk=None):
-    r = BelongsTo(target=clazz, name=name, fk=fk)
+def belongs_to(class_, name=None, fk=None):
+    r = BelongsTo(target=class_, name=name, fk=fk)
     relation_q.put(r)

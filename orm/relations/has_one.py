@@ -85,10 +85,10 @@ class HasOneThrough(HasManyThrough):
 
         return self
 
-def has_one(clazz, name=None, fk=None, cascade=False,
+def has_one(class_, name=None, fk=None, cascade=False,
                     through=None, through_fk_on_owner=None, through_fk_on_target=None):
     if not through:
-        r = HasOne(target=clazz, name=name, fk=fk, cascade=cascade)
+        r = HasOne(target=class_, name=name, fk=fk, cascade=cascade)
     else:
-        r = HasOneThrough(target=clazz, name=name, through=through, through_fk_on_owner=through_fk_on_owner, through_fk_on_target=through_fk_on_target)
+        r = HasOneThrough(target=class_, name=name, through=through, through_fk_on_owner=through_fk_on_owner, through_fk_on_target=through_fk_on_target)
     relation_q.put(r)

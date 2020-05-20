@@ -149,6 +149,6 @@ class HasAndBelongsToMany(HasManyThrough):
         return self
 
 
-def has_and_belongs_to_many(clazz, name=None, through_table=None, through_fk_on_owner=None, through_fk_on_target=None):
-    r = HasAndBelongsToMany(target=clazz, name=name, through_fk_on_owner=through_fk_on_owner, through_table=through_table, through_fk_on_target=through_fk_on_target)
+def has_and_belongs_to_many(class_, name=None, through_table=None, through_fk_on_owner=None, through_fk_on_target=None):
+    r = HasAndBelongsToMany(target=class_, name=name, through_fk_on_owner=through_fk_on_owner, through_table=through_table, through_fk_on_target=through_fk_on_target)
     relation_q.put(r)
