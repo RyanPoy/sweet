@@ -1,5 +1,5 @@
 # coding: utf8
-from sweet._tests import TestCase
+from sweet._tests import TestCase, User
 from sweet.template import Template
 
 
@@ -62,6 +62,18 @@ class TestFormTextarea(TestCase):
 </form>
 """, t.render())
         
+    def test_for_model(self):
+
+        t = Template("""
+<%= using form(action="/user/new", model=user) do f %>
+    <%= f.textarea('intro') %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <textarea id="user_intro" name="user['intro']">1111,2222,aaaa,bbbb</textarea>
+</form>
+""", t.render(user=User(intro="1111,2222,aaaa,bbbb")))
 
 if __name__ == '__main__':
     import unittest
