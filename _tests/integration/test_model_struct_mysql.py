@@ -111,3 +111,8 @@ class TestModelStructMySQL(TestCase):
         self.assertEqual(64, f.length)
         self.assertEqual(False, f.null)
         self.assertEqual('', f.default)
+
+
+if __name__ == '__main__':
+    import unittest
+    unittest.main()
