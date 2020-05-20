@@ -1,5 +1,5 @@
 # coding: utf8
-from sweet._tests import TestCase
+from sweet._tests import TestCase, User
 from sweet.template import Template
 
 
@@ -40,6 +40,18 @@ class TestFormHidden(TestCase):
 </form>
 """, t.render())
 
+    def test_for_tag(self):
+
+        t = Template("""
+<%= using form(action="/user/new", model=user) do f %>
+    <%= f.hidden('id') %>
+<% end %>
+""")
+        self.assertEqual("""
+<form action="/user/new" method="GET" accept-charset="UTF8">
+    <input id="user_id" name="user['id']" type="hidden" value="10" />
+</form>
+""", t.render(user=User(name='Jon', id=10)))
         
 
 if __name__ == '__main__':
