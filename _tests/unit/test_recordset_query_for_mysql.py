@@ -3,7 +3,6 @@ from sweet._tests import TestCase
 from sweet.database.recordset import MySQLRecordset
 from sweet.database.clauses import WhereClause, HavingClause
 from sweet.utils import mydict
-from unittest import mock
 
 
 class TestRecordsetQueryForMySQL(TestCase):
