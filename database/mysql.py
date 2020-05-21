@@ -180,29 +180,6 @@ AND
 
         return fields
 
-
-#     def get_table_by(self, name):
-#         sql = 'SHOW FULL COLUMNS FROM %s' % name
-#         table = Table(name)
-#         for field in self.fetchall(sql):
-#             table.add_column(Column(
-#                 name=field['Field'], type=self.column_type_of(field['Type']), 
-#                 null=field['Null'] == "YES", default=field['Default']
-# #                field['Collation']
-#             ))
-#         return table
-    
-    # def column_type_of(self, db_field_type):
-    #     db_field_type = db_field_type.lower().strip().split('(')[0]
-    #     for field_type, column_type in { 
-    #         'varchar': Column.Type.string, 'text': Column.Type.text, 'tinyint': Column.Type.boolean, 
-    #         'float': Column.Type.float, 'decimal': Column.Type.decimal, 'datetime': Column.Type.datetime, 
-    #         'date': Column.Type.date, 'timestamp': Column.Type.timestamp, 'blob': Column.Type.binary, 
-    #         'int':Column.Type.int, 'longtext': Column.Type.text, }.iteritems():
-    #         if db_field_type == field_type:
-    #             return column_type
-    #     raise Exception('Can not support %s field type !' % db_field_type)
-
     def _reconnect(self):
         self.close()
         self._conn = MySQLdb.connect(**self._db_args)
