@@ -6,6 +6,9 @@ import time
 import re
 
 
+aqm = lambda s, qutotation : s if s == '*' or not s \
+                                else '.'.join([ '%s%s%s' % (qutotation, x.strip(qutotation), qutotation) for x in s.split('.') ])
+
 # data type transfer variables and functions
 FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE', 'No', 'no', 'NO')
 ISO_DATE = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'

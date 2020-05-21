@@ -1,5 +1,5 @@
 #coding: utf8
-from sweet.utils import is_array
+from sweet.utils import is_array, aqm
 
 
 class Filter(object):
@@ -67,16 +67,10 @@ class Filter(object):
         expression.name = name.replace(flag, '.')
         return expression
 
-    def aqm(self, s): 
-        if s == '*' or not s:
-            return s
-        q = self.qutotation
-        return '.'.join([ '%s%s%s' % (q, x.strip(q), q) for x in s.split('.') ])
-
     @property
     def aqm_name(self):
         if not hasattr(self, '_aqm_name'):
-            setattr(self, '_aqm_name', self.aqm(self.name))
+            setattr(self, '_aqm_name', aqm(self.name, self.qutotation))
         return getattr(self, '_aqm_name')
 
     def valid(self):
