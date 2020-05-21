@@ -1,5 +1,6 @@
 #coding: utf8
 from sweet._tests import TestCase
+from unittest import mock
 from sweet.database.recordset import MySQLRecordset
 
 
@@ -10,56 +11,39 @@ class TestRecordsetDeleteForMysql(TestCase):
         return MySQLRecordset(db=FakeDB(), tbname="users")
 
     def test_delete(self):
-        def _(sql, *params):
-            self.assertEqual('DELETE FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` = %s AND `age` >= %s', sql)
-            self.assertEqual([1, 2, 3, "Ryan", 30], list(params))
-            return 3
-        tb = self.get_recordset()
-        tb.db.execute_rowcount = _
-        
-        r = tb.where(id=[1, 2, 3], name='Ryan', age__gte=30).delete()
-        self.assertEqual(3, r)
+        db = mock.MagicMock('db')
+        db.execute_rowcount = mock.MagicMock(return_value=3)
+        tb = MySQLRecordset(db=db, tbname='users')
+        tb.where(id=[1, 2, 3], name='Ryan', age__gte=30).delete()
+        db.execute_rowcount.assert_called_once_with('DELETE FROM `users` WHERE `id` IN (%s, %s, %s) AND `name` = %s AND `age` >= %s', *[1, 2, 3, "Ryan", 30])
 
     def test_delete_with_join(self):
-        def _(sql, *params):
-            self.assertEqual('DELETE `users` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', sql)
-            self.assertEqual([1, 2, 3, 'Ryan'], list(params))
-            return 3
-        tb = self.get_recordset()
-        tb.db.execute_rowcount = _
-
-        r = tb.where(id=[1,2,3]).or_where(name="Ryan").join('cars', on='users.id=cars.user_id').delete()
-        self.assertEqual(3, r)
+        db = mock.MagicMock('db')
+        db.execute_rowcount = mock.MagicMock(return_value=3)
+        tb = MySQLRecordset(db=db, tbname='users')
+        tb.where(id=[1,2,3]).or_where(name="Ryan").join('cars', on='users.id=cars.user_id').delete()
+        db.execute_rowcount.assert_called_once_with('DELETE `users` FROM `users` INNER JOIN `cars` ON `users`.`id` = `cars`.`user_id` WHERE `id` IN (%s, %s, %s) OR `name` = %s', *[1, 2, 3, 'Ryan'])
 
     def test_truncate(self):
-        def _(sql, *params):
-            self.assertEqual('TRUNCATE `users`', sql)
-            self.assertTrue(not params)
-            return 10
-        tb = self.get_recordset()
-        tb.db.execute_rowcount = _
-
-        r = tb.where(id=[1, 2, 3]).truncate()
-        self.assertEqual(10, r)
+        db = mock.MagicMock('db')
+        db.execute_rowcount = mock.MagicMock(return_value=10)
+        tb = MySQLRecordset(db=db, tbname='users')
+        tb.where(id=[1, 2, 3]).truncate()
+        db.execute_rowcount.assert_called_once_with('TRUNCATE `users`')
 
     def test_delete_after_find_all(self):
 
-        def fetchall(sql, *params):
-            self.assertEqual('SELECT * FROM `users` WHERE `id` = %s AND `name` = %s', sql)
-            self.assertEqual([1, 'Ryan'], list(params))
+        db = mock.MagicMock('db')
+        db.fetchall = mock.MagicMock()
+        db.execute_rowcount = mock.MagicMock()
 
-        def execute_rowcount(sql, *params):
-            self.assertEqual('DELETE FROM `users` WHERE `id` = %s AND `name` = %s', sql)
-            self.assertEqual([1, 'Ryan'], list(params))
-
-        tb = self.get_recordset()
-        tb.db.fetchall = fetchall        
-        tb.db.execute_rowcount = execute_rowcount
-        
+        tb = MySQLRecordset(db=db, tbname='users')
         tb = tb.where(id=1, name='Ryan')
         tb.all()
         tb.delete()
 
+        db.fetchall.assert_called_once_with('SELECT * FROM `users` WHERE `id` = %s AND `name` = %s', *[1, 'Ryan'])
+        db.execute_rowcount.assert_called_once_with('DELETE FROM `users` WHERE `id` = %s AND `name` = %s', *[1, 'Ryan'])
 
 if __name__ == '__main__':
     import unittest
