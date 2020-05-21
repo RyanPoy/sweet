@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import unittest
-from sweet.database import DBManager
+from sweet.db import DBManager
 from sweet.orm.model import Model
 from sweet.orm.relations import *
 

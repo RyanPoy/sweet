@@ -3,8 +3,8 @@ from sweet._tests import TestCase, User, Mobile, Car, Tag, Article, Course, Stud
                         StudentForHasOneThrough as Student2, CourseForHasOneThrough as Course2, ScoreForHasOneThrough as Score2, \
                         db_mgr as mgr
 from sweet.orm import Model
-from sweet.database import MySQL
-from sweet.database.recordset import MySQLRecordset
+from sweet.db import MySQL
+from sweet.db.recordset import MySQLRecordset
 from sweet.utils.collection import Collection
 from contextlib import contextmanager
 

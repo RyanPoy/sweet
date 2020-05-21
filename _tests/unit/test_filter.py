@@ -1,6 +1,6 @@
 #coding: utf8
 from sweet._tests import TestCase
-from sweet.database.filters import Filter
+from sweet.db.filters import Filter
 
 
 class TestFilter(TestCase):

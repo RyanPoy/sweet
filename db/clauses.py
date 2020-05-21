@@ -1,6 +1,6 @@
 #coding: utf8
 from sweet.utils import is_array, is_str, is_hash
-from sweet.database.filters import Filter
+from sweet.db.filters import Filter
 
 aqm = lambda s, qutotation : s if s == '*' or not s \
                                 else '.'.join([ '%s%s%s' % (qutotation, x.strip(qutotation), qutotation) for x in s.split('.') ])

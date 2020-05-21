@@ -1,7 +1,7 @@
 #coding: utf8
 from sweet._tests import TestCase, User
-from sweet.database.recordset import MySQLRecordset
-from sweet.database import MySQL
+from sweet.db.recordset import MySQLRecordset
+from sweet.db import MySQL
 from sweet.utils import mydict
 
 

@@ -1,6 +1,6 @@
 #coding: utf8
 from sweet._tests import TestCase
-from sweet.database.recordset import MySQLRecordset
+from sweet.db.recordset import MySQLRecordset
 from unittest import mock
 
 

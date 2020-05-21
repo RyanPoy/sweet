@@ -1,6 +1,6 @@
 #coding: utf8
 from sweet._tests import TestCase
-from sweet.database.clauses import WhereClause, HavingClause, \
+from sweet.db.clauses import WhereClause, HavingClause, \
                                     JoinClause, LeftJoinClause, \
                                     RightJoinClause, OrderClause, \
                                     GroupClause, PageClause, \

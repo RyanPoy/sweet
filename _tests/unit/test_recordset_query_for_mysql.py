@@ -1,7 +1,7 @@
 #coding: utf8
 from sweet._tests import TestCase
-from sweet.database.recordset import MySQLRecordset
-from sweet.database.clauses import WhereClause, HavingClause
+from sweet.db.recordset import MySQLRecordset
+from sweet.db.clauses import WhereClause, HavingClause
 from sweet.utils import mydict
 
 

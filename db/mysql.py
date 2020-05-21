@@ -1,5 +1,5 @@
 #coding: utf8
-from sweet.database.recordset import MySQLRecordset
+from sweet.db.recordset import MySQLRecordset
 from contextlib import contextmanager
 from sweet.orm.fields import *
 from sweet.utils import *

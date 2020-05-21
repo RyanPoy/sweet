@@ -1,5 +1,5 @@
 #coding: utf8
-from sweet.database import MySQL
+from sweet.db import MySQL
 
 
 class DBManager(object):

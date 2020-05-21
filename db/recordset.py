@@ -1,6 +1,6 @@
 #coding: utf8
 from collections import namedtuple
-from sweet.database.clauses import *
+from sweet.db.clauses import *
 from sweet.utils import *
 import functools
 import copy
