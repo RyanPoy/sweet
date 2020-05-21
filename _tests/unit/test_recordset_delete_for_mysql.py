@@ -6,10 +6,6 @@ from sweet.database.recordset import MySQLRecordset
 
 class TestRecordsetDeleteForMysql(TestCase):
 
-    def get_recordset(self):
-        class FakeDB(object): pass
-        return MySQLRecordset(db=FakeDB(), tbname="users")
-
     def test_delete(self):
         db = mock.MagicMock('db')
         db.execute_rowcount = mock.MagicMock(return_value=3)
