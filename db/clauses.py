@@ -3,11 +3,7 @@ from sweet.utils import is_array, is_str, is_hash, aqm
 from sweet.db.filters import Filter
 
 
-class Clause(object):
-    pass
-
-
-class WhereClause(Clause):
+class WhereClause(object):
     
     AND, OR = 'AND', 'OR'
 
@@ -26,7 +22,7 @@ class WhereClause(Clause):
 
     def __and_or(self, and_or, *other_clauses, **kwargs):
         for c in other_clauses:
-            if not isinstance(c, Clause):
+            if not isinstance(c, WhereClause):
                 raise TypeError("Must be a Clause type")
             self.filters.append( (and_or, c) )
 
@@ -51,7 +47,7 @@ class WhereClause(Clause):
     def _compile(self):
         sqls, params = [], []
         for and_or, f in self.filters:
-            if isinstance(f, Clause):
+            if isinstance(f, WhereClause):
                 tmp_sql, tmp_params = f.compile(False)
                 sqls.append(and_or)
                 sqls.append("(")
