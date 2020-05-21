@@ -1,14 +1,13 @@
 #coding: utf8
-from sweet._tests import TestCase
+from sweet._tests import TestCase, User
 from sweet.db.recordset import MySQLRecordset
-from sweet.db import MySQL
 from sweet.utils import mydict
 
 
 class TestRecordsetCRUDMySQL(TestCase):
     
     def setUp(self):
-        self.db = MySQL('sweet_test')
+        self.db = User.db
         self.remove_record()
         self.prepare_record()
 

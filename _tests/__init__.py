@@ -19,15 +19,17 @@ class UserForTemplateTest(object):
 
 
 db_mgr = DBManager({
-    'driver': 'mysql',
-    'host': 'localhost',
-    'port': 3306,
-    'database': 'sweet_test',
-    'user': 'root',
-    'password': '',
-    'show_sql': True,
+    'default': {
+        'driver': 'mysql',
+        'host'  : 'localhost',
+        'port'  : 3306,
+        'dbname': 'sweet_test',
+        'user'  : 'root',
+        'password': '',
+        'show_sql': True,
+    }
 })
-Model.db = db_mgr.new_db()
+Model.db = db_mgr.new_db('default')
 
 class Foo(Model):
     pass

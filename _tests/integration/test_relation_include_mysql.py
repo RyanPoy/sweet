@@ -1,7 +1,7 @@
 #coding: utf8
 from sweet._tests import TestCase, User, Mobile, Car, Tag, Article, Course, Student, Score , \
                         StudentForHasOneThrough as Student2, CourseForHasOneThrough as Course2, ScoreForHasOneThrough as Score2, \
-                        db_mgr as mgr
+                        db_mgr
 from sweet.orm import Model
 from sweet.db import MySQL
 from sweet.db.recordset import MySQLRecordset
@@ -15,11 +15,7 @@ class FakeDB(MySQL):
 
     @classmethod
     def instance(cls):
-        return cls(
-            mgr.database, user=mgr.user, password=mgr.password, 
-            host=mgr.host, port=mgr.port, charset='utf8', 
-            show_sql=mgr.show_sql
-        )
+        return cls(**db_mgr.get_config_with('default'))
 
     @classmethod
     def clear_sqls(cls):

@@ -43,11 +43,31 @@ class MySQL(object):
         'time': DatetimeField,
     }
 
-    def __init__(self, dbname, user='root', password='', host='localhost', port=3306, charset='utf8', show_sql=False):
-        self._db_args = dict(db=dbname, user=user, passwd=password, host=host, port=port, charset=charset,
-                             init_command='SET time_zone = "+0:00"', sql_mode="TRADITIONAL", use_unicode=True)
+    def __init__(self, **db_config):
+        """
+        kwargs contain:
+            dbname, 
+            user='root', 
+            password='', 
+            host='localhost', 
+            port=3306, 
+            charset='utf8', 
+            show_sql=False
+        """
+
+        self._db_args = dict(
+            db      =   db_config.get('dbname'), 
+            user    =   db_config.get('user'),
+            passwd  =   db_config.get('password', ''),
+            host    =   db_config.get('host', 'localhost'),
+            port    =   db_config.get('port', 3306), 
+            charset =   db_config.get('charset', 'utf8'),
+            sql_mode    =   "TRADITIONAL",
+            use_unicode =   True,
+            init_command =  'SET time_zone = "+0:00"',
+        )
         self._conn = None
-        self.show_sql = show_sql
+        self.show_sql=   db_config.get('show_sql', False)
         self._reconnect()
 
     def fetchone(self, sql, *params):
