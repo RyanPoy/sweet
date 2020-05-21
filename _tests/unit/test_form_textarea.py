@@ -6,7 +6,6 @@ from sweet.template import Template
 class TestFormTextarea(TestCase):
 
     def test_for_tag(self):
-
         t = Template("""
 <%= using form("/user/new") do f %>
     <%= f.textarea('post') %>

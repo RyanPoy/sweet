@@ -13,7 +13,6 @@ class TestValidatorAcceptance(TestCase):
 
     def test_acceptance_should_return_true_if_allow_null(self):
         self.assertTrue(AcceptanceValidator().validate(None))
-    pass
 
 
 if __name__ == '__main__':
