@@ -155,7 +155,7 @@ class Recordset(object):
     def __aqm(self, s):
         return aqm(s, self.qutotation_marks)
 
-    def sql(self):
+    def _query_sql(self):
         params = []
         from_sql = self.__from_sql(params)
         select_sql, select_params = self.select_clause.compile()
@@ -182,7 +182,7 @@ class Recordset(object):
     def __push_exist_sql(self, where_sql, sql, params):
         sqls = []
         for or_and, t in self._exists_tables:
-            tmp_sql, tmp_params = t.sql()
+            tmp_sql, tmp_params = t._query_sql()
             sqls.append('%s EXISTS (%s)' % (or_and, tmp_sql))
             params.extend(tmp_params)
         exists_tables_sql = ' '.join(sqls)
@@ -242,7 +242,7 @@ class Recordset(object):
         sqls = []
         for u, _all in self.unions:
             sqls.append( 'UNION ALL' if _all else 'UNION' )
-            tmp_sql, tmp_params = u.sql()
+            tmp_sql, tmp_params = u._query_sql()
             sqls.append(tmp_sql)
             params.extend(tmp_params)
         return ' '.join(sqls)
@@ -334,7 +334,7 @@ class Recordset(object):
         return self.db.execute_rowcount('TRUNCATE {}'.format(self.tablename))
 
     def first(self):
-        sql, params = self.sql()
+        sql, params = self._query_sql()
         r = self.db.fetchone(sql, *params)
         if not r or not self.model_class:
             return r
@@ -343,7 +343,7 @@ class Recordset(object):
         return m
 
     def last(self):
-        sql, params = self.sql()
+        sql, params = self._query_sql()
         r = self.db.fetchlastone(sql, *params)
         if not r or not self.model_class:
             return r
@@ -352,7 +352,7 @@ class Recordset(object):
         return m
 
     def all(self):
-        sql, params = self.sql()
+        sql, params = self._query_sql()
         rs = self.db.fetchall(sql, *params)
         if not rs or not self.model_class:
             return rs
