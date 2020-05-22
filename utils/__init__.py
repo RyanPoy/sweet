@@ -2,6 +2,7 @@
 from sweet.utils.inflection import *
 from datetime import datetime, date
 from decimal import Decimal
+import functools
 import time
 import re
 
@@ -201,21 +202,17 @@ class classproperty(object):
     def __get__(self, owner_self, owner_cls): return self.fget(owner_cls)
 
 
-# class InvalidArg(Exception): pass
-# class ValidationError(Exception): pass
-# class RecordNotFound(Exception): pass
-# class RecordHasNotBeenPersisted(Exception): pass
-# class RecordValidateError(Exception): pass
-# class ColumnExistError(Exception): pass
-# class PKColumnNotInColumns(Exception): pass
-# class UpdatedAtColumnNotInColumns(Exception): pass
-# class CreatedAtColumnNotInColumns(Exception): pass
-# class UpdatedOnColumnNotInColumns(Exception): pass
-# class CreatedOnColumnNotInColumns(Exception): pass
-# class ColumnNotInColumns(Exception):
-#     def __init__(self, msg, *args, **kwargs):
-#         super(ColumnNotInColumns, self).__init__(*args, **kwargs)
-#         self.msg = msg
+def cacheproperty(func):
+
+    @functools.wrapper(func)
+    def wrapper(self, *args, **kwargs):
+        attr_name = '_%s' % func.__name__
+        if not hasattr(self, attr_name):
+            relt = func(self, *args, **kwargs)
+            setattr(self, attr_name, relt)
+        return getattr(self, attr_name)
+    return wrapper
+
 
 class mydict(dict):
 
