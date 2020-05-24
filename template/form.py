@@ -1,9 +1,11 @@
 #coding: utf8
 from collections import OrderedDict as oDict
 from datetime import datetime, date
-from sweet.utils.inflection import *
+import string
+import re
 
 
+label_value_p = re.compile(r'[-_\s]')
 class Form(object):
     
     def __init__(self, action, model=None, method="GET", id_="", multipart=False, remote=False, charset="UTF8", html=None):
@@ -107,7 +109,9 @@ class Form(object):
         else:
             d['for'] = name
         if not value:
-            value = javaize(name)
+            value = ' '.join([
+                string.capwords(x.strip()) for x in label_value_p.split(name) if x and x.strip()
+            ])
         if class_:
             d['class'] = class_
         d.update(html)
