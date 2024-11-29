@@ -1,9 +1,10 @@
+# Sweet Project
 
-# a simple template engine in python3.
->>>>>>> efa2c19d543379346a184a7ee4ed936f1f449ca0
-
-# sweet
 python3 web framework looks like rails
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 # recordset
 [recordset](./_docs/recordset.md)
