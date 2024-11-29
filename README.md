@@ -7,13 +7,16 @@ python3 web framework looks like rails
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 # recordset
+
 [recordset](./_docs/recordset.md)
 
-# orm
-[orm basic](./_docs/orm_basic.md)
 
-[orm relations](./_docs/orm_relations.md)
+# sweet
+python3 web framework looks like rails
 
-# template
-[template](./_docs/template.md)
+# recordset & orm & relations
+[recordset & orm & relations](https://github.com/RyanPoy/sweet_orm)
+
+# view
+[view](https://github.com/RyanPoy/sweet_view)
 
