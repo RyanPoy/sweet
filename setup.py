@@ -12,6 +12,7 @@ setup(
         'aiomysql~=0.2.0',
         'PyMySQL~=1.1.1',
         'aiosqlite~=0.20.0',
+        'packaging~=24.2',
     ],
     license="MIT",  # 指定使用 MIT 许可证
     tests_require=["pytest"],  # 测试依赖
