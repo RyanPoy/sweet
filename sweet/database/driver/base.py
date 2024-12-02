@@ -16,6 +16,8 @@ class Driver:
             show_sql=False
         """
         self.db_config = db_config
+        self.db_config['init_command'] = "SET sql_mode = 'ANSI_QUOTES';"
+
         self.pool = None
         self._local_connection = ContextVar('connection')  # 协程局部变量，用于存储连接
 
