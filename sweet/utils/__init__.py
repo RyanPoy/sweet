@@ -15,6 +15,11 @@ ISO_DATE = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
 ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
 
 
+qs          = lambda s: f'"{s}"'                                # 'a'  =>  '"a"'
+qlist       = lambda lst: ', '.join(map(lambda s: qs(s), lst))  # ['a', 'b', 'c']  =>  '"a", "b", "c"'
+qlist_parens = lambda lst, begin=1: f'({qlist(lst)})'            # ['a', 'b', 'c']  =>  '("a", "b", "c")'
+
+
 def to_bool(v):
     """ convert something to a boolean  """
     if not v:           return False

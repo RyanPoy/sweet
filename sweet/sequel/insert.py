@@ -1,6 +1,6 @@
 from typing import Self
-from sweet.sequel.sequel import qs, qlist_parens, Sequel
-from sweet.utils import BasicType, is_hash, is_array
+from sweet.sequel.sequel import Sequel
+from sweet.utils import BasicType, is_hash, is_array, qlist_parens, qs
 
 
 class Insert:

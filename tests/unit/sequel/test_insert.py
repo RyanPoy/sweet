@@ -61,17 +61,6 @@ class TestInsertQuery(unittest.TestCase):
         self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES ($1, $2, $3), ($4, $5, $6) RETURNING ("username", "admin")', sql)
         self.assertEqual(['charlie', 0, 1, 'mary', 1, 1], params)
 
-    # def test_empty(self):
-    #     class Empty(TestModel): pass
-    #     query = Empty.insert()
-    #     if isinstance(db, MySQLDatabase):
-    #         sql = 'INSERT INTO "empty" () VALUES ()'
-    #     elif isinstance(db, PostgresqlDatabase):
-    #         sql = 'INSERT INTO "empty" DEFAULT VALUES RETURNING "empty"."id"'
-    #     else:
-    #         sql = 'INSERT INTO "empty" DEFAULT VALUES'
-    #     self.assertSQL(query, sql, [])
-
     # @requires_sqlite
     # def test_replace_sqlite(self):
     #     query = User.replace({
