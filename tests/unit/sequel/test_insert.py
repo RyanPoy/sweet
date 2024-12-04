@@ -1,37 +1,51 @@
 import unittest
 
-from sweet.sequel import mysql
+from sweet.sequel import mysql, sqlite, pg
 from sweet.sequel.insert import Insert
 
 
 class TestInsertQuery(unittest.TestCase):
 
     def setUp(self):
-        self.users = Insert(mysql, 'users')
+        self.users_mysql = Insert(mysql, 'users')
+        self.users_sqlite = Insert(sqlite, 'users')
+        self.users_pg = Insert(pg, 'users')
 
     def test_insert_simple(self):
-        sql, params = self.users.insert(username='charlie', superuser=0, admin=1).sql()
+        sql, params = self.users_mysql.insert(username='charlie', superuser=0, admin=1).sql()
         self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES (%s, %s, %s)', sql)
+        self.assertEqual(['charlie', 0, 1], params)
+
+        sql, params = self.users_sqlite.insert(username='charlie', superuser=0, admin=1).sql()
+        self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES (?, ?, ?)', sql)
         self.assertEqual(['charlie', 0, 1], params)
 
     def test_insert_list(self):
         data = [
-            { 'username': 'charlie', 'superuser': 0, 'admin': 1 },
-            { 'username': 'lucy', 'superuser': 0, 'admin': 0 },
-            { 'username': 'jim', 'superuser': 1, 'admin': 0 },
-            { 'username': 'mary', 'superuser': 1, 'admin': 1 },
+            {'username': 'charlie', 'superuser': 0, 'admin': 1},
+            {'username': 'lucy', 'superuser': 0, 'admin': 0},
+            {'username': 'jim', 'superuser': 1, 'admin': 0},
+            {'username': 'mary', 'superuser': 1, 'admin': 1},
         ]
-        sql, params = self.users.insert(data).sql()
+        sql, params = self.users_mysql.insert(data).sql()
         self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES (%s, %s, %s), (%s, %s, %s), (%s, %s, %s), (%s, %s, %s)', sql)
+        self.assertEqual(['charlie', 0, 1, 'lucy', 0, 0, 'jim', 1, 0, 'mary', 1, 1], params)
+
+        sql, params = self.users_sqlite.insert(data).sql()
+        self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?)', sql)
         self.assertEqual(['charlie', 0, 1, 'lucy', 0, 0, 'jim', 1, 0, 'mary', 1, 1], params)
 
     def test_insert_returning(self):
         data = [
-            { 'username': 'charlie', 'superuser': 0, 'admin': 1 },
-            { 'username': 'mary', 'superuser': 1, 'admin': 1 },
+            {'username': 'charlie', 'superuser': 0, 'admin': 1},
+            {'username': 'mary', 'superuser': 1, 'admin': 1},
         ]
-        sql, params = self.users.insert(data).returning('username', 'admin').sql()
+        sql, params = self.users_mysql.insert(data).returning('username', 'admin').sql()
         self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES (%s, %s, %s), (%s, %s, %s) RETURNING ("username", "admin")', sql)
+        self.assertEqual(['charlie', 0, 1, 'mary', 1, 1], params)
+
+        sql, params = self.users_sqlite.insert(data).returning('username', 'admin').sql()
+        self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES (?, ?, ?), (?, ?, ?) RETURNING ("username", "admin")', sql)
         self.assertEqual(['charlie', 0, 1, 'mary', 1, 1], params)
 
     # def test_empty(self):
