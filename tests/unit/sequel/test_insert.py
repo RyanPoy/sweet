@@ -7,9 +7,10 @@ from sweet.sequel.insert import Insert
 class TestInsertQuery(unittest.TestCase):
 
     def setUp(self):
-        self.users_mysql = Insert(mysql, 'users')
-        self.users_sqlite = Insert(sqlite, 'users')
-        self.users_pg = Insert(pg, 'users')
+        table_name = 'users'
+        self.users_mysql = Insert(mysql, table_name)
+        self.users_sqlite = Insert(sqlite, table_name)
+        self.users_pg = Insert(pg, table_name)
 
     def test_insert_simple(self):
         sql, params = self.users_mysql.insert(username='charlie', superuser=0, admin=1).sql()
@@ -18,6 +19,10 @@ class TestInsertQuery(unittest.TestCase):
 
         sql, params = self.users_sqlite.insert(username='charlie', superuser=0, admin=1).sql()
         self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES (?, ?, ?)', sql)
+        self.assertEqual(['charlie', 0, 1], params)
+
+        sql, params = self.users_pg.insert(username='charlie', superuser=0, admin=1).sql()
+        self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES ($1, $2, $3)', sql)
         self.assertEqual(['charlie', 0, 1], params)
 
     def test_insert_list(self):
@@ -35,6 +40,10 @@ class TestInsertQuery(unittest.TestCase):
         self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?)', sql)
         self.assertEqual(['charlie', 0, 1, 'lucy', 0, 0, 'jim', 1, 0, 'mary', 1, 1], params)
 
+        sql, params = self.users_pg.insert(data).sql()
+        self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES ($1, $2, $3), ($4, $5, $6), ($7, $8, $9), ($10, $11, $12)', sql)
+        self.assertEqual(['charlie', 0, 1, 'lucy', 0, 0, 'jim', 1, 0, 'mary', 1, 1], params)
+
     def test_insert_returning(self):
         data = [
             {'username': 'charlie', 'superuser': 0, 'admin': 1},
@@ -46,6 +55,10 @@ class TestInsertQuery(unittest.TestCase):
 
         sql, params = self.users_sqlite.insert(data).returning('username', 'admin').sql()
         self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES (?, ?, ?), (?, ?, ?) RETURNING ("username", "admin")', sql)
+        self.assertEqual(['charlie', 0, 1, 'mary', 1, 1], params)
+
+        sql, params = self.users_pg.insert(data).returning('username', 'admin').sql()
+        self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES ($1, $2, $3), ($4, $5, $6) RETURNING ("username", "admin")', sql)
         self.assertEqual(['charlie', 0, 1, 'mary', 1, 1], params)
 
     # def test_empty(self):

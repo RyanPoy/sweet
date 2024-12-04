@@ -1,7 +1,5 @@
-from typing import List, Any, Self
-
-from sweet.sequel import Sequel
-from sweet.sequel.operator import opt
+from typing import Self
+from sweet.sequel import qs, qlst_parens, Sequel
 from sweet.utils import BasicType, is_hash, is_array
 
 
@@ -9,7 +7,7 @@ class Insert:
 
     def __init__(self, sequel: Sequel, tablename: str):
         self.sequel = sequel
-        self.tablename = self.sequel.qoute_s(tablename)
+        self.tablename = qs(tablename)
         self.insert_list = []
         self.returning_columns = []
 
@@ -37,16 +35,17 @@ class Insert:
                 if r.keys() != cols:
                     raise Exception("multiple insert only support same columns")
 
-        values_sql, params = [], []
+        begin, values_sql, params = 1, [], []
         for r in self.insert_list:
-            values_sql.append(self.sequel.holder_parens_s(len(r)))
+            lst, begin = self.sequel.holder_parens_s(len(r), begin=begin)
+            values_sql.append(lst)
             params.extend(r.values())
 
-        cols_sql = self.sequel.quote_lst_parens_s(cols)
+        cols_sql = qlst_parens(cols)
         value_sql = ', '.join(values_sql)
 
         if self.returning_columns:
-            returning_sql = '' if not self.returning_columns else self.sequel.quote_lst_parens_s(self.returning_columns)
+            returning_sql = '' if not self.returning_columns else qlst_parens(self.returning_columns)
             return f'INSERT INTO {self.tablename} {cols_sql} VALUES {value_sql} RETURNING {returning_sql}', params
 
         return f'INSERT INTO {self.tablename} {cols_sql} VALUES {value_sql}', params
