@@ -1,11 +1,13 @@
 import unittest
+
+from sweet.sequel import mysql
 from sweet.sequel.insert import Insert
 
 
 class TestInsertQuery(unittest.TestCase):
 
     def setUp(self):
-        self.users = Insert('users', '%s')
+        self.users = Insert(mysql, 'users')
 
     def test_insert_simple(self):
         sql, params = self.users.insert(username='charlie', superuser=0, admin=1).sql()
@@ -14,10 +16,10 @@ class TestInsertQuery(unittest.TestCase):
 
     def test_insert_list(self):
         data = [
-            {'username': 'charlie', 'superuser': 0, 'admin': 1},
-            {'username': 'lucy', 'superuser': 0, 'admin': 0},
-            {'username': 'jim', 'superuser': 1, 'admin': 0},
-            {'username': 'mary', 'superuser': 1, 'admin': 1},
+            { 'username': 'charlie', 'superuser': 0, 'admin': 1 },
+            { 'username': 'lucy', 'superuser': 0, 'admin': 0 },
+            { 'username': 'jim', 'superuser': 1, 'admin': 0 },
+            { 'username': 'mary', 'superuser': 1, 'admin': 1 },
         ]
         sql, params = self.users.insert(data).sql()
         self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES (%s, %s, %s), (%s, %s, %s), (%s, %s, %s), (%s, %s, %s)', sql)
@@ -25,8 +27,8 @@ class TestInsertQuery(unittest.TestCase):
 
     def test_insert_returning(self):
         data = [
-            {'username': 'charlie', 'superuser': 0, 'admin': 1},
-            {'username': 'mary', 'superuser': 1, 'admin': 1},
+            { 'username': 'charlie', 'superuser': 0, 'admin': 1 },
+            { 'username': 'mary', 'superuser': 1, 'admin': 1 },
         ]
         sql, params = self.users.insert(data).returning('username', 'admin').sql()
         self.assertEqual('INSERT INTO "users" ("username", "superuser", "admin") VALUES (%s, %s, %s), (%s, %s, %s) RETURNING ("username", "admin")', sql)
@@ -42,7 +44,6 @@ class TestInsertQuery(unittest.TestCase):
     #     else:
     #         sql = 'INSERT INTO "empty" DEFAULT VALUES'
     #     self.assertSQL(query, sql, [])
-    #
 
     # @requires_sqlite
     # def test_replace_sqlite(self):
@@ -61,7 +62,6 @@ class TestInsertQuery(unittest.TestCase):
     #     self.assertSQL(query, (
     #         'REPLACE INTO "users" ("superuser", "username") '
     #         'VALUES (?, ?)'), [False, 'charlie'])
-
 
 
 if __name__ == '__main__':

@@ -1,13 +1,15 @@
 from typing import List, Any, Self
+
+from sweet.sequel import Sequel
 from sweet.sequel.operator import opt
 from sweet.utils import BasicType, is_hash, is_array
 
 
 class Insert:
 
-    def __init__(self, tablename: str, placeholder: str):
-        self.tablename = f'"{tablename}"'
-        self.placeholder = placeholder
+    def __init__(self, sequel: Sequel, tablename: str):
+        self.sequel = sequel
+        self.tablename = self.sequel.qoute_s(tablename)
         self.insert_list = []
         self.returning_columns = []
 
@@ -37,13 +39,15 @@ class Insert:
 
         values_sql, params = [], []
         for r in self.insert_list:
-            pls = ', '.join([self.placeholder]*len(r))
-            values_sql.append(f"({pls})")
+            values_sql.append(self.sequel.holder_parens_s(len(r)))
             params.extend(r.values())
 
-        cols_sql = ', '.join(map(lambda c: f'"{c}"', cols))
-        returning_sql = '' if not self.returning_columns else ', '.join(map(lambda c: f'"{c}"', self.returning_columns))
+        cols_sql = self.sequel.quote_lst_parens_s(cols)
+        value_sql = ', '.join(values_sql)
 
-        if not returning_sql:
-            return f'INSERT INTO {self.tablename} ({cols_sql}) VALUES {', '.join(values_sql)}', params
-        return f'INSERT INTO {self.tablename} ({cols_sql}) VALUES {', '.join(values_sql)} RETURNING ({returning_sql})', params
+        if self.returning_columns:
+            returning_sql = '' if not self.returning_columns else self.sequel.quote_lst_parens_s(self.returning_columns)
+            return f'INSERT INTO {self.tablename} {cols_sql} VALUES {value_sql} RETURNING {returning_sql}', params
+
+        return f'INSERT INTO {self.tablename} {cols_sql} VALUES {value_sql}', params
+
