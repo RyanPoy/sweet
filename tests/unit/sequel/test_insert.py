@@ -1,6 +1,6 @@
 import unittest
 
-from sweet.sequel import mysql, sqlite, pg
+from sweet.sequel.sequel import mysql, sqlite, pg
 from sweet.sequel.insert import Insert
 
 

@@ -1,5 +1,5 @@
 from typing import Self
-from sweet.sequel import qs, qlst_parens, Sequel
+from sweet.sequel.sequel import qs, qlist_parens, Sequel
 from sweet.utils import BasicType, is_hash, is_array
 
 
@@ -41,11 +41,11 @@ class Insert:
             values_sql.append(lst)
             params.extend(r.values())
 
-        cols_sql = qlst_parens(cols)
+        cols_sql = qlist_parens(cols)
         value_sql = ', '.join(values_sql)
 
         if self.returning_columns:
-            returning_sql = '' if not self.returning_columns else qlst_parens(self.returning_columns)
+            returning_sql = '' if not self.returning_columns else qlist_parens(self.returning_columns)
             return f'INSERT INTO {self.tablename} {cols_sql} VALUES {value_sql} RETURNING {returning_sql}', params
 
         return f'INSERT INTO {self.tablename} {cols_sql} VALUES {value_sql}', params
