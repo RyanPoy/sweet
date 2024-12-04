@@ -1,3 +1,5 @@
+from typing import Union
+
 from sweet.utils.inflection import *
 from datetime import datetime, date
 from decimal import Decimal
@@ -6,6 +8,7 @@ import functools
 import time
 import re
 
+BasicType = Union[int, float, str]
 # data type transfer variables and functions
 FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE', 'No', 'no', 'NO')
 ISO_DATE = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
@@ -230,3 +233,5 @@ class Q(Queue):
         if self.qsize() <= 0:
             return None
         return super().get(block=block, timeout=timeout)
+
+

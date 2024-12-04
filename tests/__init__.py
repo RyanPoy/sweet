@@ -1,5 +1,5 @@
 import unittest
 
 
-class TestCase(unittest.TestCase):
+class BaseCase(unittest.TestCase):
     pass
