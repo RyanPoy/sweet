@@ -1,16 +1,21 @@
 import unittest
 
-from sweet.sequel.sequel import mysql, sqlite, pg
-from sweet.sequel.insert import Insert
+from sweet.sequel import mysql, sqlite, pg
+from sweet.sequel.nodes.insert_statement import InsertStatement
 
 
-class TestInsertQuery(unittest.TestCase):
+
+class TestInsertStatement(unittest.TestCase):
 
     def setUp(self):
+        mgr_mysql = InsertManager(mysql)
+        mgr_sqlite = InsertManager(sqlite)
+        mgr_pg = InsertManager(pg)
+
         table_name = 'users'
-        self.users_mysql = Insert(mysql, table_name)
-        self.users_sqlite = Insert(sqlite, table_name)
-        self.users_pg = Insert(pg, table_name)
+        self.users_mysql = InsertStatement(mysql, table_name)
+        self.users_sqlite = InsertStatement(sqlite, table_name)
+        self.users_pg = InsertStatement(pg, table_name)
 
     def test_insert_simple(self):
         sql, params = self.users_mysql.insert(username='charlie', superuser=0, admin=1).sql()
