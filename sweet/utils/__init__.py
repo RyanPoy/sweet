@@ -151,8 +151,14 @@ is_array = lambda obj: isinstance(obj, (tuple, list))
 is_set = lambda obj: isinstance(obj, set)
 
 
+def replace_multiple(s: str, groups: [(str, str),]) -> str:
+    """
 
-# other functions
+    :rtype: object
+    """
+    for g in groups:
+        s.replace(g[0], g[1])
+    return s
 
 def xflatten(sequnce):
     for x in sequnce:

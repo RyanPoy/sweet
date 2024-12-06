@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from sweet.sequel.nodes.node import Node
-from sweet.sequel.table import Table
+from sweet.sequel.schema.table import Table
 from sweet.utils.collectors import SQLString
 
 

@@ -10,7 +10,7 @@ def quote_string(s: str) -> str:
     return s
 
 
-def quote(self, value):
+def quote(value: any):
     """Quotes the column value to help prevent"""
     if value is None: return "NULL"
 

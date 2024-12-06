@@ -1,4 +1,5 @@
 from sweet.sequel.nodes.node import Node
+from sweet.sequel.schema.column import Column
 from sweet.utils import qs
 
 
@@ -15,4 +16,13 @@ class Table:
             alias = None
         self.alias = alias
 
+        self.columns = {}
+
+    def __setitem__(self, key: str, value: Column):
+        if value.name in self.columns:
+            raise ValueError('Column "{column.name}" already exists.')
+        self.columns[value.name] = value
+
+    def __getitem__(self, item: str):
+        return self.columns.get(item, None)
 

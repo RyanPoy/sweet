@@ -1,5 +1,5 @@
 from sweet.sequel.nodes.sql_literal import SqlLiteral
-from sweet.sequel.visitor.postgressql import PostgreSQL
+from sweet.sequel.visitor.postgresql import PostgreSQL
 from sweet.sequel.visitor.sqlite import SQLite
 from sweet.sequel.visitor.mysql import MySQL
 

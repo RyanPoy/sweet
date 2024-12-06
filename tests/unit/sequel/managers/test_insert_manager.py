@@ -3,7 +3,8 @@ import sweet.sequel as sequel
 from sweet.sequel import MySQL, PostgreSQL, SQLite
 from sweet.sequel.managers.insert_manager import InsertManager
 from sweet.sequel.nodes.values_list import ValuesList
-from sweet.sequel.table import Table
+from sweet.sequel.schema.column import Column
+from sweet.sequel.schema.table import Table
 
 
 class TestInsertManager(unittest.TestCase):
@@ -27,28 +28,41 @@ class TestInsertManager(unittest.TestCase):
         manager.values = manager.create_values([sequel.sql("*")])
 
         sql = manager.to_sql(self.mysql)
-        self.assertEqual('INSERT INTO "users" VALUES (*)', str(sql))
+        self.assertEqual('INSERT INTO "users" VALUES (*)', sql)
+
+        sql = manager.to_sql(self.sqlite)
+        self.assertEqual('INSERT INTO "users" VALUES (*)', sql)
+
+        sql = manager.to_sql(self.pg)
+        self.assertEqual('INSERT INTO "users" VALUES (*)', sql)
+
+def test_works_with_multiple_values(self):
+        table = Table("users")
+        table["id"] = Column("id")
+        table["name"] = Column("name")
+
+        manager = InsertManager()
+        manager.into(table)
+
+        manager.columns.append(table["id"])
+        manager.columns.append(table["name"])
+
+        manager.values = manager.create_values_list([
+          ["1", "david"],
+          ["2", "kir"],
+          ["3", sequel.sql("DEFAULT")],
+        ])
+
+        sql = manager.to_sql(self.mysql)
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES ('1', 'david'), ('2', 'kir'), ('3', DEFAULT)""", sql)
+
+        manager.to_sql(self.sqlite)
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES ('1', 'david'), ('2', 'kir'), ('3', DEFAULT)""", sql)
+
+        manager.to_sql(self.pg)
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES ('1', 'david'), ('2', 'kir'), ('3', DEFAULT)""", str(sql))
 
 
-    #   it "works with multiple values" do
-    #     table = Table.new(:users)
-    #     manager = Arel::InsertManager.new
-    #     manager.into table
-    #
-    #     manager.columns << table[:id]
-    #     manager.columns << table[:name]
-    #
-    #     manager.values = manager.create_values_list([
-    #       %w{1 david},
-    #       %w{2 kir},
-    #       ["3", Arel.sql("DEFAULT")],
-    #     ])
-    #
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO \"users\" (\"id\", \"name\") VALUES ('1', 'david'), ('2', 'kir'), ('3', DEFAULT)
-    #     }
-    #   end
-    #
     #   it "literals in multiple values are not escaped" do
     #     table = Table.new(:users)
     #     manager = Arel::InsertManager.new

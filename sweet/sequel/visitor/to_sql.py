@@ -1,26 +1,25 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from sweet.sequel import SqlLiteral, quoting
 from sweet.sequel.nodes.insert_statement import InsertStatement
 from sweet.sequel.nodes.node import Node
 from sweet.sequel.nodes.values_list import ValuesList
-from sweet.sequel.table import Table
+from sweet.sequel.schema.table import Table
 from sweet.sequel.visitor.visitor import Visitor
 from sweet.utils.collectors import SQLString
 
 
 class ToSql(Visitor, ABC):
 
-    def quote(self, value: SqlLiteral | str) -> object:
-        return value if isinstance(value, SqlLiteral) else value
+    @abstractmethod
+    def quote_column_name(self, name: str) -> str:
+        raise NotImplementedError
 
-    def quote_column_name(self, name: SqlLiteral | str) -> str:
-        return name.value if isinstance(name, SqlLiteral) else f'"{name}"'
+    @abstractmethod
+    def quote_table_name(self, name: str) -> str:
+        raise NotImplementedError
 
-    def quote_table_name(self, name: SqlLiteral | str) -> str:
-        return name.value if isinstance(name, SqlLiteral) else f'"{name}"'
-
-    def maybe_visit(self, thing, collector: SQLString) -> SQLString:
+    def maybe_visit(self, thing: Node | Table, collector: SQLString) -> SQLString:
         if not thing:
             return collector
         collector << " "
@@ -56,7 +55,7 @@ class ToSql(Visitor, ABC):
             for idx, c in enumerate(o.columns):
                 if idx != 0:
                     collector << ", "
-                collector << self.quote_column_name(c.__class__.__name__)
+                collector << self.quote_column_name(c.name)
             collector << ")"
 
         if o.values:
@@ -65,35 +64,11 @@ class ToSql(Visitor, ABC):
             self.maybe_visit(o.select, collector)
         return collector
 
-    def visit_Table(self, o: Node | Table, collector):
-        if issubclass(o.__class__, Node):  # other Node
-            self.visit(o, collector)
-        else:  # Table
-            collector << self.quote_table_name(o.name)
+    def visit_Table(self, o: Table, collector):
+        # if issubclass(o.__class__, Node):  # other Node
+        #     self.visit(o, collector)
+        if issubclass(o.__class__, Table):  # Table
+            collector << self.quote_table_name(f'"{o.name}"')
         if o.alias:
             collector << " " << self.quote_table_name(o.table_alias)
         return collector
-
-        # if not o.insert_list:
-        #     return "", []
-        #
-        # cols = o.insert_list[0].keys()
-        # if len(o.insert_list) > 1:
-        #     for r in o.insert_list:
-        #         if r.keys() != cols:
-        #             raise Exception("multiple insert only support same columns")
-        #
-        # begin, values_sql, params = 1, [], []
-        # for r in o.insert_list:
-        #     lst, begin = o.sequel.holder_parens_s(len(r), begin=begin)
-        #     values_sql.append(lst)
-        #     params.extend(r.values())
-        #
-        # cols_sql = qlist_parens(cols)
-        # value_sql = ', '.join(values_sql)
-        #
-        # if o.returning_columns:
-        #     returning_sql = '' if not o.returning_columns else qlist_parens(o.returning_columns)
-        #     return f'INSERT INTO {o.tablename} {cols_sql} VALUES {value_sql} RETURNING {returning_sql}', params
-        #
-        # return f'INSERT INTO {o.tablename} {cols_sql} VALUES {value_sql}', params

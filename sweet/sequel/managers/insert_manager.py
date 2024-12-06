@@ -2,9 +2,8 @@ from typing import Self
 
 from sweet.sequel.nodes.insert_statement import InsertStatement
 from sweet.sequel.nodes.values_list import ValuesList
-from sweet.sequel.table import Table
+from sweet.sequel.schema.table import Table
 from sweet.sequel.visitor.visitor import Visitor
-from sweet.utils import is_hash, is_array
 
 
 class InsertManager:
@@ -18,6 +17,7 @@ class InsertManager:
         self.ast.relation = table
         return self
 
+    @property
     def columns(self):
         return self.ast.columns
 
@@ -39,7 +39,7 @@ class InsertManager:
         self.ast.select = select
 
     def to_sql(self, visitor: Visitor):
-        return visitor.visit(self.ast)
+        return str(visitor.visit(self.ast))
 
 #   def insert(fields)
 #     return if fields.empty?

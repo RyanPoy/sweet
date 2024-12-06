@@ -2,8 +2,7 @@ import copy
 from typing import Self
 
 from sweet.sequel.nodes.node import Node
-from sweet.sequel.table import Table
-from sweet.utils import is_hash, is_array, qs
+from sweet.sequel.schema.table import Table
 
 
 class InsertStatement(Node):
