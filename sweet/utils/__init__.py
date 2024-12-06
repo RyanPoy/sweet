@@ -142,13 +142,14 @@ is_blank_str = lambda obj: obj.strip() == ''
 is_bytes = lambda obj: isinstance(obj, bytes)
 is_str = lambda obj: isinstance(obj, str)
 is_decimal = lambda obj: isinstance(obj, Decimal)
-
+is_true = lambda obj: isinstance(obj, bool) and obj is True
+is_false = lambda obj: isinstance(obj, bool) and obj is False
 is_date = lambda obj: isinstance(obj, date)
 is_datetime = lambda obj: isinstance(obj, datetime)
-
 is_hash = lambda obj: isinstance(obj, dict)
 is_array = lambda obj: isinstance(obj, (tuple, list))
 is_set = lambda obj: isinstance(obj, set)
+
 
 
 # other functions

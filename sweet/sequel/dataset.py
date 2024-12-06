@@ -1,4 +1,4 @@
-from sweet.sequel.insert import Insert
+from sweet.sequel.nodes.insert_statement import Insert
 
 
 class DataSet:

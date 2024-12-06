@@ -5,7 +5,7 @@ from sweet.sequel.nodes.insert_statement import InsertStatement
 
 
 
-class TestInsertStatement(unittest.TestCase):
+class TestInsertManager(unittest.TestCase):
 
     def setUp(self):
         mgr_mysql = InsertManager(mysql)
