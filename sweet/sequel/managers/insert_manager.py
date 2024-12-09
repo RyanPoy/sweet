@@ -1,7 +1,9 @@
 from typing import Self
 
+from sweet.sequel import SqlLiteral
 from sweet.sequel.nodes.insert_statement import InsertStatement
 from sweet.sequel.nodes.values_list import ValuesList
+from sweet.sequel.schema.column import Column
 from sweet.sequel.schema.table import Table
 from sweet.sequel.visitor.visitor import Visitor
 
@@ -41,27 +43,22 @@ class InsertManager:
     def to_sql(self, visitor: Visitor):
         return str(visitor.visit(self.ast))
 
-#   def insert(fields)
-#     return if fields.empty?
-#
-#     if String === fields
-#       @ast.values = Nodes::SqlLiteral.new(fields)
-#     else
-#       @ast.relation ||= fields.first.first.relation
-#
-#       values = []
-#
-#       fields.each do |column, value|
-#         @ast.columns << column
-#         values << value
-#       end
-#       @ast.values = create_values(values)
-#     end
-#     self
-#   end
+    def insert(self, fields: [Column, any]):
+        if not fields: return
 
+        if isinstance(fields, str):
+            self.ast.values = SqlLiteral(fields)
+        elif not self.ast.relation:
+            self.ast.relation = fields[0][0].relation
 
-#
+        values = []
+
+        for column, value in fields:
+            self.ast.columns.append(column)
+            values.append(value)
+        self.ast.values = self.create_values(values)
+        return self
+
 # def insert(self, records: list[dict] = None, **kwargs) -> Self:
 #     insert_list = [dict]
 #     if records:

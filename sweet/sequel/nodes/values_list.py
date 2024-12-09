@@ -2,8 +2,7 @@ from sweet.sequel.nodes.unary import Unary
 
 
 class ValuesList(Unary):
-
-    def __init__(self, values):
+    def __init__(self, values: []):
         super().__init__(self)
         self.values = values
 
@@ -21,3 +20,7 @@ class ValuesList(Unary):
 
     def __hash__(self):
         return hash(f"{self.__class__}{self.values}")
+    #
+    # def __lshift__(self, other):
+    #     self.values.append([other])
+    #     return self

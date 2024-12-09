@@ -4,7 +4,6 @@ from sweet.utils import qs
 
 
 class Table:
-
     def __init__(self, name: str, alias: str = None, clazz: object = None, type_caster: object = None):
         self.name = name
         self.name_quoted = qs(self.name)
@@ -15,14 +14,14 @@ class Table:
         if alias == name:
             alias = None
         self.alias = alias
-
-        self.columns = {}
+        self._columns = {}
 
     def __setitem__(self, key: str, value: Column):
-        if value.name in self.columns:
+        if value.name in self._columns:
             raise ValueError('Column "{column.name}" already exists.')
-        self.columns[value.name] = value
+        self._columns[value.name] = value
+        value.table = self
 
     def __getitem__(self, item: str):
-        return self.columns.get(item, None)
+        return self._columns.get(item, None)
 

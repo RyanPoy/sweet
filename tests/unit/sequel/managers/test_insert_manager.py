@@ -1,3 +1,4 @@
+import time
 import unittest
 import sweet.sequel as sequel
 from sweet.sequel import MySQL, PostgreSQL, SQLite
@@ -36,7 +37,7 @@ class TestInsertManager(unittest.TestCase):
         sql = manager.to_sql(self.pg)
         self.assertEqual('INSERT INTO "users" VALUES (*)', sql)
 
-def test_works_with_multiple_values(self):
+    def test_works_with_multiple_values(self):
         table = Table("users")
         table["id"] = Column("id")
         table["name"] = Column("name")
@@ -56,102 +57,145 @@ def test_works_with_multiple_values(self):
         sql = manager.to_sql(self.mysql)
         self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES ('1', 'david'), ('2', 'kir'), ('3', DEFAULT)""", sql)
 
-        manager.to_sql(self.sqlite)
+        sql = manager.to_sql(self.sqlite)
         self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES ('1', 'david'), ('2', 'kir'), ('3', DEFAULT)""", sql)
 
-        manager.to_sql(self.pg)
+        sql = manager.to_sql(self.pg)
         self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES ('1', 'david'), ('2', 'kir'), ('3', DEFAULT)""", str(sql))
 
 
-    #   it "literals in multiple values are not escaped" do
-    #     table = Table.new(:users)
-    #     manager = Arel::InsertManager.new
-    #     manager.into table
-    #
-    #     manager.columns << table[:name]
-    #
-    #     manager.values = manager.create_values_list([
-    #       [Arel.sql("*")],
-    #       [Arel.sql("DEFAULT")],
-    #     ])
-    #
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO \"users\" (\"name\") VALUES (*), (DEFAULT)
-    #     }
-    #   end
-    #
-    #   it "works with multiple single values" do
-    #     table = Table.new(:users)
-    #     manager = Arel::InsertManager.new
-    #     manager.into table
-    #
-    #     manager.columns << table[:name]
-    #
-    #     manager.values = manager.create_values_list([
-    #       %w{david},
-    #       %w{kir},
-    #       [Arel.sql("DEFAULT")],
-    #     ])
-    #
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO \"users\" (\"name\") VALUES ('david'), ('kir'), (DEFAULT)
-    #     }
-    #   end
-    #
-    #   it "inserts false" do
-    #     table = Table.new(:users)
-    #     manager = Arel::InsertManager.new
-    #
-    #     manager.insert [[table[:bool], false]]
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO "users" ("bool") VALUES ('f')
-    #     }
-    #   end
-    #
-    #   it "inserts null" do
-    #     table = Table.new(:users)
-    #     manager = Arel::InsertManager.new
-    #     manager.insert [[table[:id], nil]]
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO "users" ("id") VALUES (NULL)
-    #     }
-    #   end
-    #
-    #   it "inserts time" do
-    #     table = Table.new(:users)
-    #     manager = Arel::InsertManager.new
-    #
-    #     time = Time.now
-    #     attribute = table[:created_at]
-    #
-    #     manager.insert [[attribute, time]]
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO "users" ("created_at") VALUES (#{Table.engine.lease_connection.quote time})
-    #     }
-    #   end
-    #
-    #   it "takes a list of lists" do
-    #     table = Table.new(:users)
-    #     manager = Arel::InsertManager.new
-    #     manager.into table
-    #     manager.insert [[table[:id], 1], [table[:name], "aaron"]]
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')
-    #     }
-    #   end
-    #
-    #   it "defaults the table" do
-    #     table = Table.new(:users)
-    #     manager = Arel::InsertManager.new
-    #     manager.insert [[table[:id], 1], [table[:name], "aaron"]]
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')
-    #     }
-    #   end
-    #
+    def test_literals_in_multiple_values_are_not_escaped(self):
+        table = Table("users")
+        table["name"] = Column("name")
+
+        manager = InsertManager()
+        manager.into(table)
+        manager.columns.append(table["name"])
+
+        manager.values = manager.create_values_list([
+            [sequel.sql("*")],
+            [sequel.sql("DEFAULT")],
+        ])
+
+        sql = manager.to_sql(self.mysql)
+        self.assertEqual("""INSERT INTO "users" ("name") VALUES (*), (DEFAULT)""", sql)
+
+        sql = manager.to_sql(self.sqlite)
+        self.assertEqual("""INSERT INTO "users" ("name") VALUES (*), (DEFAULT)""", sql)
+
+        sql = manager.to_sql(self.pg)
+        self.assertEqual("""INSERT INTO "users" ("name") VALUES (*), (DEFAULT)""", sql)
+
+    def test_works_with_multiple_single_values(self):
+        table = Table("users")
+        table["name"] = Column("name")
+
+        manager = InsertManager()
+        manager.into(table)
+
+        manager.columns.append(table["name"])
+
+        manager.values = manager.create_values_list([
+          ["david"],
+          ["kir"],
+          [sequel.sql("DEFAULT")],
+        ])
+        sql = manager.to_sql(self.mysql)
+        self.assertEqual("""INSERT INTO "users" ("name") VALUES ('david'), ('kir'), (DEFAULT)""", sql)
+
+        sql = manager.to_sql(self.sqlite)
+        self.assertEqual("""INSERT INTO "users" ("name") VALUES ('david'), ('kir'), (DEFAULT)""", sql)
+
+        sql = manager.to_sql(self.pg)
+        self.assertEqual("""INSERT INTO "users" ("name") VALUES ('david'), ('kir'), (DEFAULT)""", sql)
+
+    def test_inserts_false(self):
+        table = Table("users")
+        table["bool"] = Column("bool")
+
+        manager = InsertManager()
+        manager.insert([[table["bool"], False]])
+
+        sql = manager.to_sql(self.mysql)
+        self.assertEqual("""INSERT INTO "users" ("bool") VALUES (0)""", sql)
+
+        sql = manager.to_sql(self.sqlite)
+        self.assertEqual("""INSERT INTO "users" ("bool") VALUES (0)""", sql)
+
+        sql = manager.to_sql(self.pg)
+        self.assertEqual("""INSERT INTO "users" ("bool") VALUES (0)""", sql)
+
+    def test_inserts_null(self):
+        table = Table("users")
+        table["id"] = Column("id")
+
+        manager = InsertManager()
+        manager.insert([[table["id"], None]])
+
+        sql = manager.to_sql(self.mysql)
+        self.assertEqual("""INSERT INTO "users" ("id") VALUES (NULL)""", sql)
+
+        sql = manager.to_sql(self.sqlite)
+        self.assertEqual("""INSERT INTO "users" ("id") VALUES (NULL)""", sql)
+
+        sql = manager.to_sql(self.pg)
+        self.assertEqual("""INSERT INTO "users" ("id") VALUES (NULL)""", sql)
+
+    def test_inserts_time(self):
+        table = Table("users")
+        table["created_at"] = Column("created_at")
+        manager = InsertManager()
+
+        t = time.time()
+        manager.insert([[table["created_at"], t]])
+
+        sql = manager.to_sql(self.mysql)
+        self.assertEqual(f"""INSERT INTO "users" ("created_at") VALUES ({str(t)})""", sql)
+
+        sql = manager.to_sql(self.sqlite)
+        self.assertEqual(f"""INSERT INTO "users" ("created_at") VALUES ({str(t)})""", sql)
+
+        sql = manager.to_sql(self.pg)
+        self.assertEqual(f"""INSERT INTO "users" ("created_at") VALUES ({str(t)})""", sql)
+
+    def test_insert_takes_a_list_of_lists(self):
+        table = Table("users")
+        table["id"] = Column("id")
+        table["name"] = Column("name")
+
+        manager = InsertManager()
+        manager.into(table)
+        manager.insert([[table["id"], 1], [table["name"], "aaron"]])
+        sql = manager.to_sql(self.mysql)
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", sql)
+
+        sql = manager.to_sql(self.sqlite)
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", sql)
+
+        sql = manager.to_sql(self.pg)
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", sql)
+
+    def test_defaults_the_table(self):
+        table = Table("users")
+        table["id"] = Column("id")
+        table["name"] = Column("name")
+
+        manager = InsertManager()
+        manager.insert([[table["id"], 1], [table["name"], "aaron"]])
+
+        sql = manager.to_sql(self.mysql)
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", sql)
+
+        sql = manager.to_sql(self.sqlite)
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", sql)
+
+        sql = manager.to_sql(self.pg)
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", sql)
+
+
     #   it "noop for empty list" do
-    #     table = Table.new(:users)
-    #     manager = Arel::InsertManager.new
+    #     table = Table("users")
+    #     manager = InsertManager()
     #     manager.insert [[table[:id], 1]]
     #     manager.insert []
     #     _(manager.to_sql).must_be_like %{
@@ -160,8 +204,8 @@ def test_works_with_multiple_values(self):
     #   end
     #
     #   it "is chainable" do
-    #     table = Table.new(:users)
-    #     manager = Arel::InsertManager.new
+    #     table = Table("users")
+    #     manager = InsertManager()
     #     insert_result = manager.insert [[table[:id], 1]]
     #     assert_equal manager, insert_result
     #   end
@@ -169,14 +213,14 @@ def test_works_with_multiple_values(self):
     #
     # describe "into" do
     #   it "takes a Table and chains" do
-    #     manager = Arel::InsertManager.new
+    #     manager = InsertManager()
     #     _(manager.into(Table.new(:users))).must_equal manager
     #   end
     #
     #   it "converts to sql" do
     #     table   = Table.new :users
-    #     manager = Arel::InsertManager.new
-    #     manager.into table
+    #     manager = InsertManager()
+    #     manager.into(table)
     #     _(manager.to_sql).must_be_like %{
     #       INSERT INTO "users"
     #     }
@@ -186,8 +230,8 @@ def test_works_with_multiple_values(self):
     # describe "columns" do
     #   it "converts to sql" do
     #     table   = Table.new :users
-    #     manager = Arel::InsertManager.new
-    #     manager.into table
+    #     manager = InsertManager()
+    #     manager.into(table)
     #     manager.columns << table[:id]
     #     _(manager.to_sql).must_be_like %{
     #       INSERT INTO "users" ("id")
@@ -198,8 +242,8 @@ def test_works_with_multiple_values(self):
     # describe "values" do
     #   it "converts to sql" do
     #     table   = Table.new :users
-    #     manager = Arel::InsertManager.new
-    #     manager.into table
+    #     manager = InsertManager()
+    #     manager.into(table)
     #
     #     manager.values = Nodes::ValuesList.new([[1], [2]])
     #     _(manager.to_sql).must_be_like %{
@@ -209,10 +253,10 @@ def test_works_with_multiple_values(self):
     #
     #   it "accepts sql literals" do
     #     table   = Table.new :users
-    #     manager = Arel::InsertManager.new
-    #     manager.into table
+    #     manager = InsertManager()
+    #     manager.into(table)
     #
-    #     manager.values = Arel.sql("DEFAULT VALUES")
+    #     manager.values = sequel.sql("DEFAULT VALUES")
     #     _(manager.to_sql).must_be_like %{
     #       INSERT INTO "users" DEFAULT VALUES
     #     }
@@ -222,12 +266,12 @@ def test_works_with_multiple_values(self):
     # describe "combo" do
     #   it "combines columns and values list in order" do
     #     table   = Table.new :users
-    #     manager = Arel::InsertManager.new
-    #     manager.into table
+    #     manager = InsertManager()
+    #     manager.into(table)
     #
     #     manager.values = Nodes::ValuesList.new([[1, "aaron"], [2, "david"]])
     #     manager.columns << table[:id]
-    #     manager.columns << table[:name]
+    #     table["name"] = Column("name"); manager.columns.append(table["name"])
     #     _(manager.to_sql).must_be_like %{
     #       INSERT INTO "users" ("id", "name") VALUES (1, 'aaron'), (2, 'david')
     #     }
@@ -238,16 +282,16 @@ def test_works_with_multiple_values(self):
     #   it "accepts a select query in place of a VALUES clause" do
     #     table   = Table.new :users
     #
-    #     manager = Arel::InsertManager.new
-    #     manager.into table
+    #     manager = InsertManager()
+    #     manager.into(table)
     #
     #     select = Arel::SelectManager.new
-    #     select.project Arel.sql("1")
-    #     select.project Arel.sql('"aaron"')
+    #     select.project sequel.sql("1")
+    #     select.project sequel.sql('"aaron"')
     #
     #     manager.select select
     #     manager.columns << table[:id]
-    #     manager.columns << table[:name]
+    #     table["name"] = Column("name"); manager.columns.append(table["name"])
     #     _(manager.to_sql).must_be_like %{
     #       INSERT INTO "users" ("id", "name") (SELECT 1, "aaron")
     #     }

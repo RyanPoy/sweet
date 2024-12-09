@@ -55,7 +55,7 @@ class ToSql(Visitor, ABC):
             for idx, c in enumerate(o.columns):
                 if idx != 0:
                     collector << ", "
-                collector << self.quote_column_name(c.name)
+                collector << self.quote_column_name(f'"{c.name}"')
             collector << ")"
 
         if o.values:
@@ -70,5 +70,5 @@ class ToSql(Visitor, ABC):
         if issubclass(o.__class__, Table):  # Table
             collector << self.quote_table_name(f'"{o.name}"')
         if o.alias:
-            collector << " " << self.quote_table_name(o.table_alias)
+            collector << " " << self.quote_table_name(f'"{o.table_alias}"')
         return collector

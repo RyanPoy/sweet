@@ -16,11 +16,11 @@ def quote(value: any):
 
     tp = type(value)
     if tp == str:  # Todos: if tp in (str, ActiveSupport::Multibyte::Chars):
-        return f'#{quote_string(value)}'
+        return f"'{quote_string(value)}'"
     if tp == bool and value is True:
-        return "TRUE"
+        return '1'
     if tp == bool and value is False:
-        return "FALSE"
+        return '0'
     if tp in (Decimal, int, float):  # BigDecimals need to be put in a non-normalized form and quoted.
         return str(value)
     if tp == datetime:
@@ -29,6 +29,6 @@ def quote(value: any):
         return date2str(value)
     if tp == bytes:
         return binary2str(value)
-    # when Type::Time::Value then "'#{quoted_time(value)}'"
-    # when Class      then "'#{value}'"
-    raise TypeError("can't quote #{value.__class__.__name__}")
+    # when Type::Time::Value then "'{quoted_time(value)}'"
+    # when Class      then "'{value}'"
+    raise TypeError(f"can't quote {value.__class__.__name__}")
