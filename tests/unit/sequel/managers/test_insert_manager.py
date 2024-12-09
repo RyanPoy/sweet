@@ -28,14 +28,11 @@ class TestInsertManager(unittest.TestCase):
         manager.into(tabel)
         manager.values = manager.create_values([sequel.sql("*")])
 
-        sql = manager.to_sql(self.mysql)
-        self.assertEqual('INSERT INTO "users" VALUES (*)', sql)
+        self.assertEqual('INSERT INTO "users" VALUES (*)', manager.to_sql(self.mysql))
 
-        sql = manager.to_sql(self.sqlite)
-        self.assertEqual('INSERT INTO "users" VALUES (*)', sql)
+        self.assertEqual('INSERT INTO "users" VALUES (*)', manager.to_sql(self.sqlite))
 
-        sql = manager.to_sql(self.pg)
-        self.assertEqual('INSERT INTO "users" VALUES (*)', sql)
+        self.assertEqual('INSERT INTO "users" VALUES (*)', manager.to_sql(self.pg))
 
     def test_works_with_multiple_values(self):
         table = Table("users")
@@ -49,20 +46,13 @@ class TestInsertManager(unittest.TestCase):
         manager.columns.append(table["name"])
 
         manager.values = manager.create_values_list([
-          ["1", "david"],
-          ["2", "kir"],
-          ["3", sequel.sql("DEFAULT")],
+            ["1", "david"],
+            ["2", "kir"],
+            ["3", sequel.sql("DEFAULT")],
         ])
-
-        sql = manager.to_sql(self.mysql)
-        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES ('1', 'david'), ('2', 'kir'), ('3', DEFAULT)""", sql)
-
-        sql = manager.to_sql(self.sqlite)
-        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES ('1', 'david'), ('2', 'kir'), ('3', DEFAULT)""", sql)
-
-        sql = manager.to_sql(self.pg)
-        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES ('1', 'david'), ('2', 'kir'), ('3', DEFAULT)""", str(sql))
-
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES ('1', 'david'), ('2', 'kir'), ('3', DEFAULT)""", manager.to_sql(self.mysql))
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES ('1', 'david'), ('2', 'kir'), ('3', DEFAULT)""", manager.to_sql(self.sqlite))
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES ('1', 'david'), ('2', 'kir'), ('3', DEFAULT)""", manager.to_sql(self.pg))
 
     def test_literals_in_multiple_values_are_not_escaped(self):
         table = Table("users")
@@ -77,14 +67,9 @@ class TestInsertManager(unittest.TestCase):
             [sequel.sql("DEFAULT")],
         ])
 
-        sql = manager.to_sql(self.mysql)
-        self.assertEqual("""INSERT INTO "users" ("name") VALUES (*), (DEFAULT)""", sql)
-
-        sql = manager.to_sql(self.sqlite)
-        self.assertEqual("""INSERT INTO "users" ("name") VALUES (*), (DEFAULT)""", sql)
-
-        sql = manager.to_sql(self.pg)
-        self.assertEqual("""INSERT INTO "users" ("name") VALUES (*), (DEFAULT)""", sql)
+        self.assertEqual("""INSERT INTO "users" ("name") VALUES (*), (DEFAULT)""", manager.to_sql(self.mysql))
+        self.assertEqual("""INSERT INTO "users" ("name") VALUES (*), (DEFAULT)""", manager.to_sql(self.sqlite))
+        self.assertEqual("""INSERT INTO "users" ("name") VALUES (*), (DEFAULT)""", manager.to_sql(self.pg))
 
     def test_works_with_multiple_single_values(self):
         table = Table("users")
@@ -96,18 +81,13 @@ class TestInsertManager(unittest.TestCase):
         manager.columns.append(table["name"])
 
         manager.values = manager.create_values_list([
-          ["david"],
-          ["kir"],
-          [sequel.sql("DEFAULT")],
+            ["david"],
+            ["kir"],
+            [sequel.sql("DEFAULT")],
         ])
-        sql = manager.to_sql(self.mysql)
-        self.assertEqual("""INSERT INTO "users" ("name") VALUES ('david'), ('kir'), (DEFAULT)""", sql)
-
-        sql = manager.to_sql(self.sqlite)
-        self.assertEqual("""INSERT INTO "users" ("name") VALUES ('david'), ('kir'), (DEFAULT)""", sql)
-
-        sql = manager.to_sql(self.pg)
-        self.assertEqual("""INSERT INTO "users" ("name") VALUES ('david'), ('kir'), (DEFAULT)""", sql)
+        self.assertEqual("""INSERT INTO "users" ("name") VALUES ('david'), ('kir'), (DEFAULT)""", manager.to_sql(self.mysql))
+        self.assertEqual("""INSERT INTO "users" ("name") VALUES ('david'), ('kir'), (DEFAULT)""", manager.to_sql(self.sqlite))
+        self.assertEqual("""INSERT INTO "users" ("name") VALUES ('david'), ('kir'), (DEFAULT)""", manager.to_sql(self.pg))
 
     def test_inserts_false(self):
         table = Table("users")
@@ -116,14 +96,9 @@ class TestInsertManager(unittest.TestCase):
         manager = InsertManager()
         manager.insert([[table["bool"], False]])
 
-        sql = manager.to_sql(self.mysql)
-        self.assertEqual("""INSERT INTO "users" ("bool") VALUES (0)""", sql)
-
-        sql = manager.to_sql(self.sqlite)
-        self.assertEqual("""INSERT INTO "users" ("bool") VALUES (0)""", sql)
-
-        sql = manager.to_sql(self.pg)
-        self.assertEqual("""INSERT INTO "users" ("bool") VALUES (0)""", sql)
+        self.assertEqual("""INSERT INTO "users" ("bool") VALUES (0)""", manager.to_sql(self.mysql))
+        self.assertEqual("""INSERT INTO "users" ("bool") VALUES (0)""", manager.to_sql(self.sqlite))
+        self.assertEqual("""INSERT INTO "users" ("bool") VALUES (0)""", manager.to_sql(self.pg))
 
     def test_inserts_null(self):
         table = Table("users")
@@ -132,14 +107,9 @@ class TestInsertManager(unittest.TestCase):
         manager = InsertManager()
         manager.insert([[table["id"], None]])
 
-        sql = manager.to_sql(self.mysql)
-        self.assertEqual("""INSERT INTO "users" ("id") VALUES (NULL)""", sql)
-
-        sql = manager.to_sql(self.sqlite)
-        self.assertEqual("""INSERT INTO "users" ("id") VALUES (NULL)""", sql)
-
-        sql = manager.to_sql(self.pg)
-        self.assertEqual("""INSERT INTO "users" ("id") VALUES (NULL)""", sql)
+        self.assertEqual("""INSERT INTO "users" ("id") VALUES (NULL)""", manager.to_sql(self.mysql))
+        self.assertEqual("""INSERT INTO "users" ("id") VALUES (NULL)""", manager.to_sql(self.sqlite))
+        self.assertEqual("""INSERT INTO "users" ("id") VALUES (NULL)""", manager.to_sql(self.pg))
 
     def test_inserts_time(self):
         table = Table("users")
@@ -149,14 +119,9 @@ class TestInsertManager(unittest.TestCase):
         t = time.time()
         manager.insert([[table["created_at"], t]])
 
-        sql = manager.to_sql(self.mysql)
-        self.assertEqual(f"""INSERT INTO "users" ("created_at") VALUES ({str(t)})""", sql)
-
-        sql = manager.to_sql(self.sqlite)
-        self.assertEqual(f"""INSERT INTO "users" ("created_at") VALUES ({str(t)})""", sql)
-
-        sql = manager.to_sql(self.pg)
-        self.assertEqual(f"""INSERT INTO "users" ("created_at") VALUES ({str(t)})""", sql)
+        self.assertEqual(f"""INSERT INTO "users" ("created_at") VALUES ({str(t)})""", manager.to_sql(self.mysql))
+        self.assertEqual(f"""INSERT INTO "users" ("created_at") VALUES ({str(t)})""", manager.to_sql(self.sqlite))
+        self.assertEqual(f"""INSERT INTO "users" ("created_at") VALUES ({str(t)})""", manager.to_sql(self.pg))
 
     def test_insert_takes_a_list_of_lists(self):
         table = Table("users")
@@ -166,14 +131,9 @@ class TestInsertManager(unittest.TestCase):
         manager = InsertManager()
         manager.into(table)
         manager.insert([[table["id"], 1], [table["name"], "aaron"]])
-        sql = manager.to_sql(self.mysql)
-        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", sql)
-
-        sql = manager.to_sql(self.sqlite)
-        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", sql)
-
-        sql = manager.to_sql(self.pg)
-        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", sql)
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", manager.to_sql(self.mysql))
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", manager.to_sql(self.sqlite))
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", manager.to_sql(self.pg))
 
     def test_defaults_the_table(self):
         table = Table("users")
@@ -183,116 +143,107 @@ class TestInsertManager(unittest.TestCase):
         manager = InsertManager()
         manager.insert([[table["id"], 1], [table["name"], "aaron"]])
 
-        sql = manager.to_sql(self.mysql)
-        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", sql)
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", manager.to_sql(self.mysql))
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", manager.to_sql(self.sqlite))
+        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", manager.to_sql(self.pg))
 
-        sql = manager.to_sql(self.sqlite)
-        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", sql)
+    def test_noop_for_empty_list(self):
+        table = Table("users")
+        table["id"] = Column("id")
 
-        sql = manager.to_sql(self.pg)
-        self.assertEqual("""INSERT INTO "users" ("id", "name") VALUES (1, 'aaron')""", sql)
+        manager = InsertManager()
+        manager.insert([[table["id"], 1]])
+        manager.insert([])
+        self.assertEqual("""INSERT INTO "users" ("id") VALUES (1)""", manager.to_sql(self.mysql))
+        self.assertEqual("""INSERT INTO "users" ("id") VALUES (1)""", manager.to_sql(self.sqlite))
+        self.assertEqual("""INSERT INTO "users" ("id") VALUES (1)""", manager.to_sql(self.pg))
 
+    def test_is_chainable(self):
+        table = Table("users")
+        table["id"] = Column("id")
 
-    #   it "noop for empty list" do
+        manager = InsertManager()
+        insert_result = manager.insert([[table["id"], 1]])
+        self.assertIs(manager, insert_result)
+
+    def test_takes_a_table_and_chains_after_call_into(self):
+        manager = InsertManager()
+        self.assertTrue(isinstance(manager.into(Table("users")), InsertManager))
+
+    def test_converts_to_sql_after_call_into(self):
+        table = Table("users")
+        manager = InsertManager()
+        manager.into(table)
+        self.assertEqual('''INSERT INTO "users"''', manager.to_sql(self.mysql))
+        self.assertEqual('''INSERT INTO "users"''', manager.to_sql(self.sqlite))
+        self.assertEqual('''INSERT INTO "users"''', manager.to_sql(self.pg))
+
+    def test_convers_to_sql_after_call_columns(self):
+        table = Table("users")
+        table["id"] = Column("id")
+
+        manager = InsertManager()
+        manager.into(table)
+        manager.columns.append(table["id"])
+        self.assertEqual('INSERT INTO "users" ("id")', manager.to_sql(self.mysql))
+        self.assertEqual('INSERT INTO "users" ("id")', manager.to_sql(self.sqlite))
+        self.assertEqual('INSERT INTO "users" ("id")', manager.to_sql(self.pg))
+
+    def test_converts_to_sql_after_set_values(self):
+        table = Table("users")
+
+        manager = InsertManager()
+        manager.into(table)
+        manager.values = ValuesList([[1], [2]])
+
+        self.assertEqual('''INSERT INTO "users" VALUES (1), (2)''', manager.to_sql(self.mysql))
+        self.assertEqual('''INSERT INTO "users" VALUES (1), (2)''', manager.to_sql(self.sqlite))
+        self.assertEqual('''INSERT INTO "users" VALUES (1), (2)''', manager.to_sql(self.pg))
+
+    def test_accepts_set_sql_literals(self):
+        table = Table("users")
+        manager = InsertManager()
+        manager.into(table)
+
+        manager.values = sequel.sql("DEFAULT VALUES")
+        self.assertEqual('''INSERT INTO "users" DEFAULT VALUES''', manager.to_sql(self.mysql))
+        self.assertEqual('''INSERT INTO "users" DEFAULT VALUES''', manager.to_sql(self.sqlite))
+        self.assertEqual('''INSERT INTO "users" DEFAULT VALUES''', manager.to_sql(self.pg))
+
+    def test_combines_columns_and_values_list_in_order(self):
+        table = Table("users")
+        table["id"] = Column("id")
+        table["name"] = Column("name")
+
+        manager = InsertManager()
+        manager.into(table)
+
+        manager.values = ValuesList([[1, "aaron"], [2, "david"]])
+        manager.columns.append(table["id"])
+        manager.columns.append(table["name"])
+
+        self.assertEqual('''INSERT INTO "users" ("id", "name") VALUES (1, 'aaron'), (2, 'david')''', manager.to_sql(self.mysql))
+        self.assertEqual('''INSERT INTO "users" ("id", "name") VALUES (1, 'aaron'), (2, 'david')''', manager.to_sql(self.sqlite))
+        self.assertEqual('''INSERT INTO "users" ("id", "name") VALUES (1, 'aaron'), (2, 'david')''', manager.to_sql(self.pg))
+
+    # def test_accepts_a_select_query_in_place_of_a_VALUES_clause(self):
+    #     # Todo: pass this test
     #     table = Table("users")
-    #     manager = InsertManager()
-    #     manager.insert [[table[:id], 1]]
-    #     manager.insert []
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO "users" ("id") VALUES (1)
-    #     }
-    #   end
-    #
-    #   it "is chainable" do
-    #     table = Table("users")
-    #     manager = InsertManager()
-    #     insert_result = manager.insert [[table[:id], 1]]
-    #     assert_equal manager, insert_result
-    #   end
-    # end
-    #
-    # describe "into" do
-    #   it "takes a Table and chains" do
-    #     manager = InsertManager()
-    #     _(manager.into(Table.new(:users))).must_equal manager
-    #   end
-    #
-    #   it "converts to sql" do
-    #     table   = Table.new :users
-    #     manager = InsertManager()
-    #     manager.into(table)
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO "users"
-    #     }
-    #   end
-    # end
-    #
-    # describe "columns" do
-    #   it "converts to sql" do
-    #     table   = Table.new :users
-    #     manager = InsertManager()
-    #     manager.into(table)
-    #     manager.columns << table[:id]
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO "users" ("id")
-    #     }
-    #   end
-    # end
-    #
-    # describe "values" do
-    #   it "converts to sql" do
-    #     table   = Table.new :users
-    #     manager = InsertManager()
-    #     manager.into(table)
-    #
-    #     manager.values = Nodes::ValuesList.new([[1], [2]])
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO "users" VALUES (1), (2)
-    #     }
-    #   end
-    #
-    #   it "accepts sql literals" do
-    #     table   = Table.new :users
-    #     manager = InsertManager()
-    #     manager.into(table)
-    #
-    #     manager.values = sequel.sql("DEFAULT VALUES")
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO "users" DEFAULT VALUES
-    #     }
-    #   end
-    # end
-    #
-    # describe "combo" do
-    #   it "combines columns and values list in order" do
-    #     table   = Table.new :users
-    #     manager = InsertManager()
-    #     manager.into(table)
-    #
-    #     manager.values = Nodes::ValuesList.new([[1, "aaron"], [2, "david"]])
-    #     manager.columns << table[:id]
-    #     table["name"] = Column("name"); manager.columns.append(table["name"])
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO "users" ("id", "name") VALUES (1, 'aaron'), (2, 'david')
-    #     }
-    #   end
-    # end
-    #
-    # describe "select" do
-    #   it "accepts a select query in place of a VALUES clause" do
-    #     table   = Table.new :users
+    #     table["id"] = Column("id")
+    #     table["name"] = Column("name")
     #
     #     manager = InsertManager()
     #     manager.into(table)
     #
-    #     select = Arel::SelectManager.new
-    #     select.project sequel.sql("1")
-    #     select.project sequel.sql('"aaron"')
+    #     select = SelectManager()
+    #     select.project(sequel.sql("1"))
+    #     select.project(sequel.sql('"aaron"'))
     #
-    #     manager.select select
-    #     manager.columns << table[:id]
-    #     table["name"] = Column("name"); manager.columns.append(table["name"])
-    #     _(manager.to_sql).must_be_like %{
-    #       INSERT INTO "users" ("id", "name") (SELECT 1, "aaron")
-    #     }
-    #   end
+    #     manager.select = select
+    #
+    #     manager.columns.append(table["id"])
+    #     manager.columns.append(table["name"])
+    #
+    #     self.assertEqual('''INSERT INTO "users" ("id", "name") (SELECT 1, "aaron")''', manager.to_sql(self.sqlite))
+    #     self.assertEqual('''INSERT INTO "users" ("id", "name") (SELECT 1, "aaron")''', manager.to_sql(self.mysql))
+    #     self.assertEqual('''INSERT INTO "users" ("id", "name") (SELECT 1, "aaron")''', manager.to_sql(self.pg))
