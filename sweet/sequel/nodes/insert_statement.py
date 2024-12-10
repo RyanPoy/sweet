@@ -7,8 +7,8 @@ from sweet.sequel.schema.table import Table
 
 class InsertStatement(Node):
 
-    def __init__(self):
-        self.relation: Table = None
+    def __init__(self, relation: Table = None):
+        self.relation: Table = relation
         self.columns: [str] = []
         self.values: [any] = []
         self.select = None

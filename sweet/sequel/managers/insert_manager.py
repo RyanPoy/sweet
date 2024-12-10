@@ -1,6 +1,7 @@
 from typing import Self
 
 from sweet.sequel import SqlLiteral
+from sweet.sequel.managers.tree_manager import TreeManager
 from sweet.sequel.nodes.insert_statement import InsertStatement
 from sweet.sequel.nodes.values_list import ValuesList
 from sweet.sequel.schema.column import Column
@@ -8,9 +9,11 @@ from sweet.sequel.schema.table import Table
 from sweet.sequel.visitor.visitor import Visitor
 
 
-class InsertManager:
+class InsertManager(TreeManager):
 
     def __init__(self):
+        super().__init__()
+
         self.table = None
         self.select = None
         self.ast = InsertStatement()
@@ -39,9 +42,6 @@ class InsertManager:
 
     def select(self, select):
         self.ast.select = select
-
-    def to_sql(self, visitor: Visitor):
-        return str(visitor.visit(self.ast))
 
     def insert(self, fields: [Column, any]):
         if not fields: return
