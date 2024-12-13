@@ -220,18 +220,6 @@ class classproperty:
     def __get__(self, owner_self, owner_cls): return self.fget(owner_cls)
 
 
-def cacheproperty(func):
-    @functools.wraps(func)
-    def wrapper(self, *args, **kwargs):
-        attr_name = '_%s' % func.__name__
-        if not hasattr(self, attr_name):
-            relt = func(self, *args, **kwargs)
-            setattr(self, attr_name, relt)
-        return getattr(self, attr_name)
-
-    return wrapper
-
-
 class mydict(dict):
 
     def __getattr__(self, k):
