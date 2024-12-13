@@ -3,7 +3,6 @@ from typing import Self
 
 
 class SQLString:
-
     def __init__(self, s: str = None):
         self.bind_index = 1
         self._parts = []
