@@ -7,6 +7,5 @@ class Column:
         self.name = name
 
     @cached_property
-    def name_quoted(self):
+    def name_quoted(self) -> str:
         return f'"{self.name}"'
-

@@ -1,5 +1,8 @@
 from functools import cached_property
 
+from sweet.sequel.statements.insert_statement import InsertStatement
+from sweet.utils import DBDataType
+
 
 class Table:
 
@@ -9,3 +12,6 @@ class Table:
     @cached_property
     def name_quoted(self) -> str:
         return f'"{self.name}"'
+
+    def insert(self, *values: DBDataType) -> InsertStatement:
+        return InsertStatement().into(self).insert(*values)

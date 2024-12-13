@@ -4,20 +4,43 @@ from sweet.utils.inflection import *
 from datetime import datetime, date
 from decimal import Decimal
 from queue import Queue
-import functools
 import time
 import re
 
-BasicType = Union[int, float, str]
+DBDataType = Union[int, float, str, bool, date, datetime]
+
 # data type transfer variables and functions
 FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE', 'No', 'no', 'NO')
 ISO_DATE = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
 ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
 
 
-qs          = lambda s: f'"{s}"'                                # 'a'  =>  '"a"'
-qlist       = lambda lst: ', '.join(map(lambda s: qs(s), lst))  # ['a', 'b', 'c']  =>  '"a", "b", "c"'
-qlist_parens = lambda lst, begin=1: f'({qlist(lst)})'            # ['a', 'b', 'c']  =>  '("a", "b", "c")'
+def qs(s: str) -> str:
+    s.replace("\\", '\\\\')
+    s.replace("'", "''")
+    return s
+
+
+def quote(value: DBDataType) -> str:
+    """Quotes the column value to help prevent"""
+    if value is None: return "NULL"
+
+    tp = type(value)
+    if tp == str:  # Todos: if tp in (str, ActiveSupport::Multibyte::Chars):
+        return f"'{qs(value)}'"
+    if tp == bool:
+        return '1' if value is True else '0'
+    if tp in (Decimal, int, float):  # BigDecimals need to be put in a non-normalized form and quoted.
+        return str(value)
+    if tp == datetime:
+        return datetime2str(value)
+    if tp == date:
+        return date2str(value)
+    if tp == bytes:
+        return binary2str(value)
+    if tp in (tuple, list):
+        return f"[{', '.join([ quote(v) for v in value ])}]"
+    raise TypeError(f"can't quote '{value.__class__.__name__}' type")
 
 
 def to_bool(v):
@@ -151,7 +174,7 @@ is_array = lambda obj: isinstance(obj, (tuple, list))
 is_set = lambda obj: isinstance(obj, set)
 
 
-def replace_multiple(s: str, groups: [(str, str),]) -> str:
+def replace_multiple(s: str, groups: [(str, str), ]) -> str:
     """
 
     :rtype: object
@@ -159,6 +182,7 @@ def replace_multiple(s: str, groups: [(str, str),]) -> str:
     for g in groups:
         s.replace(g[0], g[1])
     return s
+
 
 def xflatten(sequnce):
     for x in sequnce:
@@ -233,5 +257,3 @@ class Q(Queue):
         if self.qsize() <= 0:
             return None
         return super().get(block=block, timeout=timeout)
-
-
