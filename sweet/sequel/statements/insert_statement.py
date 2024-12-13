@@ -1,11 +1,12 @@
 from typing import Self
 
 from sweet.sequel.schema.columns import Column
+from sweet.sequel.statements import Statement
 from sweet.sequel.terms.values import Values
 from sweet.utils import DBDataType
 
 
-class InsertStatement:
+class InsertStatement(Statement):
     """
     InsertStatement
     ├── Target: TableName
@@ -25,6 +26,7 @@ class InsertStatement:
         │   ├── ColumnName: "column2"
         │   └── ColumnName: "column3"
         └── Filters: (e.g., WHERE conditions)
+            └── Condition: column1 > Literal(10)
 
     Todo: support Source of ast
     """
@@ -74,7 +76,3 @@ class InsertStatement:
         if rows:
             self.values.append(rows)
         return self
-
-    def sql(self, visitor: "Visitor") -> str:
-        c = visitor.visit(self)
-        return str(c)
