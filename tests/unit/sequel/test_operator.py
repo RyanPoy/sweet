@@ -1,5 +1,5 @@
 import unittest
-import sweet.arel.operator as operator
+import sweet.sequel.operator as operator
 
 
 class TestOperator(unittest.TestCase):
