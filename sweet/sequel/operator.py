@@ -1,4 +1,4 @@
-from sweet.utils import BasicType
+from sweet.utils import DBDataType
 
 OPERATOR_DELIMITER = '__'
 OPERATOR_MAP = {
@@ -14,7 +14,10 @@ OPERATOR_MAP = {
 }
 
 
-def opt(key: str, value: BasicType, placeholder: str) -> (str, list):
+def opt(key: str, value: DBDataType, placeholder: str) -> (str, str, any):
+    pass
+
+def opt(key: str, value: DBDataType, placeholder: str) -> (str, list):
     if OPERATOR_DELIMITER not in key:
         if value is None:
             return f"{key} IS NULL", None

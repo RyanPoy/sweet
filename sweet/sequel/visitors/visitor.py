@@ -1,7 +1,9 @@
 from typing import Callable
 
 from sweet.sequel.collectors import SQLCollector
+from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
+from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.values import Values
 from sweet.utils import quote
 
@@ -9,6 +11,9 @@ from sweet.utils import quote
 class Visitor:
 
     visit_methods_dict = {}
+
+    def visit_Q(self, q: Q, sql: SQLCollector) -> SQLCollector:
+        pass
 
     def visit_Values(self, values: Values, sql: SQLCollector) -> SQLCollector:
         for i, vs in enumerate(values.data):
@@ -29,6 +34,10 @@ class Visitor:
             sql << " (" << ", ".join([c.name_quoted for c in stmt._columns]) << ")"
         sql << " VALUES "
         self.visit(stmt.values, sql)
+        return sql
+
+    def visit_DeleteStatement(self, stmt: DeleteStatement, sql: SQLCollector) -> SQLCollector:
+        sql << f"DELETE FROM {stmt.table.name_quoted}"
         return sql
 
     def visit(self, o: any, sql: SQLCollector = None) -> SQLCollector:

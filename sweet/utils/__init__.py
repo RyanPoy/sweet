@@ -7,7 +7,7 @@ from queue import Queue
 import time
 import re
 
-DBDataType = Union[int, float, str, bool, date, datetime]
+DBDataType = Union[int, float, str, bool, date, datetime, list, tuple]
 
 # data type transfer variables and functions
 FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE', 'No', 'no', 'NO')
