@@ -39,7 +39,7 @@ def quote(value: DBDataType) -> str:
     if tp == bytes:
         return binary2str(value)
     if tp in (tuple, list):
-        return f"[{', '.join([ quote(v) for v in value ])}]"
+        return f"({', '.join([ quote(v) for v in value ])})"
     raise TypeError(f"can't quote '{value.__class__.__name__}' type")
 
 
