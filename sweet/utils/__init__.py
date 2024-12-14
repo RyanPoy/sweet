@@ -21,7 +21,15 @@ def qs(s: str) -> str:
     return s
 
 
-def quote(value: DBDataType) -> str:
+def quote_for_values(value: DBDataType) -> str:
+    return quote(value, "[", "]")
+
+
+def quote_for_condition(value: DBDataType) -> str:
+    return quote(value, "(", ")")
+
+
+def quote(value: DBDataType, begin: str = "[", end: str = "]") -> str:
     """Quotes the column value to help prevent"""
     if value is None: return "NULL"
 
@@ -39,7 +47,7 @@ def quote(value: DBDataType) -> str:
     if tp == bytes:
         return binary2str(value)
     if tp in (tuple, list):
-        return f"({', '.join([ quote(v) for v in value ])})"
+        return f"{begin}{', '.join([quote(v) for v in value])}{end}"
     raise TypeError(f"can't quote '{value.__class__.__name__}' type")
 
 

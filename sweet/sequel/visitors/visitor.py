@@ -6,7 +6,7 @@ from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.terms.condition import Condition, Operator
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.values import Values
-from sweet.utils import quote
+from sweet.utils import quote_for_values, quote_for_condition
 
 
 class Visitor:
@@ -18,15 +18,15 @@ class Visitor:
 
     def visit_Condition(self, c: Condition, sql: SQLCollector) -> SQLCollector:
         if c.operator == Operator.BETWEEN or c.operator == Operator.NOT_BETWEEN:
-            sql << c.field_quoted << f" {str(c.operator)} {quote(c.value[0])} AND {quote(c.value[1])}"
+            sql << c.field_quoted << f" {str(c.operator)} {quote_for_condition(c.value[0])} AND {quote_for_condition(c.value[1])}"
         else:
-            sql << f"{c.field_quoted} {str(c.operator)} {quote(c.value)}"
+            sql << f"{c.field_quoted} {str(c.operator)} {quote_for_condition(c.value)}"
         return sql
 
     def visit_Values(self, values: Values, sql: SQLCollector) -> SQLCollector:
         for i, vs in enumerate(values.data):
             if i != 0: sql << ", "
-            sql << "(" << ', '.join([ quote(v) for v in vs ]) << ")"
+            sql << "(" << ', '.join([ quote_for_values(v) for v in vs ]) << ")"
         return sql
 
     def visit_InsertStatement(self, stmt: InsertStatement, sql: SQLCollector) -> SQLCollector:
