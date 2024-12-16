@@ -14,10 +14,10 @@ class TestValues(unittest.TestCase):
         vs = Values(1, "lucy", 30, d1)
         self.assertEqual([(1, "lucy", 30, d1)], vs.data)
 
-        vs.append(2, "lily", 20, d2)
+        vs.append([(2, "lily", 20, d2)])
         self.assertEqual([(1, "lucy", 30, d1), (2, "lily", 20, d2)], vs.data)
 
-        vs.append_list((3, "jim", 12, d3), (4, "noname", 9, d1))
+        vs.append([(3, "jim", 12, d3), (4, "noname", 9, d1)])
         self.assertEqual([(1, "lucy", 30, d1), (2, "lily", 20, d2), (3, "jim", 12, d3), (4, "noname", 9, d1)], vs.data)
 
 

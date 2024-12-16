@@ -2,6 +2,7 @@ from typing import Self
 
 from sweet.sequel.collectors import SQLCollector
 from sweet.sequel.statements import Statement
+from sweet.sequel.terms.q import Q
 
 
 class DeleteStatement(Statement):
@@ -32,12 +33,18 @@ class DeleteStatement(Statement):
         │   └── ColumnName: "column3"
         └── Filters: (e.g., WHERE or JOIN conditions)
     """
+
     def __init__(self) -> None:
         self.table = None
+        self.wheres = []
 
     def from_(self, table: "Table") -> Self:
         self.table = table
         return self
 
-    # def filters(self, *qs: Q, **kwargs):
-    #     pass
+    def where(self, *qs: Q, **kwargs):
+        for q in qs:
+            self.wheres.append(q)
+        if kwargs:
+            self.wheres.append(Q(**kwargs))
+        return self

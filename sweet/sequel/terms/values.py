@@ -17,7 +17,7 @@ class Values:
     def is_empty(self):
         return False if self.data else True
 
-    def append(self, rows: [DBDataType]) -> Self:
+    def append(self, rows: [[DBDataType]]) -> Self:
         if not rows:
             return self
 

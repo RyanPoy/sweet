@@ -54,6 +54,12 @@ class Visitor:
 
     def visit_DeleteStatement(self, stmt: DeleteStatement, sql: SQLCollector) -> SQLCollector:
         sql << f"DELETE FROM {stmt.table.name_quoted}"
+        if stmt.wheres:
+            sql << " WHERE "
+            for i, w in enumerate(stmt.wheres):
+                if i != 0: sql << f" AND "
+                self.visit(w, sql)
+
         return sql
 
     def visit(self, o: any, sql: SQLCollector = None) -> SQLCollector:
