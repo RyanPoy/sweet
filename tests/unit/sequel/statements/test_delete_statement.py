@@ -51,64 +51,37 @@ class TestDeleteStatement(unittest.TestCase):
         self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND ("baz" = \'xyz\' OR "abc" = 123) AND "age" < 30', dm.sql(self.mysql))
         self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND ("baz" = \'xyz\' OR "abc" = 123) AND "age" < 30', dm.sql(self.sqlite))
         self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND ("baz" = \'xyz\' OR "abc" = 123) AND "age" < 30', dm.sql(self.pg))
-
-    # def test_for_portion(self):
-    #     with self.subTest("with system time"):
-    #         q = Query.from_(self.table_abc.for_portion(SYSTEM_TIME.from_to('2020-01-01', '2020-02-01')))
+    # def test_delete_returning(self):
+    #     dm = DeleteStatement().from_(self.table_users).where(self.table_users.foo == self.table_users.bar).returning(self.table_users.id)
+    #     self.assertEqual('DELETE FROM "users" WHERE "foo"="bar" RETURNING "id"', str(dm))
     #
-    #         self.assertEqual(
-    #             'DELETE FROM "abc" FOR PORTION OF SYSTEM_TIME FROM \'2020-01-01\' TO \'2020-02-01\'', str(q)
-    #         )
+    # def test_delete_returning_str(self):
+    #     dm = (
+    #         DeleteStatement().from_(self.table_users)
+    #         .where(self.table_users.foo == self.table_users.bar)
+    #         .returning("id")
+    #     )
     #
-    #     with self.subTest("with column"):
-    #         q = Query.from_(
-    #             self.table_abc.for_portion(self.table_abc.valid_period.from_to('2020-01-01', '2020-02-01'))
-    #         )
+    #     self.assertEqual('DELETE FROM "users" WHERE "foo"="bar" RETURNING "id"', str(dm))
     #
-    #         self.assertEqual(
-    #             'DELETE FROM "abc" FOR PORTION OF "valid_period" FROM \'2020-01-01\' TO \'2020-02-01\'', str(q)
-    #         )
+    # def test_delete_returning_star(self):
+    #     dm = (
+    #         DeleteStatement().from_(self.table_users)
+    #         .where(self.table_users.foo == self.table_users.bar)
+    #         .returning(Star())
+    #     )
+    #
+    #     self.assertEqual('DELETE FROM "users" WHERE "foo"="bar" RETURNING *', str(dm))
+    #
+    # def test_delete_using(self):
+    #     table_trash = Table('trash')
+    #     dm = (
+    #         DeleteStatement().from_(self.table_users)
+    #         .using(table_trash)
+    #         .where(self.table_users.id == table_trash.abc_id)
+    #     )
+    #
+    #     self.assertEqual('DELETE FROM "users" USING "trash" WHERE "abc"."id"="trash"."abc_id"', str(dm))
 
-
-# class PostgresDeleteTests(unittest.TestCase):
-#     @classmethod
-#     def setUpClass(cls) -> None:
-#         super().setUpClass()
-#         cls.table_abc = Table("abc")
-#
-#     def test_delete_returning(self):
-#         q1 = (
-#             PostgreSQLQuery.from_(self.table_abc)
-#             .where(self.table_abc.foo == self.table_abc.bar)
-#             .returning(self.table_abc.id)
-#         )
-#
-#         self.assertEqual('DELETE FROM "abc" WHERE "foo"="bar" RETURNING "id"', str(q1))
-#
-#     def test_delete_returning_str(self):
-#         q1 = (
-#             PostgreSQLQuery.from_(self.table_abc)
-#             .where(self.table_abc.foo == self.table_abc.bar)
-#             .returning("id")
-#         )
-#
-#         self.assertEqual('DELETE FROM "abc" WHERE "foo"="bar" RETURNING "id"', str(q1))
-#
-#     def test_delete_returning_star(self):
-#         q1 = (
-#             PostgreSQLQuery.from_(self.table_abc)
-#             .where(self.table_abc.foo == self.table_abc.bar)
-#             .returning(Star())
-#         )
-#
-#         self.assertEqual('DELETE FROM "abc" WHERE "foo"="bar" RETURNING *', str(q1))
-#
-#     def test_delete_using(self):
-#         table_trash = Table('trash')
-#         q1 = (
-#             PostgreSQLQuery.from_(self.table_abc)
-#             .using(table_trash)
-#             .where(self.table_abc.id == table_trash.abc_id)
-#         )
-#
-#         self.assertEqual('DELETE FROM "abc" USING "trash" WHERE "abc"."id"="trash"."abc_id"', str(q1))
+if __name__ == '__main__':
+    unittest.main()
