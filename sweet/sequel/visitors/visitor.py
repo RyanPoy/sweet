@@ -14,6 +14,14 @@ class Visitor:
     visit_methods_dict = {}
 
     def visit_Q(self, q: Q, sql: SQLCollector) -> SQLCollector:
+        if q.condition:
+            self.visit_Condition(q.condition, sql)
+        if q.children:
+            sql << "("
+            for i, c in enumerate(q.children):
+                if i != 0: sql << f" {str(q.logic_op)} "
+                self.visit_Q(c, sql)
+            sql << ")"
         return sql
 
     def visit_Condition(self, c: Condition, sql: SQLCollector) -> SQLCollector:

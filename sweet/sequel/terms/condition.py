@@ -1,6 +1,7 @@
 from enum import Enum
+from typing import Self
 
-from sweet.utils import DBDataType
+from sweet.utils import DBDataType, quote
 
 
 class Operator(Enum):
@@ -80,3 +81,27 @@ class Condition:
             self.operator = Operator.NOT_LIKE
         else:
             self._parse_normal(key, value)
+
+    def __repr__(self) -> str:
+        return f'{self.field} {self.operator} {self.value}'
+
+    def __eq__(self, other: Self) -> bool:
+        return self.__basic_eq(other) and other.operator == self.operator
+
+    def __hash__(self):
+        return hash(f"{self.__class__}-{self.field}-{quote(self.value)}-{self.operator}-{self.field_quoted}")
+
+    # def is_mergeable_with(self, other: Self) -> bool:
+    #     return self.__basic_eq(other) and (
+    #         (self.operator == Operator.GT and other.operator == Operator.EQ) or (self.operator == Operator.EQ and other.operator == Operator.GT)    # gt & eq <=> gte
+    #         or (self.operator == Operator.LT and other.operator == Operator.EQ) or (self.operator == Operator.EQ and other.operator == Operator.LT) # lt & eq <=> lte
+    #         or (self.operator == Operator.GT and other.operator == Operator.LT) or (self.operator == Operator.LT and other.operator == Operator.GT) # gt & lt <=> not_eq
+    #     )
+
+    def __basic_eq(self, other: Self) -> bool:
+        return self.__class__ == other.__class__ and self.field == other.field \
+            and self.field_quoted == other.field_quoted and (
+                self.value == other.value or (
+                    isinstance(self.value, (tuple, list)) and isinstance(other.value, (tuple, list)) and list(self.value) == list(other.value)
+                )
+            )
