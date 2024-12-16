@@ -25,10 +25,6 @@ def quote_for_values(value: DBDataType) -> str:
     return quote(value, "[", "]")
 
 
-def quote_for_condition(value: DBDataType) -> str:
-    return quote(value, "(", ")")
-
-
 def quote(value: DBDataType, begin: str = "[", end: str = "]") -> str:
     """Quotes the column value to help prevent"""
     if value is None: return "NULL"
