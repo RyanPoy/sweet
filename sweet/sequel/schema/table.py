@@ -1,5 +1,6 @@
 from functools import cached_property
 
+from sweet.sequel.schema.columns import Column
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.utils import DBDataType
 
@@ -18,3 +19,9 @@ class Table:
 
     def insert(self, *values: DBDataType) -> InsertStatement:
         return InsertStatement().into(self).insert(*values)
+
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if isinstance(value, Column):
+            if not value.table:
+                value.table = self

@@ -1,8 +1,10 @@
 from typing import Callable
 
 from sweet.sequel.collectors import SQLCollector
+from sweet.sequel.schema.columns import Column
 from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
+from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
 from sweet.sequel.terms.condition import Condition, Operator
 from sweet.sequel.terms.q import Q
@@ -14,11 +16,11 @@ class Visitor:
 
     visit_methods_dict = {}
 
-    def quote_table_name(self, name):
-        return f'"{name}"'
-
     def quote_condition(self, value: DBDataType) -> str:
         return quote(value, "(", ")")
+
+    def quote_column(self, column: Column):
+        return self.quote_column_name(column.name)
 
     def quote_column_name(self, name):
         pointer = "."
@@ -30,6 +32,10 @@ class Visitor:
 
     def quote_values(self, values):
         return quote_for_values(values)
+
+    def visit_Table(self, t: "Table", sql: SQLCollector) -> SQLCollector:
+        sql << t.name_quoted
+        return sql
 
     def visit_Q(self, q: Q, sql: SQLCollector) -> SQLCollector:
         if q.condition:
@@ -63,7 +69,8 @@ class Visitor:
         else:
             sql << "INSERT"
 
-        sql << f" INTO {stmt.table.name_quoted}"
+        sql << f" INTO "
+        sql = self.visit(stmt.table, sql)
         if stmt._columns:
             sql << " (" << ", ".join([c.name_quoted for c in stmt._columns]) << ")"
         sql << " VALUES "
@@ -83,7 +90,8 @@ class Visitor:
         if not stmt.sets:
             return sql
 
-        sql << f"UPDATE {stmt.table.name_quoted}"
+        sql << f"UPDATE "
+        sql = self.visit(stmt.table, sql)
         if stmt.sets:
             sql << " SET "
             i = 0
@@ -96,6 +104,17 @@ class Visitor:
             for i, w in enumerate(stmt.wheres):
                 if i != 0: sql << f" AND "
                 self.visit(w, sql)
+        return sql
+
+    def visit_SelectStatement(self, stmt: SelectStatement, sql: SQLCollector) -> SQLCollector:
+        sql << "SELECT "
+        if not stmt.columns:
+            sql << "*"
+        else:
+            sql << ", ".join([ self.quote_column(c) for c in stmt.columns ])
+        if stmt.table:
+            sql << " FROM "
+            sql = self.visit(stmt.table, sql)
         return sql
 
     def visit(self, o: any, sql: SQLCollector = None) -> SQLCollector:
