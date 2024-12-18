@@ -2,10 +2,12 @@ from typing import Callable
 
 from sweet.sequel.collectors import SQLCollector
 from sweet.sequel.schema.columns import Column
+from sweet.sequel.schema.table import Table
 from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
+from sweet.sequel.terms.alias import Alias
 from sweet.sequel.terms.condition import Condition, Operator
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.values import Values
@@ -35,11 +37,11 @@ class Visitor:
     def quote_values(self, values):
         return quote_for_values(values)
 
-    def visit_Table(self, t: "Table", sql: SQLCollector) -> SQLCollector:
+    def visit_Table(self, t: Table, sql: SQLCollector) -> SQLCollector:
         sql << t.name_quoted
         return sql
 
-    def visit_Alias(self, a: "Alias", sql: SQLCollector) -> SQLCollector:
+    def visit_Alias(self, a: Alias, sql: SQLCollector) -> SQLCollector:
         self.visit(a.target, sql)
         sql << " AS " << self.quote_column_name(a.as_str)
         return sql
