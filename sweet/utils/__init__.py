@@ -16,9 +16,7 @@ ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d
 
 
 def qs(s: str) -> str:
-    s.replace("\\", '\\\\')
-    s.replace("'", "''")
-    return s
+    return s.replace("\\", '\\\\').replace("'", "''")
 
 
 def quote_for_values(value: DBDataType) -> str:

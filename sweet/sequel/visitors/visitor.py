@@ -3,6 +3,7 @@ from typing import Callable
 from sweet.sequel.collectors import SQLCollector
 from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
+from sweet.sequel.statements.update_statement import UpdateStatement
 from sweet.sequel.terms.condition import Condition, Operator
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.values import Values
@@ -20,6 +21,11 @@ class Visitor:
         return quote(value, "(", ")")
 
     def quote_column_name(self, name):
+        pointer = "."
+        if "__" in name:
+            name = name.replace("__", pointer)
+        if pointer in name:
+            return pointer.join([ f"{n}" for n in name.split(pointer)])
         return f'"{name}"'
 
     def quote_values(self, values):
@@ -71,7 +77,25 @@ class Visitor:
             for i, w in enumerate(stmt.wheres):
                 if i != 0: sql << f" AND "
                 self.visit(w, sql)
+        return sql
 
+    def visit_UpdateStatement(self, stmt: UpdateStatement, sql: SQLCollector) -> SQLCollector:
+        if not stmt.sets:
+            return sql
+
+        sql << f"UPDATE {stmt.table.name_quoted}"
+        if stmt.sets:
+            sql << " SET "
+            i = 0
+            for k, v in stmt.sets.items():
+                if i != 0: sql << ", "
+                sql << f"{self.quote_column_name(k)} = {self.quote_values(v)}"
+                i += 1
+        if stmt.wheres:
+            sql << " WHERE "
+            for i, w in enumerate(stmt.wheres):
+                if i != 0: sql << f" AND "
+                self.visit(w, sql)
         return sql
 
     def visit(self, o: any, sql: SQLCollector = None) -> SQLCollector:

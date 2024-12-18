@@ -1,6 +1,5 @@
 from typing import Self
 
-from sweet.sequel.collectors import SQLCollector
 from sweet.sequel.statements import Statement
 from sweet.sequel.terms.q import Q
 
@@ -42,7 +41,7 @@ class DeleteStatement(Statement):
         self.table = table
         return self
 
-    def where(self, *qs: Q, **kwargs):
+    def where(self, *qs: Q, **kwargs) -> Self:
         for q in qs:
             self.wheres.append(q)
         if kwargs:
