@@ -37,59 +37,47 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT * FROM "schema1"."abc"', ss.sql(self.sqlite))
         self.assertEqual('SELECT * FROM "schema1"."abc"', ss.sql(self.pg))
 
-#     def test_select__table_schema_with_multiple_levels_as_tuple(self):
-#         q = Query.from_(Table("abc", ("schema1", "schema2"))).select("*")
-#
-#         self.assertEqual('SELECT * FROM "schema1"."schema2"."abc"', str(q))
-#
-#     def test_select__table_schema_with_multiple_levels_as_list(self):
-#         q = Query.from_(Table("abc", ["schema1", "schema2"])).select("*")
-#
-#         self.assertEqual('SELECT * FROM "schema1"."schema2"."abc"', str(q))
-#
-#     def test_select__star__replacement(self):
-#         q = Query.from_("abc").select("foo").select("*")
-#
-#         self.assertEqual('SELECT * FROM "abc"', str(q))
-#
-#     def test_select__distinct__single(self):
-#         q = Query.from_("abc").select("foo").distinct()
-#
-#         self.assertEqual('SELECT DISTINCT "foo" FROM "abc"', str(q))
-#
-#     def test_select__distinct__multi(self):
-#         q = Query.from_("abc").select("foo", "bar").distinct()
-#
-#         self.assertEqual('SELECT DISTINCT "foo","bar" FROM "abc"', str(q))
-#
-#     def test_select__column__single__str(self):
-#         q = Query.from_("abc").select("foo")
-#
-#         self.assertEqual('SELECT "foo" FROM "abc"', str(q))
-#
-#     def test_select__column__single__alias__str(self):
-#         q = Query.from_(self.table_abc).select(self.table_abc.foo.as_("bar"))
-#
-#         self.assertEqual('SELECT "foo" "bar" FROM "abc"', str(q))
-#
-#     def test_select__column__single__table_alias__str(self):
+    def test_select__distinct__single(self):
+        self.table_abc.foo = Column("foo")
+        ss = SelectStatement().from_(self.table_abc).select(self.table_abc.foo).distinct()
+        self.assertEqual('SELECT DISTINCT "foo" FROM "abc"', ss.sql(self.mysql))
+        self.assertEqual('SELECT DISTINCT "foo" FROM "abc"', ss.sql(self.sqlite))
+        self.assertEqual('SELECT DISTINCT "foo" FROM "abc"', ss.sql(self.pg))
+
+    def test_select__distinct__multi(self):
+        self.table_abc.foo = Column("foo")
+        self.table_abc.bar = Column("bar")
+        ss = SelectStatement().from_(self.table_abc).select(self.table_abc.foo, self.table_abc.bar).distinct()
+        self.assertEqual('SELECT DISTINCT "foo", "bar" FROM "abc"', ss.sql(self.mysql))
+        self.assertEqual('SELECT DISTINCT "foo", "bar" FROM "abc"', ss.sql(self.sqlite))
+        self.assertEqual('SELECT DISTINCT "foo", "bar" FROM "abc"', ss.sql(self.pg))
+
+    def test_select_single_column(self):
+        self.table_abc.foo = Column("foo")
+        ss = SelectStatement().from_(self.table_abc).select(self.table_abc.foo)
+        self.assertEqual('SELECT "foo" FROM "abc"', ss.sql(self.mysql))
+        self.assertEqual('SELECT "foo" FROM "abc"', ss.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" FROM "abc"', ss.sql(self.pg))
+
+    def test_select_single_column_with_alias(self):
+        self.table_abc.foo = Column("foo")
+        ss = SelectStatement().from_(self.table_abc).select(self.table_abc.foo.as_("bar"))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc"', ss.sql(self.mysql))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc"', ss.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc"', ss.sql(self.pg))
+
+#     def test_select_single_column_and_table_alias_str(self):
 #         q = Query.from_(self.table_abc.as_("fizzbuzz")).select(self.table_abc.foo.as_("bar"))
-#
-#         self.assertEqual('SELECT "foo" "bar" FROM "abc" "fizzbuzz"', str(q))
-#
-#     def test_select__column__single__field(self):
-#         t = Table("abc")
-#         q = Query.from_(t).select(t.foo)
-#
-#         self.assertEqual('SELECT "foo" FROM "abc"', str(q))
-#
-#     def test_select__columns__multi__str(self):
-#         q1 = Query.from_("abc").select("foo", "bar")
-#         q2 = Query.from_("abc").select("foo").select("bar")
-#
-#         self.assertEqual('SELECT "foo","bar" FROM "abc"', str(q1))
-#         self.assertEqual('SELECT "foo","bar" FROM "abc"', str(q2))
-#
+#         self.assertEqual('SELECT "foo" AS "bar" FROM "abc" AS "fizzbuzz"', str(q))
+
+    def test_select_multiple_columns(self):
+        self.table_abc.foo = Column("foo")
+        self.table_abc.bar = Column("bar")
+        ss = SelectStatement().from_(self.table_abc).select(self.table_abc.foo).select(self.table_abc.bar)
+        self.assertEqual('SELECT "foo", "bar" FROM "abc"', ss.sql(self.mysql))
+        self.assertEqual('SELECT "foo", "bar" FROM "abc"', ss.sql(self.sqlite))
+        self.assertEqual('SELECT "foo", "bar" FROM "abc"', ss.sql(self.pg))
+
 #     def test_select__columns__multi__field(self):
 #         q1 = Query.from_(self.table_abc).select(self.table_abc.foo, self.table_abc.bar)
 #         q2 = Query.from_(self.table_abc).select(self.table_abc.foo).select(self.table_abc.bar)

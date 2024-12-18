@@ -19,8 +19,10 @@ class Visitor:
     def quote_condition(self, value: DBDataType) -> str:
         return quote(value, "(", ")")
 
-    def quote_column(self, column: Column):
-        return self.quote_column_name(column.name)
+    def quote_column(self, column: Column | str):
+        if isinstance(column, Column):
+            return self.quote_column_name(column.name)
+        return self.quote_column_name(column)
 
     def quote_column_name(self, name):
         pointer = "."
@@ -35,6 +37,15 @@ class Visitor:
 
     def visit_Table(self, t: "Table", sql: SQLCollector) -> SQLCollector:
         sql << t.name_quoted
+        return sql
+
+    def visit_Alias(self, a: "Alias", sql: SQLCollector) -> SQLCollector:
+        self.visit(a.target, sql)
+        sql << " AS " << self.quote_column_name(a.as_str)
+        return sql
+
+    def visit_Column(self, c: Column, sql: SQLCollector) -> SQLCollector:
+        sql << self.quote_column(c)
         return sql
 
     def visit_Q(self, q: Q, sql: SQLCollector) -> SQLCollector:
@@ -108,10 +119,14 @@ class Visitor:
 
     def visit_SelectStatement(self, stmt: SelectStatement, sql: SQLCollector) -> SQLCollector:
         sql << "SELECT "
+        if stmt._distinct:
+            sql << "DISTINCT "
         if not stmt.columns:
             sql << "*"
         else:
-            sql << ", ".join([ self.quote_column(c) for c in stmt.columns ])
+            for i, c in enumerate(stmt.columns):
+                if i != 0: sql << ", "
+                self.visit(c, sql)
         if stmt.table:
             sql << " FROM "
             sql = self.visit(stmt.table, sql)
