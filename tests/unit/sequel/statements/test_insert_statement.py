@@ -113,13 +113,13 @@ class TestInsertStatement(unittest.TestCase):
         self.assertEqual('INSERT INTO "users" VALUES (NULL)', im.sql(self.sqlite))
         self.assertEqual('INSERT INTO "users" VALUES (NULL)', im.sql(self.pg))
 
-    def test_insert_column_using_table_alias(self):
+    def test_insert_column(self):
         im = self.table_users.insert(1)
         self.assertEqual('INSERT INTO "users" VALUES (1)', im.sql(self.mysql))
         self.assertEqual('INSERT INTO "users" VALUES (1)', im.sql(self.sqlite))
         self.assertEqual('INSERT INTO "users" VALUES (1)', im.sql(self.pg))
 
-    def test_insert_column_using_alias_with_chain(self):
+    def test_insert_column_with_chain(self):
         im = self.table_users.insert(1, "a", True).insert(2, "b", False)
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", im.sql(self.mysql))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", im.sql(self.sqlite))

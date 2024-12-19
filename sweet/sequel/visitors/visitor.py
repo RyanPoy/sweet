@@ -7,7 +7,7 @@ from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
-from sweet.sequel.terms.alias import Alias
+from sweet.sequel.terms.alias import Alias, alias_of
 from sweet.sequel.terms.condition import Condition, Operator
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.values import Values
@@ -31,7 +31,7 @@ class Visitor:
         if "__" in name:
             name = name.replace("__", pointer)
         if pointer in name:
-            return pointer.join([ f"{n}" for n in name.split(pointer)])
+            return pointer.join([ f'"{n}"' for n in name.split(pointer)])
         return f'"{name}"'
 
     def quote_values(self, values):
@@ -42,8 +42,10 @@ class Visitor:
         return sql
 
     def visit_Alias(self, a: Alias, sql: SQLCollector) -> SQLCollector:
-        self.visit(a.target, sql)
-        sql << " AS " << self.quote_column_name(a.as_str)
+        if a.target:
+            self.visit(a.target, sql)
+            sql << " AS "
+        sql << self.quote_column_name(a.as_str)
         return sql
 
     def visit_Column(self, c: Column, sql: SQLCollector) -> SQLCollector:
@@ -119,19 +121,29 @@ class Visitor:
                 self.visit(w, sql)
         return sql
 
-    def visit_SelectStatement(self, stmt: SelectStatement, sql: SQLCollector) -> SQLCollector:
+    def visit_SelectStatement(self, stmt: SelectStatement, sql: SQLCollector, level=0) -> SQLCollector:
         sql << "SELECT "
-        if stmt._distinct:
+        if stmt.is_distinct_required():
             sql << "DISTINCT "
         if not stmt.columns:
             sql << "*"
         else:
-            for i, c in enumerate(stmt.columns):
+            cs = stmt.columns if len(stmt.tables) <= 1 else [ alias_of(f"{c.table.name}.{c.name}") for c in stmt.columns ]
+            for i, c in enumerate(cs):
                 if i != 0: sql << ", "
                 self.visit(c, sql)
-        if stmt.table:
+        if stmt.tables:
             sql << " FROM "
-            sql = self.visit(stmt.table, sql)
+            for i, table in enumerate(stmt.tables):
+                if i != 0: sql << ", "
+                if isinstance(table, Table):
+                    self.visit_Table(table, sql)
+                elif isinstance(table, SelectStatement):
+                    sql << "("
+                    self.visit_SelectStatement(stmt, sql, level+1)
+                    sql << f") AS ss{level}"
+                else:
+                    self.visit(table, sql)
         return sql
 
     def visit(self, o: any, sql: SQLCollector = None) -> SQLCollector:

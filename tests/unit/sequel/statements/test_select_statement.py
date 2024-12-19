@@ -66,9 +66,12 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT "foo" AS "bar" FROM "abc"', ss.sql(self.sqlite))
         self.assertEqual('SELECT "foo" AS "bar" FROM "abc"', ss.sql(self.pg))
 
-#     def test_select_single_column_and_table_alias_str(self):
-#         q = Query.from_(self.table_abc.as_("fizzbuzz")).select(self.table_abc.foo.as_("bar"))
-#         self.assertEqual('SELECT "foo" AS "bar" FROM "abc" AS "fizzbuzz"', str(q))
+    def test_select_single_column_and_table_alias_str(self):
+        self.table_abc.foo = Column("foo")
+        ss = SelectStatement().from_(self.table_abc.as_("fizzbuzz")).select(self.table_abc.foo.as_("bar"))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" AS "fizzbuzz"', ss.sql(self.mysql))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" AS "fizzbuzz"', ss.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" AS "fizzbuzz"', ss.sql(self.pg))
 
     def test_select_multiple_columns(self):
         self.table_abc.foo = Column("foo")
@@ -78,24 +81,23 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT "foo", "bar" FROM "abc"', ss.sql(self.sqlite))
         self.assertEqual('SELECT "foo", "bar" FROM "abc"', ss.sql(self.pg))
 
-#     def test_select__columns__multi__field(self):
-#         q1 = Query.from_(self.table_abc).select(self.table_abc.foo, self.table_abc.bar)
-#         q2 = Query.from_(self.table_abc).select(self.table_abc.foo).select(self.table_abc.bar)
-#
-#         self.assertEqual('SELECT "foo","bar" FROM "abc"', str(q1))
-#         self.assertEqual('SELECT "foo","bar" FROM "abc"', str(q2))
-#
-#     def test_select__multiple_tables(self):
-#         q = Query.from_(self.table_abc).select(self.table_abc.foo).from_(self.table_efg).select(self.table_efg.bar)
-#
-#         self.assertEqual('SELECT "abc"."foo","efg"."bar" FROM "abc","efg"', str(q))
-#
-#     def test_select__subquery(self):
-#         subquery = Query.from_(self.table_abc).select("*")
-#         q = Query.from_(subquery).select(subquery.foo, subquery.bar)
-#
-#         self.assertEqual('SELECT "sq0"."foo","sq0"."bar" ' 'FROM (SELECT * FROM "abc") "sq0"', str(q))
-#
+    def test_select_multiple_tables(self):
+        self.table_abc.foo = Column("foo")
+        self.table_efg.bar = Column("bar")
+        ss = SelectStatement().from_(self.table_abc).select(self.table_abc.foo).from_(self.table_efg).select(self.table_efg.bar)
+        self.assertEqual('SELECT "abc"."foo", "efg"."bar" FROM "abc", "efg"', ss.sql(self.mysql))
+        self.assertEqual('SELECT "abc"."foo", "efg"."bar" FROM "abc", "efg"', ss.sql(self.sqlite))
+        self.assertEqual('SELECT "abc"."foo", "efg"."bar" FROM "abc", "efg"', ss.sql(self.pg))
+
+    # def test_select_subquery(self):
+    #     self.table_abc.foo = Column("foo")
+    #     self.table_abc.bar = Column("bar")
+    #     sub = SelectStatement().from_(self.table_abc)
+    #     ss = SelectStatement().from_(sub).select(sub.foo, sub.bar)
+    #     self.assertEqual('SELECT "sq0"."foo", "sq0"."bar" FROM (SELECT * FROM "abc") "sq0"', ss.sql(self.mysql))
+    #     self.assertEqual('SELECT "sq0"."foo", "sq0"."bar" FROM (SELECT * FROM "abc") "sq0"', ss.sql(self.sqlite))
+    #     self.assertEqual('SELECT "sq0"."foo", "sq0"."bar" FROM (SELECT * FROM "abc") "sq0"', ss.sql(self.pg))
+
 #     def test_select__multiple_subqueries(self):
 #         subquery0 = Query.from_(self.table_abc).select("foo")
 #         subquery1 = Query.from_(self.table_efg).select("bar")

@@ -2,6 +2,7 @@ from functools import cached_property
 
 from sweet.sequel.schema.columns import Column
 from sweet.sequel.statements.insert_statement import InsertStatement
+from sweet.sequel.terms.alias import Alias
 from sweet.utils import DBDataType
 
 
@@ -25,3 +26,6 @@ class Table:
         if isinstance(value, Column):
             if not value.table:
                 value.table = self
+
+    def as_(self, alias: str) -> Alias:
+        return Alias(self, alias)
