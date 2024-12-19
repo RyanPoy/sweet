@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime
 
-from sweet.sequel.terms.values import Values
+from sweet.sequel.terms.values_list import Values
 
 
 class TestValues(unittest.TestCase):

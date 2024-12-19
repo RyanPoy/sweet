@@ -2,7 +2,7 @@ from typing import Self
 
 from sweet.sequel.schema.columns import Column
 from sweet.sequel.statements import Statement
-from sweet.sequel.terms.values import Values
+from sweet.sequel.terms.values_list import Values
 from sweet.utils import DBDataType
 
 

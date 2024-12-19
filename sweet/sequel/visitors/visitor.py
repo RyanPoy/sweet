@@ -10,7 +10,7 @@ from sweet.sequel.statements.update_statement import UpdateStatement
 from sweet.sequel.terms.alias import Alias, alias_of
 from sweet.sequel.terms.condition import Condition, Operator
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.values import Values
+from sweet.sequel.terms.values_list import Values
 from sweet.utils import DBDataType, quote, quote_for_values
 
 
