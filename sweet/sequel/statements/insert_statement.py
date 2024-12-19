@@ -2,7 +2,7 @@ from typing import Self
 
 from sweet.sequel.schema.columns import Column
 from sweet.sequel.statements import Statement
-from sweet.sequel.terms.values_list import Values
+from sweet.sequel.terms.values_list import ValuesList
 from sweet.utils import DBDataType
 
 
@@ -36,7 +36,7 @@ class InsertStatement(Statement):
         self._columns = None
         self._ignore = False
         self._replace = False
-        self.values = Values()
+        self.values = ValuesList()
 
     def is_ignore(self):
         return self._ignore

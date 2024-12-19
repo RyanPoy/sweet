@@ -10,7 +10,7 @@ from sweet.sequel.statements.update_statement import UpdateStatement
 from sweet.sequel.terms.alias import Alias, alias_of
 from sweet.sequel.terms.condition import Condition, Operator
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.values_list import Values
+from sweet.sequel.terms.values_list import ValuesList
 from sweet.utils import DBDataType, quote, quote_for_values
 
 
@@ -70,7 +70,7 @@ class Visitor:
             sql << f"{c.field_quoted} {str(c.operator)} {self.quote_condition(c.value)}"
         return sql
 
-    def visit_Values(self, values: Values, sql: SQLCollector) -> SQLCollector:
+    def visit_ValuesList(self, values: ValuesList, sql: SQLCollector) -> SQLCollector:
         for i, vs in enumerate(values.data):
             if i != 0: sql << ", "
             sql << "(" << ', '.join([ self.quote_values(v) for v in vs ]) << ")"

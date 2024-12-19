@@ -3,7 +3,7 @@ from typing import Self
 from sweet.utils import DBDataType
 
 
-class Values:
+class ValuesList:
     """
     vs = Values(1, "lily", 20)
     vs.append(2, "lucy", 32)

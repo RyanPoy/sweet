@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime
 
-from sweet.sequel.terms.values_list import Values
+from sweet.sequel.terms.values_list import ValuesList
 
 
 class TestValues(unittest.TestCase):
@@ -11,7 +11,7 @@ class TestValues(unittest.TestCase):
         d2 = datetime(2024, 12, 13, 11, 9, 28, 547992)
         d3 = datetime(2024, 12, 13, 11, 9, 28, 547992)
 
-        vs = Values(1, "lucy", 30, d1)
+        vs = ValuesList(1, "lucy", 30, d1)
         self.assertEqual([(1, "lucy", 30, d1)], vs.data)
 
         vs.append([(2, "lily", 20, d2)])
