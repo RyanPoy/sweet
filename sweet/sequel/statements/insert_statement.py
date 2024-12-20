@@ -1,17 +1,21 @@
-from typing import Self
+from typing import Optional, Self
 
 from sweet.sequel.schema.columns import Column
 from sweet.sequel.statements import Statement
+from sweet.sequel.terms.name import TableName
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.utils import DBDataType
 
 
 class InsertStatement(Statement):
     """
+    Represents Abstract Syntax Tree(AST) for SQL INSERT statement
+
+    The InsertStatement AST is structured as follows:
+
     InsertStatement
     ├── Target: TableName
-    │   └── Name: "table_name"
-    ├── Columns: ColumnList
+    ├── Columns: ColumnNameList
     │   ├── ColumnName: "column1"
     │   ├── ColumnName: "column2"
     │   └── ColumnName: "column3"
@@ -32,11 +36,11 @@ class InsertStatement(Statement):
     """
 
     def __init__(self) -> None:
-        self.table = None
+        super().__init__()
         self._columns = None
         self._ignore = False
         self._replace = False
-        self.values = ValuesList()
+        self._values_list: ValuesList = ValuesList()
 
     def is_ignore(self):
         return self._ignore
@@ -44,14 +48,18 @@ class InsertStatement(Statement):
     def is_replace(self):
         return self._replace
 
-    def into(self, table: "Table") -> Self:
-        self.table = table
+    def into(self, table: TableName) -> Self:
+        self._table_name = table
         return self
 
     def columns(self, *columns: Column) -> Self:
         if columns:
             self._columns = columns
         return self
+
+    @property
+    def values(self) -> ValuesList:
+        return self._values_list
 
     def replace(self, *values: DBDataType) -> Self:
         self.__insert_or_replace(*values)
@@ -65,7 +73,7 @@ class InsertStatement(Statement):
 
     def __insert_or_replace(self, *values: DBDataType) -> Self:
         if values:
-            self.values.append([values])
+            self._values_list.append([values])
         return self
 
     def ignore(self) -> Self:
@@ -74,5 +82,5 @@ class InsertStatement(Statement):
 
     def insert_rows(self, *rows: [DBDataType]) -> Self:
         if rows:
-            self.values.append(rows)
+            self._values_list.append(rows)
         return self

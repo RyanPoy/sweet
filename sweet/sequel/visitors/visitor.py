@@ -88,7 +88,7 @@ class Visitor:
             sql << "INSERT"
 
         sql << f" INTO "
-        sql = self.visit(stmt.table, sql)
+        sql = self.visit(stmt.table_name, sql)
         if stmt._columns:
             sql << " (" << ", ".join([c.name_quoted for c in stmt._columns]) << ")"
         sql << " VALUES "

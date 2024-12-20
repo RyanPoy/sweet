@@ -48,7 +48,7 @@ class DeleteStatement(Statement):
         stmt.sql(MySQLVisitor())
     """
     def __init__(self) -> None:
-        self.table_name: Optional[TableName]    = None
+        super().__init__()
         self.wheres: [Condition | Q]            = []
 
     def from_(self, table_name: TableName) -> Self:
@@ -58,7 +58,7 @@ class DeleteStatement(Statement):
         :param table_name: the table name to delete (of type `TableName`)
         :return: the current instance of DeleteStatement
         """
-        self.table_name = table_name
+        self._table_name = table_name
         return self
 
     def where(self, *qs: Q, **kwargs) -> Self:
