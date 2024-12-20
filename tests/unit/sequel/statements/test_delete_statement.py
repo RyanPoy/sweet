@@ -17,43 +17,43 @@ class TestDeleteStatement(unittest.TestCase):
         self.table_users = TableName("users")
 
     def test_omit_where(self):
-        dm = DeleteStatement().from_(self.table_users)
-        self.assertEqual('DELETE FROM "users"', dm.sql(self.mysql))
-        self.assertEqual('DELETE FROM "users"', dm.sql(self.sqlite))
-        self.assertEqual('DELETE FROM "users"', dm.sql(self.pg))
+        stmt = DeleteStatement().from_(self.table_users)
+        self.assertEqual('DELETE FROM "users"', stmt.sql(self.mysql))
+        self.assertEqual('DELETE FROM "users"', stmt.sql(self.sqlite))
+        self.assertEqual('DELETE FROM "users"', stmt.sql(self.pg))
 
     def test_where_field_equals(self):
-        dm = DeleteStatement().from_(self.table_users).where(foo="bar")
-        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\'', dm.sql(self.mysql))
-        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\'', dm.sql(self.sqlite))
-        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\'', dm.sql(self.pg))
+        stmt = DeleteStatement().from_(self.table_users).where(foo="bar")
+        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\'', stmt.sql(self.mysql))
+        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\'', stmt.sql(self.sqlite))
+        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\'', stmt.sql(self.pg))
 
     def test_where_chaining_field_equals(self):
-        dm = DeleteStatement().from_(self.table_users).where(foo="bar").where(baz="xyz")
-        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND "baz" = \'xyz\'', dm.sql(self.mysql))
-        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND "baz" = \'xyz\'', dm.sql(self.sqlite))
-        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND "baz" = \'xyz\'', dm.sql(self.pg))
+        stmt = DeleteStatement().from_(self.table_users).where(foo="bar").where(baz="xyz")
+        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND "baz" = \'xyz\'', stmt.sql(self.mysql))
+        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND "baz" = \'xyz\'', stmt.sql(self.sqlite))
+        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND "baz" = \'xyz\'', stmt.sql(self.pg))
 
     def test_where_q(self):
-        dm = DeleteStatement().from_(self.table_users).where(Q(foo="bar") & Q(baz="xyz"))
-        self.assertEqual('DELETE FROM "users" WHERE ("foo" = \'bar\' AND "baz" = \'xyz\')', dm.sql(self.mysql))
-        self.assertEqual('DELETE FROM "users" WHERE ("foo" = \'bar\' AND "baz" = \'xyz\')', dm.sql(self.sqlite))
-        self.assertEqual('DELETE FROM "users" WHERE ("foo" = \'bar\' AND "baz" = \'xyz\')', dm.sql(self.pg))
+        stmt = DeleteStatement().from_(self.table_users).where(Q(foo="bar") & Q(baz="xyz"))
+        self.assertEqual('DELETE FROM "users" WHERE ("foo" = \'bar\' AND "baz" = \'xyz\')', stmt.sql(self.mysql))
+        self.assertEqual('DELETE FROM "users" WHERE ("foo" = \'bar\' AND "baz" = \'xyz\')', stmt.sql(self.sqlite))
+        self.assertEqual('DELETE FROM "users" WHERE ("foo" = \'bar\' AND "baz" = \'xyz\')', stmt.sql(self.pg))
 
     def test_where_chaining_q(self):
-        dm = DeleteStatement().from_(self.table_users).where(Q(foo="bar")).where(Q(baz="xyz"))
-        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND "baz" = \'xyz\'', dm.sql(self.mysql))
-        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND "baz" = \'xyz\'', dm.sql(self.sqlite))
-        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND "baz" = \'xyz\'', dm.sql(self.pg))
+        stmt = DeleteStatement().from_(self.table_users).where(Q(foo="bar")).where(Q(baz="xyz"))
+        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND "baz" = \'xyz\'', stmt.sql(self.mysql))
+        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND "baz" = \'xyz\'', stmt.sql(self.sqlite))
+        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND "baz" = \'xyz\'', stmt.sql(self.pg))
 
     def test_where_complex_args(self):
-        dm = DeleteStatement().from_(self.table_users).where(foo="bar").where(Q(baz="xyz") | Q(abc=123)).where(age__lt=30)
-        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND ("baz" = \'xyz\' OR "abc" = 123) AND "age" < 30', dm.sql(self.mysql))
-        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND ("baz" = \'xyz\' OR "abc" = 123) AND "age" < 30', dm.sql(self.sqlite))
-        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND ("baz" = \'xyz\' OR "abc" = 123) AND "age" < 30', dm.sql(self.pg))
+        stmt = DeleteStatement().from_(self.table_users).where(foo="bar").where(Q(baz="xyz") | Q(abc=123)).where(age__lt=30)
+        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND ("baz" = \'xyz\' OR "abc" = 123) AND "age" < 30', stmt.sql(self.mysql))
+        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND ("baz" = \'xyz\' OR "abc" = 123) AND "age" < 30', stmt.sql(self.sqlite))
+        self.assertEqual('DELETE FROM "users" WHERE "foo" = \'bar\' AND ("baz" = \'xyz\' OR "abc" = 123) AND "age" < 30', stmt.sql(self.pg))
 
     # def test_delete_returning(self):
-    #     dm = DeleteStatement().from_(self.table_users).where(self.table_users.foo == self.table_users.bar).returning(self.table_users.id)
+    #     stmt = DeleteStatement().from_(self.table_users).where(self.table_users.foo == self.table_users.bar).returning(self.table_users.id)
     #     self.assertEqual('DELETE FROM "users" WHERE "foo"="bar" RETURNING "id"', str(dm))
     #
     # def test_delete_returning_str(self):
@@ -83,6 +83,7 @@ class TestDeleteStatement(unittest.TestCase):
     #     )
     #
     #     self.assertEqual('DELETE FROM "users" USING "trash" WHERE "abc"."id"="trash"."abc_id"', str(dm))
+
 
 if __name__ == '__main__':
     unittest.main()
