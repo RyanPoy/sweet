@@ -26,6 +26,9 @@ class Visitor:
             return self.quote_column_name(column.name)
         return self.quote_column_name(column)
 
+    def quote_table_name(self, name: str) -> str:
+        return f'"{name}"'
+
     def quote_column_name(self, name):
         pointer = "."
         if "__" in name:
@@ -93,7 +96,8 @@ class Visitor:
         return sql
 
     def visit_DeleteStatement(self, stmt: DeleteStatement, sql: SQLCollector) -> SQLCollector:
-        sql << f"DELETE FROM {stmt.table.name_quoted}"
+        sql << "DELETE FROM "
+        self.visit(stmt.table_name, sql)
         if stmt.wheres:
             sql << " WHERE "
             for i, w in enumerate(stmt.wheres):
