@@ -1,6 +1,7 @@
 from typing import Self
 
 from sweet.sequel.statements import Statement
+from sweet.sequel.terms.name import TableName
 from sweet.sequel.terms.q import Q
 from sweet.utils import DBDataType
 
@@ -30,12 +31,12 @@ class UpdateStatement(Statement):
         └── ColumnName: "column3"
     """
     def __init__(self):
-        self.table = None
+        super().__init__()
         self.wheres = []
         self.sets : {str: DBDataType} = {}
 
-    def update(self, table: "Table") -> Self:
-        self.table = table
+    def update(self, table_name: TableName) -> Self:
+        self._table_name = table_name
         return self
 
     def set(self, **kwargs) -> Self:

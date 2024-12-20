@@ -2,6 +2,7 @@ import unittest
 
 from sweet.sequel.schema.table import Table
 from sweet.sequel.statements.update_statement import UpdateStatement
+from sweet.sequel.terms.name import TableName
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
@@ -13,7 +14,7 @@ class TestUpdateStatement(unittest.TestCase):
         self.mysql = MySQLVisitor()
         self.sqlite = SQLiteVisitor()
         self.pg = PostgreSQLVisitor()
-        self.table_users = Table("users")
+        self.table_users = TableName("users")
 
     def test_empty_query(self):
         um = UpdateStatement().update(self.table_users)
@@ -34,8 +35,7 @@ class TestUpdateStatement(unittest.TestCase):
         self.assertEqual("UPDATE \"users\" SET \"foo\" = 'bar''foo'", um.sql(self.pg))
 
     def test_update__table_schema(self):
-        table = Table("users", "schema1")
-        um = UpdateStatement().update(table).set(foo=1).where(foo=0)
+        um = UpdateStatement().update(TableName("schema1.users")).set(foo=1).where(foo=0)
 
         self.assertEqual('UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0', um.sql(self.mysql))
         self.assertEqual('UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0', um.sql(self.sqlite))

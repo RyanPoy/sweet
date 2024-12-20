@@ -28,9 +28,12 @@ class Visitor:
         return self.quote_column_name(column)
 
     def quote_table_name(self, name: str) -> str:
-        return f'"{name}"'
+        return self._quote_table_name_or_column_name(name)
 
     def quote_column_name(self, name):
+        return self._quote_table_name_or_column_name(name)
+
+    def _quote_table_name_or_column_name(self, name):
         pointer = "."
         if "__" in name:
             name = name.replace("__", pointer)
@@ -123,7 +126,7 @@ class Visitor:
             return sql
 
         sql << f"UPDATE "
-        sql = self.visit(stmt.table, sql)
+        sql = self.visit(stmt.table_name, sql)
         if stmt.sets:
             sql << " SET "
             i = 0
@@ -153,9 +156,7 @@ class Visitor:
             sql << " FROM "
             for i, table in enumerate(stmt.tables):
                 if i != 0: sql << ", "
-                if isinstance(table, Table):
-                    self.visit_Table(table, sql)
-                elif isinstance(table, SelectStatement):
+                if isinstance(table, SelectStatement):
                     sql << "("
                     self.visit_SelectStatement(stmt, sql, level+1)
                     sql << f") AS ss{level}"
