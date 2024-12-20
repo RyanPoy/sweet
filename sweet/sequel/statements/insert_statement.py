@@ -39,14 +39,19 @@ class InsertStatement(Statement):
         # set column to insert
         stmt.column(ColumnName("id"), TableName("name"))
 
-        # insert normal values
-        stmt.insert(1, "lucy")
+        # insert operation
+        stmt.insert(1, "lucy")  # insert normal values
+        stmt.insert(1, "Lucy").insert(2, "Lily") # chaining multiple insert for batch processing
+        stmt.insert_rows([ (1, "Lucy"), (2, "Lily") ]) # listing multiple insert for batch processing
+        stmt.insert(1, "Lucy").insert(2, "Lily") # chaining multiple insert or replace for batch processing
+        stmt.insert_rows([ (1, "Lucy"), (2, "Lily") ]) # listing multiple insert for batch processing
 
-        # chaining multiple insert for batch processing
-        stmt.insert(1, "Lucy").insert(2, "Lily")
-
-        # listing multiple insert for batch processing
-        stmt.insert([ (1, "Lucy"), (2, "Lily") ])
+        # you can also execute replace operation in the same way.
+        stmt.replace(1, "lucy")  # insert normal values
+        stmt.replace(1, "Lucy").replace(2, "Lily") # chaining multiple insert for batch processing
+        stmt.replace_rows([ (1, "Lucy"), (2, "Lily") ]) # listing multiple insert for batch processing
+        stmt.replace(1, "Lucy").replace(2, "Lily") # chaining multiple insert or replace for batch processing
+        stmt.replace_rows([ (1, "Lucy"), (2, "Lily") ]) # listing multiple insert for batch processing
 
         # generator the sql of database (e.g. MySQL)
         stmt.sql(MySQLVisitor())
@@ -83,14 +88,26 @@ class InsertStatement(Statement):
     def values(self) -> ValuesList:
         return self._values_list
 
+    def insert(self, *values: DBDataType) -> Self:
+        self.__insert_or_replace(*values)
+        self._replace = False
+        return self
+
+    def insert_rows(self, *rows: [DBDataType]) -> Self:
+        if rows:
+            self._values_list.append(rows)
+        self._replace = False
+        return self
+
     def replace(self, *values: DBDataType) -> Self:
         self.__insert_or_replace(*values)
         self._replace = True
         return self
 
-    def insert(self, *values: DBDataType) -> Self:
-        self.__insert_or_replace(*values)
-        self._replace = False
+    def replace_rows(self, *rows: [DBDataType]) -> Self:
+        if rows:
+            self._values_list.append(rows)
+        self._replace = True
         return self
 
     def __insert_or_replace(self, *values: DBDataType) -> Self:
@@ -102,7 +119,3 @@ class InsertStatement(Statement):
         self._ignore = True
         return self
 
-    def insert_rows(self, *rows: [DBDataType]) -> Self:
-        if rows:
-            self._values_list.append(rows)
-        return self
