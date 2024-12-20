@@ -65,57 +65,123 @@ class InsertStatement(Statement):
         self._replace = False
         self._values_list: ValuesList = ValuesList()
 
-    def is_ignore(self):
+    def is_ignore(self) -> bool:
+        """
+        Returns whether the insert statement should ignore errors.
+
+        :return: True if the statement should ignore errors, False otherwise.
+        """
         return self._ignore
 
-    def is_replace(self):
+    def is_replace(self) -> bool:
+        """
+        Returns whether the insert statement is a REPLACE operation.
+
+        :return: True if the statement is a REPLACE operation, False otherwise.
+        """
         return self._replace
 
-    def into(self, table: TableName) -> Self:
-        self._table_name = table
+    def into(self, table_name: TableName) -> Self:
+        """
+        Specifies the target table for the INSERT statement.
+
+        :param table_name: The table name to insert into. Should be an instance of `TableName`
+        :return: The current InsertStatement instance.
+        """
+        self._table_name = table_name
         return self
 
     @property
     def columns(self) -> [ColumnName]:
+        """
+        Gets the list of columns to insert into.
+
+        :return: List of ColumnName instances.
+        """
         return self._column_names
 
     def column(self, *column_names: ColumnName) -> Self:
+        """
+        Specifies the columns to insert into.
+
+        :param column_names: One or more ColumnName instances to insert into.
+        :return: The current InsertStatement instance.
+        """
         if column_names:
             self._column_names = column_names
         return self
 
     @property
     def values(self) -> ValuesList:
+        """
+        Gets the list of values to insert.
+
+        :return: The list of values to insert.
+        """
         return self._values_list
 
     def insert(self, *values: DBDataType) -> Self:
+        """
+        Adds a new row to the INSERT statement.
+
+        :param values: The values to insert into the specified columns.
+        :return: The current InsertStatement instance.
+        """
         self.__insert_or_replace(*values)
         self._replace = False
         return self
 
     def insert_rows(self, *rows: [DBDataType]) -> Self:
+        """
+        Adds multiple rows to the INSERT statement.
+
+        :param rows: List of tuples representing rows to insert.
+        :return: The current InsertStatement instance.
+        """
         if rows:
             self._values_list.append(rows)
         self._replace = False
         return self
 
     def replace(self, *values: DBDataType) -> Self:
+        """
+        Adds a new row to the INSERT statement with a REPLACE operation.
+
+        :param values: The values to insert into the specified columns.
+        :return: The current InsertStatement instance.
+        """
         self.__insert_or_replace(*values)
         self._replace = True
         return self
 
     def replace_rows(self, *rows: [DBDataType]) -> Self:
+        """
+        Adds multiple rows with a REPLACE operation for batch processing.
+
+        :param rows: List of tuples representing rows to replace.
+        :return: The current InsertStatement instance.
+        """
         if rows:
             self._values_list.append(rows)
         self._replace = True
         return self
 
     def __insert_or_replace(self, *values: DBDataType) -> Self:
+        """
+        Internal method to handle both insert and replace operations.
+
+        :param values: The values to insert or replace into the specified columns.
+        :return: The current InsertStatement instance.
+        """
         if values:
             self._values_list.append([values])
         return self
 
     def ignore(self) -> Self:
+        """
+        Marks the INSERT statement to ignore errors during the operation.
+
+        :return: The current InsertStatement instance.
+        """
         self._ignore = True
         return self
-
