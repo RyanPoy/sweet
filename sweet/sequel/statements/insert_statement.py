@@ -32,6 +32,24 @@ class InsertStatement(Statement):
         └── Filters: (e.g., WHERE conditions)
             └── Condition: column1 > Literal(10)
 
+    Usage:
+        # Create a Insert statement and specify the target table
+        stmt = InsertStatement().into(TableName("users"))
+
+        # set column to insert
+        stmt.column(ColumnName("id"), TableName("name"))
+
+        # insert normal values
+        stmt.insert(1, "lucy")
+
+        # chaining multiple insert for batch processing
+        stmt.insert(1, "Lucy").insert(2, "Lily")
+
+        # listing multiple insert for batch processing
+        stmt.insert([ (1, "Lucy"), (2, "Lily") ])
+
+        # generator the sql of database (e.g. MySQL)
+        stmt.sql(MySQLVisitor())
     Todo: support Source of ast
     """
 
