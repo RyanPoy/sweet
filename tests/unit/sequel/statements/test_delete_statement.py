@@ -1,7 +1,7 @@
 import unittest
 
-from sweet.sequel.schema.table import Table
 from sweet.sequel.statements.delete_statement import DeleteStatement
+from sweet.sequel.terms.name import TableName
 from sweet.sequel.terms.q import Q
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
@@ -14,7 +14,7 @@ class TestDeleteStatement(unittest.TestCase):
         self.mysql = MySQLVisitor()
         self.sqlite = SQLiteVisitor()
         self.pg = PostgreSQLVisitor()
-        self.table_users = Table("users")
+        self.table_users = TableName("users")
 
     def test_omit_where(self):
         dm = DeleteStatement().from_(self.table_users)

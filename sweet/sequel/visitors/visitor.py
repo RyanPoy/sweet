@@ -9,6 +9,7 @@ from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
 from sweet.sequel.terms.alias import Alias, alias_of
 from sweet.sequel.terms.condition import Condition, Operator
+from sweet.sequel.terms.name import TableName
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.utils import DBDataType, quote, quote_for_values
@@ -42,6 +43,10 @@ class Visitor:
 
     def visit_Table(self, t: Table, sql: SQLCollector) -> SQLCollector:
         sql << t.name_quoted
+        return sql
+
+    def visit_TableName(self, n: TableName, sql: SQLCollector) -> SQLCollector:
+        sql << self.quote_table_name(n.value)
         return sql
 
     def visit_Alias(self, a: Alias, sql: SQLCollector) -> SQLCollector:
@@ -89,8 +94,8 @@ class Visitor:
 
         sql << f" INTO "
         sql = self.visit(stmt.table_name, sql)
-        if stmt._columns:
-            sql << " (" << ", ".join([c.name_quoted for c in stmt._columns]) << ")"
+        if stmt.columns:
+            sql << " (" << ", ".join([c.name_quoted for c in stmt.columns]) << ")"
         sql << " VALUES "
         self.visit(stmt.values, sql)
         return sql

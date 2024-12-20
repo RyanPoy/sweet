@@ -3,6 +3,7 @@ import unittest
 from sweet.sequel.schema.columns import Column
 from sweet.sequel.schema.table import Table
 from sweet.sequel.statements.insert_statement import InsertStatement
+from sweet.sequel.terms.name import TableName
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
@@ -14,7 +15,7 @@ class TestInsertStatement(unittest.TestCase):
         self.mysql = MySQLVisitor()
         self.sqlite = SQLiteVisitor()
         self.pg = PostgreSQLVisitor()
-        self.table_users = Table("users")
+        self.table_users = TableName("users")
 
     def test_insert_one_column(self):
         im = InsertStatement().into(self.table_users).insert(1)
@@ -89,14 +90,14 @@ class TestInsertStatement(unittest.TestCase):
         self.table_users.buz = Column("buz")
 
         im = InsertStatement().into(self.table_users) \
-                .columns(self.table_users.foo, self.table_users.bar, self.table_users.buz) \
+                .column(self.table_users.foo, self.table_users.bar, self.table_users.buz) \
                 .insert(1, "a", True)
         self.assertEqual('INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)', im.sql(self.mysql))
         self.assertEqual('INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)', im.sql(self.sqlite))
         self.assertEqual('INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)', im.sql(self.pg))
 
     def test_insert_empty_columns(self):
-        im = InsertStatement().into(self.table_users).columns().insert(1, "a", True)
+        im = InsertStatement().into(self.table_users).column().insert(1, "a", True)
         self.assertEqual('INSERT INTO "users" VALUES (1, \'a\', 1)', im.sql(self.mysql))
         self.assertEqual('INSERT INTO "users" VALUES (1, \'a\', 1)', im.sql(self.sqlite))
         self.assertEqual('INSERT INTO "users" VALUES (1, \'a\', 1)', im.sql(self.pg))
@@ -114,13 +115,13 @@ class TestInsertStatement(unittest.TestCase):
         self.assertEqual('INSERT INTO "users" VALUES (NULL)', im.sql(self.pg))
 
     def test_insert_column(self):
-        im = self.table_users.insert(1)
+        im = Table("users").insert(1)
         self.assertEqual('INSERT INTO "users" VALUES (1)', im.sql(self.mysql))
         self.assertEqual('INSERT INTO "users" VALUES (1)', im.sql(self.sqlite))
         self.assertEqual('INSERT INTO "users" VALUES (1)', im.sql(self.pg))
 
     def test_insert_column_with_chain(self):
-        im = self.table_users.insert(1, "a", True).insert(2, "b", False)
+        im = Table("users").insert(1, "a", True).insert(2, "b", False)
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", im.sql(self.mysql))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", im.sql(self.sqlite))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", im.sql(self.pg))
@@ -680,7 +681,7 @@ class TestInsertStatement(unittest.TestCase):
 #     def test_insert_selected_columns_on_duplicate_update_one(self):
 #         query = (
 #             MySQLQuery.into(self.table_users)
-#             .columns(self.table_users.foo, self.table_users.bar, self.table_users.baz)
+#             .column(self.table_users.foo, self.table_users.bar, self.table_users.baz)
 #             .insert(1, "a", True)
 #             .on_duplicate_key_update(self.table_users.baz, False)
 #         )
@@ -693,7 +694,7 @@ class TestInsertStatement(unittest.TestCase):
 #     def test_insert_selected_columns_on_duplicate_update_multiple(self):
 #         query = (
 #             MySQLQuery.into(self.table_users)
-#             .columns(self.table_users.foo, self.table_users.bar, self.table_users.baz)
+#             .column(self.table_users.foo, self.table_users.bar, self.table_users.baz)
 #             .insert(1, "a", True)
 #             .on_duplicate_key_update(self.table_users.baz, False)
 #             .on_duplicate_key_update(self.table_users.bar, Values(self.table_users.bar))
@@ -744,7 +745,7 @@ class TestInsertStatement(unittest.TestCase):
 #     def test_insert_columns_from_star(self):
 #         query = (
 #             Query.into(self.table_users)
-#             .columns(
+#             .column(
 #                 self.table_users.foo,
 #                 self.table_users.bar,
 #                 self.table_users.buz,
@@ -758,7 +759,7 @@ class TestInsertStatement(unittest.TestCase):
 #     def test_insert_columns_from_columns(self):
 #         query = (
 #             Query.into(self.table_users)
-#             .columns(self.table_users.foo, self.table_users.bar, self.table_users.buz)
+#             .column(self.table_users.foo, self.table_users.bar, self.table_users.buz)
 #             .from_(self.table_efg)
 #             .select(self.table_efg.fiz, self.table_efg.buz, self.table_efg.baz)
 #         )
@@ -771,7 +772,7 @@ class TestInsertStatement(unittest.TestCase):
 #     def test_insert_columns_from_columns_with_join(self):
 #         query = (
 #             Query.into(self.table_users)
-#             .columns(
+#             .column(
 #                 self.table_users.c1,
 #                 self.table_users.c2,
 #                 self.table_users.c3,
@@ -798,7 +799,7 @@ class TestInsertStatement(unittest.TestCase):
 #
 #         q = (
 #             Query.into(purchase_order_item)
-#             .columns(purchase_order_item.id_part, purchase_order_item.id_customer)
+#             .column(purchase_order_item.id_part, purchase_order_item.id_customer)
 #             .insert(
 #                 Query.from_(part).select(part.part_id).where(part.part_number == "FOOBAR"),
 #                 12345,

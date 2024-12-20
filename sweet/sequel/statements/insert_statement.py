@@ -2,7 +2,7 @@ from typing import Optional, Self
 
 from sweet.sequel.schema.columns import Column
 from sweet.sequel.statements import Statement
-from sweet.sequel.terms.name import TableName
+from sweet.sequel.terms.name import ColumnName, TableName
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.utils import DBDataType
 
@@ -37,7 +37,7 @@ class InsertStatement(Statement):
 
     def __init__(self) -> None:
         super().__init__()
-        self._columns = None
+        self._column_names: [ColumnName] = []
         self._ignore = False
         self._replace = False
         self._values_list: ValuesList = ValuesList()
@@ -52,9 +52,13 @@ class InsertStatement(Statement):
         self._table_name = table
         return self
 
-    def columns(self, *columns: Column) -> Self:
+    @property
+    def columns(self) -> [ColumnName]:
+        return self._column_names
+
+    def column(self, *columns: ColumnName) -> Self:
         if columns:
-            self._columns = columns
+            self._column_names = columns
         return self
 
     @property
