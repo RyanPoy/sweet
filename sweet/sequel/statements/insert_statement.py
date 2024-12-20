@@ -56,9 +56,9 @@ class InsertStatement(Statement):
     def columns(self) -> [ColumnName]:
         return self._column_names
 
-    def column(self, *columns: ColumnName) -> Self:
-        if columns:
-            self._column_names = columns
+    def column(self, *column_names: ColumnName) -> Self:
+        if column_names:
+            self._column_names = column_names
         return self
 
     @property
