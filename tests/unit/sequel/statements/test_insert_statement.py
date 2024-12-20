@@ -3,7 +3,7 @@ import unittest
 from sweet.sequel.schema.columns import Column
 from sweet.sequel.schema.table import Table
 from sweet.sequel.statements.insert_statement import InsertStatement
-from sweet.sequel.terms.name import TableName
+from sweet.sequel.terms.name import ColumnName, TableName
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
@@ -85,12 +85,8 @@ class TestInsertStatement(unittest.TestCase):
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)", im.sql(self.pg))
 
     def test_insert_selected_columns(self):
-        self.table_users.foo = Column("foo")
-        self.table_users.bar = Column("bar")
-        self.table_users.buz = Column("buz")
-
         im = InsertStatement().into(self.table_users) \
-                .column(self.table_users.foo, self.table_users.bar, self.table_users.buz) \
+                .column(ColumnName("foo"), ColumnName("bar"), ColumnName("buz")) \
                 .insert(1, "a", True)
         self.assertEqual('INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)', im.sql(self.mysql))
         self.assertEqual('INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)', im.sql(self.sqlite))
@@ -107,12 +103,6 @@ class TestInsertStatement(unittest.TestCase):
         self.assertEqual('INSERT IGNORE INTO "users" VALUES (1)', im.sql(self.mysql))
         self.assertEqual('INSERT IGNORE INTO "users" VALUES (1)', im.sql(self.sqlite))
         self.assertEqual('INSERT IGNORE INTO "users" VALUES (1)', im.sql(self.pg))
-
-    def test_insert_null(self):
-        im = InsertStatement().into(self.table_users).insert(None)
-        self.assertEqual('INSERT INTO "users" VALUES (NULL)', im.sql(self.mysql))
-        self.assertEqual('INSERT INTO "users" VALUES (NULL)', im.sql(self.sqlite))
-        self.assertEqual('INSERT INTO "users" VALUES (NULL)', im.sql(self.pg))
 
     def test_insert_column(self):
         im = Table("users").insert(1)

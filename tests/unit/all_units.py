@@ -8,6 +8,7 @@ from tests.unit.sequel.statements.test_select_statement import TestSelectStateme
 from tests.unit.sequel.statements.test_update_statement import TestUpdateStatement
 from tests.unit.sequel.terms.test_alias import TestAlias
 from tests.unit.sequel.terms.test_condition import TestCondition
+from tests.unit.sequel.terms.test_name import TestName
 from tests.unit.sequel.terms.test_q import TestQ
 from tests.unit.sequel.terms.test_values import TestValues
 
@@ -25,6 +26,7 @@ if __name__ == '__main__':
         TestQ,
         TestValues,
         TestAlias,
+        TestName,
     ]:
         suites.addTests(loader.loadTestsFromTestCase(case))
     unittest.TextTestRunner().run(suites)
