@@ -7,7 +7,7 @@ from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
-from sweet.sequel.terms.alias import Alias, alias_of
+from sweet.sequel.terms.alias import Alias
 from sweet.sequel.terms.condition import Condition, Operator
 from sweet.sequel.terms.name import ColumnName, TableName
 from sweet.sequel.terms.q import Q
@@ -53,10 +53,10 @@ class Visitor:
         return sql
 
     def visit_Alias(self, a: Alias, sql: SQLCollector) -> SQLCollector:
+        self.visit(a.origin, sql)
         if a.target:
-            self.visit(a.target, sql)
             sql << " AS "
-        sql << self.quote_column_name(a.as_str)
+            self.visit(a.target, sql)
         return sql
 
     def visit_Column(self, c: Column, sql: SQLCollector) -> SQLCollector:
@@ -143,11 +143,15 @@ class Visitor:
             sql << "DISTINCT "
         if not stmt.columns:
             sql << "*"
-        else:
-            cs = stmt.columns if len(stmt.tables) <= 1 else [ alias_of(f"{c.table.name}.{c.name}") for c in stmt.columns ]
-            for i, c in enumerate(cs):
+        if len(stmt.tables) <= 1:
+            for i, c in enumerate(stmt.columns):
                 if i != 0: sql << ", "
                 self.visit(c, sql)
+        else:
+            for i, c in enumerate(stmt.columns):
+                if i != 0: sql << ", "
+                self.visit(ColumnName(f"{c.table.name}.{c.name}"), sql)
+
         if stmt.tables:
             sql << " FROM "
             for i, table in enumerate(stmt.tables):
