@@ -1,15 +1,18 @@
 from typing import Self
 
+from sweet.sequel.terms import Term
 from sweet.utils import DBDataType
 
 
-class ValuesList:
+class ValuesList(Term):
     """
     vs = Values(1, "lily", 20)
     vs.append(2, "lucy", 32)
     vs.append((3, "jimy", 15), (4, "abc", 8))
     """
     def __init__(self, *vs: DBDataType) -> None:
+        super().__init__()
+
         self.data = []
         if vs:
             self.data.append(vs)
