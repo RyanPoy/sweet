@@ -4,6 +4,7 @@ from sweet.sequel.schema.columns import Column
 from sweet.sequel.schema.table import Table
 from sweet.sequel.statements import Statement
 from sweet.sequel.terms.alias import Alias
+from sweet.sequel.terms.name import Name, TableName
 
 
 class SelectStatement(Statement):
@@ -33,26 +34,21 @@ class SelectStatement(Statement):
         self.columns = []
         self._distinct = False
 
-    def from_(self, table_or_select: Table | Self) -> Self:
+    def from_(self, table: TableName | Alias) -> Self:
         found = False
-        if isinstance(table_or_select, Table):
+        if isinstance(table, Table):
             for t in self.tables:
-                if t.name == table_or_select.name:
+                if t.name == table.name:
                     found = True
             if not found:
-                self.tables.append(table_or_select)
+                self.tables.append(table)
         else:
-            self.tables.append(table_or_select)
+            self.tables.append(table)
         return self
 
-    def select(self, *columns: Column | Alias) -> Self:
+    def select(self, *columns: Name | Alias) -> Self:
         if columns:
             self.columns.extend(columns)
-            if not self.tables:
-                for c in columns:
-                    tb = c.table if isinstance(c, Column) else c.target.table
-                    self.from_(tb)
-                    break
         return self
 
     def distinct(self) -> Self:

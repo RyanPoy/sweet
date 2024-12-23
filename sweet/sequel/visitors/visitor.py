@@ -41,16 +41,17 @@ class Visitor:
         return quote_for_values(values)
 
     def visit_Table(self, t: Table, sql: SQLCollector) -> SQLCollector:
-        sql << t.name_quoted
-        return sql
+        return sql << t.name_quoted
 
     def visit_TableName(self, n: TableName, sql: SQLCollector) -> SQLCollector:
-        sql << self.quote_table_name(n.value)
-        return sql
+        if n.schema_name:
+            return sql << self.quote_table_name(f"{n.schema_name}.{n.value}")
+        return sql << self.quote_table_name(n.value)
 
     def visit_ColumnName(self, n: ColumnName, sql: SQLCollector) -> SQLCollector:
-        sql << self.quote_column_name(n.value)
-        return sql
+        if n.schema_name:
+            return sql << self.quote_column_name(f"{n.schema_name}.{n.value}")
+        return sql << self.quote_column_name(n.value)
 
     def visit_Alias(self, a: Alias, sql: SQLCollector) -> SQLCollector:
         self.visit(a.origin, sql)
@@ -60,8 +61,7 @@ class Visitor:
         return sql
 
     def visit_Column(self, c: Column, sql: SQLCollector) -> SQLCollector:
-        sql << self.quote_column(c)
-        return sql
+        return sql << self.quote_column(c)
 
     def visit_Q(self, q: Q, sql: SQLCollector) -> SQLCollector:
         if q.condition:
@@ -143,25 +143,20 @@ class Visitor:
             sql << "DISTINCT "
         if not stmt.columns:
             sql << "*"
-        if len(stmt.tables) <= 1:
-            for i, c in enumerate(stmt.columns):
-                if i != 0: sql << ", "
-                self.visit(c, sql)
-        else:
-            for i, c in enumerate(stmt.columns):
-                if i != 0: sql << ", "
-                self.visit(ColumnName(f"{c.table.name}.{c.name}"), sql)
 
-        if stmt.tables:
-            sql << " FROM "
-            for i, table in enumerate(stmt.tables):
-                if i != 0: sql << ", "
-                if isinstance(table, SelectStatement):
-                    sql << "("
-                    self.visit_SelectStatement(stmt, sql, level+1)
-                    sql << f") AS ss{level}"
-                else:
-                    self.visit(table, sql)
+        for i, c in enumerate(stmt.columns):
+            if i != 0: sql << ", "
+            self.visit(c, sql)
+
+        sql << " FROM "
+        for i, table in enumerate(stmt.tables):
+            if i != 0: sql << ", "
+            if isinstance(table, SelectStatement):
+                sql << "("
+                self.visit_SelectStatement(stmt, sql, level+1)
+                sql << f") AS ss{level}"
+            else:
+                self.visit(table, sql)
         return sql
 
     def visit(self, o: any, sql: SQLCollector = None) -> SQLCollector:

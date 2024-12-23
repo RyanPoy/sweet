@@ -15,14 +15,17 @@ class Name(Term):
         value (str): The name as a string (e.g., column, table, alias).
     """
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, schema_name: str = None) -> None:
         """
         :param name: The name of the entity (column, table, alias). (e.g., of `str`)
         """
         super().__init__()
         self.value: str = name
+        self.schema_name: str = schema_name
 
     def __repr__(self):
+        if self.schema_name:
+            return f'{self.__class__.__name__}("{self.schema_name}"."{self.value}")'
         return f'{self.__class__.__name__}("{self.value}")'
 
 
