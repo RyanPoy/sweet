@@ -19,157 +19,147 @@ class TestSelectStatement(unittest.TestCase):
         self.table_efg = TableName("efg")
 
     def test_empty_query(self):
-        ss = SelectStatement().from_(self.table_abc)
-        self.assertEqual('SELECT * FROM "abc"', ss.sql(self.mysql))
-        self.assertEqual('SELECT * FROM "abc"', ss.sql(self.sqlite))
-        self.assertEqual('SELECT * FROM "abc"', ss.sql(self.pg))
+        stmt = SelectStatement().from_(self.table_abc)
+        self.assertEqual('SELECT * FROM "abc"', stmt.sql(self.mysql))
+        self.assertEqual('SELECT * FROM "abc"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT * FROM "abc"', stmt.sql(self.pg))
 
     def test_select__table_schema(self):
-        ss = SelectStatement().from_(TableName("abc", "schema1"))
-        self.assertEqual('SELECT * FROM "schema1"."abc"', ss.sql(self.mysql))
-        self.assertEqual('SELECT * FROM "schema1"."abc"', ss.sql(self.sqlite))
-        self.assertEqual('SELECT * FROM "schema1"."abc"', ss.sql(self.pg))
+        stmt = SelectStatement().from_(TableName("abc", "schema1"))
+        self.assertEqual('SELECT * FROM "schema1"."abc"', stmt.sql(self.mysql))
+        self.assertEqual('SELECT * FROM "schema1"."abc"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT * FROM "schema1"."abc"', stmt.sql(self.pg))
 
     def test_select__distinct__single(self):
-        ss = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).distinct()
-        self.assertEqual('SELECT DISTINCT "foo" FROM "abc"', ss.sql(self.mysql))
-        self.assertEqual('SELECT DISTINCT "foo" FROM "abc"', ss.sql(self.sqlite))
-        self.assertEqual('SELECT DISTINCT "foo" FROM "abc"', ss.sql(self.pg))
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).distinct()
+        self.assertEqual('SELECT DISTINCT "foo" FROM "abc"', stmt.sql(self.mysql))
+        self.assertEqual('SELECT DISTINCT "foo" FROM "abc"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT DISTINCT "foo" FROM "abc"', stmt.sql(self.pg))
 
     def test_select__distinct__multi(self):
-        ss = SelectStatement().from_(self.table_abc).select(ColumnName("foo"), ColumnName("bar")).distinct()
-        self.assertEqual('SELECT DISTINCT "foo", "bar" FROM "abc"', ss.sql(self.mysql))
-        self.assertEqual('SELECT DISTINCT "foo", "bar" FROM "abc"', ss.sql(self.sqlite))
-        self.assertEqual('SELECT DISTINCT "foo", "bar" FROM "abc"', ss.sql(self.pg))
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo"), ColumnName("bar")).distinct()
+        self.assertEqual('SELECT DISTINCT "foo", "bar" FROM "abc"', stmt.sql(self.mysql))
+        self.assertEqual('SELECT DISTINCT "foo", "bar" FROM "abc"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT DISTINCT "foo", "bar" FROM "abc"', stmt.sql(self.pg))
 
     def test_select_single_column(self):
-        ss = SelectStatement().from_(self.table_abc).select(ColumnName("foo"))
-        self.assertEqual('SELECT "foo" FROM "abc"', ss.sql(self.mysql))
-        self.assertEqual('SELECT "foo" FROM "abc"', ss.sql(self.sqlite))
-        self.assertEqual('SELECT "foo" FROM "abc"', ss.sql(self.pg))
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo"))
+        self.assertEqual('SELECT "foo" FROM "abc"', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo" FROM "abc"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" FROM "abc"', stmt.sql(self.pg))
 
     def test_select_single_column_with_alias(self):
-        ss = SelectStatement().from_(self.table_abc).select(ColumnName("foo").as_("bar"))
-        self.assertEqual('SELECT "foo" AS "bar" FROM "abc"', ss.sql(self.mysql))
-        self.assertEqual('SELECT "foo" AS "bar" FROM "abc"', ss.sql(self.sqlite))
-        self.assertEqual('SELECT "foo" AS "bar" FROM "abc"', ss.sql(self.pg))
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo").as_("bar"))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc"', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc"', stmt.sql(self.pg))
 
     def test_select_single_column_and_table_alias_str(self):
-        ss = SelectStatement().from_(self.table_abc.as_("fizzbuzz")).select(ColumnName("foo").as_("bar"))
-        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" AS "fizzbuzz"', ss.sql(self.mysql))
-        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" AS "fizzbuzz"', ss.sql(self.sqlite))
-        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" AS "fizzbuzz"', ss.sql(self.pg))
+        stmt = SelectStatement().from_(self.table_abc.as_("fizzbuzz")).select(ColumnName("foo").as_("bar"))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" AS "fizzbuzz"', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" AS "fizzbuzz"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" AS "fizzbuzz"', stmt.sql(self.pg))
 
     def test_select_multiple_columns(self):
-        ss = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).select(ColumnName("bar"))
-        self.assertEqual('SELECT "foo", "bar" FROM "abc"', ss.sql(self.mysql))
-        self.assertEqual('SELECT "foo", "bar" FROM "abc"', ss.sql(self.sqlite))
-        self.assertEqual('SELECT "foo", "bar" FROM "abc"', ss.sql(self.pg))
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).select(ColumnName("bar"))
+        self.assertEqual('SELECT "foo", "bar" FROM "abc"', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo", "bar" FROM "abc"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo", "bar" FROM "abc"', stmt.sql(self.pg))
 
     def test_select_multiple_tables(self):
-        ss = SelectStatement().from_(self.table_abc).select(ColumnName("foo", self.table_abc.value)) \
-                                .from_(self.table_efg).select(ColumnName("bar", self.table_efg.value))
-        self.assertEqual('SELECT "abc"."foo", "efg"."bar" FROM "abc", "efg"', ss.sql(self.mysql))
-        self.assertEqual('SELECT "abc"."foo", "efg"."bar" FROM "abc", "efg"', ss.sql(self.sqlite))
-        self.assertEqual('SELECT "abc"."foo", "efg"."bar" FROM "abc", "efg"', ss.sql(self.pg))
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo", self.table_abc.value)) \
+            .from_(self.table_efg).select(ColumnName("bar", self.table_efg.value))
+        self.assertEqual('SELECT "abc"."foo", "efg"."bar" FROM "abc", "efg"', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "abc"."foo", "efg"."bar" FROM "abc", "efg"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "abc"."foo", "efg"."bar" FROM "abc", "efg"', stmt.sql(self.pg))
 
     # def test_select_subquery(self):
-    #     self.table_abc.foo = Column("foo")
-    #     self.table_abc.bar = Column("bar")
     #     sub = SelectStatement().from_(self.table_abc)
-    #     ss = SelectStatement().from_(sub).select(sub.foo, sub.bar)
-    #     self.assertEqual('SELECT "sq0"."foo", "sq0"."bar" FROM (SELECT * FROM "abc") "sq0"', ss.sql(self.mysql))
-    #     self.assertEqual('SELECT "sq0"."foo", "sq0"."bar" FROM (SELECT * FROM "abc") "sq0"', ss.sql(self.sqlite))
-    #     self.assertEqual('SELECT "sq0"."foo", "sq0"."bar" FROM (SELECT * FROM "abc") "sq0"', ss.sql(self.pg))
+    #     stmt = SelectStatement().from_(sub).select(ColumnName("foo"), ColumnName("bar"))
+    #     self.assertEqual('SELECT "sq0"."foo", "sq0"."bar" FROM (SELECT * FROM "abc") AS "sq0"', stmt.sql(self.mysql))
+    #     self.assertEqual('SELECT "sq0"."foo", "sq0"."bar" FROM (SELECT * FROM "abc") AS "sq0"', stmt.sql(self.sqlite))
+    #     self.assertEqual('SELECT "sq0"."foo", "sq0"."bar" FROM (SELECT * FROM "abc") AS "sq0"', stmt.sql(self.pg))
 
-#     def test_select__multiple_subqueries(self):
-#         subquery0 = Query.from_(self.table_abc).select("foo")
-#         subquery1 = Query.from_(self.table_efg).select("bar")
-#         q = Query.from_(subquery0).from_(subquery1).select(subquery0.foo, subquery1.bar)
-#
-#         self.assertEqual(
-#             'SELECT "sq0"."foo","sq1"."bar" ' 'FROM (SELECT "foo" FROM "abc") "sq0",' '(SELECT "bar" FROM "efg") "sq1"',
-#             str(q),
-#         )
-#
-#     def test_select__nested_subquery(self):
-#         subquery0 = Query.from_(self.table_abc).select("*")
-#         subquery1 = Query.from_(subquery0).select(subquery0.foo, subquery0.bar)
-#         subquery2 = Query.from_(subquery1).select(subquery1.foo)
-#
-#         q = Query.from_(subquery2).select(subquery2.foo)
-#
-#         self.assertEqual(
-#             'SELECT "sq2"."foo" '
-#             'FROM (SELECT "sq1"."foo" '
-#             'FROM (SELECT "sq0"."foo","sq0"."bar" '
-#             'FROM (SELECT * FROM "abc") "sq0") "sq1") "sq2"',
-#             str(q),
-#         )
-#
-#     def test_select__no_table(self):
-#         q = Query.select(1, 2, 3)
-#
-#         self.assertEqual("SELECT 1,2,3", str(q))
-#
-#     def test_select_then_add_table(self):
-#         q = Query.select(1).select(2, 3).from_("abc").select("foo")
-#
-#         self.assertEqual('SELECT 1,2,3,"foo" FROM "abc"', str(q))
-#
-#     def test_select_with_limit(self):
-#         q1 = Query.from_("abc").select("foo")[:10]
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" LIMIT 10', str(q1))
-#
-#     def test_select_with_limit_zero(self):
-#         with self.subTest('using python slice'):
-#             q1 = Query.from_("abc").select("foo")[:0]
-#             self.assertEqual('SELECT "foo" FROM "abc" LIMIT 0', str(q1))
-#
-#         with self.subTest('using limit method'):
-#             q2 = Query.from_("abc").select("foo").limit(0)
-#             self.assertEqual('SELECT "foo" FROM "abc" LIMIT 0', str(q2))
-#
-#     def test_select_with_limit__func(self):
-#         q1 = Query.from_("abc").select("foo").limit(10)
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" LIMIT 10', str(q1))
-#
-#     def test_select_with_offset(self):
-#         q1 = Query.from_("abc").select("foo")[10:]
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" OFFSET 10', str(q1))
-#
-#     def test_select_with_offset__func(self):
-#         q1 = Query.from_("abc").select("foo").offset(10)
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" OFFSET 10', str(q1))
-#
+    #     def test_select__multiple_subqueries(self):
+    #         subquery0 = Query.from_(self.table_abc).select("foo")
+    #         subquery1 = Query.from_(self.table_efg).select("bar")
+    #         q = Query.from_(subquery0).from_(subquery1).select(subquery0.foo, subquery1.bar)
+    #
+    #         self.assertEqual(
+    #             'SELECT "sq0"."foo","sq1"."bar" ' 'FROM (SELECT "foo" FROM "abc") "sq0",' '(SELECT "bar" FROM "efg") "sq1"',
+    #             str(q),
+    #         )
+    #
+    #     def test_select__nested_subquery(self):
+    #         subquery0 = Query.from_(self.table_abc).select("*")
+    #         subquery1 = Query.from_(subquery0).select(subquery0.foo, subquery0.bar)
+    #         subquery2 = Query.from_(subquery1).select(subquery1.foo)
+    #
+    #         q = Query.from_(subquery2).select(subquery2.foo)
+    #
+    #         self.assertEqual(
+    #             'SELECT "sq2"."foo" '
+    #             'FROM (SELECT "sq1"."foo" '
+    #             'FROM (SELECT "sq0"."foo","sq0"."bar" '
+    #             'FROM (SELECT * FROM "abc") "sq0") "sq1") "sq2"',
+    #             str(q),
+    #         )
+    #
+    def test_select__no_table(self):
+        stmt = SelectStatement().select(1, 2, 3)
+        self.assertEqual("SELECT 1, 2, 3", stmt.sql(self.mysql))
+        self.assertEqual("SELECT 1, 2, 3", stmt.sql(self.sqlite))
+        self.assertEqual("SELECT 1, 2, 3", stmt.sql(self.pg))
+
+    def test_select_then_add_table(self):
+        stmt = SelectStatement().select(1, 2, 3).from_(self.table_abc).select("foo").select(ColumnName("bar"))
+        self.assertEqual('SELECT 1, 2, 3, \'foo\', "bar" FROM "abc"', stmt.sql(self.mysql))
+        self.assertEqual('SELECT 1, 2, 3, \'foo\', "bar" FROM "abc"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT 1, 2, 3, \'foo\', "bar" FROM "abc"', stmt.sql(self.pg))
+
+    def test_select_with_limit(self):
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).limit(10)
+        self.assertEqual('SELECT "foo" FROM "abc" LIMIT 10', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo" FROM "abc" LIMIT 10', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" FROM "abc" LIMIT 10', stmt.sql(self.pg))
+
+    def test_select_with_limit_zero(self):
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).limit(0)
+        self.assertEqual('SELECT "foo" FROM "abc"', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo" FROM "abc"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" FROM "abc"', stmt.sql(self.pg))
+
+    def test_select_with_offset(self):
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).offset(10)
+        self.assertEqual('SELECT "foo" FROM "abc" OFFSET 10', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo" FROM "abc" OFFSET 10', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" FROM "abc" OFFSET 10', stmt.sql(self.pg))
+
+
 #     def test_select_with_limit_and_offset(self):
-#         q1 = Query.from_("abc").select("foo")[10:10]
+#         stmt = SelectStatement().from_(self.table_abc).select("foo")[10:10]
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" LIMIT 10 OFFSET 10', str(q1))
 #
 #     def test_select_with_force_index(self):
-#         q = Query.from_("abc").select("foo").force_index("egg")
+#         q = Query.from_(self.table_abc).select("foo").force_index("egg")
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg")', str(q))
 #
 #     def test_select_with_force_index_with_index_object(self):
 #         index = Index("egg")
-#         q = Query.from_("abc").select("foo").force_index(index)
+#         q = Query.from_(self.table_abc).select("foo").force_index(index)
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg")', str(q))
 #
 #     def test_select_with_force_index_multiple_indexes(self):
-#         q = Query.from_("abc").select("foo").force_index("egg", "bacon")
+#         q = Query.from_(self.table_abc).select("foo").force_index("egg", "bacon")
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg","bacon")', str(q))
 #
 #     def test_select_with_force_index_multiple_calls(self):
 #         q = (
-#             Query.from_("abc")
+#             Query.from_(self.table_abc)
 #             .select("foo")
 #             .force_index(
 #                 "egg",
@@ -180,24 +170,24 @@ class TestSelectStatement(unittest.TestCase):
 #         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg","spam")', str(q))
 #
 #     def test_select_with_use_index(self):
-#         q = Query.from_("abc").select("foo").use_index("egg")
+#         q = Query.from_(self.table_abc).select("foo").use_index("egg")
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" USE INDEX ("egg")', str(q))
 #
 #     def test_select_with_use_index_with_index_object(self):
 #         index = Index("egg")
-#         q = Query.from_("abc").select("foo").use_index(index)
+#         q = Query.from_(self.table_abc).select("foo").use_index(index)
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" USE INDEX ("egg")', str(q))
 #
 #     def test_select_with_use_index_multiple_indexes(self):
-#         q = Query.from_("abc").select("foo").use_index("egg", "bacon")
+#         q = Query.from_(self.table_abc).select("foo").use_index("egg", "bacon")
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" USE INDEX ("egg","bacon")', str(q))
 #
 #     def test_select_with_use_index_multiple_calls(self):
 #         q = (
-#             Query.from_("abc")
+#             Query.from_(self.table_abc)
 #             .select("foo")
 #             .use_index(
 #                 "egg",
@@ -208,32 +198,32 @@ class TestSelectStatement(unittest.TestCase):
 #         self.assertEqual('SELECT "foo" FROM "abc" USE INDEX ("egg","spam")', str(q))
 #
 #     def test_mysql_query_uses_backtick_quote_chars(self):
-#         q = MySQLQuery.from_("abc").select("foo", "bar")
+#         q = MySQLQuery.from_(self.table_abc).select("foo", "bar")
 #
 #         self.assertEqual("SELECT `foo`,`bar` FROM `abc`", str(q))
 #
 #     def test_vertica_query_uses_double_quote_chars(self):
-#         q = VerticaQuery.from_("abc").select("foo", "bar")
+#         q = VerticaQuery.from_(self.table_abc).select("foo", "bar")
 #
 #         self.assertEqual('SELECT "foo","bar" FROM "abc"', str(q))
 #
 #     def test_mssql_query_uses_double_quote_chars(self):
-#         q = MSSQLQuery.from_("abc").select("foo", "bar")
+#         q = MSSQLQuery.from_(self.table_abc).select("foo", "bar")
 #
 #         self.assertEqual('SELECT "foo","bar" FROM "abc"', str(q))
 #
 #     def test_oracle_query_uses_no_quote_chars(self):
-#         q = OracleQuery.from_("abc").select("foo", "bar")
+#         q = OracleQuery.from_(self.table_abc).select("foo", "bar")
 #
 #         self.assertEqual('SELECT foo,bar FROM abc', str(q))
 #
 #     def test_postgresql_query_uses_double_quote_chars(self):
-#         q = PostgreSQLQuery.from_("abc").select("foo", "bar")
+#         q = PostgreSQLQuery.from_(self.table_abc).select("foo", "bar")
 #
 #         self.assertEqual('SELECT "foo","bar" FROM "abc"', str(q))
 #
 #     def test_redshift_query_uses_double_quote_chars(self):
-#         q = RedshiftQuery.from_("abc").select("foo", "bar")
+#         q = RedshiftQuery.from_(self.table_abc).select("foo", "bar")
 #
 #         self.assertEqual('SELECT "foo","bar" FROM "abc"', str(q))
 #
@@ -241,13 +231,13 @@ class TestSelectStatement(unittest.TestCase):
 #         q = self.table_abc.select(1)
 #
 #         self.assertEqual('SELECT 1 FROM "abc"', str(q))
-#         self.assertEqual(q, Query.from_("abc").select(1))
+#         self.assertEqual(q, Query.from_(self.table_abc).select(1))
 #
 #     def test_table_select_alias_with_offset_and_limit(self):
-#         self.assertEqual(self.table_abc.select("foo")[10:10], Query.from_("abc").select("foo")[10:10])
+#         self.assertEqual(self.table_abc.select("foo")[10:10], Query.from_(self.table_abc).select("foo")[10:10])
 #         self.assertEqual(
 #             self.table_abc.select(self.table_abc.foo)[10:10],
-#             Query.from_("abc").select("foo")[10:10],
+#             Query.from_(self.table_abc).select("foo")[10:10],
 #         )
 #
 #     def test_temporal_select(self):
@@ -302,7 +292,7 @@ class TestSelectStatement(unittest.TestCase):
 #     t2 = Table("cba")
 #
 #     def test_where_enum(self):
-#         q1 = Query.from_(self.t).select("*").where(self.t.foo == MyEnum.STR)
+#         stmt = SelectStatement().from_(self.t).select("*").where(self.t.foo == MyEnum.STR)
 #         q2 = Query.from_(self.t).select("*").where(self.t.foo == MyEnum.INT)
 #         q3 = Query.from_(self.t).select("*").where(self.t.foo == MyEnum.BOOL)
 #         q4 = Query.from_(self.t).select("*").where(self.t.foo == MyEnum.DATE)
@@ -315,7 +305,7 @@ class TestSelectStatement(unittest.TestCase):
 #         self.assertEqual('SELECT * FROM "abc" WHERE "foo"=null', str(q5))
 #
 #     def test_where_field_equals(self):
-#         q1 = Query.from_(self.t).select("*").where(self.t.foo == self.t.bar)
+#         stmt = SelectStatement().from_(self.t).select("*").where(self.t.foo == self.t.bar)
 #         q2 = Query.from_(self.t).select("*").where(self.t.foo.eq(self.t.bar))
 #
 #         self.assertEqual('SELECT * FROM "abc" WHERE "foo"="bar"', str(q1))
@@ -495,7 +485,7 @@ class TestSelectStatement(unittest.TestCase):
 #         self.assertEqual('SELECT * FROM "abc" WHERE NOT "foo"=1 AND NOT "bar"="baz"', str(q))
 #
 #     def test_where_single_quote(self):
-#         q1 = Query.from_(self.t).select("*").where(self.t.foo == "bar'foo")
+#         stmt = SelectStatement().from_(self.t).select("*").where(self.t.foo == "bar'foo")
 #
 #         self.assertEqual("SELECT * FROM \"abc\" WHERE \"foo\"='bar''foo'", str(q1))
 #
@@ -570,17 +560,17 @@ class TestSelectStatement(unittest.TestCase):
 #         self.assertEqual('SELECT * FROM "abc" WHERE "foo" RLIKE \'^b\'', str(q))
 #
 #     def test_ignore_empty_criterion_where(self):
-#         q1 = Query.from_(self.t).select("*").where(EmptyCriterion())
+#         stmt = SelectStatement().from_(self.t).select("*").where(EmptyCriterion())
 #
 #         self.assertEqual('SELECT * FROM "abc"', str(q1))
 #
 #     def test_ignore_empty_criterion_having(self):
-#         q1 = Query.from_(self.t).select("*").having(EmptyCriterion())
+#         stmt = SelectStatement().from_(self.t).select("*").having(EmptyCriterion())
 #
 #         self.assertEqual('SELECT * FROM "abc"', str(q1))
 #
 #     def test_select_with_force_index_and_where(self):
-#         q = Query.from_("abc").select("foo").where(self.t.foo == self.t.bar).force_index("egg")
+#         q = Query.from_(self.table_abc).select("foo").where(self.t.foo == self.t.bar).force_index("egg")
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg") WHERE "foo"="bar"', str(q))
 #
@@ -609,7 +599,7 @@ class TestSelectStatement(unittest.TestCase):
 #     t = Table("abc")
 #
 #     def test_prewhere_field_equals(self):
-#         q1 = Query.from_(self.t).select("*").prewhere(self.t.foo == self.t.bar)
+#         stmt = SelectStatement().from_(self.t).select("*").prewhere(self.t.foo == self.t.bar)
 #         q2 = Query.from_(self.t).select("*").prewhere(self.t.foo.eq(self.t.bar))
 #
 #         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q1))
@@ -665,12 +655,12 @@ class TestSelectStatement(unittest.TestCase):
 #         self.assertEqual('SELECT "foo",SUM("bar") FILTER(WHERE "id"=1 AND "cid">2) FROM "abc" GROUP BY "foo"', str(q))
 #
 #     def test_groupby__str(self):
-#         q = Query.from_("abc").groupby("foo").select("foo", fn.Count("*").distinct())
+#         q = Query.from_(self.table_abc).groupby("foo").select("foo", fn.Count("*").distinct())
 #
 #         self.assertEqual('SELECT "foo",COUNT(DISTINCT *) FROM "abc" GROUP BY "foo"', str(q))
 #
 #     def test_groupby__int(self):
-#         q = Query.from_("abc").groupby(1).select("foo", fn.Count("*").distinct())
+#         q = Query.from_(self.table_abc).groupby(1).select("foo", fn.Count("*").distinct())
 #
 #         self.assertEqual('SELECT "foo",COUNT(DISTINCT *) FROM "abc" GROUP BY 1', str(q))
 #
@@ -916,7 +906,7 @@ class TestSelectStatement(unittest.TestCase):
 #         self.assertEqual('SELECT "foo","bar" FROM "abc" ORDER BY "foo","bar"', str(q))
 #
 #     def test_orderby_single_str(self):
-#         q = Query.from_("abc").orderby("foo").select("foo")
+#         q = Query.from_(self.table_abc).orderby("foo").select("foo")
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo"', str(q))
 #

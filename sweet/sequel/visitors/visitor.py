@@ -11,6 +11,7 @@ from sweet.sequel.terms.alias import Alias
 from sweet.sequel.terms.condition import Condition, Operator
 from sweet.sequel.terms.name import ColumnName, TableName
 from sweet.sequel.terms.q import Q
+from sweet.sequel.terms.value import Value
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.utils import DBDataType, quote, quote_for_values
 
@@ -81,6 +82,9 @@ class Visitor:
             sql << f"{c.field_quoted} {str(c.operator)} {self.quote_condition(c.value)}"
         return sql
 
+    def visit_Value(self, v: Value, sql: SQLCollector) -> SQLCollector:
+        return sql << quote(v.v)
+
     def visit_ValuesList(self, values: ValuesList, sql: SQLCollector) -> SQLCollector:
         for i, vs in enumerate(values.data):
             if i != 0: sql << ", "
@@ -148,15 +152,23 @@ class Visitor:
             if i != 0: sql << ", "
             self.visit(c, sql)
 
-        sql << " FROM "
-        for i, table in enumerate(stmt.tables):
-            if i != 0: sql << ", "
-            if isinstance(table, SelectStatement):
-                sql << "("
-                self.visit_SelectStatement(stmt, sql, level+1)
-                sql << f") AS ss{level}"
-            else:
-                self.visit(table, sql)
+        if stmt.tables:
+            sql << " FROM "
+            for i, table in enumerate(stmt.tables):
+                if i != 0: sql << ", "
+                if isinstance(table, SelectStatement):
+                    sql << "("
+                    self.visit_SelectStatement(table, sql, level+1)
+                    sql << f") AS sq{level}"
+                else:
+                    self.visit(table, sql)
+
+        if stmt._limit and stmt._offset:
+            sql << f" LIMIT {stmt._limit}, OFFSET {stmt._offset}"
+        elif stmt._limit:
+            sql << f" LIMIT {stmt._limit}"
+        elif stmt._offset:
+            sql << f" OFFSET {stmt._offset}"
         return sql
 
     def visit(self, o: any, sql: SQLCollector = None) -> SQLCollector:

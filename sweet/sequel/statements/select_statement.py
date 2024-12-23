@@ -5,6 +5,8 @@ from sweet.sequel.schema.table import Table
 from sweet.sequel.statements import Statement
 from sweet.sequel.terms.alias import Alias
 from sweet.sequel.terms.name import Name, TableName
+from sweet.sequel.terms.value import Value
+from sweet.utils import DBDataType
 
 
 class SelectStatement(Statement):
@@ -30,11 +32,15 @@ class SelectStatement(Statement):
           └── DESC / ASC
     """
     def __init__(self):
+        super().__init__()
+
         self.tables = []
         self.columns = []
         self._distinct = False
+        self._limit = 0
+        self._offset = 0
 
-    def from_(self, table: TableName | Alias) -> Self:
+    def from_(self, table: TableName | Alias | Self) -> Self:
         found = False
         if isinstance(table, Table):
             for t in self.tables:
@@ -46,9 +52,13 @@ class SelectStatement(Statement):
             self.tables.append(table)
         return self
 
-    def select(self, *columns: Name | Alias) -> Self:
-        if columns:
-            self.columns.extend(columns)
+    def select(self, *columns: Name | Alias | DBDataType) -> Self:
+        for c in columns:
+            if isinstance(c, (Name, Alias)):
+                self.columns.append(c)
+            else:
+                self.columns.append(Value(c))
+
         return self
 
     def distinct(self) -> Self:
@@ -57,7 +67,15 @@ class SelectStatement(Statement):
 
     def is_distinct_required(self) -> bool:
         return self._distinct
-    #
+
+    def limit(self, limit) -> Self:
+        self._limit = limit
+        return self
+
+    def offset(self, offset) -> Self:
+        self._offset = offset
+        return self
+
     # def __getattribute__(self, item):
     #     try:
     #         return object.__getattribute__(self, item)
