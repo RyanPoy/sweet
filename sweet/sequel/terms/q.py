@@ -1,11 +1,12 @@
 from enum import Enum
 from typing import Self
 
+from sweet.sequel.terms import Term
 from sweet.sequel.terms.condition import Condition
 from sweet.utils import DBDataType
 
 
-class Q:
+class Q(Term):
     class Logic(Enum):
         AND = 'AND'
         OR = 'OR'
@@ -15,9 +16,8 @@ class Q:
             return self.value
 
     def __init__(self, **kwargs: { str: DBDataType }) -> None:
-        # self.logic_op = operator  # Logical operator: 'AND', 'OR', 'NOT'
-        # self.children = children or []  # List of child nodes
-        # self.invert = False
+        super().__init__()
+
         self.logic_op = Q.Logic.AND
         self.children = []
         self.condition = None
