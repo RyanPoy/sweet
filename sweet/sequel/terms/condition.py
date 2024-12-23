@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Self
 
+from sweet.sequel.terms import Term
 from sweet.utils import DBDataType, quote
 
 
@@ -24,12 +25,15 @@ class Operator(Enum):
         return self.value
 
 
-class Condition:
+class Condition(Term):
     SEPERATOR = '__'
 
     def __init__(self, **kwargs) -> None:
         if len(kwargs) > 1:
             raise ValueError("Only one parameter is allowed for construction.")
+
+        super().__init__()
+
         self.field = None
         self.value = None
         self.operator = Operator.EQ
