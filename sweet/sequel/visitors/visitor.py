@@ -27,19 +27,15 @@ class Visitor:
             return self.quote_column_name(column.name)
         return self.quote_column_name(column)
 
-    def quote_table_name(self, name: str) -> str:
-        return self._quote_table_name_or_column_name(name)
-
-    def quote_column_name(self, name):
-        return self._quote_table_name_or_column_name(name)
-
-    def _quote_table_name_or_column_name(self, name):
+    def _quote_table_name_or_column_name(self, name) -> str:
         pointer = "."
         if "__" in name:
             name = name.replace("__", pointer)
         if pointer in name:
             return pointer.join([ f'"{n}"' for n in name.split(pointer)])
         return f'"{name}"'
+    quote_table_name = _quote_table_name_or_column_name
+    quote_column_name = _quote_table_name_or_column_name
 
     def quote_values(self, values):
         return quote_for_values(values)
