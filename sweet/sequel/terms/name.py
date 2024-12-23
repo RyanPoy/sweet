@@ -16,6 +16,7 @@ class Name(Term):
         """
         :param name: The name of the entity (column, table, alias). (e.g., of `str`)
         """
+        super().__init__()
         self.value: str = name
 
     def __repr__(self):

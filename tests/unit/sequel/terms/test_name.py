@@ -21,20 +21,20 @@ class TestName(unittest.TestCase):
 
     def test_sql_of_table_name(self):
         n = TableName("users")
-        self.assertEqual('"users"', str(n.sql(self.mysql)))
-        self.assertEqual('"users"', str(n.sql(self.sqlite)))
-        self.assertEqual('"users"', str(n.sql(self.pg)))
+        self.assertEqual('"users"', n.sql(self.mysql))
+        self.assertEqual('"users"', n.sql(self.sqlite))
+        self.assertEqual('"users"', n.sql(self.pg))
 
     def test_sql_of_column_name(self):
         n = ColumnName("name")
-        self.assertEqual('"name"', str(n.sql(self.mysql)))
-        self.assertEqual('"name"', str(n.sql(self.sqlite)))
-        self.assertEqual('"name"', str(n.sql(self.pg)))
+        self.assertEqual('"name"', n.sql(self.mysql))
+        self.assertEqual('"name"', n.sql(self.sqlite))
+        self.assertEqual('"name"', n.sql(self.pg))
 
         n = ColumnName("users.name")
-        self.assertEqual('"users"."name"', str(n.sql(self.mysql)))
-        self.assertEqual('"users"."name"', str(n.sql(self.sqlite)))
-        self.assertEqual('"users"."name"', str(n.sql(self.pg)))
+        self.assertEqual('"users"."name"', n.sql(self.mysql))
+        self.assertEqual('"users"."name"', n.sql(self.sqlite))
+        self.assertEqual('"users"."name"', n.sql(self.pg))
 
 
 if __name__ == '__main__':
