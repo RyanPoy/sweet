@@ -2,4 +2,8 @@ from sweet.sequel.visitors.visitor import Visitor
 
 
 class PostgreSQLVisitor(Visitor):
-    pass
+
+    visit_methods_dict = {}
+    qchar = '"'
+
+

@@ -2,5 +2,6 @@ from sweet.sequel.visitors.visitor import Visitor
 
 
 class MySQLVisitor(Visitor):
-    pass
 
+    visit_methods_dict = {}
+    qchar = '`'

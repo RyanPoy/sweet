@@ -43,7 +43,6 @@ class Condition(Term):
             else:
                 self._parse_special(k, v)
             break
-        self.field_quoted = f'"{self.field}"'
 
     def _parse_normal(self, key: str, value: DBDataType) -> None:
         self.field = key
@@ -93,7 +92,7 @@ class Condition(Term):
         return self.__basic_eq(other) and other.operator == self.operator
 
     def __hash__(self):
-        return hash(f"{self.__class__}-{self.field}-{quote(self.value)}-{self.operator}-{self.field_quoted}")
+        return hash(f"{self.__class__}-{self.field}-{quote(self.value)}-{self.operator}")
 
     # def is_mergeable_with(self, other: Self) -> bool:
     #     return self.__basic_eq(other) and (
@@ -104,7 +103,7 @@ class Condition(Term):
 
     def __basic_eq(self, other: Self) -> bool:
         return self.__class__ == other.__class__ and self.field == other.field \
-            and self.field_quoted == other.field_quoted and (
+            and (
                 self.value == other.value or (
                     isinstance(self.value, (tuple, list)) and isinstance(other.value, (tuple, list)) and list(self.value) == list(other.value)
                 )

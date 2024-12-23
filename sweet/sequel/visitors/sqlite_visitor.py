@@ -2,5 +2,8 @@ from sweet.sequel.visitors.visitor import Visitor
 
 
 class SQLiteVisitor(Visitor):
-    pass
+
+    visit_methods_dict = {}
+    qchar = '"'
+
 

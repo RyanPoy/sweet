@@ -20,61 +20,61 @@ class TestCondition(unittest.TestCase):
 
     def test_eq(self):
         c = Condition(name='jim')
-        self.assertEqual("\"name\" = 'jim'", c.sql(self.mysql))
+        self.assertEqual("`name` = 'jim'", c.sql(self.mysql))
         self.assertEqual("\"name\" = 'jim'", c.sql(self.sqlite))
         self.assertEqual("\"name\" = 'jim'", c.sql(self.pg))
 
     def test_not_eq(self):
         c = Condition(name__not='jim')
-        self.assertEqual("\"name\" <> 'jim'", c.sql(self.mysql))
+        self.assertEqual("`name` <> 'jim'", c.sql(self.mysql))
         self.assertEqual("\"name\" <> 'jim'", c.sql(self.sqlite))
         self.assertEqual("\"name\" <> 'jim'", c.sql(self.pg))
 
     def test_eq_with___(self):
         c = Condition(nick__name='jim')
-        self.assertEqual("\"nick__name\" = 'jim'", c.sql(self.mysql))
-        self.assertEqual("\"nick__name\" = 'jim'", c.sql(self.sqlite))
-        self.assertEqual("\"nick__name\" = 'jim'", c.sql(self.pg))
+        self.assertEqual("`nick`.`name` = 'jim'", c.sql(self.mysql))
+        self.assertEqual('"nick"."name" = \'jim\'', c.sql(self.sqlite))
+        self.assertEqual('"nick"."name" = \'jim\'', c.sql(self.pg))
 
     def test_is_null(self):
         c = Condition(name=None)
-        self.assertEqual("\"name\" IS NULL", c.sql(self.mysql))
+        self.assertEqual("`name` IS NULL", c.sql(self.mysql))
         self.assertEqual("\"name\" IS NULL", c.sql(self.sqlite))
         self.assertEqual("\"name\" IS NULL", c.sql(self.pg))
 
     def test_is_not_null(self):
         c = Condition(name__not=None)
-        self.assertEqual("\"name\" IS NOT NULL", c.sql(self.mysql))
+        self.assertEqual("`name` IS NOT NULL", c.sql(self.mysql))
         self.assertEqual("\"name\" IS NOT NULL", c.sql(self.sqlite))
         self.assertEqual("\"name\" IS NOT NULL", c.sql(self.pg))
 
     def test_in(self):
         c = Condition(name=['jim', 'lucy', 'lily'])
-        self.assertEqual("\"name\" IN ('jim', 'lucy', 'lily')", c.sql(self.mysql))
+        self.assertEqual("`name` IN ('jim', 'lucy', 'lily')", c.sql(self.mysql))
         self.assertEqual("\"name\" IN ('jim', 'lucy', 'lily')", c.sql(self.sqlite))
         self.assertEqual("\"name\" IN ('jim', 'lucy', 'lily')", c.sql(self.pg))
 
     def test_not_in(self):
         c = Condition(name__not=['jim', 'lucy', 'lily'])
-        self.assertEqual("\"name\" NOT IN ('jim', 'lucy', 'lily')", c.sql(self.mysql))
+        self.assertEqual("`name` NOT IN ('jim', 'lucy', 'lily')", c.sql(self.mysql))
         self.assertEqual("\"name\" NOT IN ('jim', 'lucy', 'lily')", c.sql(self.sqlite))
         self.assertEqual("\"name\" NOT IN ('jim', 'lucy', 'lily')", c.sql(self.pg))
 
     def test_like(self):
         c = Condition(name__like='%jim')
-        self.assertEqual("\"name\" LIKE '%jim'", c.sql(self.mysql))
+        self.assertEqual("`name` LIKE '%jim'", c.sql(self.mysql))
         self.assertEqual("\"name\" LIKE '%jim'", c.sql(self.sqlite))
         self.assertEqual("\"name\" LIKE '%jim'", c.sql(self.pg))
 
     def test_not_like(self):
         c = Condition(name__not_like='%jim')
-        self.assertEqual("\"name\" NOT LIKE '%jim'", c.sql(self.mysql))
+        self.assertEqual("`name` NOT LIKE '%jim'", c.sql(self.mysql))
         self.assertEqual("\"name\" NOT LIKE '%jim'", c.sql(self.sqlite))
         self.assertEqual("\"name\" NOT LIKE '%jim'", c.sql(self.pg))
 
     def test_between(self):
         c = Condition(age__bt=[10, 60])
-        self.assertEqual("\"age\" BETWEEN 10 AND 60", c.sql(self.mysql))
+        self.assertEqual("`age` BETWEEN 10 AND 60", c.sql(self.mysql))
         self.assertEqual("\"age\" BETWEEN 10 AND 60", c.sql(self.sqlite))
         self.assertEqual("\"age\" BETWEEN 10 AND 60", c.sql(self.pg))
 
@@ -85,7 +85,7 @@ class TestCondition(unittest.TestCase):
 
     def test_not_between(self):
         c = Condition(age__not_bt=[10, 60])
-        self.assertEqual("\"age\" NOT BETWEEN 10 AND 60", c.sql(self.mysql))
+        self.assertEqual("`age` NOT BETWEEN 10 AND 60", c.sql(self.mysql))
         self.assertEqual("\"age\" NOT BETWEEN 10 AND 60", c.sql(self.sqlite))
         self.assertEqual("\"age\" NOT BETWEEN 10 AND 60", c.sql(self.pg))
 
@@ -96,25 +96,25 @@ class TestCondition(unittest.TestCase):
 
     def test_gt(self):
         c = Condition(age__gt=10)
-        self.assertEqual("\"age\" > 10", c.sql(self.mysql))
+        self.assertEqual("`age` > 10", c.sql(self.mysql))
         self.assertEqual("\"age\" > 10", c.sql(self.sqlite))
         self.assertEqual("\"age\" > 10", c.sql(self.pg))
 
     def test_gte(self):
         c = Condition(age__gte=10)
-        self.assertEqual("\"age\" >= 10", c.sql(self.mysql))
+        self.assertEqual("`age` >= 10", c.sql(self.mysql))
         self.assertEqual("\"age\" >= 10", c.sql(self.sqlite))
         self.assertEqual("\"age\" >= 10", c.sql(self.pg))
 
     def test_lt(self):
         c = Condition(age__lt=30)
-        self.assertEqual("\"age\" < 30", c.sql(self.mysql))
+        self.assertEqual("`age` < 30", c.sql(self.mysql))
         self.assertEqual("\"age\" < 30", c.sql(self.sqlite))
         self.assertEqual("\"age\" < 30", c.sql(self.pg))
 
     def test_lte(self):
         c = Condition(age__lte=30)
-        self.assertEqual("\"age\" <= 30", c.sql(self.mysql))
+        self.assertEqual("`age` <= 30", c.sql(self.mysql))
         self.assertEqual("\"age\" <= 30", c.sql(self.sqlite))
         self.assertEqual("\"age\" <= 30", c.sql(self.pg))
 

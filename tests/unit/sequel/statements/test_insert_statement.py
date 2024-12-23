@@ -19,68 +19,68 @@ class TestInsertStatement(unittest.TestCase):
 
     def test_insert_one_column(self):
         stmt = InsertStatement().into(self.table_users).insert(1)
-        self.assertEqual('INSERT INTO "users" VALUES (1)', stmt.sql(self.mysql))
+        self.assertEqual('INSERT INTO `users` VALUES (1)', stmt.sql(self.mysql))
         self.assertEqual('INSERT INTO "users" VALUES (1)', stmt.sql(self.sqlite))
         self.assertEqual('INSERT INTO "users" VALUES (1)', stmt.sql(self.pg))
 
     def test_insert_one_column_single_element_array(self):
         stmt = InsertStatement().into(self.table_users).insert_rows((1,))
-        self.assertEqual('INSERT INTO "users" VALUES (1)', stmt.sql(self.mysql))
+        self.assertEqual('INSERT INTO `users` VALUES (1)', stmt.sql(self.mysql))
         self.assertEqual('INSERT INTO "users" VALUES (1)', stmt.sql(self.sqlite))
         self.assertEqual('INSERT INTO "users" VALUES (1)', stmt.sql(self.pg))
 
     def test_insert_one_column_multi_element_array(self):
         stmt = InsertStatement().into(self.table_users).insert_rows((1,), (2,))
-        self.assertEqual('INSERT INTO "users" VALUES (1), (2)', stmt.sql(self.mysql))
+        self.assertEqual('INSERT INTO `users` VALUES (1), (2)', stmt.sql(self.mysql))
         self.assertEqual('INSERT INTO "users" VALUES (1), (2)', stmt.sql(self.sqlite))
         self.assertEqual('INSERT INTO "users" VALUES (1), (2)', stmt.sql(self.pg))
 
     def test_insert_single_row_with_array_value(self):
         stmt = InsertStatement().into(self.table_users).insert(1, ["a", "b", "c"])
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, ['a', 'b', 'c'])", stmt.sql(self.mysql))
+        self.assertEqual("INSERT INTO `users` VALUES (1, ['a', 'b', 'c'])", stmt.sql(self.mysql))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, ['a', 'b', 'c'])", stmt.sql(self.sqlite))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, ['a', 'b', 'c'])", stmt.sql(self.pg))
 
     def test_insert_multiple_rows_with_array_value(self):
         stmt = InsertStatement().into(self.table_users).insert_rows((1, ["a", "b", "c"]), (2, ["c", "d", "e"]))
-        self.assertEqual("""INSERT INTO "users" VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])""", stmt.sql(self.mysql))
+        self.assertEqual("""INSERT INTO `users` VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])""", stmt.sql(self.mysql))
         self.assertEqual("""INSERT INTO "users" VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])""", stmt.sql(self.sqlite))
         self.assertEqual("""INSERT INTO "users" VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])""", stmt.sql(self.pg))
 
     def test_insert_all_columns(self):
         stmt = InsertStatement().into(self.table_users).insert(1, "a", True)
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1)", stmt.sql(self.mysql))
+        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1)", stmt.sql(self.mysql))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1)", stmt.sql(self.sqlite))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1)", stmt.sql(self.pg))
 
     def test_insert_all_columns_single_element(self):
         stmt = InsertStatement().into(self.table_users).insert_rows([1, "a", True])
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1)", stmt.sql(self.mysql))
+        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1)", stmt.sql(self.mysql))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1)", stmt.sql(self.sqlite))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1)", stmt.sql(self.pg))
 
     def test_insert_all_columns_multi_rows(self):
         stmt = InsertStatement().into(self.table_users).insert_rows((1, "a", True), (2, "b", False))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", stmt.sql(self.mysql))
+        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)", stmt.sql(self.mysql))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", stmt.sql(self.sqlite))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", stmt.sql(self.pg))
 
     def test_insert_all_columns_multi_rows_chained(self):
         stmt = InsertStatement().into(self.table_users).insert(1, "a", True).insert(2, "b", False)
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", stmt.sql(self.mysql))
+        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)", stmt.sql(self.mysql))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", stmt.sql(self.sqlite))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", stmt.sql(self.pg))
 
     def test_insert_all_columns_multi_rows_chained_mixed(self):
         stmt = InsertStatement().into(self.table_users).insert_rows((1, "a", True), (2, "b", False)).insert(3, "c", True)
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)", stmt.sql(self.mysql))
+        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)", stmt.sql(self.mysql))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)", stmt.sql(self.sqlite))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)", stmt.sql(self.pg))
 
     def test_insert_all_columns_multi_rows_chained_multiple_rows(self):
         stmt = InsertStatement().into(self.table_users).insert_rows((1, "a", True), (2, "b", False)).insert_rows((3, "c", True), (4, "d", False))
 
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)", stmt.sql(self.mysql))
+        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)", stmt.sql(self.mysql))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)", stmt.sql(self.sqlite))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)", stmt.sql(self.pg))
 
@@ -88,37 +88,37 @@ class TestInsertStatement(unittest.TestCase):
         stmt = InsertStatement().into(self.table_users) \
                 .column(ColumnName("foo"), ColumnName("bar"), ColumnName("buz")) \
                 .insert(1, "a", True)
-        self.assertEqual('INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)', stmt.sql(self.mysql))
+        self.assertEqual('INSERT INTO `users` (`foo`, `bar`, `buz`) VALUES (1, \'a\', 1)', stmt.sql(self.mysql))
         self.assertEqual('INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)', stmt.sql(self.sqlite))
         self.assertEqual('INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)', stmt.sql(self.pg))
 
     def test_insert_empty_columns(self):
         stmt = InsertStatement().into(self.table_users).column().insert(1, "a", True)
-        self.assertEqual('INSERT INTO "users" VALUES (1, \'a\', 1)', stmt.sql(self.mysql))
+        self.assertEqual('INSERT INTO `users` VALUES (1, \'a\', 1)', stmt.sql(self.mysql))
         self.assertEqual('INSERT INTO "users" VALUES (1, \'a\', 1)', stmt.sql(self.sqlite))
         self.assertEqual('INSERT INTO "users" VALUES (1, \'a\', 1)', stmt.sql(self.pg))
 
     def test_insert_ignore(self):
         stmt = InsertStatement().into(self.table_users).insert(1).ignore()
-        self.assertEqual('INSERT IGNORE INTO "users" VALUES (1)', stmt.sql(self.mysql))
+        self.assertEqual('INSERT IGNORE INTO `users` VALUES (1)', stmt.sql(self.mysql))
         self.assertEqual('INSERT IGNORE INTO "users" VALUES (1)', stmt.sql(self.sqlite))
         self.assertEqual('INSERT IGNORE INTO "users" VALUES (1)', stmt.sql(self.pg))
 
     def test_insert_column(self):
         stmt = Table("users").insert(1)
-        self.assertEqual('INSERT INTO "users" VALUES (1)', stmt.sql(self.mysql))
+        self.assertEqual('INSERT INTO `users` VALUES (1)', stmt.sql(self.mysql))
         self.assertEqual('INSERT INTO "users" VALUES (1)', stmt.sql(self.sqlite))
         self.assertEqual('INSERT INTO "users" VALUES (1)', stmt.sql(self.pg))
 
     def test_insert_column_with_chain(self):
         stmt = Table("users").insert(1, "a", True).insert(2, "b", False)
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", stmt.sql(self.mysql))
+        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)", stmt.sql(self.mysql))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", stmt.sql(self.sqlite))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", stmt.sql(self.pg))
 
     def test_replace_simple(self):
         stmt = InsertStatement().into(self.table_users).replace("v1", "v2", "v3")
-        self.assertEqual("REPLACE INTO \"users\" VALUES ('v1', 'v2', 'v3')", stmt.sql(self.mysql))
+        self.assertEqual("REPLACE INTO `users` VALUES ('v1', 'v2', 'v3')", stmt.sql(self.mysql))
         self.assertEqual("REPLACE INTO \"users\" VALUES ('v1', 'v2', 'v3')", stmt.sql(self.sqlite))
         self.assertEqual("REPLACE INTO \"users\" VALUES ('v1', 'v2', 'v3')", stmt.sql(self.pg))
 

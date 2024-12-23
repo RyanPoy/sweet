@@ -1,5 +1,3 @@
-from typing import Type
-
 from sweet.sequel.terms import Term
 from sweet.sequel.terms.alias import Alias
 
@@ -49,3 +47,7 @@ class TableName(Name):
 
     def as_(self, alias: str) -> Alias:
         return Alias(self, TableName(alias))
+
+
+class IndexName(Name):
+    pass

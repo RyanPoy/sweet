@@ -19,6 +19,7 @@ from sweet.utils import DBDataType, quote, quote_for_values
 class Visitor:
 
     visit_methods_dict = {}
+    qchar = '"'
 
     def quote_condition(self, value: DBDataType) -> str:
         return quote(value, "(", ")")
@@ -33,8 +34,8 @@ class Visitor:
         if "__" in name:
             name = name.replace("__", pointer)
         if pointer in name:
-            return pointer.join([ f'"{n}"' for n in name.split(pointer)])
-        return f'"{name}"'
+            return pointer.join([ f'{self.qchar}{n}{self.qchar}' for n in name.split(pointer)])
+        return f'{self.qchar}{name}{self.qchar}'
     quote_table_name = _quote_table_name_or_column_name
     quote_column_name = _quote_table_name_or_column_name
 
@@ -50,6 +51,11 @@ class Visitor:
         return sql << self.quote_table_name(n.value)
 
     def visit_ColumnName(self, n: ColumnName, sql: SQLCollector) -> SQLCollector:
+        if n.schema_name:
+            return sql << self.quote_column_name(f"{n.schema_name}.{n.value}")
+        return sql << self.quote_column_name(n.value)
+
+    def visit_IndexName(self, n: ColumnName, sql: SQLCollector) -> SQLCollector:
         if n.schema_name:
             return sql << self.quote_column_name(f"{n.schema_name}.{n.value}")
         return sql << self.quote_column_name(n.value)
@@ -77,9 +83,9 @@ class Visitor:
 
     def visit_Condition(self, c: Condition, sql: SQLCollector) -> SQLCollector:
         if c.operator == Operator.BETWEEN or c.operator == Operator.NOT_BETWEEN:
-            sql << c.field_quoted << f" {str(c.operator)} {self.quote_values(c.value[0])} AND {self.quote_values(c.value[1])}"
+            sql << self.quote_column_name(c.field) << f" {str(c.operator)} {self.quote_values(c.value[0])} AND {self.quote_values(c.value[1])}"
         else:
-            sql << f"{c.field_quoted} {str(c.operator)} {self.quote_condition(c.value)}"
+            sql << f"{self.quote_column_name(c.field)} {str(c.operator)} {self.quote_condition(c.value)}"
         return sql
 
     def visit_Value(self, v: Value, sql: SQLCollector) -> SQLCollector:
@@ -143,10 +149,8 @@ class Visitor:
 
     def visit_SelectStatement(self, stmt: SelectStatement, sql: SQLCollector, level=0) -> SQLCollector:
         sql << "SELECT "
-        if stmt.is_distinct_required():
-            sql << "DISTINCT "
-        if not stmt.columns:
-            sql << "*"
+        if stmt.is_distinct_required(): sql << "DISTINCT "
+        if not stmt.columns: sql << "*"
 
         for i, c in enumerate(stmt.columns):
             if i != 0: sql << ", "
@@ -163,12 +167,23 @@ class Visitor:
                 else:
                     self.visit(table, sql)
 
-        if stmt._limit and stmt._offset:
-            sql << f" LIMIT {stmt._limit}, OFFSET {stmt._offset}"
-        elif stmt._limit:
-            sql << f" LIMIT {stmt._limit}"
-        elif stmt._offset:
-            sql << f" OFFSET {stmt._offset}"
+        if stmt._limit:  sql << f" LIMIT {stmt._limit}"
+        if stmt._offset: sql << f" OFFSET {stmt._offset}"
+
+        if stmt.force_indexes:
+            sql << " FORCE INDEX ("
+            for i, index in enumerate(stmt.force_indexes):
+                if i != 0: sql << ", "
+                self.visit(index, sql)
+            sql << ")"
+
+        if stmt.use_indexes:
+            sql << " USE INDEX ("
+            for i, index in enumerate(stmt.use_indexes):
+                if i != 0: sql << ", "
+                self.visit(index, sql)
+            sql << ")"
+
         return sql
 
     def visit(self, o: any, sql: SQLCollector = None) -> SQLCollector:
@@ -179,7 +194,6 @@ class Visitor:
 
     def dispatch(self, o: any) -> Callable:
         methods = self.__class__.visit_methods_dict
-
         name = f'visit_{o.__class__.__name__}'
         if name in methods:
             return methods[name]

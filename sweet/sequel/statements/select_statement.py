@@ -4,7 +4,7 @@ from sweet.sequel.schema.columns import Column
 from sweet.sequel.schema.table import Table
 from sweet.sequel.statements import Statement
 from sweet.sequel.terms.alias import Alias
-from sweet.sequel.terms.name import Name, TableName
+from sweet.sequel.terms.name import IndexName, Name, TableName
 from sweet.sequel.terms.value import Value
 from sweet.utils import DBDataType
 
@@ -39,6 +39,8 @@ class SelectStatement(Statement):
         self._distinct = False
         self._limit = 0
         self._offset = 0
+        self.force_indexes = []
+        self.use_indexes = []
 
     def from_(self, table: TableName | Alias | Self) -> Self:
         found = False
@@ -59,6 +61,14 @@ class SelectStatement(Statement):
             else:
                 self.columns.append(Value(c))
 
+        return self
+
+    def force_index(self, *indexes: IndexName) -> Self:
+        self.force_indexes.extend(indexes)
+        return self
+
+    def use_index(self, *indexes: IndexName) -> Self:
+        self.use_indexes.extend(indexes)
         return self
 
     def distinct(self) -> Self:

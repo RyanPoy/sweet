@@ -24,26 +24,26 @@ class TestUpdateStatement(unittest.TestCase):
 
     def test_omit_where(self):
         um = UpdateStatement().update(self.table_users).set(foo="bar")
-        self.assertEqual('UPDATE "users" SET "foo" = \'bar\'', um.sql(self.mysql))
+        self.assertEqual('UPDATE `users` SET `foo` = \'bar\'', um.sql(self.mysql))
         self.assertEqual('UPDATE "users" SET "foo" = \'bar\'', um.sql(self.sqlite))
         self.assertEqual('UPDATE "users" SET "foo" = \'bar\'', um.sql(self.pg))
 
     def test_single_quote_escape_in_set(self):
         um = UpdateStatement().update(self.table_users).set(foo="bar'foo")
-        self.assertEqual("UPDATE \"users\" SET \"foo\" = 'bar''foo'", um.sql(self.mysql))
+        self.assertEqual("UPDATE `users` SET `foo` = 'bar''foo'", um.sql(self.mysql))
         self.assertEqual("UPDATE \"users\" SET \"foo\" = 'bar''foo'", um.sql(self.sqlite))
         self.assertEqual("UPDATE \"users\" SET \"foo\" = 'bar''foo'", um.sql(self.pg))
 
     def test_update__table_schema(self):
         um = UpdateStatement().update(TableName("schema1.users")).set(foo=1).where(foo=0)
 
-        self.assertEqual('UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0', um.sql(self.mysql))
+        self.assertEqual('UPDATE `schema1`.`users` SET `foo` = 1 WHERE `foo` = 0', um.sql(self.mysql))
         self.assertEqual('UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0', um.sql(self.sqlite))
         self.assertEqual('UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0', um.sql(self.pg))
 
     def test_update_with_none(self):
         um = UpdateStatement().update(self.table_users).set(foo=None)
-        self.assertEqual('UPDATE "users" SET "foo" = NULL', um.sql(self.mysql))
+        self.assertEqual('UPDATE `users` SET `foo` = NULL', um.sql(self.mysql))
         self.assertEqual('UPDATE "users" SET "foo" = NULL', um.sql(self.sqlite))
         self.assertEqual('UPDATE "users" SET "foo" = NULL', um.sql(self.pg))
 

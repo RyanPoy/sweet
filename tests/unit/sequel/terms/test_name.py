@@ -20,18 +20,18 @@ class TestName(unittest.TestCase):
 
     def test_sql_of_table_name(self):
         n = TableName("users")
-        self.assertEqual('"users"', n.sql(self.mysql))
+        self.assertEqual('`users`', n.sql(self.mysql))
         self.assertEqual('"users"', n.sql(self.sqlite))
         self.assertEqual('"users"', n.sql(self.pg))
 
     def test_sql_of_column_name(self):
         n = ColumnName("name")
-        self.assertEqual('"name"', n.sql(self.mysql))
+        self.assertEqual('`name`', n.sql(self.mysql))
         self.assertEqual('"name"', n.sql(self.sqlite))
         self.assertEqual('"name"', n.sql(self.pg))
 
         n = ColumnName("users.name")
-        self.assertEqual('"users"."name"', n.sql(self.mysql))
+        self.assertEqual('`users`.`name`', n.sql(self.mysql))
         self.assertEqual('"users"."name"', n.sql(self.sqlite))
         self.assertEqual('"users"."name"', n.sql(self.pg))
 
