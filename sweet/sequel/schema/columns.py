@@ -1,5 +1,4 @@
 from functools import cached_property
-from sweet.sequel.terms.alias import Alias
 
 
 class Column:
@@ -13,5 +12,3 @@ class Column:
     def name_quoted(self) -> str:
         return f'"{self.name}"'
 
-    def as_(self, alias: str) -> Alias:
-        return Alias(self, alias)
