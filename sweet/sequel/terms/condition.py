@@ -26,6 +26,23 @@ class Operator(Enum):
 
 
 class Condition(Term):
+    """
+    Represents a SQL condition, which can include comparisons, logical checks, and containment checks.
+
+    A Condition instance is built from a single key-value pair. Special conditions
+    are indicated using separators (default: '__') in the key.
+
+    Usage:
+        # Normal
+        condition = Condition(column1=10)
+
+        # Special condition with operator
+        condition = Condition(column1__gte=10)
+
+        # Complex conditions with lists or tuples
+        condition = Condition(column1__bt=(5, 15))
+    """
+
     SEPERATOR = '__'
 
     def __init__(self, **kwargs) -> None:
@@ -45,6 +62,12 @@ class Condition(Term):
             break
 
     def _parse_normal(self, key: str, value: DBDataType) -> None:
+        """
+        Parses a normal condition without a special operator.
+
+        :param key: The field name.
+        :param value: The value to compare or check.
+        """
         self.field = key
         self.value = value
         if value is None:
@@ -55,6 +78,13 @@ class Condition(Term):
             self.operator = Operator.EQ
 
     def _parse_special(self, key: str, value: DBDataType) -> None:
+        """
+        Parses a condition with a special operator.
+
+        :param key: The field name and operator, separated by the SEPERATOR.
+        :param value: The value to compare or check.
+        :raises ValueError: If the provided operator or value format is invalid.
+        """
         vs = key.split(self.SEPERATOR, 1)
         col, op_type = vs[0], vs[1]
         self.field = col
@@ -93,13 +123,6 @@ class Condition(Term):
 
     def __hash__(self):
         return hash(f"{self.__class__}-{self.field}-{quote(self.value)}-{self.operator}")
-
-    # def is_mergeable_with(self, other: Self) -> bool:
-    #     return self.__basic_eq(other) and (
-    #         (self.operator == Operator.GT and other.operator == Operator.EQ) or (self.operator == Operator.EQ and other.operator == Operator.GT)    # gt & eq <=> gte
-    #         or (self.operator == Operator.LT and other.operator == Operator.EQ) or (self.operator == Operator.EQ and other.operator == Operator.LT) # lt & eq <=> lte
-    #         or (self.operator == Operator.GT and other.operator == Operator.LT) or (self.operator == Operator.LT and other.operator == Operator.GT) # gt & lt <=> not_eq
-    #     )
 
     def __basic_eq(self, other: Self) -> bool:
         return self.__class__ == other.__class__ and self.field == other.field \
