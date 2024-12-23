@@ -7,7 +7,7 @@ from queue import Queue
 import time
 import re
 
-DBDataType = Union[int, float, str, bool, date, datetime, list, tuple]
+DBDataType = Union[int, float, str, Decimal, bool, date, datetime, list, tuple, None, bytes]
 
 # data type transfer variables and functions
 FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE', 'No', 'no', 'NO')
@@ -82,8 +82,8 @@ datetime2str = lambda dt, format='%Y-%m-%d %H:%M:%S': dt.strftime(format)
 date2str = lambda d, format='%Y-%m-%d': d.strftime(format)
 
 datetime2date = lambda dt: date(dt.year, dt.month, dt.day)
-str2binary = lambda v: v  # Used to convert from Strings to BLOBs
-binary2str = lambda v: v  # Used to convert from BLOBs to Strings
+str2binary = lambda v: v.encode('utf-8')  # Used to convert from Strings to BLOBs
+binary2str = lambda v: v.decode("utf-8")   # Used to convert from BLOBs to Strings
 
 microseconds = lambda t: to_i((to_f(t) % 1) * 1000000)  # '0.123456' -> 123456; '1.123456' -> 123456
 
