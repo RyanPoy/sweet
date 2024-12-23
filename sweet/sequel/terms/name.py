@@ -1,4 +1,7 @@
+from typing import Type
+
 from sweet.sequel.terms import Term
+from sweet.sequel.terms.alias import Alias
 
 
 class Name(Term):
@@ -29,7 +32,9 @@ class ColumnName(Name):
 
     Inherits from the `Name` class and is specifically used for column names in SQL queries.
     """
-    pass
+
+    def as_(self, alias: str) -> Alias:
+        return Alias(self, ColumnName(alias))
 
 
 class TableName(Name):
@@ -38,13 +43,6 @@ class TableName(Name):
 
     Inherits from the `Name` class and is specifically used for table names in SQL queries.
     """
-    pass
 
-
-class AliasName(Name):
-    """
-    Represents an alias name in a SQL statement.
-
-    Inherits from the `Name` class and is specifically used for alias names in SQL queries.
-    """
-    pass
+    def as_(self, alias: str) -> Alias:
+        return Alias(self, TableName(alias))
