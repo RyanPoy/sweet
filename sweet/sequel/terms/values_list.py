@@ -6,9 +6,18 @@ from sweet.utils import DBDataType
 
 class ValuesList(Term):
     """
-    vs = Values(1, "lily", 20)
-    vs.append(2, "lucy", 32)
-    vs.append((3, "jimy", 15), (4, "abc", 8))
+    Represents a collection of rows to be used in SQL statements, such as INSERT or UPDATE.
+    Each row is a tuple of value, and all rows must have consistent column length.
+
+    Usage:
+        # initialize with a single row
+        vs = ValuesList(1, "lily", 20)
+
+        # add a single row
+        vs.append([(2, "lucy", 32)])
+
+        # add multiple rows
+        vs.append([ (3, "jimy", 15), (4, "abc", 8) ])
     """
     def __init__(self, *vs: DBDataType) -> None:
         super().__init__()
@@ -18,9 +27,21 @@ class ValuesList(Term):
             self.data.append(vs)
 
     def is_empty(self):
+        """
+        Check if the ValuesList contains any rows.
+
+        :return: True if the ValuesList is empty, otherwise False
+        """
         return False if self.data else True
 
-    def append(self, rows: [[DBDataType]]) -> Self:
+    def append(self, rows: [(DBDataType,)]) -> Self:
+        """
+        Append the row to the ValuesList. All rows must have consistent column length as existing rows.
+
+        :param rows: A list of tuples where each tuple represents a row to be added.
+        :raises ValueError: If the rows have inconsistent length.
+        :return: The current instance of ValuesList.
+        """
         if not rows:
             return self
 
