@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Self
 
 from sweet.sequel.terms import Term
-from sweet.sequel.terms.condition import Condition
+from sweet.sequel.terms.pair import Pair
 from sweet.utils import DBDataType
 
 
@@ -23,14 +23,14 @@ class Q(Term):
         self.condition = None
 
         if len(kwargs) == 1:
-            self.condition = Condition(**kwargs)
+            self.condition = Pair(**kwargs)
         else:
             i = 0
             q = None
             for k, v in kwargs.items():
                 if i == 0:
                     q = Q()
-                    q.condition = Condition(**{k: v})
+                    q.condition = Pair(**{k: v})
                 else:
                     q = q & Q(**{k: v})
                 i += 1

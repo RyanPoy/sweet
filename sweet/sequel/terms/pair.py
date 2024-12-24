@@ -25,7 +25,7 @@ class Operator(Enum):
         return self.value
 
 
-class Condition(Term):
+class Pair(Term):
     """
     Represents a SQL condition, which can include comparisons, logical checks, and containment checks.
 

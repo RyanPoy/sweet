@@ -8,7 +8,7 @@ from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
 from sweet.sequel.terms.alias import Alias
-from sweet.sequel.terms.condition import Condition, Operator
+from sweet.sequel.terms.pair import Pair, Operator
 from sweet.sequel.terms.name import ColumnName, TableName
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Value
@@ -72,7 +72,7 @@ class Visitor:
 
     def visit_Q(self, q: Q, sql: SQLCollector) -> SQLCollector:
         if q.condition:
-            self.visit_Condition(q.condition, sql)
+            self.visit_Pair(q.condition, sql)
         if q.children:
             sql << "("
             for i, c in enumerate(q.children):
@@ -81,11 +81,11 @@ class Visitor:
             sql << ")"
         return sql
 
-    def visit_Condition(self, c: Condition, sql: SQLCollector) -> SQLCollector:
-        if c.operator == Operator.BETWEEN or c.operator == Operator.NOT_BETWEEN:
-            sql << self.quote_column_name(c.field) << f" {str(c.operator)} {self.quote_values(c.value[0])} AND {self.quote_values(c.value[1])}"
+    def visit_Pair(self, p: Pair, sql: SQLCollector) -> SQLCollector:
+        if p.operator == Operator.BETWEEN or p.operator == Operator.NOT_BETWEEN:
+            sql << self.quote_column_name(p.field) << f" {str(p.operator)} {self.quote_values(p.value[0])} AND {self.quote_values(p.value[1])}"
         else:
-            sql << f"{self.quote_column_name(c.field)} {str(c.operator)} {self.quote_condition(c.value)}"
+            sql << f"{self.quote_column_name(p.field)} {str(p.operator)} {self.quote_condition(p.value)}"
         return sql
 
     def visit_Value(self, v: Value, sql: SQLCollector) -> SQLCollector:

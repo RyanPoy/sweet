@@ -1,7 +1,7 @@
 from typing import Optional, Self
 
 from sweet.sequel.statements import Statement
-from sweet.sequel.terms.condition import Condition
+from sweet.sequel.terms.pair import Pair
 from sweet.sequel.terms.name import TableName
 from sweet.sequel.terms.q import Q
 
@@ -49,7 +49,7 @@ class DeleteStatement(Statement):
     """
     def __init__(self) -> None:
         super().__init__()
-        self.wheres: [Condition | Q]            = []
+        self.wheres: [Pair | Q]            = []
 
     def from_(self, table_name: TableName) -> Self:
         """
