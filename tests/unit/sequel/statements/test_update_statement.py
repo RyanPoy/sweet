@@ -97,28 +97,7 @@ class TestUpdateStatement(unittest.TestCase):
 #             'WHERE "users"."comp"="an_alias"."alias_comp"',
 #             str(q),
 #         )
-#
-#     def test_for_portion(self):
-#         with self.subTest("with system time"):
-#             q = Query.update(self.table_users.for_portion(SYSTEM_TIME.from_to('2020-01-01', '2020-02-01'))).set(
-#                 "foo", "bar"
-#             )
-#
-#             self.assertEqual(
-#                 'UPDATE "users" FOR PORTION OF SYSTEM_TIME FROM \'2020-01-01\' TO \'2020-02-01\' SET "foo"=\'bar\'',
-#                 str(q),
-#             )
-#
-#         with self.subTest("with column"):
-#             q = Query.update(
-#                 self.table_users.for_portion(self.table_users.valid_period.from_to('2020-01-01', '2020-02-01'))
-#             ).set("foo", "bar")
-#
-#             self.assertEqual(
-#                 'UPDATE "users" FOR PORTION OF "valid_period" FROM \'2020-01-01\' TO \'2020-02-01\' SET "foo"=\'bar\'',
-#                 str(q),
-#             )
-#
+
 #
 # class PostgresUpdateTests(unittest.TestCase):
 #     table_users = Table("users")
