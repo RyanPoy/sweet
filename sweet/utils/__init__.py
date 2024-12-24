@@ -35,11 +35,11 @@ def quote(value: DBDataType, begin: str = "[", end: str = "]") -> str:
     if tp in (Decimal, int, float):  # BigDecimals need to be put in a non-normalized form and quoted.
         return str(value)
     if tp == datetime:
-        return datetime2str(value)
+        return f"'{datetime2str(value)}'"
     if tp == date:
-        return date2str(value)
+        return f"'{date2str(value)}'"
     if tp == bytes:
-        return binary2str(value)
+        return f"'{binary2str(value)}'"
     if tp in (tuple, list):
         return f"{begin}{', '.join([quote(v) for v in value])}{end}"
     raise TypeError(f"can't quote '{value.__class__.__name__}' type")

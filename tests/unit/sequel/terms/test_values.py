@@ -44,9 +44,9 @@ class TestValues(unittest.TestCase):
 
     def test_sql__str_and_bytes(self):
         vs = ValuesList( "lucy", b"hello, world")
-        self.assertEqual("('lucy', hello, world)", vs.sql(self.mysql))
-        self.assertEqual("('lucy', hello, world)", vs.sql(self.sqlite))
-        self.assertEqual("('lucy', hello, world)", vs.sql(self.pg))
+        self.assertEqual("('lucy', 'hello, world')", vs.sql(self.mysql))
+        self.assertEqual("('lucy', 'hello, world')", vs.sql(self.sqlite))
+        self.assertEqual("('lucy', 'hello, world')", vs.sql(self.pg))
 
     def test_sql__bool_and_number(self):
         vs = ValuesList(True, Decimal(10.000005), 30, 24.7)
@@ -56,9 +56,9 @@ class TestValues(unittest.TestCase):
 
     def test_sql__date_and_datetime(self):
         vs = ValuesList(datetime(2024, 12, 13, 11, 9, 28, 547992), date(2024, 12, 13))
-        self.assertEqual("(2024-12-13 11:09:28, 2024-12-13)", vs.sql(self.mysql))
-        self.assertEqual("(2024-12-13 11:09:28, 2024-12-13)", vs.sql(self.sqlite))
-        self.assertEqual("(2024-12-13 11:09:28, 2024-12-13)", vs.sql(self.pg))
+        self.assertEqual("('2024-12-13 11:09:28', '2024-12-13')", vs.sql(self.mysql))
+        self.assertEqual("('2024-12-13 11:09:28', '2024-12-13')", vs.sql(self.sqlite))
+        self.assertEqual("('2024-12-13 11:09:28', '2024-12-13')", vs.sql(self.pg))
 
     def test_sql__tuple_and_list(self):
         vs = ValuesList(["list1", None, 1], ("tuple2", None, 2.1))
