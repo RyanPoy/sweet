@@ -8,6 +8,7 @@ from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
 from sweet.sequel.terms.alias import Alias
+from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.pair import Pair, Operator
 from sweet.sequel.terms.name import ColumnName, TableName
 from sweet.sequel.terms.q import Q
@@ -69,6 +70,9 @@ class Visitor:
 
     def visit_Column(self, c: Column, sql: SQLCollector) -> SQLCollector:
         return sql << self.quote_column(c)
+
+    def visit_Literal(self, l: Literal, sql: SQLCollector) -> SQLCollector:
+        return sql << l.v
 
     def visit_Q(self, q: Q, sql: SQLCollector) -> SQLCollector:
         if q.condition:
@@ -166,6 +170,12 @@ class Visitor:
                     sql << f") AS sq{level}"
                 else:
                     self.visit(table, sql)
+
+        if stmt.wheres:
+            sql << " WHERE "
+            for i, w in enumerate(stmt.wheres):
+                if i != 0: sql << f" AND "
+                self.visit(w, sql)
 
         if stmt._limit:  sql << f" LIMIT {stmt._limit}"
         if stmt._offset: sql << f" OFFSET {stmt._offset}"

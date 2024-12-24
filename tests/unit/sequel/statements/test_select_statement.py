@@ -1,4 +1,5 @@
 import unittest
+from datetime import date
 
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.terms.name import ColumnName, IndexName, TableName
@@ -175,119 +176,48 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT "foo" FROM "abc" USE INDEX ("egg", "spam")', stmt.sql(self.sqlite))
         self.assertEqual('SELECT "foo" FROM "abc" USE INDEX ("egg", "spam")', stmt.sql(self.pg))
 
-#     def test_mysql_query_uses_backtick_quote_chars(self):
-#         stmt = MySQLSelectStatement().from_(self.table_abc).select("foo", "bar")
-#         self.assertEqual("SELECT `foo`,`bar` FROM `abc`", stmt.sql(self.mysql))
-#
-#     def test_vertica_query_uses_double_quote_chars(self):
-#         stmt = VerticaSelectStatement().from_(self.table_abc).select("foo", "bar")
-#         self.assertEqual('SELECT "foo","bar" FROM "abc"', stmt.sql(self.mysql))
-#
-#     def test_mssql_query_uses_double_quote_chars(self):
-#         stmt = MSSQLSelectStatement().from_(self.table_abc).select("foo", "bar")
-#         self.assertEqual('SELECT "foo","bar" FROM "abc"', stmt.sql(self.mysql))
-#
-#     def test_oracle_query_uses_no_quote_chars(self):
-#         stmt = OracleSelectStatement().from_(self.table_abc).select("foo", "bar")
-#         self.assertEqual('SELECT foo,bar FROM abc', stmt.sql(self.mysql))
-#
-#     def test_postgresql_query_uses_double_quote_chars(self):
-#         stmt = PostgreSQLSelectStatement().from_(self.table_abc).select("foo", "bar")
-#         self.assertEqual('SELECT "foo","bar" FROM "abc"', stmt.sql(self.mysql))
-#
-#     def test_redshift_query_uses_double_quote_chars(self):
-#         stmt = RedshiftSelectStatement().from_(self.table_abc).select("foo", "bar")
-#         self.assertEqual('SELECT "foo","bar" FROM "abc"', stmt.sql(self.mysql))
-#
     def test_table_select_alias(self):
         stmt = SelectStatement().from_(self.table_abc).select(1)
         self.assertEqual('SELECT 1 FROM `abc`', stmt.sql(self.mysql))
         self.assertEqual('SELECT 1 FROM "abc"', stmt.sql(self.sqlite))
         self.assertEqual('SELECT 1 FROM "abc"', stmt.sql(self.pg))
-#
-#     def test_table_select_alias_with_offset_and_limit(self):
-#         self.assertEqual(self.table_abc.select(ColumnName("foo"))[10:10], SelectStatement().from_(self.table_abc).select(ColumnName("foo"))[10:10])
-#         self.assertEqual(
-#             self.table_abc.select(self.table_abc.foo)[10:10],
-#             SelectStatement().from_(self.table_abc).select(ColumnName("foo"))[10:10],
-#         )
-#
-#     def test_temporal_select(self):
-#         t = Table("abc")
-#
-#         with self.subTest("with system time as of"):
-#             stmt = SelectStatement().from_(t.for_(SYSTEM_TIME.as_of('2020-01-01'))).select("*")
-#
-#             self.assertEqual('SELECT * FROM "abc" FOR SYSTEM_TIME AS OF \'2020-01-01\'', stmt.sql(self.mysql))
-#
-#         with self.subTest("with system time between"):
-#             stmt = SelectStatement().from_(t.for_(SYSTEM_TIME.between('2020-01-01', '2020-02-01'))).select("*")
-#
-#             self.assertEqual('SELECT * FROM "abc" FOR SYSTEM_TIME BETWEEN \'2020-01-01\' AND \'2020-02-01\'', stmt.sql(self.mysql))
-#
-#         with self.subTest("with system time from to"):
-#             stmt = SelectStatement().from_(t.for_(SYSTEM_TIME.from_to('2020-01-01', '2020-02-01'))).select("*")
-#
-#             self.assertEqual('SELECT * FROM "abc" FOR SYSTEM_TIME FROM \'2020-01-01\' TO \'2020-02-01\'', stmt.sql(self.mysql))
-#
-#         with self.subTest("with ALL"):
-#             stmt = SelectStatement().from_(t.for_(SYSTEM_TIME.all_())).select("*")
-#
-#             self.assertEqual('SELECT * FROM "abc" FOR SYSTEM_TIME ALL', stmt.sql(self.mysql))
-#
-#         with self.subTest("with period between"):
-#             stmt = SelectStatement().from_(t.for_(t.valid_period.between('2020-01-01', '2020-02-01'))).select("*")
-#
-#             self.assertEqual('SELECT * FROM "abc" FOR "valid_period" BETWEEN \'2020-01-01\' AND \'2020-02-01\'', stmt.sql(self.mysql))
-#
-#         with self.subTest("with period from to"):
-#             stmt = SelectStatement().from_(t.for_(t.valid_period.from_to('2020-01-01', '2020-02-01'))).select("*")
-#
-#             self.assertEqual('SELECT * FROM "abc" FOR "valid_period" FROM \'2020-01-01\' TO \'2020-02-01\'', stmt.sql(self.mysql))
-#
-#         with self.subTest("with ALL"):
-#             stmt = SelectStatement().from_(t.for_(t.valid_period.all_())).select("*")
-#
-#             self.assertEqual('SELECT * FROM "abc" FOR "valid_period" ALL', stmt.sql(self.mysql))
-#
-#
-# class MyEnum(Enum):
-#     STR = "foo"
-#     INT = 0
-#     BOOL = True
-#     DATE = date(2020, 2, 2)
-#     NONE = None
-#
-#
+
+    def test_where_basic(self):
+        stmt = SelectStatement().from_(self.table_abc).select("*").where(foo="foo")
+        self.assertEqual("SELECT * FROM `abc` WHERE `foo` = 'foo'", stmt.sql(self.mysql))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'foo\'', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'foo\'', stmt.sql(self.pg))
+
+        stmt = SelectStatement().from_(self.table_abc).select("*").where(foo=0)
+        self.assertEqual("SELECT * FROM `abc` WHERE `foo` = 0", stmt.sql(self.mysql))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" = 0', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" = 0', stmt.sql(self.pg))
+
+        stmt = SelectStatement().from_(self.table_abc).select("*").where(foo=True)
+        self.assertEqual("SELECT * FROM `abc` WHERE `foo` = 1", stmt.sql(self.mysql))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" = 1', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" = 1', stmt.sql(self.pg))
+
+        stmt = SelectStatement().from_(self.table_abc).select("*").where(foo=date(2020, 2, 2))
+        self.assertEqual("SELECT * FROM `abc` WHERE `foo` = '2020-02-02'", stmt.sql(self.mysql))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'2020-02-02\'', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'2020-02-02\'', stmt.sql(self.pg))
+
+        stmt = SelectStatement().from_(self.table_abc).select("*").where(foo=None)
+        self.assertEqual("SELECT * FROM `abc` WHERE `foo` IS NULL", stmt.sql(self.mysql))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" IS NULL', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" IS NULL', stmt.sql(self.pg))
+
+
 # class WhereTests(unittest.TestCase):
-#     t = Table("abc")
-#     t2 = Table("cba")
-#
-#     def test_where_enum(self):
-#         stmt = SelectStatement().from_(self.t).select("*").where(self.t.foo == MyEnum.STR)
-#         q2 = SelectStatement().from_(self.t).select("*").where(self.t.foo == MyEnum.INT)
-#         q3 = SelectStatement().from_(self.t).select("*").where(self.t.foo == MyEnum.BOOL)
-#         q4 = SelectStatement().from_(self.t).select("*").where(self.t.foo == MyEnum.DATE)
-#         q5 = SelectStatement().from_(self.t).select("*").where(self.t.foo == MyEnum.NONE)
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo"=\'foo\'', str(q1))
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo"=0', str(q2))
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo"=true', str(q3))
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo"=\'2020-02-02\'', str(q4))
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo"=null', str(q5))
-#
-#     def test_where_field_equals(self):
-#         stmt = SelectStatement().from_(self.t).select("*").where(self.t.foo == self.t.bar)
-#         q2 = SelectStatement().from_(self.t).select("*").where(self.t.foo.eq(self.t.bar))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo"="bar"', str(q1))
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo"="bar"', str(q2))
-#         stmt = self.t.select("*").where(self.t.foo == self.t.bar)
-#         self.assertEqual(q, q1)
-#
-#     def test_where_field_equals_for_update(self):
-#         stmt = SelectStatement().from_(self.t).select("*").where(self.t.foo == self.t.bar).for_update()
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo"="bar" FOR UPDATE', stmt.sql(self.mysql))
+
+    # def test_where_field_equals_for_update(self):
+    #     stmt = SelectStatement().from_(self.table_abc).where(foo=date(2020, 2, 2)).for_update()
+    #     self.assertEqual('SELECT * FROM `abc` WHERE `foo`=`bar` FOR UPDATE', stmt.sql(self.mysql))
+    #     self.assertEqual('SELECT * FROM "abc" WHERE "foo"="bar" FOR UPDATE', stmt.sql(self.sqlite))
+    #     self.assertEqual('SELECT * FROM "abc" WHERE "foo"="bar" FOR UPDATE', stmt.sql(self.pg))
+    #
+
 #
 #     def test_where_field_equals_for_update_nowait(self):
 #         for query_cls in [

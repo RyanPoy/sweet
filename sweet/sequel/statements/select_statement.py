@@ -1,10 +1,11 @@
 from typing import Self
 
-from sweet.sequel.schema.columns import Column
 from sweet.sequel.schema.table import Table
 from sweet.sequel.statements import Statement
+from sweet.sequel.terms import literal
 from sweet.sequel.terms.alias import Alias
 from sweet.sequel.terms.name import IndexName, Name, TableName
+from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Value
 from sweet.utils import DBDataType
 
@@ -39,6 +40,7 @@ class SelectStatement(Statement):
         self._distinct = False
         self._limit = 0
         self._offset = 0
+        self.wheres = []
         self.force_indexes = []
         self.use_indexes = []
 
@@ -58,6 +60,8 @@ class SelectStatement(Statement):
         for c in columns:
             if isinstance(c, (Name, Alias)):
                 self.columns.append(c)
+            elif c == '*':
+                self.columns.append(literal.STAR)
             else:
                 self.columns.append(Value(c))
 
@@ -84,6 +88,20 @@ class SelectStatement(Statement):
 
     def offset(self, offset) -> Self:
         self._offset = offset
+        return self
+
+    def where(self, *qs: Q, **kwargs) -> Self:
+        """
+        Add filtering conditions for the UPDATE statement.
+
+        :param qs: `Q` objects represents filter conditions.
+        :param kwargs: keyword arguments for creating filter conditions. (e.g., `id=1`)
+        :return: The current UpdateStatement instance
+        """
+        for q in qs:
+            self.wheres.append(q)
+        if kwargs:
+            self.wheres.append(Q(**kwargs))
         return self
 
     # def __getattribute__(self, item):
