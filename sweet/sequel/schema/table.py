@@ -27,6 +27,6 @@ class Table:
         if isinstance(value, Column):
             if not value.table:
                 value.table = self
-
-    def as_(self, alias: str) -> Alias:
-        return Alias(self, alias)
+    #
+    # def as_(self, alias: str) -> Alias:
+    #     return Alias(self, alias)
