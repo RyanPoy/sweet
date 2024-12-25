@@ -75,6 +75,8 @@ class Visitor:
         return sql << l.v
 
     def visit_Q(self, q: Q, sql: SQLCollector) -> SQLCollector:
+        if q.invert:
+            sql << "NOT "
         if q.condition:
             self.visit_Pair(q.condition, sql)
         if q.children:

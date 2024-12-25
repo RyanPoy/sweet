@@ -10,7 +10,6 @@ class Q(Term):
     class Logic(Enum):
         AND = 'AND'
         OR = 'OR'
-        NOT = 'NOT'
 
         def __str__(self):
             return self.value
@@ -21,6 +20,7 @@ class Q(Term):
         self.logic_op = Q.Logic.AND
         self.children = []
         self.condition = None
+        self.invert = False
 
         if len(kwargs) == 1:
             self.condition = Pair(**kwargs)
@@ -74,7 +74,7 @@ class Q(Term):
         return self.__combine(other, Q.Logic.OR)
 
     def __invert__(self) -> Self:
-        self.invert = True
+        self.invert = not self.invert
         return self
 
     def __combine(self, other: Self, logic_op: Logic) -> Self:

@@ -39,11 +39,21 @@ class TestQ(unittest.TestCase):
         self.assertEqual("""("price" > 'discounted_price' OR "price" = 'discounted_price')""", q.sql(self.sqlite))
         self.assertEqual("""("price" > 'discounted_price' OR "price" = 'discounted_price')""", q.sql(self.pg))
 
+        q = ~Q(price__gt="discounted_price") | ~Q(price="discounted_price")
+        self.assertEqual("""(NOT `price` > 'discounted_price' OR NOT `price` = 'discounted_price')""", q.sql(self.mysql))
+        self.assertEqual("""(NOT "price" > 'discounted_price' OR NOT "price" = 'discounted_price')""", q.sql(self.sqlite))
+        self.assertEqual("""(NOT "price" > 'discounted_price' OR NOT "price" = 'discounted_price')""", q.sql(self.pg))
+
     def test_and(self):
         q = Q(price__gt="discounted_price") & Q(price="discounted_price")
         self.assertEqual("""(`price` > 'discounted_price' AND `price` = 'discounted_price')""", q.sql(self.mysql))
         self.assertEqual("""("price" > 'discounted_price' AND "price" = 'discounted_price')""", q.sql(self.sqlite))
         self.assertEqual("""("price" > 'discounted_price' AND "price" = 'discounted_price')""", q.sql(self.pg))
+
+        q = ~Q(price__gt="discounted_price") & ~Q(price="discounted_price")
+        self.assertEqual("""(NOT `price` > 'discounted_price' AND NOT `price` = 'discounted_price')""", q.sql(self.mysql))
+        self.assertEqual("""(NOT "price" > 'discounted_price' AND NOT "price" = 'discounted_price')""", q.sql(self.sqlite))
+        self.assertEqual("""(NOT "price" > 'discounted_price' AND NOT "price" = 'discounted_price')""", q.sql(self.pg))
 
     def test_deconstruct_multiple_kwargs(self):
         q = Q(price__gt="discounted_price", price="discounted_price")
@@ -52,11 +62,11 @@ class TestQ(unittest.TestCase):
         self.assertEqual("""("price" > 'discounted_price' AND "price" = 'discounted_price')""", q.sql(self.pg))
 
     def test_complex_logic(self):
-        q = ( Q(price__gte="discounted_price") | Q(price="discounted_price") ) \
-             & ( Q(age__lte=20) | Q(name="abc") )
-        self.assertEqual("""((`price` >= 'discounted_price' OR `price` = 'discounted_price') AND (`age` <= 20 OR `name` = 'abc'))""", q.sql(self.mysql))
-        self.assertEqual("""(("price" >= 'discounted_price' OR "price" = 'discounted_price') AND ("age" <= 20 OR "name" = 'abc'))""", q.sql(self.sqlite))
-        self.assertEqual("""(("price" >= 'discounted_price' OR "price" = 'discounted_price') AND ("age" <= 20 OR "name" = 'abc'))""", q.sql(self.pg))
+        q = ( Q(price__gte="discounted_price") | ~Q(price="discounted_price") ) \
+             & ~( Q(age__lte=20) | ~Q(name="abc") )
+        self.assertEqual("""((`price` >= 'discounted_price' OR NOT `price` = 'discounted_price') AND NOT (`age` <= 20 OR NOT `name` = 'abc'))""", q.sql(self.mysql))
+        self.assertEqual("""(("price" >= 'discounted_price' OR NOT "price" = 'discounted_price') AND NOT ("age" <= 20 OR NOT "name" = 'abc'))""", q.sql(self.sqlite))
+        self.assertEqual("""(("price" >= 'discounted_price' OR NOT "price" = 'discounted_price') AND NOT ("age" <= 20 OR NOT "name" = 'abc'))""", q.sql(self.pg))
 
     def test_equal(self):
         self.assertEqual(Q(), Q())
