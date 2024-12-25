@@ -129,7 +129,8 @@ class SelectStatement(Statement):
 
     def __where_or_on(self, cs, *qs: Q, **kwargs) -> Self:
         for q in qs:
-            cs.append(q)
+            if not q.is_empty():
+                cs.append(q)
         if kwargs:
             cs.append(Q(**kwargs))
         return self

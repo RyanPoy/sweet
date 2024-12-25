@@ -14,7 +14,7 @@ class Q(Term):
         def __str__(self):
             return self.value
 
-    def __init__(self, **kwargs: { str: DBDataType }) -> None:
+    def __init__(self, **kwargs: {str: DBDataType}) -> None:
         super().__init__()
 
         self.logic_op = Q.Logic.AND
@@ -37,6 +37,16 @@ class Q(Term):
             if q is not None:
                 self.children = q.children
 
+    def is_empty(self) -> bool:
+        return not self.children and not self.condition
+
+    def ast(self):
+        return {
+            'logic'    : self.logic_op,
+            'condition': f"{self.condition}",
+            'children' : [q.ast() for q in self.children],
+        }
+
     def __repr__(self):
         return ''.join([
             str(self.logic_op),
@@ -45,13 +55,6 @@ class Q(Term):
             ', '.join([str(c) for c in self.children]),
             ")",
         ])
-
-    def ast(self):
-        return {
-            'logic'    : self.logic_op,
-            'condition': f"{self.condition}",
-            'children' : [q.ast() for q in self.children],
-        }
 
     def __eq__(self, other):
         eq = self.__class__ == other.__class__ \
@@ -65,7 +68,7 @@ class Q(Term):
         return True
 
     def __hash__(self):
-        return hash(f'{self.__class__}-{hash(self.condition)}-{self.logic_op}-{''.join([ hash(x) for x in self.children] )}')
+        return hash(f'{self.__class__}-{hash(self.condition)}-{self.logic_op}-{''.join([hash(str(x)) for x in self.children])}')
 
     def __and__(self, other) -> Self:
         return self.__combine(other, Q.Logic.AND)

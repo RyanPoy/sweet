@@ -259,21 +259,64 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual("SELECT * FROM \"abc\" WHERE \"foo\" = 'bar''foo'", stmt.sql(self.pg))
 
     def test_where_field_matches_regex(self):
-        stmt = SelectStatement().from_(self.table_abc).where(foo="r^b")
-        self.assertEqual("SELECT * FROM `abc` WHERE `foo` = 'r^b'", stmt.sql(self.mysql))
-        self.assertEqual("SELECT * FROM \"abc\" WHERE \"foo\" = 'r^b'", stmt.sql(self.sqlite))
-        self.assertEqual("SELECT * FROM \"abc\" WHERE \"foo\" = 'r^b'", stmt.sql(self.pg))
+        stmt = SelectStatement().from_(self.table_abc).where(foo__regex="r^b")
+        self.assertEqual("SELECT * FROM `abc` WHERE `foo` REGEX 'r^b'", stmt.sql(self.mysql))
+        self.assertEqual("SELECT * FROM \"abc\" WHERE \"foo\" REGEX 'r^b'", stmt.sql(self.sqlite))
+        self.assertEqual("SELECT * FROM \"abc\" WHERE \"foo\" REGEX 'r^b'", stmt.sql(self.pg))
 
-#     def test_where_field_matches_regexp(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.star).where(self.t.foo.regexp(r"^b"))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo" REGEXP \'^b\'', stmt.sql(self.mysql))
-#
-#     def test_where_field_matches_rlike(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.star).where(self.t.foo.rlike(r"^b"))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo" RLIKE \'^b\'', stmt.sql(self.mysql))
+    def test_ignore_empty_criterion_where(self):
+        stmt = SelectStatement().from_(self.table_abc).where(Q())
+        self.assertEqual("SELECT * FROM `abc`", stmt.sql(self.mysql))
+        self.assertEqual("SELECT * FROM \"abc\"", stmt.sql(self.sqlite))
+        self.assertEqual("SELECT * FROM \"abc\"", stmt.sql(self.pg))
+    #
+    # def test_ignore_empty_criterion_having(self):
+    #     stmt = SelectStatement().from_(self.t).having(EmptyCriterion())
+    #
+    #     self.assertEqual('SELECT * FROM "abc"', str(q1))
+    #
+    # def test_select_with_force_index_and_where(self):
+    #     stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).where(self.t.foo == self.t.bar).force_index("egg")
+    #
+    #     self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg") WHERE "foo"="bar"', stmt.sql(self.mysql))
+    #
+    # def test_where_with_multiple_wheres_using_and_case(self):
+    #     case_stmt = Case().when(self.t.foo == 'bar', 1).else_(0)
+    #     query = SelectStatement().from_(self.t).select(case_stmt).where(case_stmt & self.t.blah.isin(['test']))
+    #
+    #     self.assertEqual(
+    #         'SELECT CASE WHEN "foo"=\'bar\' THEN 1 ELSE 0 END FROM "abc" WHERE CASE WHEN "foo"=\'bar\' THEN 1 ELSE 0 '
+    #         'END AND "blah" IN (\'test\')',
+    #         str(query),
+    #     )
+    #
+    # def test_where_with_multiple_wheres_using_or_case(self):
+    #     case_stmt = Case().when(self.t.foo == 'bar', 1).else_(0)
+    #     query = SelectStatement().from_(self.t).select(case_stmt).where(case_stmt | self.t.blah.isin(['test']))
+    #
+    #     self.assertEqual(
+    #         'SELECT CASE WHEN "foo"=\'bar\' THEN 1 ELSE 0 END FROM "abc" WHERE CASE WHEN "foo"=\'bar\' THEN 1 ELSE 0 '
+    #         'END OR "blah" IN (\'test\')',
+    #         str(query),
+    #     )
 
+#
+# class PreWhereTests(WhereTests):
+#     t = Table("abc")
+#
+#     def test_prewhere_field_equals(self):
+#         stmt = SelectStatement().from_(self.t).prewhere(self.t.foo == self.t.bar)
+#         q2 = SelectStatement().from_(self.t).prewhere(self.t.foo.eq(self.t.bar))
+#
+#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q1))
+#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q2))
+#
+#     def test_where_and_prewhere(self):
+#         stmt = SelectStatement().from_(self.t).prewhere(self.t.foo == self.t.bar).where(self.t.foo == self.t.bar)
+#
+#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar" WHERE "foo"="bar"', stmt.sql(self.mysql))
+#
+#
 
 # class WhereTests(unittest.TestCase):
 #
@@ -314,58 +357,6 @@ class TestSelectStatement(unittest.TestCase):
 #                 ),
 #                 str(q),
 #             )
-#
-#
-#     def test_ignore_empty_criterion_where(self):
-#         stmt = SelectStatement().from_(self.t).where(EmptyCriterion())
-#
-#         self.assertEqual('SELECT * FROM "abc"', str(q1))
-#
-#     def test_ignore_empty_criterion_having(self):
-#         stmt = SelectStatement().from_(self.t).having(EmptyCriterion())
-#
-#         self.assertEqual('SELECT * FROM "abc"', str(q1))
-#
-#     def test_select_with_force_index_and_where(self):
-#         stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).where(self.t.foo == self.t.bar).force_index("egg")
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg") WHERE "foo"="bar"', stmt.sql(self.mysql))
-#
-#     def test_where_with_multiple_wheres_using_and_case(self):
-#         case_stmt = Case().when(self.t.foo == 'bar', 1).else_(0)
-#         query = SelectStatement().from_(self.t).select(case_stmt).where(case_stmt & self.t.blah.isin(['test']))
-#
-#         self.assertEqual(
-#             'SELECT CASE WHEN "foo"=\'bar\' THEN 1 ELSE 0 END FROM "abc" WHERE CASE WHEN "foo"=\'bar\' THEN 1 ELSE 0 '
-#             'END AND "blah" IN (\'test\')',
-#             str(query),
-#         )
-#
-#     def test_where_with_multiple_wheres_using_or_case(self):
-#         case_stmt = Case().when(self.t.foo == 'bar', 1).else_(0)
-#         query = SelectStatement().from_(self.t).select(case_stmt).where(case_stmt | self.t.blah.isin(['test']))
-#
-#         self.assertEqual(
-#             'SELECT CASE WHEN "foo"=\'bar\' THEN 1 ELSE 0 END FROM "abc" WHERE CASE WHEN "foo"=\'bar\' THEN 1 ELSE 0 '
-#             'END OR "blah" IN (\'test\')',
-#             str(query),
-#         )
-#
-#
-# class PreWhereTests(WhereTests):
-#     t = Table("abc")
-#
-#     def test_prewhere_field_equals(self):
-#         stmt = SelectStatement().from_(self.t).prewhere(self.t.foo == self.t.bar)
-#         q2 = SelectStatement().from_(self.t).prewhere(self.t.foo.eq(self.t.bar))
-#
-#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q1))
-#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q2))
-#
-#     def test_where_and_prewhere(self):
-#         stmt = SelectStatement().from_(self.t).prewhere(self.t.foo == self.t.bar).where(self.t.foo == self.t.bar)
-#
-#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar" WHERE "foo"="bar"', stmt.sql(self.mysql))
 #
 #
 # class GroupByTests(unittest.TestCase):
