@@ -32,17 +32,19 @@ class SelectStatement(Statement):
           ├── columns
           └── DESC / ASC
     """
+
     def __init__(self):
         super().__init__()
 
         self.tables = []
         self.columns = []
-        self._distinct = False
+        self._distinct = None
         self._limit = 0
         self._offset = 0
         self.wheres = []
         self.force_indexes = []
         self.use_indexes = []
+        self.lock = None
 
     def from_(self, table: TableName | Alias | Self) -> Self:
         found = False
@@ -76,11 +78,25 @@ class SelectStatement(Statement):
         return self
 
     def distinct(self) -> Self:
-        self._distinct = True
+        self._distinct = literal.DISTINCT
         return self
 
     def is_distinct_required(self) -> bool:
-        return self._distinct
+        return self._distinct == literal.DISTINCT
+
+    def for_update(self, share: bool = False, nowait: bool = False, skip: bool = False) -> Self:
+        if not share and not nowait and not skip:
+            self.lock = literal.FOR_UPDATE
+        elif share:
+            self.lock = literal.FOR_UPDATE_SHARE
+        elif nowait:
+            self.lock = literal.FOR_UPDATE_NOWAIT
+        elif skip:
+            self.lock = literal.FOR_UPDATE_SKIP_LOCKED
+        return self
+
+    def is_locked(self) -> bool:
+        return self.lock is not None
 
     def limit(self, limit) -> Self:
         self._limit = limit
