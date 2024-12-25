@@ -12,7 +12,7 @@ from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.pair import Pair, Operator
 from sweet.sequel.terms.name import ColumnName, TableName
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.value import Value
+from sweet.sequel.terms.value import Regexp, Value
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.utils import DBDataType, quote, quote_for_values
 
@@ -101,6 +101,9 @@ class Visitor:
 
     def visit_Value(self, v: Value, sql: SQLCollector) -> SQLCollector:
         return sql << quote(v.v)
+
+    def visit_Regexp(self, r: Regexp, sql: SQLCollector) -> SQLCollector:
+        return sql << "REGEX" << quote(r.v)
 
     def visit_ValuesList(self, values: ValuesList, sql: SQLCollector) -> SQLCollector:
         for i, vs in enumerate(values.data):
