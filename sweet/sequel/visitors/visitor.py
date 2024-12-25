@@ -86,10 +86,15 @@ class Visitor:
         return sql
 
     def visit_Pair(self, p: Pair, sql: SQLCollector) -> SQLCollector:
+        sql << self.quote_column_name(p.field)
+        sql << f" {str(p.operator)} "
         if p.operator == Operator.BETWEEN or p.operator == Operator.NOT_BETWEEN:
-            sql << self.quote_column_name(p.field) << f" {str(p.operator)} {self.quote_values(p.value[0])} AND {self.quote_values(p.value[1])}"
+            sql << f"{self.quote_values(p.value[0])} AND {self.quote_values(p.value[1])}"
         else:
-            sql << f"{self.quote_column_name(p.field)} {str(p.operator)} {self.quote_condition(p.value)}"
+            if isinstance(p.value, ColumnName):
+                self.visit(p.value, sql)
+            else:
+                sql << self.quote_condition(p.value)
         return sql
 
     def visit_Value(self, v: Value, sql: SQLCollector) -> SQLCollector:

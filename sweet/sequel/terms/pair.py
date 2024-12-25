@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Self
 
 from sweet.sequel.terms import Term
+from sweet.sequel.terms.name import ColumnName
 from sweet.utils import DBDataType, quote
 
 
@@ -61,7 +62,7 @@ class Pair(Term):
                 self._parse_special(k, v)
             break
 
-    def _parse_normal(self, key: str, value: DBDataType) -> None:
+    def _parse_normal(self, key: str, value: DBDataType | ColumnName) -> None:
         """
         Parses a normal condition without a special operator.
 
@@ -77,7 +78,7 @@ class Pair(Term):
         else:
             self.operator = Operator.EQ
 
-    def _parse_special(self, key: str, value: DBDataType) -> None:
+    def _parse_special(self, key: str, value: DBDataType | ColumnName) -> None:
         """
         Parses a condition with a special operator.
 

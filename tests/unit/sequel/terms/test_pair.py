@@ -1,5 +1,6 @@
 import unittest
 
+from sweet.sequel.terms.name import ColumnName
 from sweet.sequel.terms.pair import Pair
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
@@ -117,6 +118,12 @@ class TestPair(unittest.TestCase):
         self.assertEqual("`age` <= 30", p.sql(self.mysql))
         self.assertEqual("\"age\" <= 30", p.sql(self.sqlite))
         self.assertEqual("\"age\" <= 30", p.sql(self.pg))
+
+    def test_pair_with_ColumnName_value(self):
+        p = Pair(users__username=ColumnName("nickname", "users"))
+        self.assertEqual('`users`.`username` = `users`.`nickname`', p.sql(self.mysql))
+        self.assertEqual('"users"."username" = "users"."nickname"', p.sql(self.sqlite))
+        self.assertEqual('"users"."username" = "users"."nickname"', p.sql(self.pg))
 
 
 if __name__ == '__main__':
