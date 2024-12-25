@@ -177,6 +177,16 @@ class Visitor:
                     sql << f") AS sq{level}"
                 else:
                     self.visit(table, sql)
+        if stmt.join_tables:
+            sql << " JOIN "
+            for i, table in enumerate(stmt.join_tables):
+                if i != 0: sql << ", "
+                self.visit(table, sql)
+            if stmt.ons:
+                sql << " ON "
+                for i, w in enumerate(stmt.ons):
+                    if i != 0: sql << f" AND "
+                    self.visit(w, sql)
 
         if stmt.wheres:
             sql << " WHERE "

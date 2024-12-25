@@ -48,6 +48,9 @@ class TableName(Name):
     def as_(self, alias: str) -> Alias:
         return Alias(self, TableName(alias))
 
+    def column_name_of(self, name: str) -> ColumnName:
+        return ColumnName(name, self.value)
+
 
 class IndexName(Name):
     pass

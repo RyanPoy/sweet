@@ -45,18 +45,11 @@ class SelectStatement(Statement):
         self.force_indexes = []
         self.use_indexes = []
         self.lock = None
+        self.join_tables = []
+        self.ons = []
 
     def from_(self, table: TableName | Alias | Self) -> Self:
-        found = False
-        if isinstance(table, Table):
-            for t in self.tables:
-                if t.name == table.name:
-                    found = True
-            if not found:
-                self.tables.append(table)
-        else:
-            self.tables.append(table)
-        return self
+        return self.__from_or_join(self.tables, table)
 
     def select(self, *columns: Name | Alias | DBDataType) -> Self:
         for c in columns:
@@ -108,16 +101,37 @@ class SelectStatement(Statement):
 
     def where(self, *qs: Q, **kwargs) -> Self:
         """
-        Add filtering conditions for the UPDATE statement.
+        Add filtering conditions for the SELECT statement.
 
         :param qs: `Q` objects represents filter conditions.
         :param kwargs: keyword arguments for creating filter conditions. (e.g., `id=1`)
         :return: The current UpdateStatement instance
         """
+        return self.__where_or_on(self.wheres, *qs, **kwargs)
+
+    def join(self, table: TableName | Alias | Self) -> Self:
+        return self.__from_or_join(self.join_tables, table)
+
+    def __from_or_join(self, cs, table: TableName | Alias | Self) -> Self:
+        found = False
+        if isinstance(table, Table):
+            for t in cs:
+                if t.name == table.name:
+                    found = True
+            if not found:
+                cs.append(table)
+        else:
+            cs.append(table)
+        return self
+
+    def on(self, *qs: Q, **kwargs) -> Self:
+        return self.__where_or_on(self.ons, *qs, **kwargs)
+
+    def __where_or_on(self, cs, *qs: Q, **kwargs) -> Self:
         for q in qs:
-            self.wheres.append(q)
+            cs.append(q)
         if kwargs:
-            self.wheres.append(Q(**kwargs))
+            cs.append(Q(**kwargs))
         return self
 
     # def __getattribute__(self, item):
