@@ -18,6 +18,12 @@ class TestName(unittest.TestCase):
         self.assertEqual("name", ColumnName("name").value)
         self.assertEqual("users.name", ColumnName("users.name").value)
 
+    def test_sql_for_column_name_from_table_name(self):
+        t = TableName("users")
+        self.assertEqual('`users`.`age`', t.age.sql(self.mysql))
+        self.assertEqual('"users"."age"', t.age.sql(self.sqlite))
+        self.assertEqual('"users"."age"', t.age.sql(self.pg))
+
     def test_sql_of_table_name(self):
         n = TableName("users")
         self.assertEqual('`users`', n.sql(self.mysql))

@@ -1,3 +1,5 @@
+from typing import Self
+
 from sweet.sequel.terms import Term
 from sweet.sequel.terms.alias import Alias
 
@@ -26,6 +28,11 @@ class Name(Term):
             return f'{self.__class__.__name__}("{self.schema_name}"."{self.value}")'
         return f'{self.__class__.__name__}("{self.value}")'
 
+    def __hash__(self) -> int:
+        return hash(f'{self.value}-{self.schema_name or ""}')
+
+    def __eq__(self, other: Self) -> bool:
+        return self.__class__ == other.__class__ and self.value == other.value and self.schema_name == other.schema_name
 
 class ColumnName(Name):
     """
@@ -50,6 +57,12 @@ class TableName(Name):
 
     def column_name_of(self, name: str) -> ColumnName:
         return ColumnName(name, self.value)
+
+    def __getattribute__(self, item):
+        try:
+            return object.__getattribute__(self, item)
+        except AttributeError:
+            return ColumnName(item, self.value)
 
 
 class IndexName(Name):

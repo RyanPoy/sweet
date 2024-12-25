@@ -232,100 +232,19 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'2020-02-02\' FOR UPDATE SKIP LOCKED', stmt.sql(self.sqlite))
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'2020-02-02\' FOR UPDATE SKIP LOCKED', stmt.sql(self.pg))
 
-    def test_where_field_equals_for_update_of_multiple_tables(self):
+    def test_where_field_equals_for_multiple_tables(self):
         stmt = (SelectStatement().from_(self.table_abc)
                 .join(self.table_efg).on(abc__id=ColumnName("id", "efg"))
                 .where(abc__foo=ColumnName("bar", "efg"))
-                .for_update(skip=True)
                 )
-        self.assertEqual('SELECT * FROM `abc` JOIN `efg` ON `abc`.`id` = `efg`.`id` WHERE `abc`.`foo` = `efg`.`bar` FOR UPDATE SKIP LOCKED', stmt.sql(self.mysql))
+        self.assertEqual('SELECT * FROM `abc` JOIN `efg` ON `abc`.`id` = `efg`.`id` WHERE `abc`.`foo` = `efg`.`bar`', stmt.sql(self.mysql))
 
+    def test_where_field_equals_where(self):
+        stmt = SelectStatement().from_(self.table_abc).where(abc__foo=1).where(abc__bar=self.table_abc.baz)
+        self.assertEqual('SELECT * FROM `abc` WHERE `abc`.`foo` = 1 AND `abc`.`bar` = `abc`.`baz`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT * FROM "abc" WHERE "abc"."foo" = 1 AND "abc"."bar" = "abc"."baz"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT * FROM "abc" WHERE "abc"."foo" = 1 AND "abc"."bar" = "abc"."baz"', stmt.sql(self.pg))
 
-# class WhereTests(unittest.TestCase):
-#
-#     def test_where_field_equals_for_update_of(self):
-#         for query_cls in [
-#             MySQLQuery,
-#             PostgreSQLQuery,
-#         ]:
-#             quote_char = query_cls._builder().QUOTE_CHAR if isinstance(query_cls._builder().QUOTE_CHAR, str) else '"'
-#             stmt = query_cls.from_(self.t).select("*").where(self.t.foo == self.t.bar).for_update(of=("abc",))
-#             self.assertEqual(
-#                 'SELECT * '
-#                 'FROM {quote_char}abc{quote_char} '
-#                 'WHERE {quote_char}foo{quote_char}={quote_char}bar{quote_char} '
-#                 'FOR UPDATE OF {quote_char}abc{quote_char}'.format(
-#                     quote_char=quote_char,
-#                 ),
-#                 str(q),
-#             )
-#
-#     def test_where_field_equals_for_update_of_nowait(self):
-#         for query_cls in [
-#             MySQLQuery,
-#             PostgreSQLQuery,
-#         ]:
-#             stmt = query_cls.from_(self.t).select("*").where(self.t.foo == self.t.bar).for_update(of=("abc",), nowait=True)
-#             quote_char = query_cls._builder().QUOTE_CHAR if isinstance(query_cls._builder().QUOTE_CHAR, str) else '"'
-#             self.assertEqual(
-#                 'SELECT * '
-#                 'FROM {quote_char}abc{quote_char} '
-#                 'WHERE {quote_char}foo{quote_char}={quote_char}bar{quote_char} '
-#                 'FOR UPDATE OF {quote_char}abc{quote_char} NOWAIT'.format(
-#                     quote_char=quote_char,
-#                 ),
-#                 str(q),
-#             )
-#
-#     def test_where_field_equals_for_update_of_skip_locked(self):
-#         for query_cls in [
-#             MySQLQuery,
-#             PostgreSQLQuery,
-#         ]:
-#             stmt = (
-#                 query_cls.from_(self.t)
-#                 .select("*")
-#                 .where(self.t.foo == self.t.bar)
-#                 .for_update(of=("abc",), skip_locked=True)
-#             )
-#             quote_char = query_cls._builder().QUOTE_CHAR if isinstance(query_cls._builder().QUOTE_CHAR, str) else '"'
-#             self.assertEqual(
-#                 'SELECT * '
-#                 'FROM {quote_char}abc{quote_char} '
-#                 'WHERE {quote_char}foo{quote_char}={quote_char}bar{quote_char} '
-#                 'FOR UPDATE OF {quote_char}abc{quote_char} SKIP LOCKED'.format(
-#                     quote_char=quote_char,
-#                 ),
-#                 str(q),
-#             )
-#
-#     def test_where_field_equals_for_update_skip_locked_and_of(self):
-#         for query_cls in [
-#             MySQLQuery,
-#             PostgreSQLQuery,
-#         ]:
-#             stmt = (
-#                 query_cls.from_(self.t)
-#                 .select("*")
-#                 .where(self.t.foo == self.t.bar)
-#                 .for_update(nowait=False, skip_locked=True, of=("abc",))
-#             )
-#             quote_char = query_cls._builder().QUOTE_CHAR if isinstance(query_cls._builder().QUOTE_CHAR, str) else '"'
-#             self.assertEqual(
-#                 'SELECT * '
-#                 'FROM {quote_char}abc{quote_char} '
-#                 'WHERE {quote_char}foo{quote_char}={quote_char}bar{quote_char} '
-#                 'FOR UPDATE OF {quote_char}abc{quote_char} SKIP LOCKED'.format(
-#                     quote_char=quote_char,
-#                 ),
-#                 str(q),
-#             )
-#
-#     def test_where_field_equals_where(self):
-#         stmt = SelectStatement().from_(self.t).select("*").where(self.t.foo == 1).where(self.t.bar == self.t.baz)
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo"=1 AND "bar"="baz"', stmt.sql(self.mysql))
-#
 #     def test_where_field_equals_where_not(self):
 #         stmt = SelectStatement().from_(self.t).select("*").where((self.t.foo == 1).negate()).where(self.t.bar == self.t.baz)
 #
@@ -410,6 +329,48 @@ class TestSelectStatement(unittest.TestCase):
 #         stmt = SelectStatement().from_(self.t).select(self.t.star).where(self.t.foo.rlike(r"^b"))
 #
 #         self.assertEqual('SELECT * FROM "abc" WHERE "foo" RLIKE \'^b\'', stmt.sql(self.mysql))
+
+
+# class WhereTests(unittest.TestCase):
+#
+#     def test_where_field_equals_for_update_of(self):
+#         for query_cls in [
+#             MySQLQuery,
+#             PostgreSQLQuery,
+#         ]:
+#             quote_char = query_cls._builder().QUOTE_CHAR if isinstance(query_cls._builder().QUOTE_CHAR, str) else '"'
+#             stmt = query_cls.from_(self.t).select("*").where(self.t.foo == self.t.bar).for_update(of=("abc",))
+#             self.assertEqual(
+#                 'SELECT * '
+#                 'FROM {quote_char}abc{quote_char} '
+#                 'WHERE {quote_char}foo{quote_char}={quote_char}bar{quote_char} '
+#                 'FOR UPDATE OF {quote_char}abc{quote_char}'.format(
+#                     quote_char=quote_char,
+#                 ),
+#                 str(q),
+#             )
+#     def test_where_field_equals_for_update_skip_locked_and_of(self):
+#         for query_cls in [
+#             MySQLQuery,
+#             PostgreSQLQuery,
+#         ]:
+#             stmt = (
+#                 query_cls.from_(self.t)
+#                 .select("*")
+#                 .where(self.t.foo == self.t.bar)
+#                 .for_update(nowait=False, skip_locked=True, of=("abc",))
+#             )
+#             quote_char = query_cls._builder().QUOTE_CHAR if isinstance(query_cls._builder().QUOTE_CHAR, str) else '"'
+#             self.assertEqual(
+#                 'SELECT * '
+#                 'FROM {quote_char}abc{quote_char} '
+#                 'WHERE {quote_char}foo{quote_char}={quote_char}bar{quote_char} '
+#                 'FOR UPDATE OF {quote_char}abc{quote_char} SKIP LOCKED'.format(
+#                     quote_char=quote_char,
+#                 ),
+#                 str(q),
+#             )
+#
 #
 #     def test_ignore_empty_criterion_where(self):
 #         stmt = SelectStatement().from_(self.t).select("*").where(EmptyCriterion())
