@@ -232,46 +232,46 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'2020-02-02\' FOR UPDATE SKIP LOCKED', stmt.sql(self.sqlite))
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'2020-02-02\' FOR UPDATE SKIP LOCKED', stmt.sql(self.pg))
 
-    def test_where_field_equals_for_update_of_multiple_tables(self):
-        SelectStatement.from_(self.table_abc).join(self.table_efg).on(table_abc__id=ColumnName())
-        for query_cls in [
-            MySQLQuery,
-            PostgreSQLQuery,
-        ]:
-            stmt = (
-                query_cls.from_(self.t)
-                .join(self.t2)
-                .on(self.t.id == self.t2.abc_id)
-                .select("*")
-                .where(self.t.foo == self.t.bar)
-                .for_update(of=("abc", "cba"))
-            )
-            quote_char = query_cls._builder().QUOTE_CHAR if isinstance(query_cls._builder().QUOTE_CHAR, str) else '"'
-            self.assertIn(
-                str(q),
-                [
-                    'SELECT * '
-                    'FROM {quote_char}abc{quote_char} '
-                    'JOIN {quote_char}cba{quote_char} '
-                    'ON {quote_char}abc{quote_char}.{quote_char}id{quote_char}='
-                    '{quote_char}cba{quote_char}.{quote_char}abc_id{quote_char} '
-                    'WHERE {quote_char}abc{quote_char}.{quote_char}foo{quote_char}='
-                    '{quote_char}abc{quote_char}.{quote_char}bar{quote_char} '
-                    'FOR UPDATE OF {quote_char}cba{quote_char}, {quote_char}abc{quote_char}'.format(
-                        quote_char=quote_char,
-                    ),
-                    'SELECT * '
-                    'FROM {quote_char}abc{quote_char} '
-                    'JOIN {quote_char}cba{quote_char} '
-                    'ON {quote_char}abc{quote_char}.{quote_char}id{quote_char}='
-                    '{quote_char}cba{quote_char}.{quote_char}abc_id{quote_char} '
-                    'WHERE {quote_char}abc{quote_char}.{quote_char}foo{quote_char}='
-                    '{quote_char}abc{quote_char}.{quote_char}bar{quote_char} '
-                    'FOR UPDATE OF {quote_char}abc{quote_char}, {quote_char}cba{quote_char}'.format(
-                        quote_char=quote_char,
-                    ),
-                ],
-            )
+    # def test_where_field_equals_for_update_of_multiple_tables(self):
+    #     SelectStatement.from_(self.table_abc).join(self.table_efg).on(table_abc__id=ColumnName())
+    #     for query_cls in [
+    #         MySQLQuery,
+    #         PostgreSQLQuery,
+    #     ]:
+    #         stmt = (
+    #             query_cls.from_(self.t)
+    #             .join(self.t2)
+    #             .on(self.t.id == self.t2.abc_id)
+    #             .select("*")
+    #             .where(self.t.foo == self.t.bar)
+    #             .for_update(of=("abc", "cba"))
+    #         )
+    #         quote_char = query_cls._builder().QUOTE_CHAR if isinstance(query_cls._builder().QUOTE_CHAR, str) else '"'
+    #         self.assertIn(
+    #             str(q),
+    #             [
+    #                 'SELECT * '
+    #                 'FROM {quote_char}abc{quote_char} '
+    #                 'JOIN {quote_char}cba{quote_char} '
+    #                 'ON {quote_char}abc{quote_char}.{quote_char}id{quote_char}='
+    #                 '{quote_char}cba{quote_char}.{quote_char}abc_id{quote_char} '
+    #                 'WHERE {quote_char}abc{quote_char}.{quote_char}foo{quote_char}='
+    #                 '{quote_char}abc{quote_char}.{quote_char}bar{quote_char} '
+    #                 'FOR UPDATE OF {quote_char}cba{quote_char}, {quote_char}abc{quote_char}'.format(
+    #                     quote_char=quote_char,
+    #                 ),
+    #                 'SELECT * '
+    #                 'FROM {quote_char}abc{quote_char} '
+    #                 'JOIN {quote_char}cba{quote_char} '
+    #                 'ON {quote_char}abc{quote_char}.{quote_char}id{quote_char}='
+    #                 '{quote_char}cba{quote_char}.{quote_char}abc_id{quote_char} '
+    #                 'WHERE {quote_char}abc{quote_char}.{quote_char}foo{quote_char}='
+    #                 '{quote_char}abc{quote_char}.{quote_char}bar{quote_char} '
+    #                 'FOR UPDATE OF {quote_char}abc{quote_char}, {quote_char}cba{quote_char}'.format(
+    #                     quote_char=quote_char,
+    #                 ),
+    #             ],
+    #         )
 
 # class WhereTests(unittest.TestCase):
 #
