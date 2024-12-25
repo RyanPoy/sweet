@@ -21,6 +21,7 @@ class Operator(Enum):
     GTE = ">="
     LIKE = "LIKE"
     NOT_LIKE = "NOT LIKE"
+    REGEX = "REGEX"
 
     def __str__(self) -> str:
         return self.value
@@ -86,8 +87,10 @@ class Pair(Term):
         :param value: The value to compare or check.
         :raises ValueError: If the provided operator or value format is invalid.
         """
-        vs = key.split(self.SEPERATOR, 1)
-        col, op_type = vs[0], vs[1]
+        vs = key.split(self.SEPERATOR)
+        col = self.SEPERATOR.join(vs[:-1])
+        op_type = vs[-1]
+        # col, op_type = vs[0], vs[1]
         self.field = col
         self.value = value
         if op_type == 'not':
@@ -113,6 +116,8 @@ class Pair(Term):
             self.operator = Operator.LIKE
         elif op_type == 'not_like':
             self.operator = Operator.NOT_LIKE
+        elif op_type == 'regex':
+            self.operator = Operator.REGEX
         else:
             self._parse_normal(key, value)
 

@@ -125,7 +125,12 @@ class TestPair(unittest.TestCase):
         self.assertEqual('"users"."username" = "users"."nickname"', p.sql(self.sqlite))
         self.assertEqual('"users"."username" = "users"."nickname"', p.sql(self.pg))
 
+    def test_pair_with_regex_value(self):
+        p = Pair(users__username__regex="^[b]abc")
+        self.assertEqual("`users`.`username` REGEX '^[b]abc'", p.sql(self.mysql))
+        self.assertEqual("\"users\".\"username\" REGEX '^[b]abc'", p.sql(self.sqlite))
+        self.assertEqual("\"users\".\"username\" REGEX '^[b]abc'", p.sql(self.pg))
+
 
 if __name__ == '__main__':
     unittest.main()
-
