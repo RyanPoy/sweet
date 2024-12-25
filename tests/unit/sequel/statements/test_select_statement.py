@@ -3,6 +3,7 @@ from datetime import date
 
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.terms.name import ColumnName, IndexName, TableName
+from sweet.sequel.terms.q import Q
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
@@ -90,7 +91,7 @@ class TestSelectStatement(unittest.TestCase):
     #         )
     #
     #     def test_select__nested_subquery(self):
-    #         subquery0 = SelectStatement().from_(self.table_abc).select("*")
+    #         subquery0 = SelectStatement().from_(self.table_abc)
     #         subquery1 = SelectStatement().from_(subquery0).select(subquery0.foo, subquery0.bar)
     #         subquery2 = SelectStatement().from_(subquery1).select(subquery1.foo)
     #
@@ -183,27 +184,27 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT 1 FROM "abc"', stmt.sql(self.pg))
 
     def test_where_basic(self):
-        stmt = SelectStatement().from_(self.table_abc).select("*").where(foo="foo")
+        stmt = SelectStatement().from_(self.table_abc).where(foo="foo")
         self.assertEqual("SELECT * FROM `abc` WHERE `foo` = 'foo'", stmt.sql(self.mysql))
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'foo\'', stmt.sql(self.sqlite))
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'foo\'', stmt.sql(self.pg))
 
-        stmt = SelectStatement().from_(self.table_abc).select("*").where(foo=0)
+        stmt = SelectStatement().from_(self.table_abc).where(foo=0)
         self.assertEqual("SELECT * FROM `abc` WHERE `foo` = 0", stmt.sql(self.mysql))
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = 0', stmt.sql(self.sqlite))
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = 0', stmt.sql(self.pg))
 
-        stmt = SelectStatement().from_(self.table_abc).select("*").where(foo=True)
+        stmt = SelectStatement().from_(self.table_abc).where(foo=True)
         self.assertEqual("SELECT * FROM `abc` WHERE `foo` = 1", stmt.sql(self.mysql))
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = 1', stmt.sql(self.sqlite))
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = 1', stmt.sql(self.pg))
 
-        stmt = SelectStatement().from_(self.table_abc).select("*").where(foo=date(2020, 2, 2))
+        stmt = SelectStatement().from_(self.table_abc).where(foo=date(2020, 2, 2))
         self.assertEqual("SELECT * FROM `abc` WHERE `foo` = '2020-02-02'", stmt.sql(self.mysql))
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'2020-02-02\'', stmt.sql(self.sqlite))
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'2020-02-02\'', stmt.sql(self.pg))
 
-        stmt = SelectStatement().from_(self.table_abc).select("*").where(foo=None)
+        stmt = SelectStatement().from_(self.table_abc).where(foo=None)
         self.assertEqual("SELECT * FROM `abc` WHERE `foo` IS NULL", stmt.sql(self.mysql))
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" IS NULL', stmt.sql(self.sqlite))
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" IS NULL', stmt.sql(self.pg))
@@ -245,81 +246,24 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT * FROM "abc" WHERE "abc"."foo" = 1 AND "abc"."bar" = "abc"."baz"', stmt.sql(self.sqlite))
         self.assertEqual('SELECT * FROM "abc" WHERE "abc"."foo" = 1 AND "abc"."bar" = "abc"."baz"', stmt.sql(self.pg))
 
-#     def test_where_field_equals_where_not(self):
-#         stmt = SelectStatement().from_(self.t).select("*").where((self.t.foo == 1).negate()).where(self.t.bar == self.t.baz)
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE NOT "foo"=1 AND "bar"="baz"', stmt.sql(self.mysql))
-#
-#     def test_where_field_equals_where_two_not(self):
-#         stmt = SelectStatement().from_(self.t).select("*").where((self.t.foo == 1).negate()).where((self.t.bar == self.t.baz).negate())
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE NOT "foo"=1 AND NOT "bar"="baz"', stmt.sql(self.mysql))
-#
-#     def test_where_single_quote(self):
-#         stmt = SelectStatement().from_(self.t).select("*").where(self.t.foo == "bar'foo")
-#
-#         self.assertEqual("SELECT * FROM \"abc\" WHERE \"foo\"='bar''foo'", str(q1))
-#
-#     def test_where_field_equals_and(self):
-#         stmt = SelectStatement().from_(self.t).select("*").where((self.t.foo == 1) & (self.t.bar == self.t.baz))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo"=1 AND "bar"="baz"', stmt.sql(self.mysql))
-#
-#     def test_where_field_equals_or(self):
-#         stmt = SelectStatement().from_(self.t).select("*").where((self.t.foo == 1) | (self.t.bar == self.t.baz))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo"=1 OR "bar"="baz"', stmt.sql(self.mysql))
-#
-#     def test_where_nested_conditions(self):
-#         stmt = SelectStatement().from_(self.t).select("*").where((self.t.foo == 1) | (self.t.bar == self.t.baz)).where(self.t.baz == 0)
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE ("foo"=1 OR "bar"="baz") AND "baz"=0', stmt.sql(self.mysql))
-#
-#     def test_where_field_starts_with(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.star).where(self.t.foo.like("ab%"))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo" LIKE \'ab%\'', stmt.sql(self.mysql))
-#
-#     def test_where_field_contains(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.star).where(self.t.foo.like("%fg%"))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo" LIKE \'%fg%\'', stmt.sql(self.mysql))
-#
-#     def test_where_field_ends_with(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.star).where(self.t.foo.like("%yz"))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo" LIKE \'%yz\'', stmt.sql(self.mysql))
-#
-#     def test_where_field_is_n_chars_long(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.star).where(self.t.foo.like("___"))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo" LIKE \'___\'', stmt.sql(self.mysql))
-#
-#     def test_where_field_does_not_start_with(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.star).where(self.t.foo.not_like("ab%"))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo" NOT LIKE \'ab%\'', stmt.sql(self.mysql))
-#
-#     def test_where_field_does_not_contain(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.star).where(self.t.foo.not_like("%fg%"))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo" NOT LIKE \'%fg%\'', stmt.sql(self.mysql))
-#
-#     def test_where_field_does_not_end_with(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.star).where(self.t.foo.not_like("%yz"))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo" NOT LIKE \'%yz\'', stmt.sql(self.mysql))
-#
-#     def test_where_field_is_not_n_chars_long(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.star).where(self.t.foo.not_like("___"))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo" NOT LIKE \'___\'', stmt.sql(self.mysql))
-#
-#     def test_where_field_matches_regex(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.star).where(self.t.foo.regex(r"^b"))
-#
-#         self.assertEqual('SELECT * FROM "abc" WHERE "foo" REGEX \'^b\'', stmt.sql(self.mysql))
-#
+    def test_where_field_equals_where_not(self):
+        stmt = SelectStatement().from_(self.table_abc).where(~Q(foo=1)).where(bar=self.table_abc.baz)
+        self.assertEqual('SELECT * FROM `abc` WHERE NOT `foo` = 1 AND `bar` = `abc`.`baz`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT * FROM "abc" WHERE NOT "foo" = 1 AND "bar" = "abc"."baz"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT * FROM "abc" WHERE NOT "foo" = 1 AND "bar" = "abc"."baz"', stmt.sql(self.pg))
+
+    def test_where_single_quote(self):
+        stmt = SelectStatement().from_(self.table_abc).where(foo="bar'foo")
+        self.assertEqual("SELECT * FROM `abc` WHERE `foo` = 'bar''foo'", stmt.sql(self.mysql))
+        self.assertEqual("SELECT * FROM \"abc\" WHERE \"foo\" = 'bar''foo'", stmt.sql(self.sqlite))
+        self.assertEqual("SELECT * FROM \"abc\" WHERE \"foo\" = 'bar''foo'", stmt.sql(self.pg))
+
+    def test_where_field_matches_regex(self):
+        stmt = SelectStatement().from_(self.table_abc).where(foo="r^b")
+        self.assertEqual("SELECT * FROM `abc` WHERE `foo` = 'r^b'", stmt.sql(self.mysql))
+        self.assertEqual("SELECT * FROM \"abc\" WHERE \"foo\" = 'r^b'", stmt.sql(self.sqlite))
+        self.assertEqual("SELECT * FROM \"abc\" WHERE \"foo\" = 'r^b'", stmt.sql(self.pg))
+
 #     def test_where_field_matches_regexp(self):
 #         stmt = SelectStatement().from_(self.t).select(self.t.star).where(self.t.foo.regexp(r"^b"))
 #
@@ -339,7 +283,7 @@ class TestSelectStatement(unittest.TestCase):
 #             PostgreSQLQuery,
 #         ]:
 #             quote_char = query_cls._builder().QUOTE_CHAR if isinstance(query_cls._builder().QUOTE_CHAR, str) else '"'
-#             stmt = query_cls.from_(self.t).select("*").where(self.t.foo == self.t.bar).for_update(of=("abc",))
+#             stmt = query_cls.from_(self.t).where(self.t.foo == self.t.bar).for_update(of=("abc",))
 #             self.assertEqual(
 #                 'SELECT * '
 #                 'FROM {quote_char}abc{quote_char} '
@@ -356,7 +300,7 @@ class TestSelectStatement(unittest.TestCase):
 #         ]:
 #             stmt = (
 #                 query_cls.from_(self.t)
-#                 .select("*")
+#
 #                 .where(self.t.foo == self.t.bar)
 #                 .for_update(nowait=False, skip_locked=True, of=("abc",))
 #             )
@@ -373,12 +317,12 @@ class TestSelectStatement(unittest.TestCase):
 #
 #
 #     def test_ignore_empty_criterion_where(self):
-#         stmt = SelectStatement().from_(self.t).select("*").where(EmptyCriterion())
+#         stmt = SelectStatement().from_(self.t).where(EmptyCriterion())
 #
 #         self.assertEqual('SELECT * FROM "abc"', str(q1))
 #
 #     def test_ignore_empty_criterion_having(self):
-#         stmt = SelectStatement().from_(self.t).select("*").having(EmptyCriterion())
+#         stmt = SelectStatement().from_(self.t).having(EmptyCriterion())
 #
 #         self.assertEqual('SELECT * FROM "abc"', str(q1))
 #
@@ -412,14 +356,14 @@ class TestSelectStatement(unittest.TestCase):
 #     t = Table("abc")
 #
 #     def test_prewhere_field_equals(self):
-#         stmt = SelectStatement().from_(self.t).select("*").prewhere(self.t.foo == self.t.bar)
-#         q2 = SelectStatement().from_(self.t).select("*").prewhere(self.t.foo.eq(self.t.bar))
+#         stmt = SelectStatement().from_(self.t).prewhere(self.t.foo == self.t.bar)
+#         q2 = SelectStatement().from_(self.t).prewhere(self.t.foo.eq(self.t.bar))
 #
 #         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q1))
 #         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q2))
 #
 #     def test_where_and_prewhere(self):
-#         stmt = SelectStatement().from_(self.t).select("*").prewhere(self.t.foo == self.t.bar).where(self.t.foo == self.t.bar)
+#         stmt = SelectStatement().from_(self.t).prewhere(self.t.foo == self.t.bar).where(self.t.foo == self.t.bar)
 #
 #         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar" WHERE "foo"="bar"', stmt.sql(self.mysql))
 #
@@ -875,7 +819,7 @@ class TestSelectStatement(unittest.TestCase):
 #     def test_where__in(self):
 #         stmt = (
 #             SelectStatement().from_(self.table_abc)
-#             .select("*")
+#
 #             .where(
 #                 self.table_abc.foo.isin(
 #                     SelectStatement().from_(self.table_efg).select(self.table_efg.foo).where(self.table_efg.bar == 0)
@@ -889,7 +833,7 @@ class TestSelectStatement(unittest.TestCase):
 #         )
 #
 #     def test_where__in_nested(self):
-#         stmt = SelectStatement().from_(self.table_abc).select("*").where(self.table_abc.foo).isin(self.table_efg.select("*"))
+#         stmt = SelectStatement().from_(self.table_abc).where(self.table_abc.foo).isin(self.table_efg)
 #
 #         self.assertEqual('SELECT * FROM "abc" WHERE "foo" IN (SELECT * FROM "efg")', stmt.sql(self.mysql))
 #
@@ -1039,7 +983,7 @@ class TestSelectStatement(unittest.TestCase):
 #
 #     def test_with(self):
 #         sub_query = SelectStatement().from_(self.table_efg).select("fizz")
-#         test_query = Query.with_(sub_query, "an_alias").from_(AliasedQuery("an_alias")).select("*")
+#         test_query = Query.with_(sub_query, "an_alias").from_(AliasedQuery("an_alias"))
 #
 #         self.assertEqual(
 #             'WITH an_alias AS (SELECT "fizz" FROM "efg") SELECT * FROM an_alias',
@@ -1053,7 +997,7 @@ class TestSelectStatement(unittest.TestCase):
 #             .from_(self.table_abc)
 #             .join(AliasedQuery("an_alias"))
 #             .on(AliasedQuery("an_alias").fizz == self.table_abc.buzz)
-#             .select("*")
+#
 #         )
 #         self.assertEqual(
 #             'WITH an_alias AS (SELECT "fizz" FROM "efg") '
@@ -1063,7 +1007,7 @@ class TestSelectStatement(unittest.TestCase):
 #
 #     def test_select_from_with_returning(self):
 #         sub_query = PostgreSQLQuery.into(self.table_abc).insert(1).returning('*')
-#         test_query = Query.with_(sub_query, "an_alias").from_(AliasedQuery("an_alias")).select("*")
+#         test_query = Query.with_(sub_query, "an_alias").from_(AliasedQuery("an_alias"))
 #         self.assertEqual(
 #             'WITH an_alias AS (INSERT INTO "abc" VALUES (1) RETURNING *) SELECT * FROM an_alias', str(test_query)
 #         )

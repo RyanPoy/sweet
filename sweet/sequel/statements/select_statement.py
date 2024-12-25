@@ -133,12 +133,3 @@ class SelectStatement(Statement):
         if kwargs:
             cs.append(Q(**kwargs))
         return self
-
-    # def __getattribute__(self, item):
-    #     try:
-    #         return object.__getattribute__(self, item)
-    #     except AttributeError:
-    #         for c in self.columns:
-    #             if c.name == item:
-    #                 return c
-    #     return super().__getattribute__(item)
