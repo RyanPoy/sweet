@@ -2,6 +2,7 @@ from typing import Optional, Self
 
 from sweet.sequel.schema.columns import Column
 from sweet.sequel.statements import Statement
+from sweet.sequel.terms import literal
 from sweet.sequel.terms.name import ColumnName, TableName
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.utils import DBDataType
@@ -60,26 +61,9 @@ class InsertStatement(Statement):
 
     def __init__(self) -> None:
         super().__init__()
+        self.insert_or_update = literal.INSERT
         self._column_names: [ColumnName] = []
-        self._ignore = False
-        self._replace = False
         self._values_list: ValuesList = ValuesList()
-
-    def is_ignore(self) -> bool:
-        """
-        Returns whether the insert statement should ignore errors.
-
-        :return: True if the statement should ignore errors, False otherwise.
-        """
-        return self._ignore
-
-    def is_replace(self) -> bool:
-        """
-        Returns whether the insert statement is a REPLACE operation.
-
-        :return: True if the statement is a REPLACE operation, False otherwise.
-        """
-        return self._replace
 
     def into(self, table_name: TableName) -> Self:
         """
@@ -128,7 +112,11 @@ class InsertStatement(Statement):
         :return: The current InsertStatement instance.
         """
         self.__insert_or_replace(*values)
-        self._replace = False
+        self.insert_or_update = literal.INSERT
+        return self
+
+    def ignore(self) -> Self:
+        self.insert_or_update = literal.INSERT_IGNORE
         return self
 
     def insert_rows(self, *rows: [DBDataType]) -> Self:
@@ -140,7 +128,7 @@ class InsertStatement(Statement):
         """
         if rows:
             self._values_list.append(rows)
-        self._replace = False
+        self.insert_or_update = literal.INSERT
         return self
 
     def replace(self, *values: DBDataType) -> Self:
@@ -151,7 +139,7 @@ class InsertStatement(Statement):
         :return: The current InsertStatement instance.
         """
         self.__insert_or_replace(*values)
-        self._replace = True
+        self.insert_or_update = literal.REPLACE
         return self
 
     def replace_rows(self, *rows: [DBDataType]) -> Self:
@@ -163,7 +151,7 @@ class InsertStatement(Statement):
         """
         if rows:
             self._values_list.append(rows)
-        self._replace = True
+        self.insert_or_update = literal.REPLACE
         return self
 
     def __insert_or_replace(self, *values: DBDataType) -> Self:
@@ -177,11 +165,3 @@ class InsertStatement(Statement):
             self._values_list.append([values])
         return self
 
-    def ignore(self) -> Self:
-        """
-        Marks the INSERT statement to ignore errors during the operation.
-
-        :return: The current InsertStatement instance.
-        """
-        self._ignore = True
-        return self

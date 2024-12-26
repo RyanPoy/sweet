@@ -112,13 +112,7 @@ class Visitor:
         return sql
 
     def visit_InsertStatement(self, stmt: InsertStatement, sql: SQLCollector) -> SQLCollector:
-        if stmt.is_replace():
-            sql << "REPLACE"
-        elif stmt.is_ignore():
-            sql << "INSERT IGNORE"
-        else:
-            sql << "INSERT"
-
+        self.visit(stmt.insert_or_update, sql)
         sql << f" INTO "
         sql = self.visit(stmt.table_name, sql)
         if stmt.columns:
