@@ -157,14 +157,16 @@ class Visitor:
 
     def visit_SelectStatement(self, stmt: SelectStatement, sql: SQLCollector, level=0) -> SQLCollector:
         sql << "SELECT "
-        if stmt.is_distinct_required():
+        if stmt.is_distinct_required() and stmt.columns:
             self.visit(stmt._distinct, sql)
             sql << " "
-        if not stmt.columns: sql << "*"
 
-        for i, c in enumerate(stmt.columns):
-            if i != 0: sql << ", "
-            self.visit(c, sql)
+        if not stmt.columns:
+            sql << "*"
+        else:
+            for i, c in enumerate(stmt.columns):
+                if i != 0: sql << ", "
+                self.visit(c, sql)
 
         if stmt.tables:
             sql << " FROM "
