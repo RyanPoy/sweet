@@ -23,6 +23,9 @@ class Name(Term):
         self.value: str = name
         self.schema_name: str = schema_name
 
+    def as_(self, alias: str) -> Alias:
+        return Alias(self, self.__class__(alias))
+
     def __repr__(self):
         if self.schema_name:
             return f'{self.__class__.__name__}("{self.schema_name}"."{self.value}")'
@@ -34,15 +37,14 @@ class Name(Term):
     def __eq__(self, other: Self) -> bool:
         return self.__class__ == other.__class__ and self.value == other.value and self.schema_name == other.schema_name
 
+
 class ColumnName(Name):
     """
     Represents a column name in a SQL statement.
 
     Inherits from the `Name` class and is specifically used for column names in SQL queries.
     """
-
-    def as_(self, alias: str) -> Alias:
-        return Alias(self, ColumnName(alias))
+    pass
 
 
 class TableName(Name):
@@ -51,10 +53,6 @@ class TableName(Name):
 
     Inherits from the `Name` class and is specifically used for table names in SQL queries.
     """
-
-    def as_(self, alias: str) -> Alias:
-        return Alias(self, TableName(alias))
-
     def column_name_of(self, name: str) -> ColumnName:
         return ColumnName(name, self.value)
 
