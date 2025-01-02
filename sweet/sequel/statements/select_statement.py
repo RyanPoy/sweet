@@ -48,6 +48,8 @@ class SelectStatement(Statement):
         self.join_tables = []
         self.ons = []
 
+        self.parent = None
+
     def from_(self, table: TableName | Alias | Self) -> Self:
         return self.__from_or_join(self.tables, table)
 
@@ -113,15 +115,33 @@ class SelectStatement(Statement):
         return self.__from_or_join(self.join_tables, table)
 
     def __from_or_join(self, cs, table: TableName | Alias | Self) -> Self:
-        found = False
-        if isinstance(table, Table):
-            for t in cs:
-                if t.name == table.name:
-                    found = True
-            if not found:
-                cs.append(table)
-        else:
+        tp = type(table)
+        if tp is TableName:
+            self.__check_repetitive_tables(table, cs)
+        elif tp is Alias:
             cs.append(table)
+        elif tp is SelectStatement:
+            if self.__check_circular_reference(table):
+                raise ValueError("Circular reference detected in subquery nesting.")
+            cs.append(table)
+            table.parent = self  # set parent SelectStatement
+        else:
+            raise ValueError(f"from_ method only accepts Table, Alias, or Query as arguments. But got {tp}")
+        return self
+
+    def __check_circular_reference(self, ss) -> bool:
+        current = self
+        while current:
+            if current is ss:
+                return True
+            current = current.parent
+        return False
+
+    def __check_repetitive_tables(self, table, tables) -> Self:
+        for t in tables:  # check for repetitive tables
+            if t.name == table.name:
+                return self
+        tables.append(table)
         return self
 
     def on(self, *qs: Q, **kwargs) -> Self:
