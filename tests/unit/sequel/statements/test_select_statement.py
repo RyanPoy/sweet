@@ -233,12 +233,26 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'2020-02-02\' FOR UPDATE SKIP LOCKED', stmt.sql(self.sqlite))
         self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'2020-02-02\' FOR UPDATE SKIP LOCKED', stmt.sql(self.pg))
 
+    def test_where_field_equals_for_update_of(self):
+        stmt = SelectStatement().from_(self.table_abc).where(foo="bar").for_update(of=("abc",))
+        self.assertEqual('SELECT * FROM `abc` WHERE `foo` = \'bar\' FOR UPDATE OF `abc`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'bar\' FOR UPDATE OF "abc"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'bar\' FOR UPDATE OF "abc"', stmt.sql(self.pg))
+
+    def test_where_field_equals_for_update_skip_locked_and_of(self):
+        stmt = SelectStatement().from_(self.table_abc).where(foo="bar").for_update(skip=True, of=("abc",))
+        self.assertEqual('SELECT * FROM `abc` WHERE `foo` = \'bar\' FOR UPDATE OF `abc` SKIP LOCKED', stmt.sql(self.mysql))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'bar\' FOR UPDATE OF "abc" SKIP LOCKED', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT * FROM "abc" WHERE "foo" = \'bar\' FOR UPDATE OF "abc" SKIP LOCKED', stmt.sql(self.pg))
+
     def test_where_field_equals_for_multiple_tables(self):
         stmt = (SelectStatement().from_(self.table_abc)
                 .join(self.table_efg).on(abc__id=ColumnName("id", "efg"))
                 .where(abc__foo=ColumnName("bar", "efg"))
                 )
         self.assertEqual('SELECT * FROM `abc` JOIN `efg` ON `abc`.`id` = `efg`.`id` WHERE `abc`.`foo` = `efg`.`bar`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT * FROM "abc" JOIN "efg" ON "abc"."id" = "efg"."id" WHERE "abc"."foo" = "efg"."bar"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT * FROM "abc" JOIN "efg" ON "abc"."id" = "efg"."id" WHERE "abc"."foo" = "efg"."bar"', stmt.sql(self.pg))
 
     def test_where_field_equals_where(self):
         stmt = SelectStatement().from_(self.table_abc).where(abc__foo=1).where(abc__bar=self.table_abc.baz)
@@ -269,96 +283,14 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual("SELECT * FROM `abc`", stmt.sql(self.mysql))
         self.assertEqual("SELECT * FROM \"abc\"", stmt.sql(self.sqlite))
         self.assertEqual("SELECT * FROM \"abc\"", stmt.sql(self.pg))
-    #
-    # def test_ignore_empty_criterion_having(self):
-    #     stmt = SelectStatement().from_(self.t).having(EmptyCriterion())
-    #
-    #     self.assertEqual('SELECT * FROM "abc"', str(q1))
-    #
-    # def test_select_with_force_index_and_where(self):
-    #     stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).where(self.t.foo == self.t.bar).force_index("egg")
-    #
-    #     self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg") WHERE "foo"="bar"', stmt.sql(self.mysql))
-    #
-    # def test_where_with_multiple_wheres_using_and_case(self):
-    #     case_stmt = Case().when(self.t.foo == 'bar', 1).else_(0)
-    #     query = SelectStatement().from_(self.t).select(case_stmt).where(case_stmt & self.t.blah.isin(['test']))
-    #
-    #     self.assertEqual(
-    #         'SELECT CASE WHEN "foo"=\'bar\' THEN 1 ELSE 0 END FROM "abc" WHERE CASE WHEN "foo"=\'bar\' THEN 1 ELSE 0 '
-    #         'END AND "blah" IN (\'test\')',
-    #         str(query),
-    #     )
-    #
-    # def test_where_with_multiple_wheres_using_or_case(self):
-    #     case_stmt = Case().when(self.t.foo == 'bar', 1).else_(0)
-    #     query = SelectStatement().from_(self.t).select(case_stmt).where(case_stmt | self.t.blah.isin(['test']))
-    #
-    #     self.assertEqual(
-    #         'SELECT CASE WHEN "foo"=\'bar\' THEN 1 ELSE 0 END FROM "abc" WHERE CASE WHEN "foo"=\'bar\' THEN 1 ELSE 0 '
-    #         'END OR "blah" IN (\'test\')',
-    #         str(query),
-    #     )
 
-#
-# class PreWhereTests(WhereTests):
-#     t = Table("abc")
-#
-#     def test_prewhere_field_equals(self):
-#         stmt = SelectStatement().from_(self.t).prewhere(self.t.foo == self.t.bar)
-#         q2 = SelectStatement().from_(self.t).prewhere(self.t.foo.eq(self.t.bar))
-#
-#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q1))
-#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q2))
-#
-#     def test_where_and_prewhere(self):
-#         stmt = SelectStatement().from_(self.t).prewhere(self.t.foo == self.t.bar).where(self.t.foo == self.t.bar)
-#
-#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar" WHERE "foo"="bar"', stmt.sql(self.mysql))
-#
-#
+    def test_select_with_force_index_and_where(self):
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).where(foo="bar").force_index(IndexName("egg"))
+        self.assertEqual('SELECT `foo` FROM `abc` FORCE INDEX (`egg`) WHERE `foo` = \'bar\'', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg") WHERE "foo" = \'bar\'', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg") WHERE "foo" = \'bar\'', stmt.sql(self.pg))
 
-# class WhereTests(unittest.TestCase):
-#
-#     def test_where_field_equals_for_update_of(self):
-#         for query_cls in [
-#             MySQLQuery,
-#             PostgreSQLQuery,
-#         ]:
-#             quote_char = query_cls._builder().QUOTE_CHAR if isinstance(query_cls._builder().QUOTE_CHAR, str) else '"'
-#             stmt = query_cls.from_(self.t).where(self.t.foo == self.t.bar).for_update(of=("abc",))
-#             self.assertEqual(
-#                 'SELECT * '
-#                 'FROM {quote_char}abc{quote_char} '
-#                 'WHERE {quote_char}foo{quote_char}={quote_char}bar{quote_char} '
-#                 'FOR UPDATE OF {quote_char}abc{quote_char}'.format(
-#                     quote_char=quote_char,
-#                 ),
-#                 str(q),
-#             )
-#     def test_where_field_equals_for_update_skip_locked_and_of(self):
-#         for query_cls in [
-#             MySQLQuery,
-#             PostgreSQLQuery,
-#         ]:
-#             stmt = (
-#                 query_cls.from_(self.t)
-#
-#                 .where(self.t.foo == self.t.bar)
-#                 .for_update(nowait=False, skip_locked=True, of=("abc",))
-#             )
-#             quote_char = query_cls._builder().QUOTE_CHAR if isinstance(query_cls._builder().QUOTE_CHAR, str) else '"'
-#             self.assertEqual(
-#                 'SELECT * '
-#                 'FROM {quote_char}abc{quote_char} '
-#                 'WHERE {quote_char}foo{quote_char}={quote_char}bar{quote_char} '
-#                 'FOR UPDATE OF {quote_char}abc{quote_char} SKIP LOCKED'.format(
-#                     quote_char=quote_char,
-#                 ),
-#                 str(q),
-#             )
-#
-#
+
 # class GroupByTests(unittest.TestCase):
 #     t = Table("abc")
 #     maxDiff = None
@@ -1015,6 +947,24 @@ class TestSelectStatement(unittest.TestCase):
 #             "SELECT t1.value FROM table1 t1 " "JOIN table2 t2 ON t1.Value " "BETWEEN t2.start AND t2.end",
 #             query.get_sql(quote_char=None),
 #         )
+#
+# class PreWhereTests(WhereTests):
+#     t = Table("abc")
+#
+#     def test_prewhere_field_equals(self):
+#         stmt = SelectStatement().from_(self.t).prewhere(self.t.foo == self.t.bar)
+#         q2 = SelectStatement().from_(self.t).prewhere(self.t.foo.eq(self.t.bar))
+#
+#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q1))
+#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q2))
+#
+#     def test_where_and_prewhere(self):
+#         stmt = SelectStatement().from_(self.t).prewhere(self.t.foo == self.t.bar).where(self.t.foo == self.t.bar)
+#
+#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar" WHERE "foo"="bar"', stmt.sql(self.mysql))
+#
+#
+
 
 if __name__ == '__main__':
     unittest.main()

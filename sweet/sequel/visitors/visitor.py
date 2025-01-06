@@ -9,8 +9,9 @@ from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
 from sweet.sequel.terms.alias import Alias
 from sweet.sequel.terms.literal import Literal
+from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.pair import Pair, Operator
-from sweet.sequel.terms.name import ColumnName, TableName
+from sweet.sequel.terms.name import ColumnName, IndexName, TableName
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Regexp, Value
 from sweet.sequel.terms.values_list import ValuesList
@@ -56,7 +57,7 @@ class Visitor:
             return sql << self.quote_column_name(f"{n.schema_name}.{n.value}")
         return sql << self.quote_column_name(n.value)
 
-    def visit_IndexName(self, n: ColumnName, sql: SQLCollector) -> SQLCollector:
+    def visit_IndexName(self, n: IndexName, sql: SQLCollector) -> SQLCollector:
         if n.schema_name:
             return sql << self.quote_column_name(f"{n.schema_name}.{n.value}")
         return sql << self.quote_column_name(n.value)
@@ -73,6 +74,18 @@ class Visitor:
 
     def visit_Literal(self, l: Literal, sql: SQLCollector) -> SQLCollector:
         return sql << l.v
+
+    def visit_Lock(self, l: Lock, sql: SQLCollector) -> SQLCollector:
+        self.visit(l.prefix, sql)
+        if l.ofs:
+            sql << " OF "
+            for i, n in enumerate(l.ofs):
+                if i != 0: sql << ', '
+                self.visit_ColumnName(n, sql)
+        if l.suffix:
+            sql << " "
+            self.visit(l.suffix, sql)
+        return sql
 
     def visit_Q(self, q: Q, sql: SQLCollector) -> SQLCollector:
         if q.invert:
@@ -189,15 +202,6 @@ class Visitor:
                     if i != 0: sql << f" AND "
                     self.visit(w, sql)
 
-        if stmt.wheres:
-            sql << " WHERE "
-            for i, w in enumerate(stmt.wheres):
-                if i != 0: sql << f" AND "
-                self.visit(w, sql)
-
-        if stmt._limit:  sql << f" LIMIT {stmt._limit}"
-        if stmt._offset: sql << f" OFFSET {stmt._offset}"
-
         if stmt.force_indexes:
             sql << " FORCE INDEX ("
             for i, index in enumerate(stmt.force_indexes):
@@ -211,6 +215,16 @@ class Visitor:
                 if i != 0: sql << ", "
                 self.visit(index, sql)
             sql << ")"
+
+        if stmt.wheres:
+            sql << " WHERE "
+            for i, w in enumerate(stmt.wheres):
+                if i != 0: sql << f" AND "
+                self.visit(w, sql)
+
+        if stmt._limit:  sql << f" LIMIT {stmt._limit}"
+        if stmt._offset: sql << f" OFFSET {stmt._offset}"
+
         if stmt.lock:
             sql << " "
             self.visit(stmt.lock, sql)

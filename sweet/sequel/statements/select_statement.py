@@ -4,7 +4,8 @@ from sweet.sequel.schema.table import Table
 from sweet.sequel.statements import Statement
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.alias import Alias
-from sweet.sequel.terms.name import IndexName, Name, TableName
+from sweet.sequel.terms.lock import Lock
+from sweet.sequel.terms.name import ColumnName, IndexName, Name, TableName
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Value
 from sweet.utils import DBDataType
@@ -79,15 +80,8 @@ class SelectStatement(Statement):
     def is_distinct_required(self) -> bool:
         return self._distinct == literal.DISTINCT
 
-    def for_update(self, share: bool = False, nowait: bool = False, skip: bool = False) -> Self:
-        if not share and not nowait and not skip:
-            self.lock = literal.FOR_UPDATE
-        elif share:
-            self.lock = literal.FOR_UPDATE_SHARE
-        elif nowait:
-            self.lock = literal.FOR_UPDATE_NOWAIT
-        elif skip:
-            self.lock = literal.FOR_UPDATE_SKIP_LOCKED
+    def for_update(self, share: bool = False, nowait: bool = False, skip: bool = False, of: (str,) = ()) -> Self:
+        self.lock = Lock(share=share, nowait=nowait, skip=skip, of=of)
         return self
 
     def is_locked(self) -> bool:
