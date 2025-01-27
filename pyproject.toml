@@ -1,0 +1,22 @@
+[project]
+name = "sweet"
+version = "0.1.0"
+description = "python3 web framework looks like rails"
+authors = [
+    {name = "ryanpoy",email = "ryanpoy@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = "3.13.1"
+dependencies = [
+    "wheel (>=0.41.2,<0.42.0)",
+    "aiomysql (>=0.2.0,<0.3.0)",
+    "pymysql (>=1.1.1,<1.2.0)",
+    "aiosqlite (>=0.20.0,<0.21.0)",
+    "packaging (>=24.2,<25.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
