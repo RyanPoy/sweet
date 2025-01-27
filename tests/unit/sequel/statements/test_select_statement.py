@@ -2,6 +2,7 @@ import unittest
 from datetime import date
 
 from sweet.sequel.statements.select_statement import SelectStatement
+from sweet.sequel.terms import fn
 from sweet.sequel.terms.name import ColumnName, IndexName, TableName
 from sweet.sequel.terms.q import Q
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
@@ -290,133 +291,89 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg") WHERE "foo" = \'bar\'', stmt.sql(self.sqlite))
         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg") WHERE "foo" = \'bar\'', stmt.sql(self.pg))
 
+    def test_group_by__single(self):
+        foo = ColumnName("foo")
+        stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo)
+        self.assertEqual('SELECT `foo` FROM `abc` GROUP BY `foo`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.pg))
 
-# class GroupByTests(unittest.TestCase):
-#     t = Table("abc")
-#     maxDiff = None
-#
-#     def test_groupby__single(self):
-#         stmt = SelectStatement().from_(self.t).groupby(self.t.foo).select(self.t.foo)
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
-#
-#     def test_groupby__multi(self):
-#         stmt = SelectStatement().from_(self.t).groupby(self.t.foo, self.t.bar).select(self.t.foo, self.t.bar)
-#
-#         self.assertEqual('SELECT "foo","bar" FROM "abc" GROUP BY "foo","bar"', stmt.sql(self.mysql))
-#
-#     def test_groupby__count_star(self):
-#         stmt = SelectStatement().from_(self.t).groupby(self.t.foo).select(self.t.foo, fn.Count("*"))
-#
-#         self.assertEqual('SELECT "foo",COUNT(*) FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
-#
-#     def test_groupby__count_field(self):
-#         stmt = SelectStatement().from_(self.t).groupby(self.t.foo).select(self.t.foo, fn.Count(self.t.bar))
-#
-#         self.assertEqual('SELECT "foo",COUNT("bar") FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
-#
-#     def test_groupby__count_distinct(self):
-#         stmt = SelectStatement().from_(self.t).groupby(self.t.foo).select(self.t.foo, fn.Count("*").distinct())
-#
-#         self.assertEqual('SELECT "foo",COUNT(DISTINCT *) FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
-#
-#     def test_groupby__sum_distinct(self):
-#         stmt = SelectStatement().from_(self.t).groupby(self.t.foo).select(self.t.foo, fn.Sum(self.t.bar).distinct())
-#
-#         self.assertEqual('SELECT "foo",SUM(DISTINCT "bar") FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
-#
-#     def test_groupby__sum_filter(self):
+    def test_group_by__multi(self):
+        foo, bar = ColumnName("foo"), ColumnName("bar")
+        stmt = SelectStatement().from_(self.table_abc).group_by(foo, bar).select(foo, bar)
+        self.assertEqual('SELECT `foo`, `bar` FROM `abc` GROUP BY `foo`, `bar`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo", "bar" FROM "abc" GROUP BY "foo", "bar"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo", "bar" FROM "abc" GROUP BY "foo", "bar"', stmt.sql(self.pg))
+
+    def test_group_by__count_star(self):
+        foo= ColumnName("foo")
+        stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, fn.count("*"))
+        self.assertEqual('SELECT `foo`, COUNT(*) FROM `abc` GROUP BY `foo`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo", COUNT(*) FROM "abc" GROUP BY "foo"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo", COUNT(*) FROM "abc" GROUP BY "foo"', stmt.sql(self.pg))
+
+    def test_group_by__count_field(self):
+        stmt = SelectStatement().from_(self.table_abc).group_by("foo").select(ColumnName("foo"), fn.count("bar"))
+        self.assertEqual('SELECT `foo`, COUNT(`bar`) FROM `abc` GROUP BY `foo`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo", COUNT("bar") FROM "abc" GROUP BY "foo"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo", COUNT("bar") FROM "abc" GROUP BY "foo"', stmt.sql(self.pg))
+
+    def test_group_by__count_distinct(self):
+        stmt = SelectStatement().from_(self.table_abc).group_by("foo").select(ColumnName("foo"), fn.count("*").distinct())
+        self.assertEqual('SELECT `foo`, COUNT(DISTINCT *) FROM `abc` GROUP BY `foo`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY "foo"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY "foo"', stmt.sql(self.pg))
+
+    def test_group_by__sum_distinct(self):
+        foo = ColumnName("foo")
+        stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, fn.sum("bar").distinct())
+        self.assertEqual('SELECT `foo`, SUM(DISTINCT `bar`) FROM `abc` GROUP BY `foo`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo", SUM(DISTINCT "bar") FROM "abc" GROUP BY "foo"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo", SUM(DISTINCT "bar") FROM "abc" GROUP BY "foo"', stmt.sql(self.pg))
+
+    # def test_group_by__sum_filter(self):
+    #     """ for ClickHouse, TimescaleDB, PostgreSQL 9.4+ """
+    #     foo, bar = ColumnName("foo"), ColumnName("bar")
+    #     stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, bar).where(id=1, cid__gt=2)
+    #     self.assertEqual('SELECT "foo", SUM("bar") FILTER(WHERE "id"=1 AND "cid">2) FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
+    #     self.assertEqual('SELECT "foo", SUM("bar") FILTER(WHERE "id"=1 AND "cid">2) FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
+    #     self.assertEqual('SELECT "foo", SUM("bar") FILTER(WHERE "id"=1 AND "cid">2) FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
+
+    def test_group_by__str(self):
+        stmt = SelectStatement().from_(self.table_abc).group_by("foo").select(ColumnName("foo"), fn.count("*").distinct())
+        self.assertEqual('SELECT `foo`, COUNT(DISTINCT *) FROM `abc` GROUP BY `foo`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY "foo"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY "foo"', stmt.sql(self.pg))
+
+    def test_group_by__int(self):
+        stmt = SelectStatement().from_(self.table_abc).group_by(1).select(ColumnName("foo"), fn.count("*").distinct())
+        self.assertEqual('SELECT `foo`, COUNT(DISTINCT *) FROM `abc` GROUP BY 1', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY 1', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY 1', stmt.sql(self.pg))
+
+    def test_group_by__alias(self):
+        bar = ColumnName("bar").as_("bar01")
+        stmt = SelectStatement().from_(self.table_abc).select(fn.sum("foo"), bar).group_by(bar)
+        self.assertEqual('SELECT SUM(`foo`), `bar` AS `bar01` FROM `abc` GROUP BY `bar01`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT SUM("foo"), "bar" AS "bar01" FROM "abc" GROUP BY "bar01"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT SUM("foo"), "bar" AS "bar01" FROM "abc" GROUP BY "bar01"', stmt.sql(self.pg))
+
+    def test_group_by__alias_with_join(self):
+        table1 = TableName("table1").as_("t1")
+        bar = ColumnName("bar", table1).as_("bar01")
+        stmt = SelectStatement().from_(self.table_abc).join(table1).on(abc__id=ColumnName("t_ref", table1)).select(fn.sum("foo"), bar).group_by(bar)
+        self.assertEqual('SELECT SUM(`foo`), `t1`.`bar` AS `bar01` FROM `abc` JOIN `table1` AS `t1` ON `abc`.`id` = `t1`.`t_ref` GROUP BY `bar01`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT SUM("foo"), "t1"."bar" AS "bar01" FROM "abc" JOIN "table1" AS "t1" ON "abc"."id" = "t1"."t_ref" GROUP BY "bar01"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT SUM("foo"), "t1"."bar" AS "bar01" FROM "abc" JOIN "table1" AS "t1" ON "abc"."id" = "t1"."t_ref" GROUP BY "bar01"', stmt.sql(self.pg))
+
+#     def test_group_by_with_case_uses_the_alias(self):
 #         stmt = (
-#             SelectStatement().from_(self.t)
-#             .groupby(self.t.foo)
-#             .select(self.t.foo, fn.Sum(self.t.bar).filter(self.t.id.eq(1) & self.t.cid.gt(2)))
-#         )
-#
-#         self.assertEqual('SELECT "foo",SUM("bar") FILTER(WHERE "id"=1 AND "cid">2) FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
-#
-#     def test_groupby__str(self):
-#         stmt = SelectStatement().from_(self.table_abc).groupby("foo").select("foo", fn.Count("*").distinct())
-#
-#         self.assertEqual('SELECT "foo",COUNT(DISTINCT *) FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
-#
-#     def test_groupby__int(self):
-#         stmt = SelectStatement().from_(self.table_abc).groupby(1).select("foo", fn.Count("*").distinct())
-#
-#         self.assertEqual('SELECT "foo",COUNT(DISTINCT *) FROM "abc" GROUP BY 1', stmt.sql(self.mysql))
-#
-#     def test_groupby__alias(self):
-#         bar = self.t.bar.as_("bar01")
-#         stmt = SelectStatement().from_(self.t).select(fn.Sum(self.t.foo), bar).groupby(bar)
-#
-#         self.assertEqual('SELECT SUM("foo"),"bar" "bar01" FROM "abc" GROUP BY "bar01"', stmt.sql(self.mysql))
-#
-#     def test_groupby__no_alias(self):
-#         bar = self.t.bar.as_("bar01")
-#         stmt = SelectStatement().from_(self.t).select(fn.Sum(self.t.foo), bar).groupby(bar)
-#
-#         self.assertEqual(
-#             'SELECT SUM("foo"),"bar" "bar01" FROM "abc" GROUP BY "bar"',
-#             q.get_sql(groupby_alias=False),
-#         )
-#
-#     def test_groupby__no_alias_mssql(self):
-#         bar = self.t.bar.as_("bar01")
-#         stmt = MSSQLSelectStatement().from_(self.t).select(fn.Sum(self.t.foo), bar).groupby(bar)
-#
-#         self.assertEqual('SELECT SUM("foo"),"bar" "bar01" FROM "abc" GROUP BY "bar"', stmt.sql(self.mysql))
-#
-#     def test_groupby__no_alias_oracle(self):
-#         bar = self.t.bar.as_("bar01")
-#         stmt = OracleSelectStatement().from_(self.t).select(fn.Sum(self.t.foo), bar).groupby(bar)
-#
-#         self.assertEqual('SELECT SUM(foo),bar bar01 FROM abc GROUP BY bar', stmt.sql(self.mysql))
-#
-#     def test_groupby__alias_platforms(self):
-#         bar = self.t.bar.as_("bar01")
-#
-#         for query_cls in [
-#             MySQLQuery,
-#             VerticaQuery,
-#             PostgreSQLQuery,
-#             RedshiftQuery,
-#             ClickHouseQuery,
-#             SQLLiteQuery,
-#         ]:
-#             stmt = query_cls.from_(self.t).select(fn.Sum(self.t.foo), bar).groupby(bar)
-#
-#             quote_char = query_cls._builder().QUOTE_CHAR if isinstance(query_cls._builder().QUOTE_CHAR, str) else '"'
-#
-#             self.assertEqual(
-#                 "SELECT "
-#                 "SUM({quote_char}foo{quote_char}),"
-#                 "{quote_char}bar{quote_char}{as_keyword}{quote_char}bar01{quote_char} "
-#                 "FROM {quote_char}abc{quote_char} "
-#                 "GROUP BY {quote_char}bar01{quote_char}".format(
-#                     as_keyword=' AS ' if query_cls is ClickHouseQuery else ' ', quote_char=quote_char
-#                 ),
-#                 str(q),
-#             )
-#
-#     def test_groupby__alias_with_join(self):
-#         table1 = Table("table1", alias="t1")
-#         bar = table1.bar.as_("bar01")
-#         stmt = SelectStatement().from_(self.t).join(table1).on(self.t.id == table1.t_ref).select(fn.Sum(self.t.foo), bar).groupby(bar)
-#
-#         self.assertEqual(
-#             'SELECT SUM("abc"."foo"),"t1"."bar" "bar01" FROM "abc" '
-#             'JOIN "table1" "t1" ON "abc"."id"="t1"."t_ref" '
-#             'GROUP BY "bar01"',
-#             str(q),
-#         )
-#
-#     def test_groupby_with_case_uses_the_alias(self):
-#         stmt = (
-#             SelectStatement().from_(self.t)
+#             SelectStatement().from_(self.t)Ï
 #             .select(
 #                 fn.Sum(self.t.foo).as_("bar"),
 #                 Case().when(self.t.fname == "Tom", "It was Tom").else_("It was someone else.").as_("who_was_it"),
 #             )
-#             .groupby(Case().when(self.t.fname == "Tom", "It was Tom").else_("It was someone else.").as_("who_was_it"))
+#             .group_by(Case().when(self.t.fname == "Tom", "It was Tom").else_("It was someone else.").as_("who_was_it"))
 #         )
 #
 #         self.assertEqual(
@@ -429,42 +386,42 @@ class TestSelectStatement(unittest.TestCase):
 #         )
 #
 #     def test_mysql_query_uses_backtick_quote_chars(self):
-#         stmt = MySQLSelectStatement().from_(self.t).groupby(self.t.foo).select(self.t.foo)
+#         stmt = MySQLSelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo)
 #
 #         self.assertEqual("SELECT `foo` FROM `abc` GROUP BY `foo`", stmt.sql(self.mysql))
 #
 #     def test_vertica_query_uses_double_quote_chars(self):
-#         stmt = VerticaSelectStatement().from_(self.t).groupby(self.t.foo).select(self.t.foo)
+#         stmt = VerticaSelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo)
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
 #
 #     def test_mssql_query_uses_double_quote_chars(self):
-#         stmt = MSSQLSelectStatement().from_(self.t).groupby(self.t.foo).select(self.t.foo)
+#         stmt = MSSQLSelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo)
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
 #
 #     def test_oracle_query_uses_no_quote_chars(self):
-#         stmt = OracleSelectStatement().from_(self.t).groupby(self.t.foo).select(self.t.foo)
+#         stmt = OracleSelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo)
 #
 #         self.assertEqual('SELECT foo FROM abc GROUP BY foo', stmt.sql(self.mysql))
 #
 #     def test_postgres_query_uses_double_quote_chars(self):
-#         stmt = PostgreSQLSelectStatement().from_(self.t).groupby(self.t.foo).select(self.t.foo)
+#         stmt = PostgreSQLSelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo)
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
 #
 #     def test_redshift_query_uses_double_quote_chars(self):
-#         stmt = RedshiftSelectStatement().from_(self.t).groupby(self.t.foo).select(self.t.foo)
+#         stmt = RedshiftSelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo)
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
 #
 #     def test_group_by__single_with_totals(self):
-#         stmt = SelectStatement().from_(self.t).groupby(self.t.foo).select(self.t.foo).with_totals()
+#         stmt = SelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo).with_totals()
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo" WITH TOTALS', stmt.sql(self.mysql))
 #
-#     def test_groupby__multi_with_totals(self):
-#         stmt = SelectStatement().from_(self.t).groupby(self.t.foo, self.t.bar).select(self.t.foo, self.t.bar).with_totals()
+#     def test_group_by__multi_with_totals(self):
+#         stmt = SelectStatement().from_(self.t).group_by(self.t.foo, self.t.bar).select(self.t.foo, self.t.bar).with_totals()
 #
 #         self.assertEqual('SELECT "foo","bar" FROM "abc" GROUP BY "foo","bar" WITH TOTALS', stmt.sql(self.mysql))
 #
@@ -476,7 +433,7 @@ class TestSelectStatement(unittest.TestCase):
 #         stmt = (
 #             SelectStatement().from_(self.table_abc)
 #             .select(self.table_abc.foo, fn.Sum(self.table_abc.bar))
-#             .groupby(self.table_abc.foo)
+#             .group_by(self.table_abc.foo)
 #             .having(fn.Sum(self.table_abc.bar) > 1)
 #         )
 #
@@ -489,7 +446,7 @@ class TestSelectStatement(unittest.TestCase):
 #         stmt = (
 #             SelectStatement().from_(self.table_abc)
 #             .select(self.table_abc.foo, fn.Sum(self.table_abc.bar))
-#             .groupby(self.table_abc.foo)
+#             .group_by(self.table_abc.foo)
 #             .having((fn.Sum(self.table_abc.bar) > 1) & (fn.Sum(self.table_abc.bar) < 100))
 #         )
 #
@@ -504,7 +461,7 @@ class TestSelectStatement(unittest.TestCase):
 #             .join(self.table_efg)
 #             .on(self.table_abc.foo == self.table_efg.foo)
 #             .select(self.table_abc.foo, fn.Sum(self.table_efg.bar), self.table_abc.buz)
-#             .groupby(self.table_abc.foo)
+#             .group_by(self.table_abc.foo)
 #             .having(self.table_abc.buz == "fiz")
 #             .having(fn.Sum(self.table_efg.bar) > 100)
 #         )
@@ -521,7 +478,7 @@ class TestSelectStatement(unittest.TestCase):
 #         stmt = (
 #             MySQLSelectStatement().from_(self.table_abc)
 #             .select(self.table_abc.foo)
-#             .groupby(self.table_abc.foo)
+#             .group_by(self.table_abc.foo)
 #             .having(self.table_abc.buz == "fiz")
 #         )
 #         self.assertEqual("SELECT `foo` FROM `abc` GROUP BY `foo` HAVING `buz`='fiz'", stmt.sql(self.mysql))
@@ -530,7 +487,7 @@ class TestSelectStatement(unittest.TestCase):
 #         stmt = (
 #             VerticaSelectStatement().from_(self.table_abc)
 #             .select(self.table_abc.foo)
-#             .groupby(self.table_abc.foo)
+#             .group_by(self.table_abc.foo)
 #             .having(self.table_abc.buz == "fiz")
 #         )
 #         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo" HAVING "buz"=\'fiz\'', stmt.sql(self.mysql))
@@ -539,7 +496,7 @@ class TestSelectStatement(unittest.TestCase):
 #         stmt = (
 #             MSSQLSelectStatement().from_(self.table_abc)
 #             .select(self.table_abc.foo)
-#             .groupby(self.table_abc.foo)
+#             .group_by(self.table_abc.foo)
 #             .having(self.table_abc.buz == "fiz")
 #         )
 #         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo" HAVING "buz"=\'fiz\'', stmt.sql(self.mysql))
@@ -548,7 +505,7 @@ class TestSelectStatement(unittest.TestCase):
 #         stmt = (
 #             OracleSelectStatement().from_(self.table_abc)
 #             .select(self.table_abc.foo)
-#             .groupby(self.table_abc.foo)
+#             .group_by(self.table_abc.foo)
 #             .having(self.table_abc.buz == "fiz")
 #         )
 #         self.assertEqual('SELECT foo FROM abc GROUP BY foo HAVING buz=\'fiz\'', stmt.sql(self.mysql))
@@ -557,7 +514,7 @@ class TestSelectStatement(unittest.TestCase):
 #         stmt = (
 #             PostgreSQLSelectStatement().from_(self.table_abc)
 #             .select(self.table_abc.foo)
-#             .groupby(self.table_abc.foo)
+#             .group_by(self.table_abc.foo)
 #             .having(self.table_abc.buz == "fiz")
 #         )
 #         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo" HAVING "buz"=\'fiz\'', stmt.sql(self.mysql))
@@ -566,7 +523,7 @@ class TestSelectStatement(unittest.TestCase):
 #         stmt = (
 #             RedshiftSelectStatement().from_(self.table_abc)
 #             .select(self.table_abc.foo)
-#             .groupby(self.table_abc.foo)
+#             .group_by(self.table_abc.foo)
 #             .having(self.table_abc.buz == "fiz")
 #         )
 #         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo" HAVING "buz"=\'fiz\'', stmt.sql(self.mysql))
@@ -666,7 +623,7 @@ class TestSelectStatement(unittest.TestCase):
 #         self.assertEqual('SELECT "foo" FROM "abc" WHERE "foo"=1', stmt.sql(self.mysql))
 #
 #     def test_ignored_in_groupby(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.foo).groupby(self.t.foo.as_("bar"))
+#         stmt = SelectStatement().from_(self.t).select(self.t.foo).group_by(self.t.foo.as_("bar"))
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
 #
@@ -717,7 +674,7 @@ class TestSelectStatement(unittest.TestCase):
 #         table_abc = Table("abc", alias="q0")
 #
 #         my_foo = table_abc.foo.as_("my_foo")
-#         stmt = SelectStatement().from_(table_abc).select(my_foo, table_abc.bar).groupby(my_foo).orderby(my_foo)
+#         stmt = SelectStatement().from_(table_abc).select(my_foo, table_abc.bar).group_by(my_foo).orderby(my_foo)
 #
 #         self.assertEqual(
 #             'SELECT "q0"."foo" "my_foo","q0"."bar" ' 'FROM "abc" "q0" ' 'GROUP BY "my_foo" ' 'ORDER BY "my_foo"',
@@ -835,7 +792,7 @@ class TestSelectStatement(unittest.TestCase):
 #                 self.table_abc.foo,
 #                 fn.Sum(self.table_abc.fizz + self.table_abc.buzz).as_("fizzbuzz"),
 #             )
-#             .groupby(self.table_abc.foo)
+#             .group_by(self.table_abc.foo)
 #         )
 #
 #         subquery2 = SelectStatement().from_(self.table_efg).select(

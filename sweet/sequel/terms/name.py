@@ -15,12 +15,14 @@ class Name(Term):
         value (str): The name as a string (e.g., column, table, alias).
     """
 
-    def __init__(self, name: str, schema_name: str = None) -> None:
+    def __init__(self, name: str, schema_name: str | Alias = None) -> None:
         """
         :param name: The name of the entity (column, table, alias). (e.g., of `str`)
         """
         super().__init__()
         self.value: str = name
+        if isinstance(schema_name, Alias):
+            schema_name = schema_name.target.value
         self.schema_name: str = schema_name
 
     def as_(self, alias: str) -> Alias:

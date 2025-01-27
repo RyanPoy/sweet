@@ -8,6 +8,7 @@ from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
 from sweet.sequel.terms.alias import Alias
+from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.pair import Pair, Operator
@@ -19,7 +20,6 @@ from sweet.utils import DBDataType, quote, quote_for_values
 
 
 class Visitor:
-
     visit_methods_dict = {}
     qchar = '"'
 
@@ -36,8 +36,9 @@ class Visitor:
         if "__" in name:
             name = name.replace("__", pointer)
         if pointer in name:
-            return pointer.join([ f'{self.qchar}{n}{self.qchar}' for n in name.split(pointer)])
+            return pointer.join([f'{self.qchar}{n}{self.qchar}' for n in name.split(pointer)])
         return f'{self.qchar}{name}{self.qchar}'
+
     quote_table_name = _quote_table_name_or_column_name
     quote_column_name = _quote_table_name_or_column_name
 
@@ -74,6 +75,16 @@ class Visitor:
 
     def visit_Literal(self, l: Literal, sql: SQLCollector) -> SQLCollector:
         return sql << l.v
+
+    def visit_Fn(self, f: Fn, sql: SQLCollector) -> SQLCollector:
+        sql << f.name << "("
+        if f.is_distinct:
+            sql << "DISTINCT "
+        for i, column in enumerate(f.columns):
+            if i != 0: sql << ", "
+            self.visit(column, sql)
+        sql << ")"
+        return sql
 
     def visit_Lock(self, l: Lock, sql: SQLCollector) -> SQLCollector:
         self.visit(l.prefix, sql)
@@ -121,7 +132,7 @@ class Visitor:
     def visit_ValuesList(self, values: ValuesList, sql: SQLCollector) -> SQLCollector:
         for i, vs in enumerate(values.data):
             if i != 0: sql << ", "
-            sql << "(" << ', '.join([ self.quote_values(v) for v in vs ]) << ")"
+            sql << "(" << ', '.join([self.quote_values(v) for v in vs]) << ")"
         return sql
 
     def visit_InsertStatement(self, stmt: InsertStatement, sql: SQLCollector) -> SQLCollector:
@@ -187,7 +198,7 @@ class Visitor:
                 if i != 0: sql << ", "
                 if isinstance(table, SelectStatement):
                     sql << "("
-                    self.visit_SelectStatement(table, sql, level+1)
+                    self.visit_SelectStatement(table, sql, level + 1)
                     sql << f") AS sq{level}"
                 else:
                     self.visit(table, sql)
@@ -221,6 +232,12 @@ class Visitor:
             for i, w in enumerate(stmt.wheres):
                 if i != 0: sql << f" AND "
                 self.visit(w, sql)
+
+        if stmt.groups:
+            sql << " GROUP BY "
+            for i, c in enumerate(stmt.groups):
+                if i != 0: sql << ", "
+                self.visit(c, sql)
 
         if stmt._limit:  sql << f" LIMIT {stmt._limit}"
         if stmt._offset: sql << f" OFFSET {stmt._offset}"

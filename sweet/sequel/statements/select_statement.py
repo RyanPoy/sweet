@@ -1,9 +1,9 @@
 from typing import Self
 
-from sweet.sequel.schema.table import Table
 from sweet.sequel.statements import Statement
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.alias import Alias
+from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.name import ColumnName, IndexName, Name, TableName
 from sweet.sequel.terms.q import Q
@@ -48,15 +48,16 @@ class SelectStatement(Statement):
         self.lock = None
         self.join_tables = []
         self.ons = []
+        self.groups = []
 
         self.parent = None
 
     def from_(self, table: TableName | Alias | Self) -> Self:
         return self.__from_or_join(self.tables, table)
 
-    def select(self, *columns: Name | Alias | DBDataType) -> Self:
+    def select(self, *columns: Name | Alias | Fn | DBDataType) -> Self:
         for c in columns:
-            if isinstance(c, (Name, Alias)):
+            if isinstance(c, (Name, Alias, Fn)):
                 self.columns.append(c)
             elif c == '*':
                 self.columns.append(literal.STAR)
@@ -108,6 +109,23 @@ class SelectStatement(Statement):
     def join(self, table: TableName | Alias | Self) -> Self:
         return self.__from_or_join(self.join_tables, table)
 
+    def on(self, *qs: Q, **kwargs) -> Self:
+        return self.__where_or_on(self.ons, *qs, **kwargs)
+
+    def group_by(self, *column_names: [ColumnName | Alias | DBDataType]) -> Self:
+        for c in column_names:
+            if c == '*':
+                self.groups.append(literal.STAR)
+            if isinstance(c, ColumnName):
+                self.groups.append(c)
+            elif isinstance(c, Alias):
+                self.groups.append(c.target)
+            elif isinstance(c, (str, )):
+                self.groups.append(ColumnName(c))
+            else:
+                self.groups.append(Value(c))
+        return self
+
     def __from_or_join(self, cs, table: TableName | Alias | Self) -> Self:
         tp = type(table)
         if tp is TableName:
@@ -137,9 +155,6 @@ class SelectStatement(Statement):
                 return self
         tables.append(table)
         return self
-
-    def on(self, *qs: Q, **kwargs) -> Self:
-        return self.__where_or_on(self.ons, *qs, **kwargs)
 
     def __where_or_on(self, cs, *qs: Q, **kwargs) -> Self:
         for q in qs:
