@@ -2,7 +2,6 @@ from typing import Self
 
 from sweet.sequel.statements import Statement
 from sweet.sequel.terms import literal
-from sweet.sequel.terms.alias import Alias
 from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.name import ColumnName, IndexName, Name, TableName
@@ -54,12 +53,12 @@ class SelectStatement(Statement):
         self.orders : [OrderClause] = []
         self.parent = None
 
-    def from_(self, table: TableName | Alias | Self) -> Self:
+    def from_(self, table: TableName | Self) -> Self:
         return self.__from_or_join(self.tables, table)
 
-    def select(self, *columns: Name | Alias | Fn | DBDataType) -> Self:
+    def select(self, *columns: Name | Fn | DBDataType) -> Self:
         for c in columns:
-            if isinstance(c, (Name, Alias, Fn)):
+            if isinstance(c, (Name, Fn)):
                 self.columns.append(c)
             elif c == '*':
                 self.columns.append(literal.STAR)
@@ -111,37 +110,38 @@ class SelectStatement(Statement):
     def having(self, *qs: Q, **kwargs) -> Self:
         return self.__where_or_on(self.havings, *qs, **kwargs)
 
-    def join(self, table: TableName | Alias | Self) -> Self:
+    def join(self, table: TableName | Self) -> Self:
         return self.__from_or_join(self.join_tables, table)
 
     def on(self, *qs: Q, **kwargs) -> Self:
         return self.__where_or_on(self.ons, *qs, **kwargs)
 
-    def group_by(self, *column_names: [ColumnName | Alias | DBDataType]) -> Self:
+    def group_by(self, *column_names: [ColumnName | DBDataType]) -> Self:
         for c in column_names:
             if c == '*':
                 self.groups.append(literal.STAR)
             if isinstance(c, ColumnName):
-                self.groups.append(c)
-            elif isinstance(c, Alias):
-                self.groups.append(c.target)
+                if c.alias:
+                    self.groups.append(ColumnName(c.alias))
+                else:
+                    self.groups.append(c)
             elif isinstance(c, (str, )):
                 self.groups.append(ColumnName(c))
             else:
                 self.groups.append(Value(c))
         return self
 
-    def order_by(self, *column_names: ColumnName | Alias | DBDataType, sorted_in: SortedIn = None) -> Self:
+    def order_by(self, *column_names: ColumnName | DBDataType, sorted_in: SortedIn = None) -> Self:
         order = OrderClause(*column_names, sorted_in=sorted_in)
         self.orders.append(order)
         return self
 
-    def __from_or_join(self, cs, table: TableName | Alias | Self) -> Self:
+    def __from_or_join(self, cs, table: TableName | Self) -> Self:
         tp = type(table)
         if tp is TableName:
             self.__check_repetitive_tables(table, cs)
-        elif tp is Alias:
-            cs.append(table)
+        # elif tp is Alias:
+        #     cs.append(table)
         elif tp is SelectStatement:
             if self.__check_circular_reference(table):
                 raise ValueError("Circular reference detected in subquery nesting.")

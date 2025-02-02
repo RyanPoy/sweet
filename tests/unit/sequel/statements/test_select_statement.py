@@ -361,8 +361,8 @@ class TestSelectStatement(unittest.TestCase):
 
     def test_group_by__alias_with_join(self):
         table1 = TableName("table1").as_("t1")
-        bar = ColumnName("bar", table1).as_("bar01")
-        stmt = SelectStatement().from_(self.table_abc).join(table1).on(abc__id=ColumnName("t_ref", table1)).select(fn.sum("foo"), bar).group_by(bar)
+        bar = ColumnName("bar", table1.alias).as_("bar01")
+        stmt = SelectStatement().from_(self.table_abc).join(table1).on(abc__id=ColumnName("t_ref", table1.alias)).select(fn.sum("foo"), bar).group_by(bar)
         self.assertEqual('SELECT SUM(`foo`), `t1`.`bar` AS `bar01` FROM `abc` JOIN `table1` AS `t1` ON `abc`.`id` = `t1`.`t_ref` GROUP BY `bar01`',
                          stmt.sql(self.mysql))
         self.assertEqual('SELECT SUM("foo"), "t1"."bar" AS "bar01" FROM "abc" JOIN "table1" AS "t1" ON "abc"."id" = "t1"."t_ref" GROUP BY "bar01"',

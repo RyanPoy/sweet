@@ -2,7 +2,6 @@ from functools import cached_property
 
 from sweet.sequel.schema.columns import Column
 from sweet.sequel.statements.insert_statement import InsertStatement
-from sweet.sequel.terms.alias import Alias
 from sweet.sequel.terms.name import TableName
 from sweet.utils import DBDataType
 

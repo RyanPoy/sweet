@@ -7,7 +7,6 @@ from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
-from sweet.sequel.terms.alias import Alias
 from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
@@ -51,25 +50,34 @@ class Visitor:
 
     def visit_TableName(self, n: TableName, sql: SQLCollector) -> SQLCollector:
         if n.schema_name:
-            return sql << self.quote_table_name(f"{n.schema_name}.{n.value}")
-        return sql << self.quote_table_name(n.value)
+            sql << self.quote_table_name(f"{n.schema_name}.{n.value}")
+        else:
+            sql << self.quote_table_name(n.value)
+        if n.alias:
+            sql << " AS " << self.quote_table_name(n.alias)
+        return sql
 
     def visit_ColumnName(self, n: ColumnName, sql: SQLCollector) -> SQLCollector:
         if n.schema_name:
-            return sql << self.quote_column_name(f"{n.schema_name}.{n.value}")
-        return sql << self.quote_column_name(n.value)
+            sql << self.quote_column_name(f"{n.schema_name}.{n.value}")
+        else:
+            sql << self.quote_column_name(n.value)
+        if n.alias:
+            sql << " AS " << self.quote_column_name(n.alias)
+
+        return sql
 
     def visit_IndexName(self, n: IndexName, sql: SQLCollector) -> SQLCollector:
         if n.schema_name:
             return sql << self.quote_column_name(f"{n.schema_name}.{n.value}")
         return sql << self.quote_column_name(n.value)
 
-    def visit_Alias(self, a: Alias, sql: SQLCollector) -> SQLCollector:
-        self.visit(a.origin, sql)
-        if a.target:
-            sql << " AS "
-            self.visit(a.target, sql)
-        return sql
+    # def visit_Alias(self, a: Alias, sql: SQLCollector) -> SQLCollector:
+    #     self.visit(a.origin, sql)
+    #     if a.target:
+    #         sql << " AS "
+    #         self.visit(a.target, sql)
+    #     return sql
 
     def visit_Column(self, c: Column, sql: SQLCollector) -> SQLCollector:
         return sql << self.quote_column(c)
