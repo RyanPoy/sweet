@@ -2,6 +2,7 @@ from typing import Self
 
 from sweet.sequel.terms import Term
 from sweet.sequel.terms.alias import Alias
+from sweet.sequel.terms.literal import Literal, STAR
 
 
 class Name(Term):
@@ -46,7 +47,12 @@ class ColumnName(Name):
 
     Inherits from the `Name` class and is specifically used for column names in SQL queries.
     """
-    pass
+    def __eq__(self, other: str | Literal | Self) -> bool:
+        if isinstance(other, str) and other == '*' and self.value == '*':
+            return True
+        if isinstance(other, Literal) and other == STAR and self.value == '*':
+            return True
+        return super().__eq__(other)
 
 
 class TableName(Name):

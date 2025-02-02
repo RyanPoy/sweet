@@ -1,5 +1,6 @@
 import unittest
 
+from sweet.sequel.terms import literal
 from sweet.sequel.terms.name import ColumnName, TableName
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
@@ -12,6 +13,14 @@ class TestName(unittest.TestCase):
         self.mysql = MySQLVisitor()
         self.sqlite = SQLiteVisitor()
         self.pg = PostgreSQLVisitor()
+
+    def test_columnname__equals_star(self):
+        n1 = ColumnName("*")
+        n2 = "*"
+        n3 = literal.STAR
+        self.assertTrue(n1 == n2)
+        self.assertTrue(n1 == n3)
+        self.assertTrue(n3 == n2)
 
     def test_value(self):
         self.assertEqual("users", TableName("users").value)
