@@ -1,8 +1,9 @@
 from enum import Enum
 from typing import Self
 
+from sweet.sequel.quoting import quote
 from sweet.sequel.terms.name import Name
-from sweet.utils import DBDataType, quote
+from sweet.utils import DBDataType
 
 
 class Operator(Enum):

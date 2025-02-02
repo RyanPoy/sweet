@@ -2,7 +2,6 @@ import copy
 from typing import Callable
 
 from sweet.sequel.collectors import SQLCollector
-from sweet.sequel.schema.columns import Column
 from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
@@ -16,20 +15,15 @@ from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Regexp, Value
 from sweet.sequel.terms.values_list import ValuesList
-from sweet.utils import quote, quote_condition, quote_value
+from sweet.sequel.quoting import quote, quote_name, quote_condition, quote_value
 
 
 class Visitor:
     visit_methods_dict = {}
     qchar = '"'
 
-    def quote_column_name(self, name) -> str:
-        pointer = "."
-        if "__" in name:
-            name = name.replace("__", pointer)
-        if pointer in name:
-            return pointer.join([f'{self.qchar}{n}{self.qchar}' for n in name.split(pointer)])
-        return f'{self.qchar}{name}{self.qchar}'
+    def quote_column_name(self, name: str) -> str:
+        return quote_name(name, self.qchar)
 
     def visit_Name(self, n: Name, sql: SQLCollector) -> SQLCollector:
         if n.schema_name:

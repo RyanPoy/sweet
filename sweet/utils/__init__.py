@@ -1,5 +1,6 @@
 from typing import Union
 
+from sweet.sequel.terms.name import Name
 from sweet.utils.inflection import *
 from datetime import datetime, date
 from decimal import Decimal
@@ -13,40 +14,6 @@ DBDataType = Union[int, float, str, Decimal, bool, date, datetime, list, tuple, 
 FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE', 'No', 'no', 'NO')
 ISO_DATE = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
 ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
-
-
-def qs(s: str) -> str:
-    return s.replace("\\", '\\\\').replace("'", "''")
-
-
-def quote_value(value: DBDataType) -> str:
-    return quote(value, "[", "]")
-
-
-def quote_condition(value: DBDataType) -> str:
-    return quote(value, "(", ")")
-
-
-def quote(value: DBDataType, begin: str = "[", end: str = "]") -> str:
-    """Quotes the column value to help prevent"""
-    if value is None: return "NULL"
-
-    tp = type(value)
-    if tp == str:  # Todos: if tp in (str, ActiveSupport::Multibyte::Chars):
-        return f"'{qs(value)}'"
-    if tp == bool:
-        return '1' if value is True else '0'
-    if tp in (Decimal, int, float):  # BigDecimals need to be put in a non-normalized form and quoted.
-        return str(value)
-    if tp == datetime:
-        return f"'{datetime2str(value)}'"
-    if tp == date:
-        return f"'{date2str(value)}'"
-    if tp == bytes:
-        return f"'{binary2str(value)}'"
-    if tp in (tuple, list):
-        return f"{begin}{', '.join([quote(v) for v in value])}{end}"
-    raise TypeError(f"can't quote '{value.__class__.__name__}' type")
 
 
 def to_bool(v):
