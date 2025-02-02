@@ -22,11 +22,6 @@ class Visitor:
     visit_methods_dict = {}
     qchar = '"'
 
-    def quote_column(self, column: Column | str):
-        if isinstance(column, Column):
-            return self.quote_column_name(column.name)
-        return self.quote_column_name(column)
-
     def quote_column_name(self, name) -> str:
         pointer = "."
         if "__" in name:
@@ -42,11 +37,7 @@ class Visitor:
             sql << self.quote_column_name(n.value)
         if n.alias:
             sql << " AS " << self.quote_column_name(n.alias)
-
         return sql
-
-    def visit_Column(self, c: Column, sql: SQLCollector) -> SQLCollector:
-        return sql << self.quote_column(c)
 
     def visit_Literal(self, l: Literal, sql: SQLCollector) -> SQLCollector:
         return sql << l.v
