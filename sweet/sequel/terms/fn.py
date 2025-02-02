@@ -18,17 +18,16 @@ class Fn:
         self.cmp_pairs = []
         self.children = []
 
-    def column(self, *column_names: Name | Literal | str) -> Self:
-        if column_names == ["*"] or column_names == [literal.STAR]:
+    def column(self, *column_names: Name | Literal) -> Self:
+        if column_names == [literal.STAR]:
             return self
         cns = []
         for c in column_names:
-            if c == '*':
-                cns.append(literal.STAR)
-            elif isinstance(c, (str,)):
-                cns.append(Name(c))
-            else:
+            if isinstance(c, (Name, Literal)):
                 cns.append(c)
+            else:
+                raise ValueError(f"Support Name, Literal and '*'，but got[{c}] ")
+
         if len(self.columns) == 1 and self.columns[0] == literal.STAR:
             self.columns = cns
         else:
