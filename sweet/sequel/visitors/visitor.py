@@ -84,6 +84,9 @@ class Visitor:
             if i != 0: sql << ", "
             self.visit(column, sql)
         sql << ")"
+        for i, pair in enumerate(f.cmp_pairs):
+            sql << " " << pair[0] << " "
+            self.visit(pair[1], sql)
         return sql
 
     def visit_Lock(self, l: Lock, sql: SQLCollector) -> SQLCollector:
