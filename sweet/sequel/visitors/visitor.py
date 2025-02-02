@@ -97,18 +97,29 @@ class Visitor:
         return sql
 
     def visit_Pair(self, p: Pair, sql: SQLCollector) -> SQLCollector:
+        def deal_name_value(v: Name):
+            if v.alias:
+                new_value = copy.deepcopy(v)
+                new_value.alias = ""
+                self.visit_Name(new_value, sql)
+            else:
+                self.visit_Name(v, sql)
+
         sql << self.quote_column_name(p.field)
         sql << f" {str(p.operator)} "
         if p.operator == Operator.BETWEEN or p.operator == Operator.NOT_BETWEEN:
-            sql << f"{quote_value(p.value[0])} AND {quote_value(p.value[1])}"
+            if isinstance(p.value[0], Name):
+                deal_name_value(p.value[0])
+            else:
+                sql << quote_condition(p.value[0])
+            sql << " AND "
+            if isinstance(p.value[1], Name):
+                deal_name_value(p.value[1])
+            else:
+                sql << quote_condition(p.value[1])
         else:
             if isinstance(p.value, Name):
-                if p.value.alias:
-                    new_value = copy.deepcopy(p.value)
-                    new_value.alias = ""
-                    self.visit_Name(new_value, sql)
-                else:
-                    self.visit_Name(p.value, sql)
+                deal_name_value(p.value)
             else:
                 sql << quote_condition(p.value)
         return sql

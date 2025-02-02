@@ -507,6 +507,15 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT * FROM "schema"."abc" AS "alias"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT * FROM "schema"."abc" AS "alias"', self.pg.sql(stmt))
 
+    def test_extraneous_quotes(self):
+        t1 = Name("table1").as_("t1")
+        t2 = Name("table2").as_("t2")
+        stmt = SelectStatement().from_(t1).join(t2).on(t1__value__bt=(Name("start", t2), Name("end", t2))).select(Name("value", t1))
+        self.assertEqual('SELECT `t1`.`value` FROM `table1` AS `t1` JOIN `table2` AS `t2` ON `t1`.`value` BETWEEN `t2`.`start` AND `t2`.`end`', self.mysql.sql(stmt))
+        self.assertEqual('SELECT "t1"."value" FROM "table1" AS "t1" JOIN "table2" AS "t2" ON "t1"."value" BETWEEN "t2"."start" AND "t2"."end"', self.sqlite.sql(stmt))
+        self.assertEqual('SELECT "t1"."value" FROM "table1" AS "t1" JOIN "table2" AS "t2" ON "t1"."value" BETWEEN "t2"."start" AND "t2"."end"', self.pg.sql(stmt))
+
+
 # class SubqueryTests(unittest.TestCase):
 #     maxDiff = None
 #
@@ -709,35 +718,6 @@ class TestSelectStatement(unittest.TestCase):
 #         )
 #
 #
-# class QuoteTests(unittest.TestCase):
-#     def test_extraneous_quotes(self):
-#         t1 = Table("table1", alias="t1")
-#         t2 = Table("table2", alias="t2")
-#
-#         query = SelectStatement().from_(t1).join(t2).on(t1.Value.between(t2.start, t2.end)).select(t1.value)
-#
-#         self.assertEqual(
-#             "SELECT t1.value FROM table1 t1 " "JOIN table2 t2 ON t1.Value " "BETWEEN t2.start AND t2.end",
-#             query.get_sql(quote_char=None),
-#         )
-#
-# class PreWhereTests(WhereTests):
-#     t = Table("abc")
-#
-#     def test_prewhere_field_equals(self):
-#         stmt = SelectStatement().from_(self.table_abc).prewhere(self.t.foo == self.t.bar)
-#         q2 = SelectStatement().from_(self.table_abc).prewhere(self.t.foo.eq(self.t.bar))
-#
-#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q1))
-#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q2))
-#
-#     def test_where_and_prewhere(self):
-#         stmt = SelectStatement().from_(self.table_abc).prewhere(self.t.foo == self.t.bar).where(self.t.foo == self.t.bar)
-#
-#         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar" WHERE "foo"="bar"', self.mysql.sql(stmt))
-#
-#
-
 
 if __name__ == '__main__':
     unittest.main()
