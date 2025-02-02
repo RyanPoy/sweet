@@ -43,13 +43,13 @@ class SelectStatement(Statement):
         self._limit = 0
         self._offset = 0
         self.wheres = []
+        self.havings = []
         self.force_indexes = []
         self.use_indexes = []
         self.lock = None
         self.join_tables = []
         self.ons = []
         self.groups = []
-
         self.parent = None
 
     def from_(self, table: TableName | Alias | Self) -> Self:
@@ -106,6 +106,9 @@ class SelectStatement(Statement):
         """
         return self.__where_or_on(self.wheres, *qs, **kwargs)
 
+    def having(self, *qs: Q, **kwargs) -> Self:
+        return self.__where_or_on(self.havings, *qs, **kwargs)
+
     def join(self, table: TableName | Alias | Self) -> Self:
         return self.__from_or_join(self.join_tables, table)
 
@@ -156,9 +159,11 @@ class SelectStatement(Statement):
         tables.append(table)
         return self
 
-    def __where_or_on(self, cs, *qs: Q, **kwargs) -> Self:
+    def __where_or_on(self, cs, *qs: Q | Fn, **kwargs) -> Self:
         for q in qs:
-            if not q.is_empty():
+            if isinstance(q, Fn):
+                cs.append(q)
+            elif not q.is_empty():
                 cs.append(q)
         if kwargs:
             cs.append(Q(**kwargs))

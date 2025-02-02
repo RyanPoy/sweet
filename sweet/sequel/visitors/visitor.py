@@ -252,6 +252,12 @@ class Visitor:
                 if i != 0: sql << ", "
                 self.visit(c, sql)
 
+        if stmt.havings:
+            sql << " HAVING "
+            for i, w in enumerate(stmt.havings):
+                if i != 0: sql << f" AND "
+                self.visit(w, sql)
+
         if stmt._limit:  sql << f" LIMIT {stmt._limit}"
         if stmt._offset: sql << f" OFFSET {stmt._offset}"
 

@@ -306,7 +306,7 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT "foo", "bar" FROM "abc" GROUP BY "foo", "bar"', stmt.sql(self.pg))
 
     def test_group_by__count_star(self):
-        foo= ColumnName("foo")
+        foo = ColumnName("foo")
         stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, fn.count("*"))
         self.assertEqual('SELECT `foo`, COUNT(*) FROM `abc` GROUP BY `foo`', stmt.sql(self.mysql))
         self.assertEqual('SELECT "foo", COUNT(*) FROM "abc" GROUP BY "foo"', stmt.sql(self.sqlite))
@@ -362,173 +362,52 @@ class TestSelectStatement(unittest.TestCase):
         table1 = TableName("table1").as_("t1")
         bar = ColumnName("bar", table1).as_("bar01")
         stmt = SelectStatement().from_(self.table_abc).join(table1).on(abc__id=ColumnName("t_ref", table1)).select(fn.sum("foo"), bar).group_by(bar)
-        self.assertEqual('SELECT SUM(`foo`), `t1`.`bar` AS `bar01` FROM `abc` JOIN `table1` AS `t1` ON `abc`.`id` = `t1`.`t_ref` GROUP BY `bar01`', stmt.sql(self.mysql))
-        self.assertEqual('SELECT SUM("foo"), "t1"."bar" AS "bar01" FROM "abc" JOIN "table1" AS "t1" ON "abc"."id" = "t1"."t_ref" GROUP BY "bar01"', stmt.sql(self.sqlite))
-        self.assertEqual('SELECT SUM("foo"), "t1"."bar" AS "bar01" FROM "abc" JOIN "table1" AS "t1" ON "abc"."id" = "t1"."t_ref" GROUP BY "bar01"', stmt.sql(self.pg))
+        self.assertEqual('SELECT SUM(`foo`), `t1`.`bar` AS `bar01` FROM `abc` JOIN `table1` AS `t1` ON `abc`.`id` = `t1`.`t_ref` GROUP BY `bar01`',
+                         stmt.sql(self.mysql))
+        self.assertEqual('SELECT SUM("foo"), "t1"."bar" AS "bar01" FROM "abc" JOIN "table1" AS "t1" ON "abc"."id" = "t1"."t_ref" GROUP BY "bar01"',
+                         stmt.sql(self.sqlite))
+        self.assertEqual('SELECT SUM("foo"), "t1"."bar" AS "bar01" FROM "abc" JOIN "table1" AS "t1" ON "abc"."id" = "t1"."t_ref" GROUP BY "bar01"',
+                         stmt.sql(self.pg))
 
-#     def test_group_by_with_case_uses_the_alias(self):
-#         stmt = (
-#             SelectStatement().from_(self.t)Ï
-#             .select(
-#                 fn.Sum(self.t.foo).as_("bar"),
-#                 Case().when(self.t.fname == "Tom", "It was Tom").else_("It was someone else.").as_("who_was_it"),
-#             )
-#             .group_by(Case().when(self.t.fname == "Tom", "It was Tom").else_("It was someone else.").as_("who_was_it"))
-#         )
-#
-#         self.assertEqual(
-#             'SELECT SUM("foo") "bar",'
-#             "CASE WHEN \"fname\"='Tom' THEN 'It was Tom' "
-#             "ELSE 'It was someone else.' END \"who_was_it\" "
-#             'FROM "abc" '
-#             'GROUP BY "who_was_it"',
-#             str(q),
-#         )
-#
-#     def test_mysql_query_uses_backtick_quote_chars(self):
-#         stmt = MySQLSelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo)
-#
-#         self.assertEqual("SELECT `foo` FROM `abc` GROUP BY `foo`", stmt.sql(self.mysql))
-#
-#     def test_vertica_query_uses_double_quote_chars(self):
-#         stmt = VerticaSelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo)
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
-#
-#     def test_mssql_query_uses_double_quote_chars(self):
-#         stmt = MSSQLSelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo)
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
-#
-#     def test_oracle_query_uses_no_quote_chars(self):
-#         stmt = OracleSelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo)
-#
-#         self.assertEqual('SELECT foo FROM abc GROUP BY foo', stmt.sql(self.mysql))
-#
-#     def test_postgres_query_uses_double_quote_chars(self):
-#         stmt = PostgreSQLSelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo)
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
-#
-#     def test_redshift_query_uses_double_quote_chars(self):
-#         stmt = RedshiftSelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo)
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
-#
-#     def test_group_by__single_with_totals(self):
-#         stmt = SelectStatement().from_(self.t).group_by(self.t.foo).select(self.t.foo).with_totals()
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo" WITH TOTALS', stmt.sql(self.mysql))
-#
-#     def test_group_by__multi_with_totals(self):
-#         stmt = SelectStatement().from_(self.t).group_by(self.t.foo, self.t.bar).select(self.t.foo, self.t.bar).with_totals()
-#
-#         self.assertEqual('SELECT "foo","bar" FROM "abc" GROUP BY "foo","bar" WITH TOTALS', stmt.sql(self.mysql))
-#
-#
-# class HavingTests(unittest.TestCase):
-#     table_abc, table_efg = Tables("abc", "efg")
-#
-#     def test_having_greater_than(self):
-#         stmt = (
-#             SelectStatement().from_(self.table_abc)
-#             .select(self.table_abc.foo, fn.Sum(self.table_abc.bar))
-#             .group_by(self.table_abc.foo)
-#             .having(fn.Sum(self.table_abc.bar) > 1)
-#         )
-#
-#         self.assertEqual(
-#             'SELECT "foo",SUM("bar") FROM "abc" GROUP BY "foo" HAVING SUM("bar")>1',
-#             str(q),
-#         )
-#
-#     def test_having_and(self):
-#         stmt = (
-#             SelectStatement().from_(self.table_abc)
-#             .select(self.table_abc.foo, fn.Sum(self.table_abc.bar))
-#             .group_by(self.table_abc.foo)
-#             .having((fn.Sum(self.table_abc.bar) > 1) & (fn.Sum(self.table_abc.bar) < 100))
-#         )
-#
-#         self.assertEqual(
-#             'SELECT "foo",SUM("bar") FROM "abc" GROUP BY "foo" HAVING SUM("bar")>1 AND SUM("bar")<100',
-#             str(q),
-#         )
-#
-#     def test_having_join_and_equality(self):
-#         stmt = (
-#             SelectStatement().from_(self.table_abc)
-#             .join(self.table_efg)
-#             .on(self.table_abc.foo == self.table_efg.foo)
-#             .select(self.table_abc.foo, fn.Sum(self.table_efg.bar), self.table_abc.buz)
-#             .group_by(self.table_abc.foo)
-#             .having(self.table_abc.buz == "fiz")
-#             .having(fn.Sum(self.table_efg.bar) > 100)
-#         )
-#
-#         self.assertEqual(
-#             'SELECT "abc"."foo",SUM("efg"."bar"),"abc"."buz" FROM "abc" '
-#             'JOIN "efg" ON "abc"."foo"="efg"."foo" '
-#             'GROUP BY "abc"."foo" '
-#             'HAVING "abc"."buz"=\'fiz\' AND SUM("efg"."bar")>100',
-#             str(q),
-#         )
-#
-#     def test_mysql_query_uses_backtick_quote_chars(self):
-#         stmt = (
-#             MySQLSelectStatement().from_(self.table_abc)
-#             .select(self.table_abc.foo)
-#             .group_by(self.table_abc.foo)
-#             .having(self.table_abc.buz == "fiz")
-#         )
-#         self.assertEqual("SELECT `foo` FROM `abc` GROUP BY `foo` HAVING `buz`='fiz'", stmt.sql(self.mysql))
-#
-#     def test_vertica_query_uses_double_quote_chars(self):
-#         stmt = (
-#             VerticaSelectStatement().from_(self.table_abc)
-#             .select(self.table_abc.foo)
-#             .group_by(self.table_abc.foo)
-#             .having(self.table_abc.buz == "fiz")
-#         )
-#         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo" HAVING "buz"=\'fiz\'', stmt.sql(self.mysql))
-#
-#     def test_mssql_query_uses_double_quote_chars(self):
-#         stmt = (
-#             MSSQLSelectStatement().from_(self.table_abc)
-#             .select(self.table_abc.foo)
-#             .group_by(self.table_abc.foo)
-#             .having(self.table_abc.buz == "fiz")
-#         )
-#         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo" HAVING "buz"=\'fiz\'', stmt.sql(self.mysql))
-#
-#     def test_oracle_query_uses_no_quote_chars(self):
-#         stmt = (
-#             OracleSelectStatement().from_(self.table_abc)
-#             .select(self.table_abc.foo)
-#             .group_by(self.table_abc.foo)
-#             .having(self.table_abc.buz == "fiz")
-#         )
-#         self.assertEqual('SELECT foo FROM abc GROUP BY foo HAVING buz=\'fiz\'', stmt.sql(self.mysql))
-#
-#     def test_postgres_query_uses_double_quote_chars(self):
-#         stmt = (
-#             PostgreSQLSelectStatement().from_(self.table_abc)
-#             .select(self.table_abc.foo)
-#             .group_by(self.table_abc.foo)
-#             .having(self.table_abc.buz == "fiz")
-#         )
-#         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo" HAVING "buz"=\'fiz\'', stmt.sql(self.mysql))
-#
-#     def test_redshift_query_uses_double_quote_chars(self):
-#         stmt = (
-#             RedshiftSelectStatement().from_(self.table_abc)
-#             .select(self.table_abc.foo)
-#             .group_by(self.table_abc.foo)
-#             .having(self.table_abc.buz == "fiz")
-#         )
-#         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo" HAVING "buz"=\'fiz\'', stmt.sql(self.mysql))
-#
-#
+    def test_mysql_query_uses_backtick_quote_chars(self):
+        stmt = SelectStatement().from_(self.table_abc).group_by(ColumnName('foo')).select(ColumnName('foo'))
+        self.assertEqual('SELECT `foo` FROM `abc` GROUP BY `foo`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.pg))
+
+    def test_having_greater_than(self):
+        foo, bar = ColumnName('foo'), ColumnName('bar')
+        stmt = SelectStatement().from_(self.table_abc).select(foo, fn.sum(bar)).group_by(foo).having(fn.sum(bar) > 1)
+
+        self.assertEqual('SELECT `foo`, SUM(`bar`) FROM `abc` GROUP BY `foo` HAVING SUM(`bar`) > 1', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING SUM("bar") > 1', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING SUM("bar") > 1', stmt.sql(self.pg))
+
+    def test_having_and(self):
+        foo, bar = ColumnName('foo'), ColumnName('bar')
+        stmt = SelectStatement().from_(self.table_abc).select(foo, fn.sum(bar)).group_by(foo).having((fn.sum(bar) > 1) & (fn.sum(bar) < 100))
+        self.assertEqual('SELECT `foo`, SUM(`bar`) FROM `abc` GROUP BY `foo` HAVING (SUM(`bar`) > 1 AND SUM(`bar`) < 100)', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING (SUM("bar") > 1 AND SUM("bar") < 100)', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING (SUM("bar") > 1 AND SUM("bar") < 100)', stmt.sql(self.pg))
+
+    def test_having_join_and_equality(self):
+        stmt = (
+            SelectStatement().from_(self.table_abc).join(self.table_efg)
+            .on(abc__foo=self.table_efg.foo)
+            .select(self.table_abc.foo, fn.sum(self.table_efg.bar), self.table_abc.buz)
+            .group_by(self.table_abc.foo)
+            .having(abc__buz="fiz")
+            .having(fn.sum(self.table_efg.bar) > 100)
+        )
+
+        self.assertEqual('SELECT `abc`.`foo`, SUM(`efg`.`bar`), `abc`.`buz` FROM `abc` JOIN `efg` ON `abc`.`foo` = `efg`.`foo` '
+                         'GROUP BY `abc`.`foo` HAVING `abc`.`buz` = \'fiz\' AND SUM(`efg`.`bar`) > 100', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "abc"."foo", SUM("efg"."bar"), "abc"."buz" FROM "abc" JOIN "efg" ON "abc"."foo" = "efg"."foo" '
+                         'GROUP BY "abc"."foo" HAVING "abc"."buz" = \'fiz\' AND SUM("efg"."bar") > 100', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "abc"."foo", SUM("efg"."bar"), "abc"."buz" FROM "abc" JOIN "efg" ON "abc"."foo" = "efg"."foo" '
+                         'GROUP BY "abc"."foo" HAVING "abc"."buz" = \'fiz\' AND SUM("efg"."bar") > 100', stmt.sql(self.pg))
+
+
 # class OrderByTests(unittest.TestCase):
 #     t = Table("abc")
 #
