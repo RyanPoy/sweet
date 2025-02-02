@@ -18,7 +18,7 @@ class Fn:
         self.cmp_pairs = []
         self.children = []
 
-    def column(self, *column_names: [ColumnName | Literal | str]) -> Self:
+    def column(self, *column_names: ColumnName | Literal | str) -> Self:
         if column_names == ["*"] or column_names == [literal.STAR]:
             return self
         cns = []

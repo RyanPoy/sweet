@@ -116,7 +116,7 @@ class SelectStatement(Statement):
     def on(self, *qs: Q, **kwargs) -> Self:
         return self.__where_or_on(self.ons, *qs, **kwargs)
 
-    def group_by(self, *column_names: [ColumnName | DBDataType]) -> Self:
+    def group_by(self, *column_names: ColumnName | DBDataType) -> Self:
         for c in column_names:
             if c == '*':
                 self.groups.append(literal.STAR)
