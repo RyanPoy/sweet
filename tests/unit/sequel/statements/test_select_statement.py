@@ -3,7 +3,7 @@ from datetime import date
 
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.terms import fn
-from sweet.sequel.terms.name import ColumnName, IndexName, TableName
+from sweet.sequel.terms.name import ColumnName, Name, TableName
 from sweet.sequel.terms.order import SortedIn
 from sweet.sequel.terms.q import Q
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
@@ -144,37 +144,37 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT "foo" FROM "abc" LIMIT 10 OFFSET 10', self.pg.sql(stmt))
 
     def test_select_with_force_index(self):
-        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).force_index(IndexName("egg"))
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).force_index(Name("egg"))
         self.assertEqual('SELECT `foo` FROM `abc` FORCE INDEX (`egg`)', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg")', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg")', self.pg.sql(stmt))
 
     def test_select_with_force_index_multiple_indexes(self):
-        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).force_index(IndexName("egg"), IndexName("bacon"))
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).force_index(Name("egg"), Name("bacon"))
         self.assertEqual('SELECT `foo` FROM `abc` FORCE INDEX (`egg`, `bacon`)', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg", "bacon")', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg", "bacon")', self.pg.sql(stmt))
 
     def test_select_with_force_index_multiple_calls(self):
-        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).force_index(IndexName("egg")).force_index(IndexName("spam"))
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).force_index(Name("egg")).force_index(Name("spam"))
         self.assertEqual('SELECT `foo` FROM `abc` FORCE INDEX (`egg`, `spam`)', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg", "spam")', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg", "spam")', self.pg.sql(stmt))
 
     def test_select_with_use_index(self):
-        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).use_index(IndexName("egg"))
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).use_index(Name("egg"))
         self.assertEqual('SELECT `foo` FROM `abc` USE INDEX (`egg`)', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" USE INDEX ("egg")', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" USE INDEX ("egg")', self.pg.sql(stmt))
 
     def test_select_with_use_index_multiple_indexes(self):
-        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).use_index(IndexName("egg"), IndexName("bacon"))
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).use_index(Name("egg"), Name("bacon"))
         self.assertEqual('SELECT `foo` FROM `abc` USE INDEX (`egg`, `bacon`)', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" USE INDEX ("egg", "bacon")', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" USE INDEX ("egg", "bacon")', self.pg.sql(stmt))
 
     def test_select_with_use_index_multiple_calls(self):
-        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).use_index(IndexName("egg")).use_index(IndexName("spam"))
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).use_index(Name("egg")).use_index(Name("spam"))
         self.assertEqual('SELECT `foo` FROM `abc` USE INDEX (`egg`, `spam`)', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" USE INDEX ("egg", "spam")', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" USE INDEX ("egg", "spam")', self.pg.sql(stmt))
@@ -287,7 +287,7 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual("SELECT * FROM \"abc\"", self.pg.sql(stmt))
 
     def test_select_with_force_index_and_where(self):
-        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).where(foo="bar").force_index(IndexName("egg"))
+        stmt = SelectStatement().from_(self.table_abc).select(ColumnName("foo")).where(foo="bar").force_index(Name("egg"))
         self.assertEqual('SELECT `foo` FROM `abc` FORCE INDEX (`egg`) WHERE `foo` = \'bar\'', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg") WHERE "foo" = \'bar\'', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo" FROM "abc" FORCE INDEX ("egg") WHERE "foo" = \'bar\'', self.pg.sql(stmt))

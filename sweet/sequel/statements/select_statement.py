@@ -4,7 +4,7 @@ from sweet.sequel.statements import Statement
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.lock import Lock
-from sweet.sequel.terms.name import ColumnName, IndexName, Name, TableName
+from sweet.sequel.terms.name import ColumnName, Name, TableName
 from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Value
@@ -67,11 +67,11 @@ class SelectStatement(Statement):
 
         return self
 
-    def force_index(self, *indexes: IndexName) -> Self:
+    def force_index(self, *indexes: Name) -> Self:
         self.force_indexes.extend(indexes)
         return self
 
-    def use_index(self, *indexes: IndexName) -> Self:
+    def use_index(self, *indexes: Name) -> Self:
         self.use_indexes.extend(indexes)
         return self
 

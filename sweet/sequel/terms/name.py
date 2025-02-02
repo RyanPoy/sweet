@@ -68,6 +68,3 @@ class TableName(Name):
         except AttributeError:
             return ColumnName(item, self.value)
 
-
-class IndexName(Name):
-    pass
