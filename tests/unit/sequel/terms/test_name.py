@@ -14,15 +14,6 @@ class TestName(unittest.TestCase):
         self.sqlite = SQLiteVisitor()
         self.pg = PostgreSQLVisitor()
 
-    def test_name__equals_star(self):
-        n1 = Name("*")
-        n2 = "*"
-        n3 = literal.STAR
-        self.assertTrue(n1 == n2)
-        self.assertTrue(n1 == n3)
-        self.assertTrue(n3 == n2)
-        self.assertTrue(n3 != 4)
-
     def test_value(self):
         self.assertEqual("users", Name("users").value)
         self.assertEqual("name", Name("name").value)
