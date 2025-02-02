@@ -1,5 +1,5 @@
 from sweet.sequel.terms.literal import Literal
-from sweet.sequel.terms.name import ColumnName
+from sweet.sequel.terms.name import Name
 
 
 class Lock:
@@ -15,4 +15,4 @@ class Lock:
             self.suffix = Literal("SKIP LOCKED")
         else:
             self.suffix = ""
-        self.ofs = [ ColumnName(o) for o in of ] if of else []
+        self.ofs = [ Name(o) for o in of ] if of else []

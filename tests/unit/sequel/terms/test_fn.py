@@ -1,7 +1,7 @@
 import unittest
 
 from sweet.sequel.terms import fn
-from sweet.sequel.terms.name import ColumnName
+from sweet.sequel.terms.name import Name
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
@@ -27,7 +27,7 @@ class TestFn(unittest.TestCase):
         self.assertEqual('COUNT("bar")', self.pg.sql(func))
 
     def test_count__columnName(self):
-        func = fn.count(ColumnName("bar"))
+        func = fn.count(Name("bar"))
         self.assertEqual('COUNT(`bar`)', self.mysql.sql(func))
         self.assertEqual('COUNT("bar")', self.sqlite.sql(func))
         self.assertEqual('COUNT("bar")', self.pg.sql(func))

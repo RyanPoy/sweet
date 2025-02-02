@@ -1,9 +1,8 @@
-from typing import Optional, Self
+from typing import Self
 
-from sweet.sequel.schema.columns import Column
 from sweet.sequel.statements import Statement
 from sweet.sequel.terms import literal
-from sweet.sequel.terms.name import ColumnName, Name
+from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.utils import DBDataType
 
@@ -16,10 +15,10 @@ class InsertStatement(Statement):
 
     InsertStatement
     ├── Target: Name
-    ├── Columns: ColumnNameList
-    │   ├── ColumnName: "column1"
-    │   ├── ColumnName: "column2"
-    │   └── ColumnName: "column3"
+    ├── Columns: NameList
+    │   ├── Name: "column1"
+    │   ├── Name: "column2"
+    │   └── Name: "column3"
     ├── Values: ValueList (or Source if SELECT)
     │   ├── Value: Literal(value1)
     │   ├── Value: Literal(value2)
@@ -27,9 +26,9 @@ class InsertStatement(Statement):
     └── Source: SelectStatement (optional)
         ├── Target: Name (e.g., another_table)
         ├── Columns: ColumnList
-        │   ├── ColumnName: "column1"
-        │   ├── ColumnName: "column2"
-        │   └── ColumnName: "column3"
+        │   ├── Name: "column1"
+        │   ├── Name: "column2"
+        │   └── Name: "column3"
         └── Filters: (e.g., WHERE conditions)
             └── Condition: column1 > Literal(10)
 
@@ -38,7 +37,7 @@ class InsertStatement(Statement):
         stmt = InsertStatement().into(Name("users"))
 
         # set column to insert
-        stmt.column(ColumnName("id"), Name("name"))
+        stmt.column(Name("id"), Name("name"))
 
         # insert operation
         stmt.insert(1, "lucy")  # insert normal values
@@ -62,7 +61,7 @@ class InsertStatement(Statement):
     def __init__(self) -> None:
         super().__init__()
         self.insert_or_update = literal.INSERT
-        self._column_names: [ColumnName] = []
+        self._column_names: [Name] = []
         self._values_list: ValuesList = ValuesList()
 
     def into(self, table_name: Name) -> Self:
@@ -76,19 +75,19 @@ class InsertStatement(Statement):
         return self
 
     @property
-    def columns(self) -> [ColumnName]:
+    def columns(self) -> [Name]:
         """
         Gets the list of columns to insert into.
 
-        :return: List of ColumnName instances.
+        :return: List of Name instances.
         """
         return self._column_names
 
-    def column(self, *column_names: ColumnName) -> Self:
+    def column(self, *column_names: Name) -> Self:
         """
         Specifies the columns to insert into.
 
-        :param column_names: One or more ColumnName instances to insert into.
+        :param column_names: One or more Name instances to insert into.
         :return: The current InsertStatement instance.
         """
         if column_names:

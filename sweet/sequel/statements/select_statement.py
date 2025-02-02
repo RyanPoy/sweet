@@ -4,7 +4,7 @@ from sweet.sequel.statements import Statement
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.lock import Lock
-from sweet.sequel.terms.name import ColumnName, Name
+from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Value
@@ -116,22 +116,22 @@ class SelectStatement(Statement):
     def on(self, *qs: Q, **kwargs) -> Self:
         return self.__where_or_on(self.ons, *qs, **kwargs)
 
-    def group_by(self, *column_names: ColumnName | DBDataType) -> Self:
+    def group_by(self, *column_names: Name | DBDataType) -> Self:
         for c in column_names:
             if c == '*':
                 self.groups.append(literal.STAR)
-            if isinstance(c, ColumnName):
+            if isinstance(c, Name):
                 if c.alias:
-                    self.groups.append(ColumnName(c.alias))
+                    self.groups.append(Name(c.alias))
                 else:
                     self.groups.append(c)
             elif isinstance(c, (str, )):
-                self.groups.append(ColumnName(c))
+                self.groups.append(Name(c))
             else:
                 self.groups.append(Value(c))
         return self
 
-    def order_by(self, *column_names: ColumnName | DBDataType, sorted_in: SortedIn = None) -> Self:
+    def order_by(self, *column_names: Name | DBDataType, sorted_in: SortedIn = None) -> Self:
         order = OrderClause(*column_names, sorted_in=sorted_in)
         self.orders.append(order)
         return self

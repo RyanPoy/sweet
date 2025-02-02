@@ -2,7 +2,7 @@ from typing import Self
 
 from sweet.sequel.terms import Logic, literal
 from sweet.sequel.terms.literal import Literal
-from sweet.sequel.terms.name import ColumnName
+from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.value import Value
 from sweet.utils import DBDataType
 
@@ -18,7 +18,7 @@ class Fn:
         self.cmp_pairs = []
         self.children = []
 
-    def column(self, *column_names: ColumnName | Literal | str) -> Self:
+    def column(self, *column_names: Name | Literal | str) -> Self:
         if column_names == ["*"] or column_names == [literal.STAR]:
             return self
         cns = []
@@ -26,7 +26,7 @@ class Fn:
             if c == '*':
                 cns.append(literal.STAR)
             elif isinstance(c, (str,)):
-                cns.append(ColumnName(c))
+                cns.append(Name(c))
             else:
                 cns.append(c)
         if len(self.columns) == 1 and self.columns[0] == literal.STAR:
@@ -40,25 +40,25 @@ class Fn:
         return self
 
     def as_(self, name: str) -> Self:
-        self._as = ColumnName(name)
+        self._as = Name(name)
         return self
 
-    def __gt__(self, other: ColumnName | DBDataType) -> Self:
+    def __gt__(self, other: Name | DBDataType) -> Self:
         return self.__compare(">", other)
 
-    def __ge__(self, other: ColumnName | DBDataType) -> Self:
+    def __ge__(self, other: Name | DBDataType) -> Self:
         return self.__compare(">=", other)
 
-    def __lt__(self, other: ColumnName | DBDataType) -> Self:
+    def __lt__(self, other: Name | DBDataType) -> Self:
         return self.__compare("<", other)
 
-    def __le__(self, other: ColumnName | DBDataType) -> Self:
+    def __le__(self, other: Name | DBDataType) -> Self:
         return self.__compare("<=", other)
 
-    def __eq__(self, other: ColumnName | DBDataType) -> Self:
+    def __eq__(self, other: Name | DBDataType) -> Self:
         return self.__compare("=", other)
 
-    def __ne__(self, other: ColumnName | DBDataType) -> Self:
+    def __ne__(self, other: Name | DBDataType) -> Self:
         return self.__compare("<>", other)
 
     def __and__(self, other: Self) -> Self:
@@ -75,8 +75,8 @@ class Fn:
         self.children.append((logic_op, other))
         return self
 
-    def __compare(self, op: str, value: ColumnName | DBDataType) -> Self:
-        if isinstance(value, ColumnName):
+    def __compare(self, op: str, value: Name | DBDataType) -> Self:
+        if isinstance(value, Name):
             self.cmp_pairs.append((op, value))
         else:
             self.cmp_pairs.append((op, Value(value)))

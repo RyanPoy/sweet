@@ -25,7 +25,6 @@ class Name:
         if schema_name is not None:
             self.schema_name: str = schema_name if isinstance(schema_name, str) else schema_name.value
 
-
     def as_(self, alias: str) -> Self:
         self.alias = alias
         return self
@@ -38,19 +37,9 @@ class Name:
     def __hash__(self) -> int:
         return hash(f'{self.value}-{self.schema_name or ""}')
 
-    def __eq__(self, other: Self) -> bool:
-        return self.__class__ == other.__class__ and self.value == other.value and self.schema_name == other.schema_name
-
-
-class ColumnName(Name):
-    """
-    Represents a column name in a SQL statement.
-
-    Inherits from the `Name` class and is specifically used for column names in SQL queries.
-    """
     def __eq__(self, other: str | Literal | Self) -> bool:
         if isinstance(other, str) and other == '*' and self.value == '*':
             return True
         if isinstance(other, Literal) and other == STAR and self.value == '*':
             return True
-        return super().__eq__(other)
+        return self.__class__ == other.__class__ and self.value == other.value and self.schema_name == other.schema_name and self.alias == other.alias

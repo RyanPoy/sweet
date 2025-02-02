@@ -12,7 +12,7 @@ from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
 from sweet.sequel.terms.pair import Pair, Operator
-from sweet.sequel.terms.name import ColumnName, Name
+from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Regexp, Value
 from sweet.sequel.terms.values_list import ValuesList
@@ -48,7 +48,7 @@ class Visitor:
     def visit_Table(self, t: Table, sql: SQLCollector) -> SQLCollector:
         return sql << t.name_quoted
 
-    def visit_ColumnName(self, n: ColumnName, sql: SQLCollector) -> SQLCollector:
+    def visit_Name(self, n: Name, sql: SQLCollector) -> SQLCollector:
         return self.visit_Name(n, sql)
 
     def visit_Name(self, n: Name, sql: SQLCollector) -> SQLCollector:
@@ -96,7 +96,7 @@ class Visitor:
             sql << " OF "
             for i, n in enumerate(l.ofs):
                 if i != 0: sql << ', '
-                self.visit_ColumnName(n, sql)
+                self.visit_Name(n, sql)
         if l.suffix:
             sql << " "
             self.visit(l.suffix, sql)
@@ -121,7 +121,7 @@ class Visitor:
         if p.operator == Operator.BETWEEN or p.operator == Operator.NOT_BETWEEN:
             sql << f"{self.quote_values(p.value[0])} AND {self.quote_values(p.value[1])}"
         else:
-            if isinstance(p.value, ColumnName):
+            if isinstance(p.value, Name):
                 self.visit(p.value, sql)
             else:
                 sql << self.quote_condition(p.value)

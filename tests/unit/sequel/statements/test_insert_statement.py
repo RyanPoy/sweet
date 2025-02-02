@@ -2,7 +2,7 @@ import unittest
 
 from sweet.sequel.schema.table import Table
 from sweet.sequel.statements.insert_statement import InsertStatement
-from sweet.sequel.terms.name import ColumnName, Name
+from sweet.sequel.terms.name import Name
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
@@ -85,7 +85,7 @@ class TestInsertStatement(unittest.TestCase):
 
     def test_insert_selected_columns(self):
         stmt = InsertStatement().into(self.table_users) \
-                .column(ColumnName("foo"), ColumnName("bar"), ColumnName("buz")) \
+                .column(Name("foo"), Name("bar"), Name("buz")) \
                 .insert(1, "a", True)
         self.assertEqual('INSERT INTO `users` (`foo`, `bar`, `buz`) VALUES (1, \'a\', 1)', self.mysql.sql(stmt))
         self.assertEqual('INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)', self.sqlite.sql(stmt))
