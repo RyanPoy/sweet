@@ -11,6 +11,7 @@ from sweet.sequel.terms.alias import Alias
 from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
+from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.terms.pair import Pair, Operator
 from sweet.sequel.terms.name import ColumnName, IndexName, TableName
 from sweet.sequel.terms.q import Q
@@ -192,6 +193,14 @@ class Visitor:
                 self.visit(w, sql)
         return sql
 
+    def visit_OrderClause(self, order: OrderClause, sql: SQLCollector) -> SQLCollector:
+        for i, o in enumerate(order.orders):
+            if i != 0: sql << ", "
+            self.visit(o, sql)
+        if order.sorted_in:
+            sql << " " << str(order.sorted_in)
+        return sql
+
     def visit_SelectStatement(self, stmt: SelectStatement, sql: SQLCollector, level=0) -> SQLCollector:
         sql << "SELECT "
         if stmt.is_distinct_required() and stmt.columns:
@@ -257,6 +266,11 @@ class Visitor:
             for i, w in enumerate(stmt.havings):
                 if i != 0: sql << f" AND "
                 self.visit(w, sql)
+
+        if stmt.orders:
+            sql << " ORDER BY "
+            for i, order in enumerate(stmt.orders):
+                self.visit(order, sql)
 
         if stmt._limit:  sql << f" LIMIT {stmt._limit}"
         if stmt._offset: sql << f" OFFSET {stmt._offset}"

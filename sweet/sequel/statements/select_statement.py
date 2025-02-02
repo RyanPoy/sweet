@@ -6,6 +6,7 @@ from sweet.sequel.terms.alias import Alias
 from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.name import ColumnName, IndexName, Name, TableName
+from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Value
 from sweet.utils import DBDataType
@@ -50,6 +51,7 @@ class SelectStatement(Statement):
         self.join_tables = []
         self.ons = []
         self.groups = []
+        self.orders : [OrderClause] = []
         self.parent = None
 
     def from_(self, table: TableName | Alias | Self) -> Self:
@@ -127,6 +129,11 @@ class SelectStatement(Statement):
                 self.groups.append(ColumnName(c))
             else:
                 self.groups.append(Value(c))
+        return self
+
+    def order_by(self, *column_names: ColumnName | Alias | DBDataType, sorted_in: SortedIn = None) -> Self:
+        order = OrderClause(*column_names, sorted_in=sorted_in)
+        self.orders.append(order)
         return self
 
     def __from_or_join(self, cs, table: TableName | Alias | Self) -> Self:

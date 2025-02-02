@@ -4,6 +4,7 @@ from datetime import date
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.terms import fn
 from sweet.sequel.terms.name import ColumnName, IndexName, TableName
+from sweet.sequel.terms.order import SortedIn
 from sweet.sequel.terms.q import Q
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
@@ -407,76 +408,71 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT "abc"."foo", SUM("efg"."bar"), "abc"."buz" FROM "abc" JOIN "efg" ON "abc"."foo" = "efg"."foo" '
                          'GROUP BY "abc"."foo" HAVING "abc"."buz" = \'fiz\' AND SUM("efg"."bar") > 100', stmt.sql(self.pg))
 
+    def test_order_by__single_field(self):
+        stmt = SelectStatement().from_(self.table_abc).order_by(ColumnName("foo")).select(ColumnName("foo"))
+        self.assertEqual('SELECT `foo` FROM `abc` ORDER BY `foo`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo"', stmt.sql(self.pg))
 
-# class OrderByTests(unittest.TestCase):
-#     t = Table("abc")
-#
-#     def test_orderby_single_field(self):
-#         stmt = SelectStatement().from_(self.t).orderby(self.t.foo).select(self.t.foo)
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo"', stmt.sql(self.mysql))
-#
-#     def test_orderby_multi_fields(self):
-#         stmt = SelectStatement().from_(self.t).orderby(self.t.foo, self.t.bar).select(self.t.foo, self.t.bar)
-#
-#         self.assertEqual('SELECT "foo","bar" FROM "abc" ORDER BY "foo","bar"', stmt.sql(self.mysql))
-#
-#     def test_orderby_single_str(self):
-#         stmt = SelectStatement().from_(self.table_abc).orderby("foo").select(ColumnName("foo"))
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo"', stmt.sql(self.mysql))
-#
-#     def test_orderby_asc(self):
-#         stmt = SelectStatement().from_(self.t).orderby(self.t.foo, order=Order.asc).select(self.t.foo)
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo" ASC', stmt.sql(self.mysql))
-#
-#     def test_orderby_desc(self):
-#         stmt = SelectStatement().from_(self.t).orderby(self.t.foo, order=Order.desc).select(self.t.foo)
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo" DESC', stmt.sql(self.mysql))
-#
-#     def test_orderby_no_alias(self):
-#         bar = self.t.bar.as_("bar01")
-#         stmt = SelectStatement().from_(self.t).select(fn.Sum(self.t.foo), bar).orderby(bar)
-#
-#         self.assertEqual(
-#             'SELECT SUM("foo"),"bar" "bar01" FROM "abc" ORDER BY "bar"',
-#             q.get_sql(orderby_alias=False),
-#         )
-#
-#     def test_orderby_alias(self):
-#         bar = self.t.bar.as_("bar01")
-#         stmt = SelectStatement().from_(self.t).select(fn.Sum(self.t.foo), bar).orderby(bar)
-#
-#         self.assertEqual('SELECT SUM("foo"),"bar" "bar01" FROM "abc" ORDER BY "bar01"', q.get_sql())
-#
-#
+    def test_order_by__multi_fields(self):
+        foo, bar = ColumnName("foo"), ColumnName("bar")
+        stmt = SelectStatement().from_(self.table_abc).order_by(foo, bar).select(foo, bar)
+        self.assertEqual('SELECT `foo`, `bar` FROM `abc` ORDER BY `foo`, `bar`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo", "bar" FROM "abc" ORDER BY "foo", "bar"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo", "bar" FROM "abc" ORDER BY "foo", "bar"', stmt.sql(self.pg))
+
+    def test_order_by__single_str(self):
+        stmt = SelectStatement().from_(self.table_abc).order_by("foo").select(ColumnName("foo"))
+        self.assertEqual('SELECT `foo` FROM `abc` ORDER BY `foo`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo"', stmt.sql(self.pg))
+
+    def test_order_by_asc(self):
+        foo = ColumnName("foo")
+        stmt = SelectStatement().from_(self.table_abc).order_by(foo, sorted_in=SortedIn.ASC).select(foo)
+        self.assertEqual('SELECT `foo` FROM `abc` ORDER BY `foo` ASC', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo" ASC', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo" ASC', stmt.sql(self.pg))
+
+    def test_order_by_desc(self):
+        foo = ColumnName("foo")
+        stmt = SelectStatement().from_(self.table_abc).order_by(foo, sorted_in=SortedIn.DESC).select(foo)
+        self.assertEqual('SELECT `foo` FROM `abc` ORDER BY `foo` DESC', stmt.sql(self.mysql))
+        self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo" DESC', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo" DESC', stmt.sql(self.pg))
+
+    def test_order_by__alias(self):
+        bar = ColumnName("bar").as_("bar01")
+        stmt = SelectStatement().from_(self.table_abc).select(fn.sum(ColumnName("foo")), bar).order_by(bar)
+        self.assertEqual('SELECT SUM(`foo`), `bar` AS `bar01` FROM `abc` ORDER BY `bar01`', stmt.sql(self.mysql))
+        self.assertEqual('SELECT SUM("foo"), "bar" AS "bar01" FROM "abc" ORDER BY "bar01"', stmt.sql(self.sqlite))
+        self.assertEqual('SELECT SUM("foo"), "bar" AS "bar01" FROM "abc" ORDER BY "bar01"', stmt.sql(self.pg))
+
 # class AliasTests(unittest.TestCase):
 #     t = Table("abc")
 #
 #     def test_table_field(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.foo.as_("bar"))
+#         stmt = SelectStatement().from_(self.table_abc).select(self.t.foo.as_("bar"))
 #
 #         self.assertEqual('SELECT "foo" "bar" FROM "abc"', stmt.sql(self.mysql))
 #
 #     def test_table_field__multi(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.foo.as_("bar"), self.t.fiz.as_("buz"))
+#         stmt = SelectStatement().from_(self.table_abc).select(self.t.foo.as_("bar"), self.t.fiz.as_("buz"))
 #
 #         self.assertEqual('SELECT "foo" "bar","fiz" "buz" FROM "abc"', stmt.sql(self.mysql))
 #
 #     def test_arithmetic_function(self):
-#         stmt = SelectStatement().from_(self.t).select((self.t.foo + self.t.bar).as_("biz"))
+#         stmt = SelectStatement().from_(self.table_abc).select((self.t.foo + self.t.bar).as_("biz"))
 #
 #         self.assertEqual('SELECT "foo"+"bar" "biz" FROM "abc"', stmt.sql(self.mysql))
 #
 #     def test_functions_using_as(self):
-#         stmt = SelectStatement().from_(self.t).select(fn.Count("*").as_("foo"))
+#         stmt = SelectStatement().from_(self.table_abc).select(fn.Count("*").as_("foo"))
 #
 #         self.assertEqual('SELECT COUNT(*) "foo" FROM "abc"', stmt.sql(self.mysql))
 #
 #     def test_functions_using_constructor_param(self):
-#         stmt = SelectStatement().from_(self.t).select(fn.Count("*", alias="foo"))
+#         stmt = SelectStatement().from_(self.table_abc).select(fn.Count("*", alias="foo"))
 #
 #         self.assertEqual('SELECT COUNT(*) "foo" FROM "abc"', stmt.sql(self.mysql))
 #
@@ -484,7 +480,7 @@ class TestSelectStatement(unittest.TestCase):
 #         """
 #         We don't show aliases of fields that are arguments of a function.
 #         """
-#         stmt = SelectStatement().from_(self.t).select(fn.Sqrt(fn.Count("*").as_("foo")).as_("bar"))
+#         stmt = SelectStatement().from_(self.table_abc).select(fn.Sqrt(fn.Count("*").as_("foo")).as_("bar"))
 #
 #         self.assertEqual('SELECT SQRT(COUNT(*)) "bar" FROM "abc"', stmt.sql(self.mysql))
 #
@@ -492,22 +488,22 @@ class TestSelectStatement(unittest.TestCase):
 #         """
 #         We don't show aliases of fields that are arguments of a function.
 #         """
-#         stmt = SelectStatement().from_(self.t).select(fn.Sqrt(fn.Count("*", alias="foo"), alias="bar"))
+#         stmt = SelectStatement().from_(self.table_abc).select(fn.Sqrt(fn.Count("*", alias="foo"), alias="bar"))
 #
 #         self.assertEqual('SELECT SQRT(COUNT(*)) "bar" FROM "abc"', stmt.sql(self.mysql))
 #
 #     def test_ignored_in_where(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.foo).where(self.t.foo.as_("bar") == 1)
+#         stmt = SelectStatement().from_(self.table_abc).select(self.t.foo).where(self.t.foo.as_("bar") == 1)
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" WHERE "foo"=1', stmt.sql(self.mysql))
 #
 #     def test_ignored_in_groupby(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.foo).group_by(self.t.foo.as_("bar"))
+#         stmt = SelectStatement().from_(self.table_abc).select(self.t.foo).group_by(self.t.foo.as_("bar"))
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', stmt.sql(self.mysql))
 #
-#     def test_ignored_in_orderby(self):
-#         stmt = SelectStatement().from_(self.t).select(self.t.foo).orderby(self.t.foo.as_("bar"))
+#     def test_ignored_in_order_by(self):
+#         stmt = SelectStatement().from_(self.table_abc).select(self.t.foo).order_by(self.t.foo.as_("bar"))
 #
 #         self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo"', stmt.sql(self.mysql))
 #
@@ -522,12 +518,12 @@ class TestSelectStatement(unittest.TestCase):
 #         self.assertEqual('"foo"="fiz"', str(c))
 #
 #     def test_ignored_in_field_inside_case(self):
-#         stmt = SelectStatement().from_(self.t).select(Case().when(self.t.foo == 1, "a").else_(self.t.bar.as_('"buz"')))
+#         stmt = SelectStatement().from_(self.table_abc).select(Case().when(self.t.foo == 1, "a").else_(self.t.bar.as_('"buz"')))
 #
 #         self.assertEqual('SELECT CASE WHEN "foo"=1 THEN \'a\' ELSE "bar" END FROM "abc"', stmt.sql(self.mysql))
 #
 #     def test_case_using_as(self):
-#         stmt = SelectStatement().from_(self.t).select(Case().when(self.t.foo == 1, "a").else_("b").as_("bar"))
+#         stmt = SelectStatement().from_(self.table_abc).select(Case().when(self.t.foo == 1, "a").else_("b").as_("bar"))
 #
 #         self.assertEqual(
 #             'SELECT CASE WHEN "foo"=1 THEN \'a\' ELSE \'b\' END "bar" FROM "abc"',
@@ -535,7 +531,7 @@ class TestSelectStatement(unittest.TestCase):
 #         )
 #
 #     def test_case_using_constructor_param(self):
-#         stmt = SelectStatement().from_(self.t).select(Case(alias="bar").when(self.t.foo == 1, "a").else_("b"))
+#         stmt = SelectStatement().from_(self.table_abc).select(Case(alias="bar").when(self.t.foo == 1, "a").else_("b"))
 #
 #         self.assertEqual(
 #             'SELECT CASE WHEN "foo"=1 THEN \'a\' ELSE \'b\' END "bar" FROM "abc"',
@@ -549,11 +545,11 @@ class TestSelectStatement(unittest.TestCase):
 #
 #         self.assertEqual('SELECT "q0"."foo","q1"."bar" FROM "abc" "q0","efg" "q1"', stmt.sql(self.mysql))
 #
-#     def test_use_aliases_in_groupby_and_orderby(self):
+#     def test_use_aliases_in_groupby_and_order_by(self):
 #         table_abc = Table("abc", alias="q0")
 #
 #         my_foo = table_abc.foo.as_("my_foo")
-#         stmt = SelectStatement().from_(table_abc).select(my_foo, table_abc.bar).group_by(my_foo).orderby(my_foo)
+#         stmt = SelectStatement().from_(table_abc).select(my_foo, table_abc.bar).group_by(my_foo).order_by(my_foo)
 #
 #         self.assertEqual(
 #             'SELECT "q0"."foo" "my_foo","q0"."bar" ' 'FROM "abc" "q0" ' 'GROUP BY "my_foo" ' 'ORDER BY "my_foo"',
@@ -788,14 +784,14 @@ class TestSelectStatement(unittest.TestCase):
 #     t = Table("abc")
 #
 #     def test_prewhere_field_equals(self):
-#         stmt = SelectStatement().from_(self.t).prewhere(self.t.foo == self.t.bar)
-#         q2 = SelectStatement().from_(self.t).prewhere(self.t.foo.eq(self.t.bar))
+#         stmt = SelectStatement().from_(self.table_abc).prewhere(self.t.foo == self.t.bar)
+#         q2 = SelectStatement().from_(self.table_abc).prewhere(self.t.foo.eq(self.t.bar))
 #
 #         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q1))
 #         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar"', str(q2))
 #
 #     def test_where_and_prewhere(self):
-#         stmt = SelectStatement().from_(self.t).prewhere(self.t.foo == self.t.bar).where(self.t.foo == self.t.bar)
+#         stmt = SelectStatement().from_(self.table_abc).prewhere(self.t.foo == self.t.bar).where(self.t.foo == self.t.bar)
 #
 #         self.assertEqual('SELECT * FROM "abc" PREWHERE "foo"="bar" WHERE "foo"="bar"', stmt.sql(self.mysql))
 #
