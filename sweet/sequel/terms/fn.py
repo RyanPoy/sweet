@@ -26,7 +26,7 @@ class Fn:
             if isinstance(c, (Name, Literal)):
                 cns.append(c)
             else:
-                raise ValueError(f"Support Name, Literal and '*'，but got[{c}] ")
+                raise ValueError(f"Support Name and Literal，but got[{c}] ")
 
         if len(self.columns) == 1 and self.columns[0] == literal.STAR:
             self.columns = cns
