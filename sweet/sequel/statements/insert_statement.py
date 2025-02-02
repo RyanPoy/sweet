@@ -3,7 +3,7 @@ from typing import Optional, Self
 from sweet.sequel.schema.columns import Column
 from sweet.sequel.statements import Statement
 from sweet.sequel.terms import literal
-from sweet.sequel.terms.name import ColumnName, TableName
+from sweet.sequel.terms.name import ColumnName, Name
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.utils import DBDataType
 
@@ -15,7 +15,7 @@ class InsertStatement(Statement):
     The InsertStatement AST is structured as follows:
 
     InsertStatement
-    ├── Target: TableName
+    ├── Target: Name
     ├── Columns: ColumnNameList
     │   ├── ColumnName: "column1"
     │   ├── ColumnName: "column2"
@@ -25,7 +25,7 @@ class InsertStatement(Statement):
     │   ├── Value: Literal(value2)
     │   └── Value: Literal(value3)
     └── Source: SelectStatement (optional)
-        ├── Target: TableName (e.g., another_table)
+        ├── Target: Name (e.g., another_table)
         ├── Columns: ColumnList
         │   ├── ColumnName: "column1"
         │   ├── ColumnName: "column2"
@@ -35,10 +35,10 @@ class InsertStatement(Statement):
 
     Usage:
         # Create a Insert statement and specify the target table
-        stmt = InsertStatement().into(TableName("users"))
+        stmt = InsertStatement().into(Name("users"))
 
         # set column to insert
-        stmt.column(ColumnName("id"), TableName("name"))
+        stmt.column(ColumnName("id"), Name("name"))
 
         # insert operation
         stmt.insert(1, "lucy")  # insert normal values
@@ -65,11 +65,11 @@ class InsertStatement(Statement):
         self._column_names: [ColumnName] = []
         self._values_list: ValuesList = ValuesList()
 
-    def into(self, table_name: TableName) -> Self:
+    def into(self, table_name: Name) -> Self:
         """
         Specifies the target table for the INSERT statement.
 
-        :param table_name: The table name to insert into. Should be an instance of `TableName`
+        :param table_name: The table name to insert into. Should be an instance of `Name`
         :return: The current InsertStatement instance.
         """
         self._table_name = table_name

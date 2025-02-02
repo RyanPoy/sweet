@@ -14,14 +14,17 @@ class Name:
         value (str): The name as a string (e.g., column, table, alias).
     """
 
-    def __init__(self, name: str, schema_name: str = None) -> None:
+    def __init__(self, name: str, schema_name: str | Self = None) -> None:
         """
         :param name: The name of the entity (column, table, alias). (e.g., of `str`)
         """
         super().__init__()
         self.value: str = name
         self.alias: Optional[str] = None
-        self.schema_name: str = schema_name
+        self.schema_name = None
+        if schema_name is not None:
+            self.schema_name: str = schema_name if isinstance(schema_name, str) else schema_name.value
+
 
     def as_(self, alias: str) -> Self:
         self.alias = alias
@@ -51,20 +54,3 @@ class ColumnName(Name):
         if isinstance(other, Literal) and other == STAR and self.value == '*':
             return True
         return super().__eq__(other)
-
-
-class TableName(Name):
-    """
-    Represents a table name in a SQL statement.
-
-    Inherits from the `Name` class and is specifically used for table names in SQL queries.
-    """
-    def column_name_of(self, name: str) -> ColumnName:
-        return ColumnName(name, self.value)
-
-    def __getattribute__(self, item):
-        try:
-            return object.__getattribute__(self, item)
-        except AttributeError:
-            return ColumnName(item, self.value)
-

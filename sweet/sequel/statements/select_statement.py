@@ -4,7 +4,7 @@ from sweet.sequel.statements import Statement
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.lock import Lock
-from sweet.sequel.terms.name import ColumnName, Name, TableName
+from sweet.sequel.terms.name import ColumnName, Name
 from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Value
@@ -53,7 +53,7 @@ class SelectStatement(Statement):
         self.orders : [OrderClause] = []
         self.parent = None
 
-    def from_(self, table: TableName | Self) -> Self:
+    def from_(self, table: Name | Self) -> Self:
         return self.__from_or_join(self.tables, table)
 
     def select(self, *columns: Name | Fn | DBDataType) -> Self:
@@ -110,7 +110,7 @@ class SelectStatement(Statement):
     def having(self, *qs: Q, **kwargs) -> Self:
         return self.__where_or_on(self.havings, *qs, **kwargs)
 
-    def join(self, table: TableName | Self) -> Self:
+    def join(self, table: Name | Self) -> Self:
         return self.__from_or_join(self.join_tables, table)
 
     def on(self, *qs: Q, **kwargs) -> Self:
@@ -136,9 +136,9 @@ class SelectStatement(Statement):
         self.orders.append(order)
         return self
 
-    def __from_or_join(self, cs, table: TableName | Self) -> Self:
+    def __from_or_join(self, cs, table: Name | Self) -> Self:
         tp = type(table)
-        if tp is TableName:
+        if tp is Name:
             self.__check_repetitive_tables(table, cs)
         elif tp is SelectStatement:
             if self.__check_circular_reference(table):
@@ -159,7 +159,7 @@ class SelectStatement(Statement):
 
     def __check_repetitive_tables(self, table, tables) -> Self:
         for t in tables:  # check for repetitive tables
-            if t.name == table.name:
+            if t.value == table.value:
                 return self
         tables.append(table)
         return self

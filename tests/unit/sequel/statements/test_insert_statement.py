@@ -1,9 +1,8 @@
 import unittest
 
-from sweet.sequel.schema.columns import Column
 from sweet.sequel.schema.table import Table
 from sweet.sequel.statements.insert_statement import InsertStatement
-from sweet.sequel.terms.name import ColumnName, TableName
+from sweet.sequel.terms.name import ColumnName, Name
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
@@ -15,7 +14,7 @@ class TestInsertStatement(unittest.TestCase):
         self.mysql = MySQLVisitor()
         self.sqlite = SQLiteVisitor()
         self.pg = PostgreSQLVisitor()
-        self.table_users = TableName("users")
+        self.table_users = Name("users")
 
     def test_insert_one_column(self):
         stmt = InsertStatement().into(self.table_users).insert(1)

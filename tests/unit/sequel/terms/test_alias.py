@@ -1,6 +1,6 @@
 import unittest
 
-from sweet.sequel.terms.name import ColumnName, TableName
+from sweet.sequel.terms.name import ColumnName, Name, TableName
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
@@ -19,7 +19,7 @@ class TestAlias(unittest.TestCase):
         self.assertEqual('"id" AS "user_id"', alias.sql(self.sqlite))
         self.assertEqual('"id" AS "user_id"', alias.sql(self.pg))
 
-        alias = TableName("users").as_("customers")
+        alias = Name("users").as_("customers")
         self.assertEqual('`users` AS `customers`', alias.sql(self.mysql))
         self.assertEqual('"users" AS "customers"', alias.sql(self.sqlite))
         self.assertEqual('"users" AS "customers"', alias.sql(self.pg))

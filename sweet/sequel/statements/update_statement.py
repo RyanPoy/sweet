@@ -1,7 +1,7 @@
 from typing import Self
 
 from sweet.sequel.statements import Statement
-from sweet.sequel.terms.name import TableName
+from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
 from sweet.utils import DBDataType
 
@@ -13,7 +13,7 @@ class UpdateStatement(Statement):
     The UpdateStatement is structured as follows:
 
     UpdateStatement
-    ├── Target: TableName
+    ├── Target: Name
     │   └── Name: "table_name"
     ├── Set: AssignmentList
     │   ├── Assignment: ColumnName = Value
@@ -36,7 +36,7 @@ class UpdateStatement(Statement):
 
     Usage:
         # create an update statement
-        stmt = UpdateStatement().update(TableName("users"))
+        stmt = UpdateStatement().update(Name("users"))
 
         # set column-value pairs for update
         stmt.set(name="lucy", age=20)
@@ -52,11 +52,11 @@ class UpdateStatement(Statement):
         self.wheres = []
         self.sets : {str: DBDataType} = {}
 
-    def update(self, table_name: TableName) -> Self:
+    def update(self, table_name: Name) -> Self:
         """
         Specifies the target table for the UPDATE statement.
 
-        :param table_name: The table to be updated, represented as a `TableName` object.
+        :param table_name: The table to be updated, represented as a `Name` object.
         :return: The current UpdateStatement instance.
         """
         self._table_name = table_name

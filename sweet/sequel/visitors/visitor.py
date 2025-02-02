@@ -12,7 +12,7 @@ from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
 from sweet.sequel.terms.pair import Pair, Operator
-from sweet.sequel.terms.name import ColumnName, Name, TableName
+from sweet.sequel.terms.name import ColumnName, Name
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Regexp, Value
 from sweet.sequel.terms.values_list import ValuesList
@@ -47,9 +47,6 @@ class Visitor:
 
     def visit_Table(self, t: Table, sql: SQLCollector) -> SQLCollector:
         return sql << t.name_quoted
-
-    def visit_TableName(self, n: TableName, sql: SQLCollector) -> SQLCollector:
-        return self.visit_Name(n, sql)
 
     def visit_ColumnName(self, n: ColumnName, sql: SQLCollector) -> SQLCollector:
         return self.visit_Name(n, sql)

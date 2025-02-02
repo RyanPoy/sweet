@@ -1,8 +1,8 @@
-from typing import Optional, Self
+from typing import Self
 
 from sweet.sequel.statements import Statement
+from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.pair import Pair
-from sweet.sequel.terms.name import TableName
 from sweet.sequel.terms.q import Q
 
 
@@ -13,13 +13,13 @@ class DeleteStatement(Statement):
     The DeleteStatement AST is structured as follows:
 
     DeleteStatement
-    ├── Target: TableName
+    ├── Target: Name
     ├── Filters: ConditionList (optional)
     │   ├── Condition: (e.g., column1 > value1)
     │   ├── Condition: (e.g., column2 = value2)
     │   ├── Condition: column1 IN Subquery
     │   │       └── Source: SelectStatement
-    │   │           ├── Target: TableName
+    │   │           ├── Target: Name
     │   │           │   └── Name: "another_table"
     │   │           │── JoinCondition:
     │   │           │   └── Condition: t1.column1 = t2.column1
@@ -29,7 +29,7 @@ class DeleteStatement(Statement):
     │   │               └── Condition: column2 = Literal('value2')
     │   └── LogicalOperator: AND / OR
     └── Source: SelectStatement (optional, e.g., DELETE with subquery)
-        ├── Target: TableName
+        ├── Target: Name
         │   └── Name: "source_table"
         ├── Columns: ColumnList (optional, if needed by WHERE or JOIN)
         │   ├── ColumnName: "column1"
@@ -39,7 +39,7 @@ class DeleteStatement(Statement):
 
     Usage:
         # Create a Delete statement and specify the target table
-        stmt = DeleteStatement().from_(TableName("users"))
+        stmt = DeleteStatement().from_(Name("users"))
 
         # add filter conditions
         stmt.where(id__lt=10).where(Q(name__like="%abc") | Q(name="lucy"))
@@ -51,11 +51,11 @@ class DeleteStatement(Statement):
         super().__init__()
         self.wheres: [Pair | Q]            = []
 
-    def from_(self, table_name: TableName) -> Self:
+    def from_(self, table_name: Name) -> Self:
         """
         set the table name to delete
 
-        :param table_name: the table name to delete (of type `TableName`)
+        :param table_name: the table name to delete (of type `Name`)
         :return: the current instance of DeleteStatement
         """
         self._table_name = table_name

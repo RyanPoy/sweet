@@ -3,7 +3,7 @@ from datetime import date
 
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.terms import fn
-from sweet.sequel.terms.name import ColumnName, Name, TableName
+from sweet.sequel.terms.name import ColumnName, Name
 from sweet.sequel.terms.order import SortedIn
 from sweet.sequel.terms.q import Q
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
@@ -17,8 +17,8 @@ class TestSelectStatement(unittest.TestCase):
         self.mysql = MySQLVisitor()
         self.sqlite = SQLiteVisitor()
         self.pg = PostgreSQLVisitor()
-        self.table_abc = TableName("abc")
-        self.table_efg = TableName("efg")
+        self.table_abc = Name("abc")
+        self.table_efg = Name("efg")
 
     def test_empty_query(self):
         stmt = SelectStatement().from_(self.table_abc)
@@ -27,7 +27,7 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT * FROM "abc"', self.pg.sql(stmt))
 
     def test_select__table_schema(self):
-        stmt = SelectStatement().from_(TableName("abc", "schema1"))
+        stmt = SelectStatement().from_(Name("abc", "schema1"))
         self.assertEqual('SELECT * FROM `schema1`.`abc`', self.mysql.sql(stmt))
         self.assertEqual('SELECT * FROM "schema1"."abc"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT * FROM "schema1"."abc"', self.pg.sql(stmt))
@@ -257,13 +257,13 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT * FROM "abc" JOIN "efg" ON "abc"."id" = "efg"."id" WHERE "abc"."foo" = "efg"."bar"', self.pg.sql(stmt))
 
     def test_where_field_equals_where(self):
-        stmt = SelectStatement().from_(self.table_abc).where(abc__foo=1).where(abc__bar=self.table_abc.baz)
+        stmt = SelectStatement().from_(self.table_abc).where(abc__foo=1).where(abc__bar=ColumnName('baz', self.table_abc))
         self.assertEqual('SELECT * FROM `abc` WHERE `abc`.`foo` = 1 AND `abc`.`bar` = `abc`.`baz`', self.mysql.sql(stmt))
         self.assertEqual('SELECT * FROM "abc" WHERE "abc"."foo" = 1 AND "abc"."bar" = "abc"."baz"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT * FROM "abc" WHERE "abc"."foo" = 1 AND "abc"."bar" = "abc"."baz"', self.pg.sql(stmt))
 
     def test_where_field_equals_where_not(self):
-        stmt = SelectStatement().from_(self.table_abc).where(~Q(foo=1)).where(bar=self.table_abc.baz)
+        stmt = SelectStatement().from_(self.table_abc).where(~Q(foo=1)).where(bar=ColumnName('baz', self.table_abc))
         self.assertEqual('SELECT * FROM `abc` WHERE NOT `foo` = 1 AND `bar` = `abc`.`baz`', self.mysql.sql(stmt))
         self.assertEqual('SELECT * FROM "abc" WHERE NOT "foo" = 1 AND "bar" = "abc"."baz"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT * FROM "abc" WHERE NOT "foo" = 1 AND "bar" = "abc"."baz"', self.pg.sql(stmt))
@@ -360,7 +360,7 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT SUM("foo"), "bar" AS "bar01" FROM "abc" GROUP BY "bar01"', self.pg.sql(stmt))
 
     def test_group_by__alias_with_join(self):
-        table1 = TableName("table1").as_("t1")
+        table1 = Name("table1").as_("t1")
         bar = ColumnName("bar", table1.alias).as_("bar01")
         stmt = SelectStatement().from_(self.table_abc).join(table1).on(abc__id=ColumnName("t_ref", table1.alias)).select(fn.sum("foo"), bar).group_by(bar)
         self.assertEqual('SELECT SUM(`foo`), `t1`.`bar` AS `bar01` FROM `abc` JOIN `table1` AS `t1` ON `abc`.`id` = `t1`.`t_ref` GROUP BY `bar01`',
@@ -392,13 +392,18 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING (SUM("bar") > 1 AND SUM("bar") < 100)', self.pg.sql(stmt))
 
     def test_having_join_and_equality(self):
+        abc_foo = ColumnName('foo', self.table_abc)
+        abc_buz = ColumnName('buz', self.table_abc)
+        efg_foo = ColumnName('foo', self.table_efg)
+        efg_bar = ColumnName('bar', self.table_efg)
+
         stmt = (
             SelectStatement().from_(self.table_abc).join(self.table_efg)
-            .on(abc__foo=self.table_efg.foo)
-            .select(self.table_abc.foo, fn.sum(self.table_efg.bar), self.table_abc.buz)
-            .group_by(self.table_abc.foo)
+            .on(abc__foo=efg_foo)
+            .select(abc_foo, fn.sum(efg_bar), abc_buz)
+            .group_by(abc_foo)
             .having(abc__buz="fiz")
-            .having(fn.sum(self.table_efg.bar) > 100)
+            .having(fn.sum(efg_bar) > 100)
         )
 
         self.assertEqual('SELECT `abc`.`foo`, SUM(`efg`.`bar`), `abc`.`buz` FROM `abc` JOIN `efg` ON `abc`.`foo` = `efg`.`foo` '

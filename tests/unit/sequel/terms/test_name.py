@@ -1,7 +1,7 @@
 import unittest
 
 from sweet.sequel.terms import literal
-from sweet.sequel.terms.name import ColumnName, TableName
+from sweet.sequel.terms.name import ColumnName, Name
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
@@ -23,18 +23,18 @@ class TestName(unittest.TestCase):
         self.assertTrue(n3 == n2)
 
     def test_value(self):
-        self.assertEqual("users", TableName("users").value)
+        self.assertEqual("users", Name("users").value)
         self.assertEqual("name", ColumnName("name").value)
         self.assertEqual("users.name", ColumnName("users.name").value)
 
-    def test_sql_for_column_name_from_table_name(self):
-        t = TableName("users")
-        self.assertEqual('`users`.`age`', self.mysql.sql(t.age))
-        self.assertEqual('"users"."age"', self.sqlite.sql(t.age))
-        self.assertEqual('"users"."age"', self.pg.sql(t.age))
+    def test_sql_column_name_with_schema(self):
+        age = Name('age', "users")
+        self.assertEqual('`users`.`age`', self.mysql.sql(age))
+        self.assertEqual('"users"."age"', self.sqlite.sql(age))
+        self.assertEqual('"users"."age"', self.pg.sql(age))
 
     def test_sql_of_table_name(self):
-        n = TableName("users")
+        n = Name("users")
         self.assertEqual('`users`', self.mysql.sql(n))
         self.assertEqual('"users"', self.sqlite.sql(n))
         self.assertEqual('"users"', self.pg.sql(n))
