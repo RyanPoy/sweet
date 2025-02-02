@@ -1,6 +1,6 @@
 from typing import Self
 
-from sweet.sequel.terms import Term, literal
+from sweet.sequel.terms import Logic, Term, literal
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.name import ColumnName
 from sweet.sequel.terms.value import Value
@@ -12,9 +12,11 @@ class Fn(Term):
     def __init__(self, name: str) -> None:
         super().__init__()
         self.name = name
+        self._as = ""
         self.is_distinct = False
         self.columns = [literal.STAR]
         self.cmp_pairs = []
+        self.children = []
 
     def column(self, *column_names: [ColumnName | Literal | str]) -> Self:
         if column_names == ["*"] or column_names == [literal.STAR]:
@@ -37,6 +39,10 @@ class Fn(Term):
         self.is_distinct = True
         return self
 
+    def as_(self, name: str) -> Self:
+        self._as = ColumnName(name)
+        return self
+
     def __gt__(self, other: ColumnName | DBDataType) -> Self:
         return self.__compare(">", other)
 
@@ -54,6 +60,20 @@ class Fn(Term):
 
     def __ne__(self, other: ColumnName | DBDataType) -> Self:
         return self.__compare("<>", other)
+
+    def __and__(self, other: Self) -> Self:
+        return self.__combine(other, Logic.AND)
+
+    def __or__(self, other: Self) -> Self:
+        return self.__combine(other, Logic.OR)
+
+    def __combine(self, other: Self, logic_op: Logic) -> Self:
+        """Combines two Q objects with a logical operator (AND, OR)."""
+        if not isinstance(other, Fn):
+            raise TypeError("Logical operators can only be applied between two Fn objects.")
+
+        self.children.append((logic_op, other))
+        return self
 
     def __compare(self, op: str, value: ColumnName | DBDataType) -> Self:
         if isinstance(value, ColumnName):
