@@ -1,23 +1,17 @@
 from enum import Enum
 from typing import Self
 
-from sweet.sequel.terms import Term
+from sweet.sequel.terms import Logic, Term
 from sweet.sequel.terms.pair import Pair
 from sweet.utils import DBDataType
 
 
 class Q(Term):
-    class Logic(Enum):
-        AND = 'AND'
-        OR = 'OR'
-
-        def __str__(self):
-            return self.value
 
     def __init__(self, **kwargs: {str: DBDataType}) -> None:
         super().__init__()
 
-        self.logic_op = Q.Logic.AND
+        self.logic_op = Logic.AND
         self.children = []
         self.condition = None
         self.invert = False
@@ -71,10 +65,10 @@ class Q(Term):
         return hash(f'{self.__class__}-{hash(self.condition)}-{self.logic_op}-{''.join([hash(str(x)) for x in self.children])}')
 
     def __and__(self, other) -> Self:
-        return self.__combine(other, Q.Logic.AND)
+        return self.__combine(other, Logic.AND)
 
     def __or__(self, other) -> Self:
-        return self.__combine(other, Q.Logic.OR)
+        return self.__combine(other, Logic.OR)
 
     def __invert__(self) -> Self:
         self.invert = not self.invert
