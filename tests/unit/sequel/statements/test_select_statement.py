@@ -429,124 +429,84 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT SUM("foo"), "bar" AS "bar01" FROM "abc" ORDER BY "bar01"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT SUM("foo"), "bar" AS "bar01" FROM "abc" ORDER BY "bar01"', self.pg.sql(stmt))
 
-# class AliasTests(unittest.TestCase):
-#     t = Table("abc")
-#
-#     def test_table_field(self):
-#         stmt = SelectStatement().from_(self.table_abc).select(self.t.foo.as_("bar"))
-#
-#         self.assertEqual('SELECT "foo" "bar" FROM "abc"', self.mysql.sql(stmt))
-#
-#     def test_table_field__multi(self):
-#         stmt = SelectStatement().from_(self.table_abc).select(self.t.foo.as_("bar"), self.t.fiz.as_("buz"))
-#
-#         self.assertEqual('SELECT "foo" "bar","fiz" "buz" FROM "abc"', self.mysql.sql(stmt))
-#
-#     def test_arithmetic_function(self):
-#         stmt = SelectStatement().from_(self.table_abc).select((self.t.foo + self.t.bar).as_("biz"))
-#
-#         self.assertEqual('SELECT "foo"+"bar" "biz" FROM "abc"', self.mysql.sql(stmt))
-#
-#     def test_functions_using_as(self):
-#         stmt = SelectStatement().from_(self.table_abc).select(fn.Count(literal.STAR).as_("foo"))
-#
-#         self.assertEqual('SELECT COUNT(*) "foo" FROM "abc"', self.mysql.sql(stmt))
-#
-#     def test_functions_using_constructor_param(self):
-#         stmt = SelectStatement().from_(self.table_abc).select(fn.Count(literal.STAR, alias="foo"))
-#
-#         self.assertEqual('SELECT COUNT(*) "foo" FROM "abc"', self.mysql.sql(stmt))
-#
-#     def test_function_using_as_nested(self):
-#         """
-#         We don't show aliases of fields that are arguments of a function.
-#         """
-#         stmt = SelectStatement().from_(self.table_abc).select(fn.Sqrt(fn.Count(literal.STAR).as_("foo")).as_("bar"))
-#
-#         self.assertEqual('SELECT SQRT(COUNT(*)) "bar" FROM "abc"', self.mysql.sql(stmt))
-#
-#     def test_functions_using_constructor_param_nested(self):
-#         """
-#         We don't show aliases of fields that are arguments of a function.
-#         """
-#         stmt = SelectStatement().from_(self.table_abc).select(fn.Sqrt(fn.Count(literal.STAR, alias="foo"), alias="bar"))
-#
-#         self.assertEqual('SELECT SQRT(COUNT(*)) "bar" FROM "abc"', self.mysql.sql(stmt))
-#
-#     def test_ignored_in_where(self):
-#         stmt = SelectStatement().from_(self.table_abc).select(self.t.foo).where(self.t.foo.as_("bar") == 1)
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" WHERE "foo"=1', self.mysql.sql(stmt))
-#
-#     def test_ignored_in_groupby(self):
-#         stmt = SelectStatement().from_(self.table_abc).select(self.t.foo).group_by(self.t.foo.as_("bar"))
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" GROUP BY "foo"', self.mysql.sql(stmt))
-#
-#     def test_ignored_in_order_by(self):
-#         stmt = SelectStatement().from_(self.table_abc).select(self.t.foo).order_by(self.t.foo.as_("bar"))
-#
-#         self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo"', self.mysql.sql(stmt))
-#
-#     def test_ignored_in_criterion(self):
-#         c = self.t.foo.as_("bar") == 1
-#
-#         self.assertEqual('"foo"=1', str(c))
-#
-#     def test_ignored_in_criterion_comparison(self):
-#         c = self.t.foo.as_("bar") == self.t.fiz.as_("buz")
-#
-#         self.assertEqual('"foo"="fiz"', str(c))
-#
-#     def test_ignored_in_field_inside_case(self):
-#         stmt = SelectStatement().from_(self.table_abc).select(Case().when(self.t.foo == 1, "a").else_(self.t.bar.as_('"buz"')))
-#
-#         self.assertEqual('SELECT CASE WHEN "foo"=1 THEN \'a\' ELSE "bar" END FROM "abc"', self.mysql.sql(stmt))
-#
-#     def test_case_using_as(self):
-#         stmt = SelectStatement().from_(self.table_abc).select(Case().when(self.t.foo == 1, "a").else_("b").as_("bar"))
-#
-#         self.assertEqual(
-#             'SELECT CASE WHEN "foo"=1 THEN \'a\' ELSE \'b\' END "bar" FROM "abc"',
-#             str(q),
-#         )
-#
-#     def test_case_using_constructor_param(self):
-#         stmt = SelectStatement().from_(self.table_abc).select(Case(alias="bar").when(self.t.foo == 1, "a").else_("b"))
-#
-#         self.assertEqual(
-#             'SELECT CASE WHEN "foo"=1 THEN \'a\' ELSE \'b\' END "bar" FROM "abc"',
-#             str(q),
-#         )
-#
-#     def test_select__multiple_tables(self):
-#         table_abc, table_efg = Table("abc", alias="q0"), Table("efg", alias="q1")
-#
-#         stmt = SelectStatement().from_(table_abc).select(table_abc.foo).from_(table_efg).select(table_efg.bar)
-#
-#         self.assertEqual('SELECT "q0"."foo","q1"."bar" FROM "abc" "q0","efg" "q1"', self.mysql.sql(stmt))
-#
-#     def test_use_aliases_in_groupby_and_order_by(self):
-#         table_abc = Table("abc", alias="q0")
-#
-#         my_foo = table_abc.foo.as_("my_foo")
-#         stmt = SelectStatement().from_(table_abc).select(my_foo, table_abc.bar).group_by(my_foo).order_by(my_foo)
-#
-#         self.assertEqual(
-#             'SELECT "q0"."foo" "my_foo","q0"."bar" ' 'FROM "abc" "q0" ' 'GROUP BY "my_foo" ' 'ORDER BY "my_foo"',
-#             str(q),
-#         )
-#
-#     def test_table_with_schema_and_alias(self):
-#         table = Table("abc", schema="schema", alias="alias")
-#         self.assertEqual('"schema"."abc" "alias"', str(table))
-#
-#     def test_null_value_with_alias(self):
-#         stmt = Query.select(NullValue().as_("abcdef"))
-#
-#         self.assertEqual('SELECT NULL "abcdef"', self.mysql.sql(stmt))
-#
-#
+    def test_table_field(self):
+        bar = Name("foo").as_("bar")
+        stmt = SelectStatement().from_(self.table_abc).select(bar)
+        self.assertEqual('SELECT `foo` AS `bar` FROM `abc`', self.mysql.sql(stmt))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc"', self.sqlite.sql(stmt))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc"', self.pg.sql(stmt))
+
+    def test_table_field__multi(self):
+        stmt = SelectStatement().from_(self.table_abc).select(Name("foo").as_("bar"), Name("fiz").as_("buz"))
+        self.assertEqual('SELECT `foo` AS `bar`, `fiz` AS `buz` FROM `abc`', self.mysql.sql(stmt))
+        self.assertEqual('SELECT "foo" AS "bar", "fiz" AS "buz" FROM "abc"', self.sqlite.sql(stmt))
+        self.assertEqual('SELECT "foo" AS "bar", "fiz" AS "buz" FROM "abc"', self.pg.sql(stmt))
+
+    # def test_arithmetic_function(self):
+    #     """ @todo: support arithmetic """
+    #     stmt = SelectStatement().from_(self.table_abc).select((self.t.foo + self.t.bar).as_("biz"))
+    #     self.assertEqual('SELECT "foo"+"bar" "biz" FROM "abc"', self.mysql.sql(stmt))
+
+    def test_alias_functions(self):
+        stmt = SelectStatement().from_(self.table_abc).select(fn.count(literal.STAR).as_("foo"))
+        self.assertEqual('SELECT COUNT(*) AS `foo` FROM `abc`', self.mysql.sql(stmt))
+        self.assertEqual('SELECT COUNT(*) AS "foo" FROM "abc"', self.sqlite.sql(stmt))
+        self.assertEqual('SELECT COUNT(*) AS "foo" FROM "abc"', self.pg.sql(stmt))
+
+    def test_alias_function_using_as_nested(self):
+        """ We don't show aliases of fields that are arguments of a function. """
+        stmt = SelectStatement().from_(self.table_abc).select(fn.sqrt(fn.count(literal.STAR).as_("foo")).as_("bar"))
+        self.assertEqual('SELECT SQRT(COUNT(*)) AS `bar` FROM `abc`', self.mysql.sql(stmt))
+        self.assertEqual('SELECT SQRT(COUNT(*)) AS "bar" FROM "abc"', self.sqlite.sql(stmt))
+        self.assertEqual('SELECT SQRT(COUNT(*)) AS "bar" FROM "abc"', self.pg.sql(stmt))
+
+    def test_alias_in__group_by(self):
+        foo = Name('foo').as_('bar')
+        stmt = SelectStatement().from_(self.table_abc).select(foo).group_by(foo)
+        self.assertEqual('SELECT `foo` AS `bar` FROM `abc` GROUP BY `bar`', self.mysql.sql(stmt))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" GROUP BY "bar"', self.sqlite.sql(stmt))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" GROUP BY "bar"', self.pg.sql(stmt))
+
+    def test_alias_in__order_by(self):
+        foo = Name('foo').as_('bar')
+        stmt = SelectStatement().from_(self.table_abc).select(foo).order_by(foo)
+        self.assertEqual('SELECT `foo` AS `bar` FROM `abc` ORDER BY `bar`', self.mysql.sql(stmt))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" ORDER BY "bar"', self.sqlite.sql(stmt))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" ORDER BY "bar"', self.pg.sql(stmt))
+
+    def test_alias_ignored__in_value(self):
+        foo = Name('foo').as_('bar')
+        stmt = SelectStatement().from_(self.table_abc).select(foo).where(username=foo)
+        self.assertEqual('SELECT `foo` AS `bar` FROM `abc` WHERE `username` = `foo`', self.mysql.sql(stmt))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" WHERE "username" = "foo"', self.sqlite.sql(stmt))
+        self.assertEqual('SELECT "foo" AS "bar" FROM "abc" WHERE "username" = "foo"', self.pg.sql(stmt))
+
+    def test_select__multiple_tables(self):
+        table_abc = Name("abc").as_("t0")
+        table_efg = Name("efg").as_("t1")
+        foo = Name('foo', table_abc)
+        bar = Name('bar', table_efg)
+        stmt = SelectStatement().from_(table_abc).select(foo).from_(table_efg).select(bar)
+        self.assertEqual('SELECT `t0`.`foo`, `t1`.`bar` FROM `abc` AS `t0`, `efg` AS `t1`', self.mysql.sql(stmt))
+        self.assertEqual('SELECT "t0"."foo", "t1"."bar" FROM "abc" AS "t0", "efg" AS "t1"', self.sqlite.sql(stmt))
+        self.assertEqual('SELECT "t0"."foo", "t1"."bar" FROM "abc" AS "t0", "efg" AS "t1"', self.pg.sql(stmt))
+
+    def test_use_aliases_in__group_by_and_order_by(self):
+        table_abc = Name("abc").as_("t0")
+        my_foo = Name("foo", table_abc).as_("my_foo")
+        bar = Name("bar", table_abc)
+        stmt = SelectStatement().from_(table_abc).select(my_foo, bar).group_by(my_foo).order_by(my_foo)
+        self.assertEqual('SELECT `t0`.`foo` AS `my_foo`, `t0`.`bar` FROM `abc` AS `t0` GROUP BY `my_foo` ORDER BY `my_foo`', self.mysql.sql(stmt))
+        self.assertEqual('SELECT "t0"."foo" AS "my_foo", "t0"."bar" FROM "abc" AS "t0" GROUP BY "my_foo" ORDER BY "my_foo"', self.sqlite.sql(stmt))
+        self.assertEqual('SELECT "t0"."foo" AS "my_foo", "t0"."bar" FROM "abc" AS "t0" GROUP BY "my_foo" ORDER BY "my_foo"', self.pg.sql(stmt))
+
+    def test_table_with_schema_and_alias(self):
+        table = Name("abc", schema_name="schema").as_("alias")
+        stmt = SelectStatement().from_(table)
+        self.assertEqual('SELECT * FROM `schema`.`abc` AS `alias`', self.mysql.sql(stmt))
+        self.assertEqual('SELECT * FROM "schema"."abc" AS "alias"', self.sqlite.sql(stmt))
+        self.assertEqual('SELECT * FROM "schema"."abc" AS "alias"', self.pg.sql(stmt))
+
 # class SubqueryTests(unittest.TestCase):
 #     maxDiff = None
 #
@@ -719,7 +679,7 @@ class TestSelectStatement(unittest.TestCase):
 #
 #     def test_with(self):
 #         sub_query = SelectStatement().from_(self.table_efg).select("fizz")
-#         test_query = Query.with_(sub_query, "an_alias").from_(AliasedQuery("an_alias"))
+#         test_query = SelectStatement().with_(sub_query, "an_alias").from_(AliasedQuery("an_alias"))
 #
 #         self.assertEqual(
 #             'WITH an_alias AS (SELECT "fizz" FROM "efg") SELECT * FROM an_alias',
@@ -729,7 +689,7 @@ class TestSelectStatement(unittest.TestCase):
 #     def test_join_with_with(self):
 #         sub_query = SelectStatement().from_(self.table_efg).select("fizz")
 #         test_query = (
-#             Query.with_(sub_query, "an_alias")
+#             SelectStatement().with_(sub_query, "an_alias")
 #             .from_(self.table_abc)
 #             .join(AliasedQuery("an_alias"))
 #             .on(AliasedQuery("an_alias").fizz == self.table_abc.buzz)
@@ -742,8 +702,8 @@ class TestSelectStatement(unittest.TestCase):
 #         )
 #
 #     def test_select_from_with_returning(self):
-#         sub_query = PostgreSQLQuery.into(self.table_abc).insert(1).returning('*')
-#         test_query = Query.with_(sub_query, "an_alias").from_(AliasedQuery("an_alias"))
+#         sub_query = SelectStatement().into(self.table_abc).insert(1).returning('*')
+#         test_query = SelectStatement().with_(sub_query, "an_alias").from_(AliasedQuery("an_alias"))
 #         self.assertEqual(
 #             'WITH an_alias AS (INSERT INTO "abc" VALUES (1) RETURNING *) SELECT * FROM an_alias', str(test_query)
 #         )

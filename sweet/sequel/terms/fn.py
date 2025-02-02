@@ -1,3 +1,4 @@
+import copy
 from typing import Self
 
 from sweet.sequel.terms import Logic, literal
@@ -9,22 +10,30 @@ from sweet.utils import DBDataType
 
 class Fn:
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, parentheses: bool = True) -> None:
         super().__init__()
         self.name = name
-        self._as = ""
-        self.is_distinct = False
-        self.columns = [literal.STAR]
+        self.parentheses = parentheses
+        self.alias = ""
+        self.columns = []
         self.cmp_pairs = []
-        self.children = []
+        self.chain = []
+        self.nesting = None
 
-    def column(self, *column_names: Name | Literal) -> Self:
+    def column(self, *column_names: Name | Literal | Self) -> Self:
         if column_names == [literal.STAR]:
             return self
         cns = []
         for c in column_names:
             if isinstance(c, (Name, Literal)):
                 cns.append(c)
+            elif isinstance(c, Fn):
+                if c.alias:
+                    new_fn = copy.deepcopy(c)
+                    new_fn.alias = ""
+                    self.nesting = new_fn
+                else:
+                    self.nesting = c
             else:
                 raise ValueError(f"Support Name and Literal，but got[{c}] ")
 
@@ -35,11 +44,17 @@ class Fn:
         return self
 
     def distinct(self) -> Self:
-        self.is_distinct = True
-        return self
+        dis = distinct()
+        self_copied = copy.deepcopy(self)
+        self_copied.name = dis.name # change self_copied to distinct Fn
+        self_copied.parentheses = False
+        new_self = Fn(self.name)
+
+        new_self.nesting = self_copied
+        return new_self
 
     def as_(self, name: str) -> Self:
-        self._as = Name(name)
+        self.alias = Name(name)
         return self
 
     def __gt__(self, other: Name | DBDataType) -> Self:
@@ -71,7 +86,7 @@ class Fn:
         if not isinstance(other, Fn):
             raise TypeError("Logical operators can only be applied between two Fn objects.")
 
-        self.children.append((logic_op, other))
+        self.chain.append((logic_op, other))
         return self
 
     def __compare(self, op: str, value: Name | DBDataType) -> Self:
@@ -85,3 +100,5 @@ class Fn:
 count = lambda *columns: Fn("COUNT").column(*columns)
 sum = lambda *columns: Fn("SUM").column(*columns)
 avg = lambda *columns: Fn("AVERAGE").column(*columns)
+sqrt = lambda *columns: Fn("SQRT").column(*columns)
+distinct = lambda *columns: Fn("DISTINCT", False).column(*columns)

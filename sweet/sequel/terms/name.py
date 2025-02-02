@@ -26,7 +26,10 @@ class Name:
         elif isinstance(schema_name, str):
             self.schema_name: str = schema_name
         elif isinstance(schema_name, Name):
-            self.schema_name = schema_name.value
+            if schema_name.alias:
+                self.schema_name = schema_name.alias
+            else:
+                self.schema_name = schema_name.value
 
     def as_(self, alias: str) -> Self:
         self.alias = alias

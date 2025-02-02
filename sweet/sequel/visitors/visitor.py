@@ -1,3 +1,4 @@
+import copy
 from typing import Callable
 
 from sweet.sequel.collectors import SQLCollector
@@ -43,25 +44,30 @@ class Visitor:
         return sql << l.v
 
     def visit_Fn(self, f: Fn, sql: SQLCollector) -> SQLCollector:
-        if f.children:
+        if f.chain:
             sql << "("
-        sql << f.name << "("
-        if f.is_distinct:
-            sql << "DISTINCT "
+        sql << f.name
+        if f.parentheses:
+            sql << "("
+        else:
+            sql << " "
+        if f.nesting:
+            self.visit_Fn(f.nesting, sql)
         for i, column in enumerate(f.columns):
             if i != 0: sql << ", "
             self.visit(column, sql)
-        sql << ")"
+        if f.parentheses:
+            sql << ")"
         for i, pair in enumerate(f.cmp_pairs):
             sql << f" {pair[0]} "
             self.visit(pair[1], sql)
-        for i, (logic_op, child) in enumerate(f.children):
+        for i, (logic_op, child) in enumerate(f.chain):
             sql << f" {str(logic_op)} "
             self.visit_Fn(child, sql)
-        if f._as:
+        if f.alias:
             sql << " AS "
-            self.visit(f._as, sql)
-        if f.children:
+            self.visit(f.alias, sql)
+        if f.chain:
             sql << ")"
         return sql
 
@@ -97,7 +103,12 @@ class Visitor:
             sql << f"{quote_value(p.value[0])} AND {quote_value(p.value[1])}"
         else:
             if isinstance(p.value, Name):
-                self.visit(p.value, sql)
+                if p.value.alias:
+                    new_value = copy.deepcopy(p.value)
+                    new_value.alias = ""
+                    self.visit_Name(new_value, sql)
+                else:
+                    self.visit_Name(p.value, sql)
             else:
                 sql << quote_condition(p.value)
         return sql
