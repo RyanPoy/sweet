@@ -140,8 +140,6 @@ class SelectStatement(Statement):
         tp = type(table)
         if tp is TableName:
             self.__check_repetitive_tables(table, cs)
-        # elif tp is Alias:
-        #     cs.append(table)
         elif tp is SelectStatement:
             if self.__check_circular_reference(table):
                 raise ValueError("Circular reference detected in subquery nesting.")
