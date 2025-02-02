@@ -26,7 +26,7 @@ class TestFn(unittest.TestCase):
         self.assertEqual('COUNT("bar")', self.sqlite.sql(func))
         self.assertEqual('COUNT("bar")', self.pg.sql(func))
 
-    def test_count__columnName(self):
+    def test_count__Name(self):
         func = fn.count(Name("bar"))
         self.assertEqual('COUNT(`bar`)', self.mysql.sql(func))
         self.assertEqual('COUNT("bar")', self.sqlite.sql(func))

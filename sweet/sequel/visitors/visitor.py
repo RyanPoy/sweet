@@ -31,7 +31,7 @@ class Visitor:
             return self.quote_column_name(column.name)
         return self.quote_column_name(column)
 
-    def _quote_table_name_or_column_name(self, name) -> str:
+    def quote_column_name(self, name) -> str:
         pointer = "."
         if "__" in name:
             name = name.replace("__", pointer)
@@ -39,17 +39,8 @@ class Visitor:
             return pointer.join([f'{self.qchar}{n}{self.qchar}' for n in name.split(pointer)])
         return f'{self.qchar}{name}{self.qchar}'
 
-    quote_table_name = _quote_table_name_or_column_name
-    quote_column_name = _quote_table_name_or_column_name
-
     def quote_values(self, values):
         return quote_for_values(values)
-
-    def visit_Table(self, t: Table, sql: SQLCollector) -> SQLCollector:
-        return sql << t.name_quoted
-
-    def visit_Name(self, n: Name, sql: SQLCollector) -> SQLCollector:
-        return self.visit_Name(n, sql)
 
     def visit_Name(self, n: Name, sql: SQLCollector) -> SQLCollector:
         if n.schema_name:

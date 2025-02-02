@@ -84,9 +84,7 @@ class TestInsertStatement(unittest.TestCase):
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)", self.pg.sql(stmt))
 
     def test_insert_selected_columns(self):
-        stmt = InsertStatement().into(self.table_users) \
-                .column(Name("foo"), Name("bar"), Name("buz")) \
-                .insert(1, "a", True)
+        stmt = InsertStatement().into(self.table_users).column(Name("foo"), Name("bar"), Name("buz")).insert(1, "a", True)
         self.assertEqual('INSERT INTO `users` (`foo`, `bar`, `buz`) VALUES (1, \'a\', 1)', self.mysql.sql(stmt))
         self.assertEqual('INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)', self.sqlite.sql(stmt))
         self.assertEqual('INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)', self.pg.sql(stmt))

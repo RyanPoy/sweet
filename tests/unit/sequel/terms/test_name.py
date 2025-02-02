@@ -14,7 +14,7 @@ class TestName(unittest.TestCase):
         self.sqlite = SQLiteVisitor()
         self.pg = PostgreSQLVisitor()
 
-    def test_columnname__equals_star(self):
+    def test_name__equals_star(self):
         n1 = Name("*")
         n2 = "*"
         n3 = literal.STAR
@@ -28,13 +28,13 @@ class TestName(unittest.TestCase):
         self.assertEqual("name", Name("name").value)
         self.assertEqual("users.name", Name("users.name").value)
 
-    def test_sql_column_name_with_schema(self):
+    def test_sql_name_with_schema(self):
         age = Name('age', "users")
         self.assertEqual('`users`.`age`', self.mysql.sql(age))
         self.assertEqual('"users"."age"', self.sqlite.sql(age))
         self.assertEqual('"users"."age"', self.pg.sql(age))
 
-    def test_sql_of_column_name(self):
+    def test_sql_of_name(self):
         n = Name("name")
         self.assertEqual('`name`', self.mysql.sql(n))
         self.assertEqual('"name"', self.sqlite.sql(n))
@@ -44,6 +44,12 @@ class TestName(unittest.TestCase):
         self.assertEqual('`users`.`name`', self.mysql.sql(n))
         self.assertEqual('"users"."name"', self.sqlite.sql(n))
         self.assertEqual('"users"."name"', self.pg.sql(n))
+
+    def test_sql_of_name_alias(self):
+        alias = Name("id").as_("user_id")
+        self.assertEqual('`id` AS `user_id`', self.mysql.sql(alias))
+        self.assertEqual('"id" AS "user_id"', self.sqlite.sql(alias))
+        self.assertEqual('"id" AS "user_id"', self.pg.sql(alias))
 
 
 if __name__ == '__main__':
