@@ -14,16 +14,16 @@ from sweet.utils import DBDataType
 class SelectStatement(Statement):
     """
     SELECT
-      ├── Columns
+      ├── Columns (Name class)
       ├── From
-      │   └── table
+      │   └── Table (Name class)
       ├── Where
       │   └── Condition
       │       ├── column
       │       └── operator
       │       └── value
       ├── Group By
-      │   ├── columns
+      │   ├── Columns (Name class)
       ├── Where
       │   └── Condition
       │       ├── column
@@ -116,22 +116,15 @@ class SelectStatement(Statement):
     def on(self, *qs: Q, **kwargs) -> Self:
         return self.__where_or_on(self.ons, *qs, **kwargs)
 
-    def group_by(self, *column_names: Name | DBDataType) -> Self:
+    def group_by(self, *column_names: Name) -> Self:
         for c in column_names:
-            if c == '*':
-                self.groups.append(literal.STAR)
-            if isinstance(c, Name):
-                if c.alias:
-                    self.groups.append(Name(c.alias))
-                else:
-                    self.groups.append(c)
-            elif isinstance(c, (str, )):
-                self.groups.append(Name(c))
+            if c.alias:
+                self.groups.append(Name(c.alias))
             else:
-                self.groups.append(Value(c))
+                self.groups.append(c)
         return self
 
-    def order_by(self, *column_names: Name | DBDataType, sorted_in: SortedIn = None) -> Self:
+    def order_by(self, *column_names: Name, sorted_in: SortedIn = None) -> Self:
         order = OrderClause(*column_names, sorted_in=sorted_in)
         self.orders.append(order)
         return self

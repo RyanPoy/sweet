@@ -15,19 +15,11 @@ class SortedIn(Enum):
 
 class OrderClause:
 
-    def __init__(self, *column_names: Name | DBDataType, sorted_in: SortedIn = None) -> None:
+    def __init__(self, *column_names: Name, sorted_in: SortedIn = None) -> None:
         self.orders = []
         self.sorted_in: SortedIn = sorted_in
-
         for c in column_names:
-            if c == '*':
-                self.orders.append(literal.STAR)
-            if isinstance(c, Name):
-                if c.alias:
-                    self.orders.append(Name(c.alias))
-                else:
-                    self.orders.append(c)
-            elif isinstance(c, (str, )):
-                self.orders.append(Name(c))
+            if c.alias:
+                self.orders.append(Name(c.alias))
             else:
-                self.orders.append(Value(c))
+                self.orders.append(c)

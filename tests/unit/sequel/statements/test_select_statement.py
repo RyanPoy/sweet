@@ -314,13 +314,15 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT "foo", COUNT(*) FROM "abc" GROUP BY "foo"', self.pg.sql(stmt))
 
     def test_group_by__count_field(self):
-        stmt = SelectStatement().from_(self.table_abc).group_by("foo").select(Name("foo"), fn.count("bar"))
+        foo = Name("foo")
+        stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, fn.count("bar"))
         self.assertEqual('SELECT `foo`, COUNT(`bar`) FROM `abc` GROUP BY `foo`', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo", COUNT("bar") FROM "abc" GROUP BY "foo"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo", COUNT("bar") FROM "abc" GROUP BY "foo"', self.pg.sql(stmt))
 
     def test_group_by__count_distinct(self):
-        stmt = SelectStatement().from_(self.table_abc).group_by("foo").select(Name("foo"), fn.count("*").distinct())
+        foo = Name("foo")
+        stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, fn.count("*").distinct())
         self.assertEqual('SELECT `foo`, COUNT(DISTINCT *) FROM `abc` GROUP BY `foo`', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY "foo"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY "foo"', self.pg.sql(stmt))
@@ -339,18 +341,6 @@ class TestSelectStatement(unittest.TestCase):
     #     self.assertEqual('SELECT "foo", SUM("bar") FILTER(WHERE "id"=1 AND "cid">2) FROM "abc" GROUP BY "foo"', self.mysql.sql(stmt))
     #     self.assertEqual('SELECT "foo", SUM("bar") FILTER(WHERE "id"=1 AND "cid">2) FROM "abc" GROUP BY "foo"', self.mysql.sql(stmt))
     #     self.assertEqual('SELECT "foo", SUM("bar") FILTER(WHERE "id"=1 AND "cid">2) FROM "abc" GROUP BY "foo"', self.mysql.sql(stmt))
-
-    def test_group_by__str(self):
-        stmt = SelectStatement().from_(self.table_abc).group_by("foo").select(Name("foo"), fn.count("*").distinct())
-        self.assertEqual('SELECT `foo`, COUNT(DISTINCT *) FROM `abc` GROUP BY `foo`', self.mysql.sql(stmt))
-        self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY "foo"', self.sqlite.sql(stmt))
-        self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY "foo"', self.pg.sql(stmt))
-
-    def test_group_by__int(self):
-        stmt = SelectStatement().from_(self.table_abc).group_by(1).select(Name("foo"), fn.count("*").distinct())
-        self.assertEqual('SELECT `foo`, COUNT(DISTINCT *) FROM `abc` GROUP BY 1', self.mysql.sql(stmt))
-        self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY 1', self.sqlite.sql(stmt))
-        self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY 1', self.pg.sql(stmt))
 
     def test_group_by__alias(self):
         bar = Name("bar").as_("bar01")
@@ -425,12 +415,6 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT `foo`, `bar` FROM `abc` ORDER BY `foo`, `bar`', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo", "bar" FROM "abc" ORDER BY "foo", "bar"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo", "bar" FROM "abc" ORDER BY "foo", "bar"', self.pg.sql(stmt))
-
-    def test_order_by__single_str(self):
-        stmt = SelectStatement().from_(self.table_abc).order_by("foo").select(Name("foo"))
-        self.assertEqual('SELECT `foo` FROM `abc` ORDER BY `foo`', self.mysql.sql(stmt))
-        self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo"', self.sqlite.sql(stmt))
-        self.assertEqual('SELECT "foo" FROM "abc" ORDER BY "foo"', self.pg.sql(stmt))
 
     def test_order_by_asc(self):
         foo = Name("foo")
