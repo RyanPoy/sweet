@@ -1,9 +1,8 @@
-from sweet.sequel.terms import Term
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.name import ColumnName
 
 
-class Lock(Term):
+class Lock:
 
     def __init__(self, share: bool = False, nowait: bool = False, skip: bool = False, of: (str,) = ()) -> None:
         super().__init__()

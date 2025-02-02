@@ -45,7 +45,7 @@ class DeleteStatement(Statement):
         stmt.where(id__lt=10).where(Q(name__like="%abc") | Q(name="lucy"))
 
         # generator the sql of database (e.g. MySQL)
-        stmt.sql(MySQLVisitor())
+        MySQLVisitor().sql(stmt)
     """
     def __init__(self) -> None:
         super().__init__()

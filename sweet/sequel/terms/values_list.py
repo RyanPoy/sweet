@@ -1,10 +1,9 @@
 from typing import Self
 
-from sweet.sequel.terms import Term
 from sweet.utils import DBDataType
 
 
-class ValuesList(Term):
+class ValuesList:
     """
     Represents a collection of rows to be used in SQL statements, such as INSERT or UPDATE.
     Each row is a tuple of value, and all rows must have consistent column length.

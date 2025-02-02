@@ -45,7 +45,7 @@ class UpdateStatement(Statement):
         stmt.where(name="lily").where(Q(gender='m'))
 
         # generate SQL (e.g., for MySQL)
-        stmt.sql(MySQLVisitor())
+        MySQLVisitor().sql(stmt)
     """
     def __init__(self):
         super().__init__()

@@ -29,26 +29,26 @@ class TestName(unittest.TestCase):
 
     def test_sql_for_column_name_from_table_name(self):
         t = TableName("users")
-        self.assertEqual('`users`.`age`', t.age.sql(self.mysql))
-        self.assertEqual('"users"."age"', t.age.sql(self.sqlite))
-        self.assertEqual('"users"."age"', t.age.sql(self.pg))
+        self.assertEqual('`users`.`age`', self.mysql.sql(t.age))
+        self.assertEqual('"users"."age"', self.sqlite.sql(t.age))
+        self.assertEqual('"users"."age"', self.pg.sql(t.age))
 
     def test_sql_of_table_name(self):
         n = TableName("users")
-        self.assertEqual('`users`', n.sql(self.mysql))
-        self.assertEqual('"users"', n.sql(self.sqlite))
-        self.assertEqual('"users"', n.sql(self.pg))
+        self.assertEqual('`users`', self.mysql.sql(n))
+        self.assertEqual('"users"', self.sqlite.sql(n))
+        self.assertEqual('"users"', self.pg.sql(n))
 
     def test_sql_of_column_name(self):
         n = ColumnName("name")
-        self.assertEqual('`name`', n.sql(self.mysql))
-        self.assertEqual('"name"', n.sql(self.sqlite))
-        self.assertEqual('"name"', n.sql(self.pg))
+        self.assertEqual('`name`', self.mysql.sql(n))
+        self.assertEqual('"name"', self.sqlite.sql(n))
+        self.assertEqual('"name"', self.pg.sql(n))
 
         n = ColumnName("users.name")
-        self.assertEqual('`users`.`name`', n.sql(self.mysql))
-        self.assertEqual('"users"."name"', n.sql(self.sqlite))
-        self.assertEqual('"users"."name"', n.sql(self.pg))
+        self.assertEqual('`users`.`name`', self.mysql.sql(n))
+        self.assertEqual('"users"."name"', self.sqlite.sql(n))
+        self.assertEqual('"users"."name"', self.pg.sql(n))
 
 
 if __name__ == '__main__':

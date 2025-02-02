@@ -1,10 +1,9 @@
 from typing import Optional, Self
 
-from sweet.sequel.terms import Term
 from sweet.sequel.terms.literal import Literal, STAR
 
 
-class Name(Term):
+class Name:
     """
     Represents a generic name term in a SQL statement (e.g., table name, column name, alias).
 

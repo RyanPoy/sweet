@@ -1,7 +1,6 @@
 from enum import Enum
 from typing import Self
 
-from sweet.sequel.terms import Term
 from sweet.sequel.terms.name import ColumnName
 from sweet.utils import DBDataType, quote
 
@@ -27,7 +26,7 @@ class Operator(Enum):
         return self.value
 
 
-class Pair(Term):
+class Pair:
     """
     Represents a SQL condition, which can include comparisons, logical checks, and containment checks.
 

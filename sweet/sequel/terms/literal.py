@@ -1,9 +1,7 @@
 from typing import Self
 
-from sweet.sequel.terms import Term
 
-
-class Literal(Term):
+class Literal:
 
     def __init__(self, v):
         super().__init__()

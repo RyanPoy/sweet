@@ -1,13 +1,13 @@
 from typing import Self
 
-from sweet.sequel.terms import Logic, Term, literal
+from sweet.sequel.terms import Logic, literal
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.name import ColumnName
 from sweet.sequel.terms.value import Value
 from sweet.utils import DBDataType
 
 
-class Fn(Term):
+class Fn:
 
     def __init__(self, name: str) -> None:
         super().__init__()

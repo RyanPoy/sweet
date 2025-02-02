@@ -1,5 +1,5 @@
 from enum import Enum
-from sweet.sequel.terms import Term, literal
+from sweet.sequel.terms import literal
 from sweet.sequel.terms.name import ColumnName
 from sweet.sequel.terms.value import Value
 from sweet.utils import DBDataType
@@ -13,7 +13,7 @@ class SortedIn(Enum):
         return self.value
 
 
-class OrderClause(Term):
+class OrderClause:
 
     def __init__(self, *column_names: ColumnName | DBDataType, sorted_in: SortedIn = None) -> None:
         self.orders = []

@@ -288,6 +288,9 @@ class Visitor:
             self.visit(stmt.lock, sql)
         return sql
 
+    def sql(self, o: any) -> str:
+        return str(self.visit(o))
+
     def visit(self, o: any, sql: SQLCollector = None) -> SQLCollector:
         method = self.dispatch(o)
         if sql is None:

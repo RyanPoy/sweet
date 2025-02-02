@@ -55,7 +55,7 @@ class InsertStatement(Statement):
         stmt.replace_rows([ (1, "Lucy"), (2, "Lily") ]) # listing multiple insert for batch processing
 
         # generator the sql of database (e.g. MySQL)
-        stmt.sql(MySQLVisitor())
+        MySQLVisitor().sql(stmt)
     Todo: support Source of ast
     """
 

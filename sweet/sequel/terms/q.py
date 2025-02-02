@@ -1,12 +1,12 @@
 from enum import Enum
 from typing import Self
 
-from sweet.sequel.terms import Logic, Term
+from sweet.sequel.terms import Logic
 from sweet.sequel.terms.pair import Pair
 from sweet.utils import DBDataType
 
 
-class Q(Term):
+class Q:
 
     def __init__(self, **kwargs: {str: DBDataType}) -> None:
         super().__init__()

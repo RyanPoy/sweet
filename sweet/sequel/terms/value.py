@@ -1,8 +1,7 @@
-from sweet.sequel.terms import Term
 from sweet.utils import DBDataType
 
 
-class Value(Term):
+class Value:
     """
     Represents a value in a SQL statement.
 
@@ -14,7 +13,7 @@ class Value(Term):
         self.v = v
 
 
-class Regexp(Term):
+class Regexp:
     """
     Represents a value in a SQL statement.
 
