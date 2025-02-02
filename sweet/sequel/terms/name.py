@@ -21,9 +21,12 @@ class Name:
         super().__init__()
         self.value: str = name
         self.alias: Optional[str] = None
-        self.schema_name = None
-        if schema_name is not None:
-            self.schema_name: str = schema_name if isinstance(schema_name, str) else schema_name.value
+        if schema_name is None:
+            self.schema_name = None
+        elif isinstance(schema_name, str):
+            self.schema_name: str = schema_name
+        elif isinstance(schema_name, Name):
+            self.schema_name = schema_name.value
 
     def as_(self, alias: str) -> Self:
         self.alias = alias
