@@ -19,8 +19,12 @@ def qs(s: str) -> str:
     return s.replace("\\", '\\\\').replace("'", "''")
 
 
-def quote_for_values(value: DBDataType) -> str:
+def quote_value(value: DBDataType) -> str:
     return quote(value, "[", "]")
+
+
+def quote_condition(value: DBDataType) -> str:
+    return quote(value, "(", ")")
 
 
 def quote(value: DBDataType, begin: str = "[", end: str = "]") -> str:
@@ -83,7 +87,7 @@ date2str = lambda d, format='%Y-%m-%d': d.strftime(format)
 
 datetime2date = lambda dt: date(dt.year, dt.month, dt.day)
 str2binary = lambda v: v.encode('utf-8')  # Used to convert from Strings to BLOBs
-binary2str = lambda v: v.decode("utf-8")   # Used to convert from BLOBs to Strings
+binary2str = lambda v: v.decode("utf-8")  # Used to convert from BLOBs to Strings
 
 microseconds = lambda t: to_i((to_f(t) % 1) * 1000000)  # '0.123456' -> 123456; '1.123456' -> 123456
 

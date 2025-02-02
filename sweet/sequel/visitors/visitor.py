@@ -2,7 +2,6 @@ from typing import Callable
 
 from sweet.sequel.collectors import SQLCollector
 from sweet.sequel.schema.columns import Column
-from sweet.sequel.schema.table import Table
 from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
@@ -16,15 +15,12 @@ from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Regexp, Value
 from sweet.sequel.terms.values_list import ValuesList
-from sweet.utils import DBDataType, quote, quote_for_values
+from sweet.utils import quote, quote_condition, quote_value
 
 
 class Visitor:
     visit_methods_dict = {}
     qchar = '"'
-
-    def quote_condition(self, value: DBDataType) -> str:
-        return quote(value, "(", ")")
 
     def quote_column(self, column: Column | str):
         if isinstance(column, Column):
@@ -38,9 +34,6 @@ class Visitor:
         if pointer in name:
             return pointer.join([f'{self.qchar}{n}{self.qchar}' for n in name.split(pointer)])
         return f'{self.qchar}{name}{self.qchar}'
-
-    def quote_values(self, values):
-        return quote_for_values(values)
 
     def visit_Name(self, n: Name, sql: SQLCollector) -> SQLCollector:
         if n.schema_name:
@@ -110,12 +103,12 @@ class Visitor:
         sql << self.quote_column_name(p.field)
         sql << f" {str(p.operator)} "
         if p.operator == Operator.BETWEEN or p.operator == Operator.NOT_BETWEEN:
-            sql << f"{self.quote_values(p.value[0])} AND {self.quote_values(p.value[1])}"
+            sql << f"{quote_value(p.value[0])} AND {quote_value(p.value[1])}"
         else:
             if isinstance(p.value, Name):
                 self.visit(p.value, sql)
             else:
-                sql << self.quote_condition(p.value)
+                sql << quote_condition(p.value)
         return sql
 
     def visit_Value(self, v: Value, sql: SQLCollector) -> SQLCollector:
@@ -127,7 +120,7 @@ class Visitor:
     def visit_ValuesList(self, values: ValuesList, sql: SQLCollector) -> SQLCollector:
         for i, vs in enumerate(values.data):
             if i != 0: sql << ", "
-            sql << "(" << ', '.join([self.quote_values(v) for v in vs]) << ")"
+            sql << "(" << ', '.join([quote_value(v) for v in vs]) << ")"
         return sql
 
     def visit_InsertStatement(self, stmt: InsertStatement, sql: SQLCollector) -> SQLCollector:
@@ -165,7 +158,7 @@ class Visitor:
             i = 0
             for k, v in stmt.sets.items():
                 if i != 0: sql << ", "
-                sql << f"{self.quote_column_name(k)} = {self.quote_values(v)}"
+                sql << f"{self.quote_column_name(k)} = {quote_value(v)}"
                 i += 1
         if stmt.wheres:
             sql << " WHERE "
