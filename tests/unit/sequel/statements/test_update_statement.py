@@ -17,42 +17,42 @@ class TestUpdateStatement(unittest.TestCase):
         self.table_users = TableName("users")
 
     def test_empty_query(self):
-        um = UpdateStatement().update(self.table_users)
-        self.assertEqual("", um.sql(self.mysql))
-        self.assertEqual("", um.sql(self.sqlite))
-        self.assertEqual("", um.sql(self.pg))
+        stmt = UpdateStatement().update(self.table_users)
+        self.assertEqual("", self.mysql.sql(stmt))
+        self.assertEqual("", self.sqlite.sql(stmt))
+        self.assertEqual("", self.pg.sql(stmt))
 
     def test_omit_where(self):
-        um = UpdateStatement().update(self.table_users).set(foo="bar")
-        self.assertEqual('UPDATE `users` SET `foo` = \'bar\'', um.sql(self.mysql))
-        self.assertEqual('UPDATE "users" SET "foo" = \'bar\'', um.sql(self.sqlite))
-        self.assertEqual('UPDATE "users" SET "foo" = \'bar\'', um.sql(self.pg))
+        stmt = UpdateStatement().update(self.table_users).set(foo="bar")
+        self.assertEqual('UPDATE `users` SET `foo` = \'bar\'', self.mysql.sql(stmt))
+        self.assertEqual('UPDATE "users" SET "foo" = \'bar\'', self.sqlite.sql(stmt))
+        self.assertEqual('UPDATE "users" SET "foo" = \'bar\'', self.pg.sql(stmt))
 
     def test_single_quote_escape_in_set(self):
-        um = UpdateStatement().update(self.table_users).set(foo="bar'foo")
-        self.assertEqual("UPDATE `users` SET `foo` = 'bar''foo'", um.sql(self.mysql))
-        self.assertEqual("UPDATE \"users\" SET \"foo\" = 'bar''foo'", um.sql(self.sqlite))
-        self.assertEqual("UPDATE \"users\" SET \"foo\" = 'bar''foo'", um.sql(self.pg))
+        stmt = UpdateStatement().update(self.table_users).set(foo="bar'foo")
+        self.assertEqual("UPDATE `users` SET `foo` = 'bar''foo'", self.mysql.sql(stmt))
+        self.assertEqual("UPDATE \"users\" SET \"foo\" = 'bar''foo'", self.sqlite.sql(stmt))
+        self.assertEqual("UPDATE \"users\" SET \"foo\" = 'bar''foo'", self.pg.sql(stmt))
 
     def test_update__table_schema(self):
-        um = UpdateStatement().update(TableName("schema1.users")).set(foo=1).where(foo=0)
+        stmt = UpdateStatement().update(TableName("schema1.users")).set(foo=1).where(foo=0)
 
-        self.assertEqual('UPDATE `schema1`.`users` SET `foo` = 1 WHERE `foo` = 0', um.sql(self.mysql))
-        self.assertEqual('UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0', um.sql(self.sqlite))
-        self.assertEqual('UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0', um.sql(self.pg))
+        self.assertEqual('UPDATE `schema1`.`users` SET `foo` = 1 WHERE `foo` = 0', self.mysql.sql(stmt))
+        self.assertEqual('UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0', self.sqlite.sql(stmt))
+        self.assertEqual('UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0', self.pg.sql(stmt))
 
     def test_update_with_none(self):
-        um = UpdateStatement().update(self.table_users).set(foo=None)
-        self.assertEqual('UPDATE `users` SET `foo` = NULL', um.sql(self.mysql))
-        self.assertEqual('UPDATE "users" SET "foo" = NULL', um.sql(self.sqlite))
-        self.assertEqual('UPDATE "users" SET "foo" = NULL', um.sql(self.pg))
+        stmt = UpdateStatement().update(self.table_users).set(foo=None)
+        self.assertEqual('UPDATE `users` SET `foo` = NULL', self.mysql.sql(stmt))
+        self.assertEqual('UPDATE "users" SET "foo" = NULL', self.sqlite.sql(stmt))
+        self.assertEqual('UPDATE "users" SET "foo" = NULL', self.pg.sql(stmt))
 
     # def test_update_with_join(self):
     #     table_def = Table("def")
-    #     um = UpdateStatement().update(self.table_users).set(foo=None).join(table_def).on(abc_id=self.table_users.id).set(lname=table_def.lname)
-    #     self.assertEqual('UPDATE "users" JOIN "def" ON "def"."abc_id" = "users"."id" SET "lname" = "def"."lname"', um.sql(self.mysql))
-    #     self.assertEqual('UPDATE "users" JOIN "def" ON "def"."abc_id" = "users"."id" SET "lname" = "def"."lname"', um.sql(self.sqlite))
-    #     self.assertEqual('UPDATE "users" JOIN "def" ON "def"."abc_id" = "users"."id" SET "lname" = "def"."lname"', um.sql(self.pg))
+    #     stmt = UpdateStatement().update(self.table_users).set(foo=None).join(table_def).on(abc_id=self.table_users.id).set(lname=table_def.lname)
+    #     self.assertEqual('UPDATE "users" JOIN "def" ON "def"."abc_id" = "users"."id" SET "lname" = "def"."lname"', self.mysql.sql(stmt))
+    #     self.assertEqual('UPDATE "users" JOIN "def" ON "def"."abc_id" = "users"."id" SET "lname" = "def"."lname"', self.sqlite.sql(stmt))
+    #     self.assertEqual('UPDATE "users" JOIN "def" ON "def"."abc_id" = "users"."id" SET "lname" = "def"."lname"', self.pg.sql(stmt))
 
     # def test_update_with_limit(self):
     #     q = Query.update(self.table_users).set(self.table_users.lname, "test").limit(1)
