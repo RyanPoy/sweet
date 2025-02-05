@@ -4,6 +4,7 @@ from sweet.sequel.statements import Statement
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.pair import Pair
 from sweet.sequel.terms.q import Q
+from sweet.sequel.terms.where import Where
 
 
 class DeleteStatement(Statement):
@@ -49,7 +50,7 @@ class DeleteStatement(Statement):
     """
     def __init__(self) -> None:
         super().__init__()
-        self.wheres: [Pair | Q]            = []
+        self.where_clause = Where()
 
     def from_(self, table_name: Name) -> Self:
         """
@@ -87,8 +88,5 @@ class DeleteStatement(Statement):
             # Chaining multiple where conditions
             stmt.where(Q(age__gt=40)).where(Q(age__lt=20))
         """
-        for q in qs:
-            self.wheres.append(q)
-        if kwargs:
-            self.wheres.append(Q(**kwargs))
+        self.where_clause.append(*qs, **kwargs)
         return self

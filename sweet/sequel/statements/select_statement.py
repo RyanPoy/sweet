@@ -8,6 +8,7 @@ from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Value
+from sweet.sequel.terms.where import Where
 from sweet.utils import DBDataType
 
 
@@ -42,7 +43,7 @@ class SelectStatement(Statement):
         self._distinct = None
         self._limit = 0
         self._offset = 0
-        self.wheres = []
+        self.where_clause: Where = Where()
         self.havings = []
         self.force_indexes = []
         self.use_indexes = []
@@ -105,7 +106,8 @@ class SelectStatement(Statement):
         :param kwargs: keyword arguments for creating filter conditions. (e.g., `id=1`)
         :return: The current UpdateStatement instance
         """
-        return self.__where_or_on(self.wheres, *qs, **kwargs)
+        self.where_clause.append(*qs, **kwargs)
+        return self
 
     def having(self, *qs: Q, **kwargs) -> Self:
         return self.__where_or_on(self.havings, *qs, **kwargs)

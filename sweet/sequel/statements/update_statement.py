@@ -3,6 +3,7 @@ from typing import Self
 from sweet.sequel.statements import Statement
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
+from sweet.sequel.terms.where import Where
 from sweet.utils import DBDataType
 
 
@@ -49,7 +50,7 @@ class UpdateStatement(Statement):
     """
     def __init__(self):
         super().__init__()
-        self.wheres = []
+        self.where_clause = Where()
         self.sets : {str: DBDataType} = {}
 
     def update(self, table_name: Name) -> Self:
@@ -84,11 +85,6 @@ class UpdateStatement(Statement):
         :param kwargs: keyword arguments for creating filter conditions. (e.g., `id=1`)
         :return: The current UpdateStatement instance
         """
-        for q in qs:
-            self.wheres.append(q)
-        if kwargs:
-            self.wheres.append(Q(**kwargs))
+        self.where_clause.append(*qs, **kwargs)
         return self
 
-    def where_or(self, *qs: Q, **kwargs) -> Self:
-        return self

@@ -1,8 +1,5 @@
 from enum import Enum
-from sweet.sequel.terms import literal
 from sweet.sequel.terms.name import Name
-from sweet.sequel.terms.value import Value
-from sweet.utils import DBDataType
 
 
 class SortedIn(Enum):

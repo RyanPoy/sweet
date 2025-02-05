@@ -16,6 +16,7 @@ from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Regexp, Value
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.sequel.quoting import quote, quote_name, quote_condition, quote_value
+from sweet.sequel.terms.where import Where
 
 
 class Visitor:
@@ -130,6 +131,14 @@ class Visitor:
             sql << "(" << ', '.join([quote_value(v) for v in vs]) << ")"
         return sql
 
+    def visit_Where(self, where: Where, sql: SQLCollector) -> SQLCollector:
+        if not where.empty():
+            sql << " WHERE "
+            for i, q in enumerate(where.qs):
+                if i != 0: sql << f" AND "
+                self.visit_Q(q, sql)
+        return sql
+
     def visit_InsertStatement(self, stmt: InsertStatement, sql: SQLCollector) -> SQLCollector:
         self.visit(stmt.insert_or_update, sql)
         sql << f" INTO "
@@ -147,11 +156,7 @@ class Visitor:
     def visit_DeleteStatement(self, stmt: DeleteStatement, sql: SQLCollector) -> SQLCollector:
         sql << "DELETE FROM "
         self.visit(stmt.table_name, sql)
-        if stmt.wheres:
-            sql << " WHERE "
-            for i, w in enumerate(stmt.wheres):
-                if i != 0: sql << f" AND "
-                self.visit(w, sql)
+        self.visit_Where(stmt.where_clause, sql)
         return sql
 
     def visit_UpdateStatement(self, stmt: UpdateStatement, sql: SQLCollector) -> SQLCollector:
@@ -167,11 +172,7 @@ class Visitor:
                 if i != 0: sql << ", "
                 sql << f"{self.quote_column_name(k)} = {quote_value(v)}"
                 i += 1
-        if stmt.wheres:
-            sql << " WHERE "
-            for i, w in enumerate(stmt.wheres):
-                if i != 0: sql << f" AND "
-                self.visit(w, sql)
+        self.visit_Where(stmt.where_clause, sql)
         return sql
 
     def visit_OrderClause(self, order: OrderClause, sql: SQLCollector) -> SQLCollector:
@@ -230,11 +231,7 @@ class Visitor:
                 self.visit(index, sql)
             sql << ")"
 
-        if stmt.wheres:
-            sql << " WHERE "
-            for i, w in enumerate(stmt.wheres):
-                if i != 0: sql << f" AND "
-                self.visit(w, sql)
+        self.visit_Where(stmt.where_clause, sql)
 
         if stmt.groups:
             sql << " GROUP BY "
