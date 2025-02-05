@@ -8,7 +8,7 @@ from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Value
-from sweet.sequel.terms.where import Having, Where
+from sweet.sequel.terms.where import Having, On, Where
 from sweet.utils import DBDataType
 
 
@@ -49,7 +49,7 @@ class SelectStatement(Statement):
         self.use_indexes = []
         self.lock = None
         self.join_tables = []
-        self.ons = []
+        self.on_clause : On = On()
         self.groups = []
         self.orders : [OrderClause] = []
         self.parent = None
@@ -117,7 +117,8 @@ class SelectStatement(Statement):
         return self.__from_or_join(self.join_tables, table)
 
     def on(self, *qs: Q, **kwargs) -> Self:
-        return self.__where_or_on(self.ons, *qs, **kwargs)
+        self.on_clause.append(*qs, **kwargs)
+        return self
 
     def group_by(self, *column_names: Name) -> Self:
         for c in column_names:
@@ -158,14 +159,4 @@ class SelectStatement(Statement):
             if t.value == table.value:
                 return self
         tables.append(table)
-        return self
-
-    def __where_or_on(self, cs, *qs: Q | Fn, **kwargs) -> Self:
-        for q in qs:
-            if isinstance(q, Fn):
-                cs.append(q)
-            elif not q.is_empty():
-                cs.append(q)
-        if kwargs:
-            cs.append(Q(**kwargs))
         return self

@@ -26,3 +26,6 @@ class Where(Filter): pass
 
 
 class Having(Filter): pass
+
+
+class On(Filter): pass

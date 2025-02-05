@@ -16,7 +16,7 @@ from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Regexp, Value
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.sequel.quoting import quote, quote_name, quote_condition, quote_value
-from sweet.sequel.terms.where import Having, Where
+from sweet.sequel.terms.where import Filter, Having, On, Where
 
 
 class Visitor:
@@ -132,17 +132,18 @@ class Visitor:
         return sql
 
     def visit_Where(self, where: Where, sql: SQLCollector) -> SQLCollector:
-        if not where.empty():
-            sql << " WHERE "
-            for i, q in enumerate(where.filters):
-                if i != 0: sql << f" AND "
-                self.visit(q, sql)
-        return sql
+        return self._visit_Filter("WHERE", where, sql)
 
     def visit_Having(self, having: Having, sql: SQLCollector) -> SQLCollector:
-        if not having.empty():
-            sql << " HAVING "
-            for i, q in enumerate(having.filters):
+        return self._visit_Filter("HAVING", having, sql)
+
+    def visit_On(self, on: On, sql: SQLCollector) -> SQLCollector:
+        return self._visit_Filter("ON", on, sql)
+
+    def _visit_Filter(self, scope: str, filter: Filter, sql: SQLCollector) -> SQLCollector:
+        if not filter.empty():
+            sql << f" {scope} "
+            for i, q in enumerate(filter.filters):
                 if i != 0: sql << f" AND "
                 self.visit(q, sql)
         return sql
@@ -219,11 +220,7 @@ class Visitor:
             for i, table in enumerate(stmt.join_tables):
                 if i != 0: sql << ", "
                 self.visit(table, sql)
-            if stmt.ons:
-                sql << " ON "
-                for i, w in enumerate(stmt.ons):
-                    if i != 0: sql << f" AND "
-                    self.visit(w, sql)
+            self.visit_On(stmt.on_clause, sql)
 
         if stmt.force_indexes:
             sql << " FORCE INDEX ("
