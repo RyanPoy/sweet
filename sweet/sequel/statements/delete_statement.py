@@ -38,7 +38,7 @@ class DeleteStatement:
 
     Usage:
         # Create a Delete statement and specify the target table
-        stmt = DeleteStatement().from_(Name("users"))
+        stmt = DeleteStatement(Name("users"))
 
         # add filter conditions
         stmt.where(id__lt=10).where(Q(name__like="%abc") | Q(name="lucy"))
@@ -46,19 +46,9 @@ class DeleteStatement:
         # generator the sql of database (e.g. MySQL)
         MySQLVisitor().sql(stmt)
     """
-    def __init__(self) -> None:
-        self.where_clause = Where()
-        self.table_name = None
-
-    def from_(self, table_name: Name) -> Self:
-        """
-        set the table name to delete
-
-        :param table_name: the table name to delete (of type `Name`)
-        :return: the current instance of DeleteStatement
-        """
-        self.table_name = table_name
-        return self
+    def __init__(self, table_name: Name) -> None:
+        self.where_clause : Where = Where()
+        self.table_name : Name = table_name
 
     def where(self, *qs: Q, **kwargs) -> Self:
         """
