@@ -16,39 +16,39 @@ class TestUpdateStatement(unittest.TestCase):
         self.table_users = Name("users")
 
     def test_empty_query(self):
-        stmt = UpdateStatement().update(self.table_users)
+        stmt = UpdateStatement(self.table_users)
         self.assertEqual("", self.mysql.sql(stmt))
         self.assertEqual("", self.sqlite.sql(stmt))
         self.assertEqual("", self.pg.sql(stmt))
 
     def test_omit_where(self):
-        stmt = UpdateStatement().update(self.table_users).set(foo="bar")
+        stmt = UpdateStatement(self.table_users).set(foo="bar")
         self.assertEqual('UPDATE `users` SET `foo` = \'bar\'', self.mysql.sql(stmt))
         self.assertEqual('UPDATE "users" SET "foo" = \'bar\'', self.sqlite.sql(stmt))
         self.assertEqual('UPDATE "users" SET "foo" = \'bar\'', self.pg.sql(stmt))
 
     def test_single_quote_escape_in_set(self):
-        stmt = UpdateStatement().update(self.table_users).set(foo="bar'foo")
+        stmt = UpdateStatement(self.table_users).set(foo="bar'foo")
         self.assertEqual("UPDATE `users` SET `foo` = 'bar''foo'", self.mysql.sql(stmt))
         self.assertEqual("UPDATE \"users\" SET \"foo\" = 'bar''foo'", self.sqlite.sql(stmt))
         self.assertEqual("UPDATE \"users\" SET \"foo\" = 'bar''foo'", self.pg.sql(stmt))
 
     def test_update__table_schema(self):
-        stmt = UpdateStatement().update(Name("schema1.users")).set(foo=1).where(foo=0)
+        stmt = UpdateStatement(Name("schema1.users")).set(foo=1).where(foo=0)
 
         self.assertEqual('UPDATE `schema1`.`users` SET `foo` = 1 WHERE `foo` = 0', self.mysql.sql(stmt))
         self.assertEqual('UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0', self.sqlite.sql(stmt))
         self.assertEqual('UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0', self.pg.sql(stmt))
 
     def test_update_with_none(self):
-        stmt = UpdateStatement().update(self.table_users).set(foo=None)
+        stmt = UpdateStatement(self.table_users).set(foo=None)
         self.assertEqual('UPDATE `users` SET `foo` = NULL', self.mysql.sql(stmt))
         self.assertEqual('UPDATE "users" SET "foo" = NULL', self.sqlite.sql(stmt))
         self.assertEqual('UPDATE "users" SET "foo" = NULL', self.pg.sql(stmt))
 
     # def test_update_with_join(self):
     #     table_def = Table("def")
-    #     stmt = UpdateStatement().update(self.table_users).set(foo=None).join(table_def).on(abc_id=self.table_users.id).set(lname=table_def.lname)
+    #     stmt = UpdateStatement(self.table_users).set(foo=None).join(table_def).on(abc_id=self.table_users.id).set(lname=table_def.lname)
     #     self.assertEqual('UPDATE "users" JOIN "def" ON "def"."abc_id" = "users"."id" SET "lname" = "def"."lname"', self.mysql.sql(stmt))
     #     self.assertEqual('UPDATE "users" JOIN "def" ON "def"."abc_id" = "users"."id" SET "lname" = "def"."lname"', self.sqlite.sql(stmt))
     #     self.assertEqual('UPDATE "users" JOIN "def" ON "def"."abc_id" = "users"."id" SET "lname" = "def"."lname"', self.pg.sql(stmt))
@@ -59,7 +59,7 @@ class TestUpdateStatement(unittest.TestCase):
 
     # def test_update_from(self):
     #     from_table = Table('from_table')
-    #     q = UpdateStatement().update(self.table_users).set(lname="long_name").from_(from_table)
+    #     q = UpdateStatement(self.table_users).set(lname="long_name").from_(from_table)
     #     self.assertEqual('UPDATE "users" SET "lname"="from_table"."long_name" FROM "from_table"', str(q))
 #
 #     def test_update_from_with_where(self):

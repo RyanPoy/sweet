@@ -47,20 +47,11 @@ class UpdateStatement:
         # generate SQL (e.g., for MySQL)
         MySQLVisitor().sql(stmt)
     """
-    def __init__(self):
+    def __init__(self, table_name: Name):
         self.where_clause = Where()
         self.sets : {str: DBDataType} = {}
-        self.table_name = None
+        self.table_name: Name = table_name
 
-    def update(self, table_name: Name) -> Self:
-        """
-        Specifies the target table for the UPDATE statement.
-
-        :param table_name: The table to be updated, represented as a `Name` object.
-        :return: The current UpdateStatement instance.
-        """
-        self.table_name = table_name
-        return self
 
     def set(self, **kwargs) -> Self:
         """
