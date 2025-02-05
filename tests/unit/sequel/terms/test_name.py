@@ -99,11 +99,23 @@ class TestName(unittest.TestCase):
         self.assertEqual("\"name\" IN ('jim', 'lucy', 'lily')", self.sqlite.sql(n))
         self.assertEqual("\"name\" IN ('jim', 'lucy', 'lily')", self.pg.sql(n))
 
+    def test_not_in(self):
+        n = Name('name').not_eq(['jim', 'lucy', 'lily'])
+        self.assertEqual("`name` NOT IN ('jim', 'lucy', 'lily')", self.mysql.sql(n))
+        self.assertEqual("\"name\" NOT IN ('jim', 'lucy', 'lily')", self.sqlite.sql(n))
+        self.assertEqual("\"name\" NOT IN ('jim', 'lucy', 'lily')", self.pg.sql(n))
+
     def test_gt(self):
         n = Name('age').gt(10)
         self.assertEqual("`age` > 10", self.mysql.sql(n))
         self.assertEqual("\"age\" > 10", self.sqlite.sql(n))
         self.assertEqual("\"age\" > 10", self.pg.sql(n))
+
+    def test_not_gt(self):
+        n = Name('age').not_gt(10)
+        self.assertEqual("`age` <= 10", self.mysql.sql(n))
+        self.assertEqual("\"age\" <= 10", self.sqlite.sql(n))
+        self.assertEqual("\"age\" <= 10", self.pg.sql(n))
 
     def test_gte(self):
         n = Name('age').gte(10)
@@ -111,11 +123,23 @@ class TestName(unittest.TestCase):
         self.assertEqual("\"age\" >= 10", self.sqlite.sql(n))
         self.assertEqual("\"age\" >= 10", self.pg.sql(n))
 
+    def test_not_gte(self):
+        n = Name('age').not_gte(10)
+        self.assertEqual("`age` < 10", self.mysql.sql(n))
+        self.assertEqual("\"age\" < 10", self.sqlite.sql(n))
+        self.assertEqual("\"age\" < 10", self.pg.sql(n))
+
     def test_lt(self):
         n = Name('age').lt(30)
         self.assertEqual("`age` < 30", self.mysql.sql(n))
         self.assertEqual("\"age\" < 30", self.sqlite.sql(n))
         self.assertEqual("\"age\" < 30", self.pg.sql(n))
+
+    def test_not_lt(self):
+        n = Name('age').not_lt(30)
+        self.assertEqual("`age` >= 30", self.mysql.sql(n))
+        self.assertEqual("\"age\" >= 30", self.sqlite.sql(n))
+        self.assertEqual("\"age\" >= 30", self.pg.sql(n))
 
     def test_lte(self):
         n = Name('age').lte(30)
@@ -123,12 +147,11 @@ class TestName(unittest.TestCase):
         self.assertEqual("\"age\" <= 30", self.sqlite.sql(n))
         self.assertEqual("\"age\" <= 30", self.pg.sql(n))
 
-
-    def test_not_in(self):
-        n = Name('name').not_eq(['jim', 'lucy', 'lily'])
-        self.assertEqual("`name` NOT IN ('jim', 'lucy', 'lily')", self.mysql.sql(n))
-        self.assertEqual("\"name\" NOT IN ('jim', 'lucy', 'lily')", self.sqlite.sql(n))
-        self.assertEqual("\"name\" NOT IN ('jim', 'lucy', 'lily')", self.pg.sql(n))
+    def test_not_lte(self):
+        n = Name('age').not_lte(30)
+        self.assertEqual("`age` > 30", self.mysql.sql(n))
+        self.assertEqual("\"age\" > 30", self.sqlite.sql(n))
+        self.assertEqual("\"age\" > 30", self.pg.sql(n))
 
     def test_like(self):
         n = Name('name').like('%jim')
@@ -164,11 +187,18 @@ class TestName(unittest.TestCase):
             n = Name('age').not_between([10, 60, 30])
         self.assertEqual('The not_between function expects a list or tuple of length 2, but it is not.', str(ctx.exception))
 
-    # def test_pair_with_regex_value(self):
-    #     n = Pair(users__username__regex="^[b]abc")
-    #     self.assertEqual("`users`.`username` REGEX '^[b]abc'", self.mysql.sql(n))
-    #     self.assertEqual("\"users\".\"username\" REGEX '^[b]abc'", self.sqlite.sql(n))
-    #     self.assertEqual("\"users\".\"username\" REGEX '^[b]abc'", self.pg.sql(n))
+    def test_pair_with_regex_value(self):
+        n = Name('username', 'users').regex("^[b]abc")
+        self.assertEqual("`users`.`username` REGEX '^[b]abc'", self.mysql.sql(n))
+        self.assertEqual("\"users\".\"username\" REGEX '^[b]abc'", self.sqlite.sql(n))
+        self.assertEqual("\"users\".\"username\" REGEX '^[b]abc'", self.pg.sql(n))
+
+    def test_pair_with_not_regex_value(self):
+        n = Name('username', 'users').not_regex("^[b]abc")
+        self.assertEqual("`users`.`username` NOT REGEX '^[b]abc'", self.mysql.sql(n))
+        self.assertEqual("\"users\".\"username\" NOT REGEX '^[b]abc'", self.sqlite.sql(n))
+        self.assertEqual("\"users\".\"username\" NOT REGEX '^[b]abc'", self.pg.sql(n))
+
 
 if __name__ == '__main__':
     unittest.main()

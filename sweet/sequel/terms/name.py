@@ -71,14 +71,26 @@ class Name:
     def gt(self, v: Self | DBDataType) -> Binary:
         return Binary(">", self, v)
 
+    def not_gt(self, v: Self | DBDataType) -> Binary:
+        return self.lte(v)
+
     def gte(self, v: Self | DBDataType) -> Binary:
         return Binary(">=", self, v)
+
+    def not_gte(self, v: Self | DBDataType) -> Binary:
+        return self.lt(v)
 
     def lt(self, v: Self | DBDataType) -> Binary:
         return Binary("<", self, v)
 
+    def not_lt(self, v: Self | DBDataType) -> Binary:
+        return self.gte(v)
+
     def lte(self, v: Self | DBDataType) -> Binary:
         return Binary("<=", self, v)
+
+    def not_lte(self, v: Self | DBDataType) -> Binary:
+        return self.gt(v)
 
     def like(self, v: Self | DBDataType) -> Binary:
         return Binary("LIKE", self, v)
@@ -95,3 +107,9 @@ class Name:
         if not (is_array(v) and len(v) == 2):
             raise ValueError('The not_between function expects a list or tuple of length 2, but it is not.')
         return Binary("NOT BETWEEN", self, v)
+
+    def regex(self, v: str) -> Binary:
+        return Binary("REGEX", self, v)
+
+    def not_regex(self, v: str) -> Binary:
+        return Binary("NOT REGEX", self, v)
