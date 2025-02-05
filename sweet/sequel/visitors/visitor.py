@@ -6,6 +6,8 @@ from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
+from sweet.sequel.terms.binary import Between, Binary, Equal, GreatThan, GreatThanAndEqual, In, Is, IsNot, LessThan, LessThanAndEqual, Like, NotEqual, NotIn, \
+    NotLike
 from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
@@ -89,6 +91,31 @@ class Visitor:
                 if i != 0: sql << f" {str(q.logic_op)} "
                 self.visit_Q(c, sql)
             sql << ")"
+        return sql
+
+    def visit_Binary(self, b: Binary, sql: SQLCollector) -> SQLCollector:
+        if isinstance(b.key, Name):
+            self.visit(b.key, sql)
+        else:
+            sql << self.quote_column_name(b.key)
+        sql << f" {b.op} "
+        if b.belongs_to_between():
+            if isinstance(b.value, Name):
+                self.visit(b.value[0], sql)
+                sql << " AND "
+                self.visit(b.value[1], sql)
+            else:
+                # sql << quote_value(b.value)
+                sql << quote_condition(b.value[0])
+                sql << " AND "
+                sql << quote_condition(b.value[1])
+        else:
+            if isinstance(b.value, Name):
+                self.visit(b.value, sql)
+            else:
+                # sql << quote_value(b.value)
+                sql << quote_condition(b.value)
+
         return sql
 
     def visit_Pair(self, p: Pair, sql: SQLCollector) -> SQLCollector:

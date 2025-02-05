@@ -1,6 +1,5 @@
 from typing import Union
 
-from sweet.sequel.terms.name import Name
 from sweet.utils.inflection import *
 from datetime import datetime, date
 from decimal import Decimal
