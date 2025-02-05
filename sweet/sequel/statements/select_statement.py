@@ -8,7 +8,7 @@ from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Value
-from sweet.sequel.terms.where import Where
+from sweet.sequel.terms.where import Having, Where
 from sweet.utils import DBDataType
 
 
@@ -44,7 +44,7 @@ class SelectStatement(Statement):
         self._limit = 0
         self._offset = 0
         self.where_clause: Where = Where()
-        self.havings = []
+        self.having_clause: Having = Having()
         self.force_indexes = []
         self.use_indexes = []
         self.lock = None
@@ -110,7 +110,8 @@ class SelectStatement(Statement):
         return self
 
     def having(self, *qs: Q, **kwargs) -> Self:
-        return self.__where_or_on(self.havings, *qs, **kwargs)
+        self.having_clause.append(*qs, **kwargs)
+        return self
 
     def join(self, table: Name | Self) -> Self:
         return self.__from_or_join(self.join_tables, table)

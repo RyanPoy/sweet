@@ -16,7 +16,7 @@ from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Regexp, Value
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.sequel.quoting import quote, quote_name, quote_condition, quote_value
-from sweet.sequel.terms.where import Where
+from sweet.sequel.terms.where import Having, Where
 
 
 class Visitor:
@@ -134,9 +134,17 @@ class Visitor:
     def visit_Where(self, where: Where, sql: SQLCollector) -> SQLCollector:
         if not where.empty():
             sql << " WHERE "
-            for i, q in enumerate(where.qs):
+            for i, q in enumerate(where.filters):
                 if i != 0: sql << f" AND "
-                self.visit_Q(q, sql)
+                self.visit(q, sql)
+        return sql
+
+    def visit_Having(self, having: Having, sql: SQLCollector) -> SQLCollector:
+        if not having.empty():
+            sql << " HAVING "
+            for i, q in enumerate(having.filters):
+                if i != 0: sql << f" AND "
+                self.visit(q, sql)
         return sql
 
     def visit_InsertStatement(self, stmt: InsertStatement, sql: SQLCollector) -> SQLCollector:
@@ -239,11 +247,8 @@ class Visitor:
                 if i != 0: sql << ", "
                 self.visit(c, sql)
 
-        if stmt.havings:
-            sql << " HAVING "
-            for i, w in enumerate(stmt.havings):
-                if i != 0: sql << f" AND "
-                self.visit(w, sql)
+        if not stmt.having_clause.empty():
+            self.visit_Having(stmt.having_clause, sql)
 
         if stmt.orders:
             sql << " ORDER BY "
