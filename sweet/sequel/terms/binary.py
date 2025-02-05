@@ -1,5 +1,6 @@
-from typing import Union, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
+from sweet.sequel import Operator
 from sweet.utils import DBDataType
 
 if TYPE_CHECKING:
@@ -8,10 +9,8 @@ if TYPE_CHECKING:
 
 class Binary:
 
-    def __init__(self, op: str, key, value: DBDataType | 'Name' = None):
+    def __init__(self, op: Operator, key, value: DBDataType | 'Name' = None):
         self.key: Name | str = key
         self.value: Name | DBDataType = value
-        self.op: str = op
+        self.op: Operator = op
 
-    def belongs_to_between(self):
-        return self.op == 'BETWEEN' or self.op == 'NOT BETWEEN'

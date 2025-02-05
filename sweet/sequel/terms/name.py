@@ -1,5 +1,6 @@
 from typing import Optional, Self
 
+from sweet.sequel import Operator
 from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.literal import Literal, STAR
 from sweet.utils import DBDataType, is_array
@@ -54,62 +55,62 @@ class Name:
 
     def eq(self, v: Self | DBDataType) -> Binary:
         if v is None:
-            return Binary("IS", self, v)
+            return Binary(Operator.IS, self, v)
         elif is_array(v):
-            return Binary("IN", self, v)
+            return Binary(Operator.IN, self, v)
         else:
-            return Binary("=", self, v)
+            return Binary(Operator.EQ, self, v)
 
     def not_eq(self, v: Self | DBDataType) -> Binary:
         if v is None:
-            return Binary("IS NOT", self, v)
+            return Binary(Operator.IS_NOT, self, v)
         elif is_array(v):
-            return Binary("NOT IN", self, v)
+            return Binary(Operator.NOT_IN, self, v)
         else:
-            return Binary("<>", self, v)
+            return Binary(Operator.NOT_EQ, self, v)
 
     def gt(self, v: Self | DBDataType) -> Binary:
-        return Binary(">", self, v)
+        return Binary(Operator.GT, self, v)
 
     def not_gt(self, v: Self | DBDataType) -> Binary:
         return self.lte(v)
 
     def gte(self, v: Self | DBDataType) -> Binary:
-        return Binary(">=", self, v)
+        return Binary(Operator.GTE, self, v)
 
     def not_gte(self, v: Self | DBDataType) -> Binary:
         return self.lt(v)
 
     def lt(self, v: Self | DBDataType) -> Binary:
-        return Binary("<", self, v)
+        return Binary(Operator.LT, self, v)
 
     def not_lt(self, v: Self | DBDataType) -> Binary:
         return self.gte(v)
 
     def lte(self, v: Self | DBDataType) -> Binary:
-        return Binary("<=", self, v)
+        return Binary(Operator.LTE, self, v)
 
     def not_lte(self, v: Self | DBDataType) -> Binary:
         return self.gt(v)
 
     def like(self, v: Self | DBDataType) -> Binary:
-        return Binary("LIKE", self, v)
+        return Binary(Operator.LIKE, self, v)
 
     def not_like(self, v: Self | DBDataType) -> Binary:
-        return Binary("NOT LIKE", self, v)
+        return Binary(Operator.NOT_LIKE, self, v)
 
     def between(self, v: [Self | DBDataType]) -> Binary:
         if not (is_array(v) and len(v) == 2):
             raise ValueError('The between function expects a list or tuple of length 2, but it is not.')
-        return Binary("BETWEEN", self, v)
+        return Binary(Operator.BETWEEN, self, v)
 
     def not_between(self, v: [Self | DBDataType]) -> Binary:
         if not (is_array(v) and len(v) == 2):
             raise ValueError('The not_between function expects a list or tuple of length 2, but it is not.')
-        return Binary("NOT BETWEEN", self, v)
+        return Binary(Operator.NOT_BETWEEN, self, v)
 
     def regex(self, v: str) -> Binary:
-        return Binary("REGEX", self, v)
+        return Binary(Operator.REGEX, self, v)
 
     def not_regex(self, v: str) -> Binary:
-        return Binary("NOT REGEX", self, v)
+        return Binary(Operator.NOT_REGEX, self, v)

@@ -98,13 +98,12 @@ class Visitor:
         else:
             sql << self.quote_column_name(b.key)
         sql << f" {b.op} "
-        if b.belongs_to_between():
+        if b.op == Operator.BETWEEN or b.op == Operator.NOT_BETWEEN:
             if isinstance(b.value, Name):
                 self.visit(b.value[0], sql)
                 sql << " AND "
                 self.visit(b.value[1], sql)
             else:
-                # sql << quote_value(b.value)
                 sql << quote_condition(b.value[0])
                 sql << " AND "
                 sql << quote_condition(b.value[1])
@@ -112,7 +111,6 @@ class Visitor:
             if isinstance(b.value, Name):
                 self.visit(b.value, sql)
             else:
-                # sql << quote_value(b.value)
                 sql << quote_condition(b.value)
 
         return sql

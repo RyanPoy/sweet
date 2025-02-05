@@ -1,30 +1,9 @@
-from enum import Enum
 from typing import Self
 
+from sweet.sequel import Operator
 from sweet.sequel.quoting import quote
 from sweet.sequel.terms.name import Name
 from sweet.utils import DBDataType
-
-
-class Operator(Enum):
-    IS = "IS"
-    IS_NOT = "IS NOT"
-    IN = "IN"
-    NOT_IN = "NOT IN"
-    BETWEEN = "BETWEEN"
-    NOT_BETWEEN = "NOT BETWEEN"
-    EQ = "="
-    NOT_EQ = "<>"
-    LT = "<"
-    LTE = "<="
-    GT = ">"
-    GTE = ">="
-    LIKE = "LIKE"
-    NOT_LIKE = "NOT LIKE"
-    REGEX = "REGEX"
-
-    def __str__(self) -> str:
-        return self.value
 
 
 class Pair:
@@ -133,7 +112,7 @@ class Pair:
     def __basic_eq(self, other: Self) -> bool:
         return self.__class__ == other.__class__ and self.field == other.field \
             and (
-                self.value == other.value or (
+                    self.value == other.value or (
                     isinstance(self.value, (tuple, list)) and isinstance(other.value, (tuple, list)) and list(self.value) == list(other.value)
-                )
+            )
             )
