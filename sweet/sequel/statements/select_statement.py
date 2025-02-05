@@ -1,6 +1,5 @@
 from typing import Self
 
-from sweet.sequel.statements import Statement
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.lock import Lock
@@ -12,7 +11,7 @@ from sweet.sequel.terms.where import Having, On, Where
 from sweet.utils import DBDataType
 
 
-class SelectStatement(Statement):
+class SelectStatement:
     """
     SELECT
       ├── Columns (Name class)
@@ -36,8 +35,6 @@ class SelectStatement(Statement):
     """
 
     def __init__(self):
-        super().__init__()
-
         self.tables = []
         self.columns = []
         self._distinct = None

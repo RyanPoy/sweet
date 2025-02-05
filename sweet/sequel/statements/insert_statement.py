@@ -1,13 +1,12 @@
 from typing import Self
 
-from sweet.sequel.statements import Statement
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.utils import DBDataType
 
 
-class InsertStatement(Statement):
+class InsertStatement:
     """
     Represents Abstract Syntax Tree(AST) for SQL INSERT statement
 
@@ -59,8 +58,8 @@ class InsertStatement(Statement):
     """
 
     def __init__(self) -> None:
-        super().__init__()
         self.insert_or_update = literal.INSERT
+        self.table_name = None
         self._column_names: [Name] = []
         self._values_list: ValuesList = ValuesList()
 
@@ -71,7 +70,7 @@ class InsertStatement(Statement):
         :param table_name: The table name to insert into. Should be an instance of `Name`
         :return: The current InsertStatement instance.
         """
-        self._table_name = table_name
+        self.table_name = table_name
         return self
 
     @property

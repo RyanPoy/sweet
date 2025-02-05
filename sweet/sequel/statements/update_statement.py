@@ -1,13 +1,12 @@
 from typing import Self
 
-from sweet.sequel.statements import Statement
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.where import Where
 from sweet.utils import DBDataType
 
 
-class UpdateStatement(Statement):
+class UpdateStatement:
     """
     Represents the Abstract Syntax Tree(AST) for a SQL UPDATE statement.
 
@@ -49,9 +48,9 @@ class UpdateStatement(Statement):
         MySQLVisitor().sql(stmt)
     """
     def __init__(self):
-        super().__init__()
         self.where_clause = Where()
         self.sets : {str: DBDataType} = {}
+        self.table_name = None
 
     def update(self, table_name: Name) -> Self:
         """
@@ -60,7 +59,7 @@ class UpdateStatement(Statement):
         :param table_name: The table to be updated, represented as a `Name` object.
         :return: The current UpdateStatement instance.
         """
-        self._table_name = table_name
+        self.table_name = table_name
         return self
 
     def set(self, **kwargs) -> Self:

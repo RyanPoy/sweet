@@ -1,13 +1,11 @@
 from typing import Self
 
-from sweet.sequel.statements import Statement
 from sweet.sequel.terms.name import Name
-from sweet.sequel.terms.pair import Pair
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.where import Where
 
 
-class DeleteStatement(Statement):
+class DeleteStatement:
     """
     Represents the Abstract Syntax Tree (AST) for a SQL DELETE statement.
 
@@ -49,8 +47,8 @@ class DeleteStatement(Statement):
         MySQLVisitor().sql(stmt)
     """
     def __init__(self) -> None:
-        super().__init__()
         self.where_clause = Where()
+        self.table_name = None
 
     def from_(self, table_name: Name) -> Self:
         """
@@ -59,7 +57,7 @@ class DeleteStatement(Statement):
         :param table_name: the table name to delete (of type `Name`)
         :return: the current instance of DeleteStatement
         """
-        self._table_name = table_name
+        self.table_name = table_name
         return self
 
     def where(self, *qs: Q, **kwargs) -> Self:
