@@ -19,13 +19,10 @@ class Table:
         return f'"{self.name}"'
 
     def insert(self, *values: DBDataType) -> InsertStatement:
-        return InsertStatement().into(Name(self.name)).insert(*values)
+        return InsertStatement(Name(self.name)).insert(*values)
 
     def __setattr__(self, key, value):
         super().__setattr__(key, value)
         if isinstance(value, Column):
             if not value.table:
                 value.table = self
-    #
-    # def as_(self, alias: str) -> Alias:
-    #     return Alias(self, alias)

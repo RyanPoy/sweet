@@ -57,21 +57,12 @@ class InsertStatement:
     Todo: support Source of ast
     """
 
-    def __init__(self) -> None:
+    def __init__(self, table_name: Name) -> None:
         self.insert_or_update = literal.INSERT
-        self.table_name = None
+        self.table_name : Name = table_name
         self._column_names: [Name] = []
         self._values_list: ValuesList = ValuesList()
 
-    def into(self, table_name: Name) -> Self:
-        """
-        Specifies the target table for the INSERT statement.
-
-        :param table_name: The table name to insert into. Should be an instance of `Name`
-        :return: The current InsertStatement instance.
-        """
-        self.table_name = table_name
-        return self
 
     @property
     def columns(self) -> [Name]:
