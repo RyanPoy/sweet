@@ -33,7 +33,7 @@ class InsertStatement:
 
     Usage:
         # Create a Insert statement and specify the target table
-        stmt = InsertStatement().into(Name("users"))
+        stmt = InsertStatement(Name("users"))
 
         # set column to insert
         stmt.column(Name("id"), Name("name"))

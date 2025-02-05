@@ -36,7 +36,7 @@ class UpdateStatement:
 
     Usage:
         # create an update statement
-        stmt = UpdateStatement().update(Name("users"))
+        stmt = UpdateStatement(Name("users"))
 
         # set column-value pairs for update
         stmt.set(name="lucy", age=20)
