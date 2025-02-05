@@ -1,17 +1,8 @@
-from typing import Optional, Self, Union
+from typing import Optional, Self
+
+from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.literal import Literal, STAR
 from sweet.utils import DBDataType, is_array
-
-
-class Binary:
-
-    def __init__(self, op: str, key: 'Name', value: Union[DBDataType | 'Name'] = None):
-        self.key = key
-        self.value = value
-        self.op = op
-
-    def belongs_to_between(self):
-        return self.op == 'BETWEEN' or self.op == 'NOT BETWEEN'
 
 
 class Name:
