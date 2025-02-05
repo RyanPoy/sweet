@@ -1,8 +1,17 @@
-from typing import Optional, Self, TYPE_CHECKING
-if TYPE_CHECKING: from sweet.sequel.terms import binary
-
+from typing import Optional, Self, Union
 from sweet.sequel.terms.literal import Literal, STAR
 from sweet.utils import DBDataType, is_array
+
+
+class Binary:
+
+    def __init__(self, op: str, key: 'Name', value: Union[DBDataType | 'Name'] = None):
+        self.key = key
+        self.value = value
+        self.op = op
+
+    def belongs_to_between(self):
+        return self.op == 'BETWEEN' or self.op == 'NOT BETWEEN'
 
 
 class Name:
@@ -52,56 +61,46 @@ class Name:
             return True
         return self.__class__ == other.__class__ and self.value == other.value and self.schema_name == other.schema_name and self.alias == other.alias
 
-    def eq(self, v: Self | DBDataType) -> 'Binary':
-        from sweet.sequel.terms import binary
+    def eq(self, v: Self | DBDataType) -> Binary:
         if v is None:
-            return binary.Is(self, v)
+            return Binary("IS", self, v)
         elif is_array(v):
-            return binary.In(self, v)
+            return Binary("IN", self, v)
         else:
-            return binary.Equal(self, v)
+            return Binary("=", self, v)
 
-    def not_eq(self, v: Self | DBDataType) -> 'binary.Binary':
-        from sweet.sequel.terms import binary
+    def not_eq(self, v: Self | DBDataType) -> Binary:
         if v is None:
-            return binary.IsNot(self, v)
+            return Binary("IS NOT", self, v)
         elif is_array(v):
-            return binary.NotIn(self, v)
+            return Binary("NOT IN", self, v)
         else:
-            return binary.NotEqual(self, v)
+            return Binary("<>", self, v)
 
-    def gt(self, v: Self | DBDataType) -> 'binary.Binary':
-        from sweet.sequel.terms import binary
-        return binary.GreatThan(self, v)
+    def gt(self, v: Self | DBDataType) -> Binary:
+        return Binary(">", self, v)
 
-    def gte(self, v: Self | DBDataType) -> 'binary.Binary':
-        from sweet.sequel.terms import binary
-        return binary.GreatThanAndEqual(self, v)
+    def gte(self, v: Self | DBDataType) -> Binary:
+        return Binary(">=", self, v)
 
-    def lt(self, v: Self | DBDataType) -> 'binary.Binary':
-        from sweet.sequel.terms import binary
-        return binary.LessThan(self, v)
+    def lt(self, v: Self | DBDataType) -> Binary:
+        return Binary("<", self, v)
 
-    def lte(self, v: Self | DBDataType) -> 'binary.Binary':
-        from sweet.sequel.terms import binary
-        return binary.LessThanAndEqual(self, v)
+    def lte(self, v: Self | DBDataType) -> Binary:
+        return Binary("<=", self, v)
 
-    def like(self, v: Self | DBDataType) -> 'binary.Binary':
-        from sweet.sequel.terms import binary
-        return binary.Like(self, v)
+    def like(self, v: Self | DBDataType) -> Binary:
+        return Binary("LIKE", self, v)
 
-    def not_like(self, v: Self | DBDataType) -> 'binary.Binary':
-        from sweet.sequel.terms import binary
-        return binary.NotLike(self, v)
+    def not_like(self, v: Self | DBDataType) -> Binary:
+        return Binary("NOT LIKE", self, v)
 
-    def between(self, v: [Self | DBDataType]) -> 'binary.Binary':
-        from sweet.sequel.terms import binary
+    def between(self, v: [Self | DBDataType]) -> Binary:
         if not (is_array(v) and len(v) == 2):
             raise ValueError('The between function expects a list or tuple of length 2, but it is not.')
-        return binary.Between(self, v)
+        return Binary("BETWEEN", self, v)
 
-    def not_between(self, v: [Self | DBDataType]) -> 'binary.Binary':
-        from sweet.sequel.terms import binary
+    def not_between(self, v: [Self | DBDataType]) -> Binary:
         if not (is_array(v) and len(v) == 2):
             raise ValueError('The not_between function expects a list or tuple of length 2, but it is not.')
-        return binary.NotBetween(self, v)
+        return Binary("NOT BETWEEN", self, v)

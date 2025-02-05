@@ -6,14 +6,12 @@ from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
-from sweet.sequel.terms.binary import Between, Binary, Equal, GreatThan, GreatThanAndEqual, In, Is, IsNot, LessThan, LessThanAndEqual, Like, NotEqual, NotIn, \
-    NotLike
 from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
 from sweet.sequel.terms.pair import Pair, Operator
-from sweet.sequel.terms.name import Name
+from sweet.sequel.terms.name import Binary, Name
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Regexp, Value
 from sweet.sequel.terms.values_list import ValuesList
