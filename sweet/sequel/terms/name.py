@@ -21,7 +21,6 @@ class Name:
         """
         :param name: The name of the entity (column, table, alias). (e.g., of `str`)
         """
-        super().__init__()
         self.value: str = name
         self.alias: Optional[str] = None
         if schema_name is None:
