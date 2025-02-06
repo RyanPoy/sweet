@@ -61,42 +61,37 @@ class Name:
             return Binary(Operator.EQ, self, v)
 
     def not_eq(self, v: Self | DBDataType) -> Binary:
-        if v is None:
-            return Binary(Operator.IS_NOT, self, v)
-        elif is_array(v):
-            return Binary(Operator.NOT_IN, self, v)
-        else:
-            return Binary(Operator.NOT_EQ, self, v)
+        return self.eq(v).invert()
 
     def gt(self, v: Self | DBDataType) -> Binary:
         return Binary(Operator.GT, self, v)
 
     def not_gt(self, v: Self | DBDataType) -> Binary:
-        return self.lte(v)
+        return self.gt(v).invert()
 
     def gte(self, v: Self | DBDataType) -> Binary:
         return Binary(Operator.GTE, self, v)
 
     def not_gte(self, v: Self | DBDataType) -> Binary:
-        return self.lt(v)
+        return self.gte(v).invert()
 
     def lt(self, v: Self | DBDataType) -> Binary:
         return Binary(Operator.LT, self, v)
 
     def not_lt(self, v: Self | DBDataType) -> Binary:
-        return self.gte(v)
+        return self.lt(v).invert()
 
     def lte(self, v: Self | DBDataType) -> Binary:
         return Binary(Operator.LTE, self, v)
 
     def not_lte(self, v: Self | DBDataType) -> Binary:
-        return self.gt(v)
+        return self.lte(v).invert()
 
     def like(self, v: Self | DBDataType) -> Binary:
         return Binary(Operator.LIKE, self, v)
 
     def not_like(self, v: Self | DBDataType) -> Binary:
-        return Binary(Operator.NOT_LIKE, self, v)
+        return self.like(v).invert()
 
     def between(self, v: [Self | DBDataType]) -> Binary:
         if not (is_array(v) and len(v) == 2):
@@ -112,4 +107,4 @@ class Name:
         return Binary(Operator.REGEX, self, v)
 
     def not_regex(self, v: str) -> Binary:
-        return Binary(Operator.NOT_REGEX, self, v)
+        return self.regex(v).invert()

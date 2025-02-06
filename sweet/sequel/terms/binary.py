@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import Self, TYPE_CHECKING
 
 from sweet.sequel import Operator
 from sweet.utils import DBDataType
@@ -14,3 +14,6 @@ class Binary:
         self.value: Name | DBDataType = value
         self.op: Operator = op
 
+    def invert(self) -> Self:
+        self.op = self.op.invert()
+        return self
