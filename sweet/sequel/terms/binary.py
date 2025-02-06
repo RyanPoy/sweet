@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 class Binary:
 
-    def __init__(self, op: Operator, key, value: DBDataType | 'Name' = None):
+    def __init__(self, op: Operator, key, value: DBDataType | 'Name' = None) -> None:
         self.key: Name | str = key
         self.value: Name | DBDataType = value
         self.op: Operator = op
