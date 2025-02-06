@@ -1,5 +1,5 @@
-from enum import Enum
 from typing import Self
+from enum import Enum
 
 
 class Operator(Enum):
@@ -21,23 +21,40 @@ class Operator(Enum):
     NOT_REGEX = "NOT REGEX"
 
     def invert(self) -> Self:
-        if self is Operator.IS: return Operator.IS_NOT
-        elif self is Operator.IS_NOT: return Operator.IS
-        elif self is Operator.IN: return Operator.NOT_IN
-        elif self is Operator.NOT_IN: return Operator.IN
-        elif self is Operator.BETWEEN: return Operator.NOT_BETWEEN
-        elif self is Operator.NOT_BETWEEN: return Operator.BETWEEN
-        elif self is Operator.EQ: return Operator.NOT_EQ
-        elif self is Operator.NOT_EQ: return Operator.EQ
-        elif self is Operator.LT: return Operator.GTE
-        elif self is Operator.LTE: return Operator.GT
-        elif self is Operator.GT: return Operator.LTE
-        elif self is Operator.GTE: return Operator.LT
-        elif self is Operator.LIKE: return Operator.NOT_LIKE
-        elif self is Operator.NOT_LIKE: return Operator.LIKE
-        elif self is Operator.REGEX: return Operator.NOT_REGEX
-        elif self is Operator.NOT_REGEX: return Operator.REGEX
-        else: raise ValueError(f"Can't support {self.value}")
+        if self is Operator.IS:
+            return Operator.IS_NOT
+        elif self is Operator.IS_NOT:
+            return Operator.IS
+        elif self is Operator.IN:
+            return Operator.NOT_IN
+        elif self is Operator.NOT_IN:
+            return Operator.IN
+        elif self is Operator.BETWEEN:
+            return Operator.NOT_BETWEEN
+        elif self is Operator.NOT_BETWEEN:
+            return Operator.BETWEEN
+        elif self is Operator.EQ:
+            return Operator.NOT_EQ
+        elif self is Operator.NOT_EQ:
+            return Operator.EQ
+        elif self is Operator.LT:
+            return Operator.GTE
+        elif self is Operator.LTE:
+            return Operator.GT
+        elif self is Operator.GT:
+            return Operator.LTE
+        elif self is Operator.GTE:
+            return Operator.LT
+        elif self is Operator.LIKE:
+            return Operator.NOT_LIKE
+        elif self is Operator.NOT_LIKE:
+            return Operator.LIKE
+        elif self is Operator.REGEX:
+            return Operator.NOT_REGEX
+        elif self is Operator.NOT_REGEX:
+            return Operator.REGEX
+        else:
+            raise ValueError(f"Can't support {self.value}")
 
     def __str__(self) -> str:
         return self.value
