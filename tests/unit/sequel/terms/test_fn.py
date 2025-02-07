@@ -56,6 +56,12 @@ class TestFn(unittest.TestCase):
         self.assertEqual('SUM("foo") > 1', self.sqlite.sql(func))
         self.assertEqual('SUM("foo") > 1', self.pg.sql(func))
 
+    def test_sum__gt_Name(self):
+        func = fn.sum(Name("foo")) > Name("age")
+        self.assertEqual('SUM(`foo`) > `age`', self.mysql.sql(func))
+        self.assertEqual('SUM("foo") > "age"', self.sqlite.sql(func))
+        self.assertEqual('SUM("foo") > "age"', self.pg.sql(func))
+
     def test_sum__gte(self):
         func = fn.sum(Name("foo")) >= 1
         self.assertEqual('SUM(`foo`) >= 1', self.mysql.sql(func))
