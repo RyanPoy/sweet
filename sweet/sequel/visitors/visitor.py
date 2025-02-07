@@ -13,7 +13,7 @@ from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.value import Value1
+from sweet.sequel.terms.value import Value, Value1, Values
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.sequel.quoting import quote, quote_name, quote_condition, quote_value
 from sweet.sequel.terms.where import Filter, Having, On, Where
@@ -114,15 +114,32 @@ class Visitor:
                 sql << quote_condition(b.value)
         return sql
 
-    def visit_Value(self, v: Value1, sql: SQLCollector) -> SQLCollector:
+    def visit_Value1(self, v: Value1, sql: SQLCollector) -> SQLCollector:
         if isinstance(v, (Name, Fn)):
             return self.visit(v, sql)
         return sql << quote(v)
 
-    def visit_ValuesList(self, values: ValuesList, sql: SQLCollector) -> SQLCollector:
-        for i, vs in enumerate(values.data):
+    def visit_Value(self, value: Value, sql: SQLCollector) -> SQLCollector:
+        v = value.v
+        if isinstance(v, (Name, Fn)):
+            return self.visit(v, sql)
+        return sql << quote(v)
+
+    def visit_Values(self, values: Values, sql: SQLCollector) -> SQLCollector:
+        sql << "("
+        for i, v in enumerate(values.vs):
             if i != 0: sql << ", "
-            sql << "(" << ', '.join([quote_value(v) for v in vs]) << ")"
+            self.visit(v, sql)
+        sql << ")"
+        return sql
+
+    def visit_ValuesList(self, values: ValuesList, sql: SQLCollector) -> SQLCollector:
+        if values.is_empty():
+            sql << "(NULL)"
+        else:
+            for i, values in enumerate(values.data):
+                if i != 0: sql << ", "
+                self.visit(values, sql)
         return sql
 
     def visit_Where(self, where: Where, sql: SQLCollector) -> SQLCollector:
@@ -276,7 +293,7 @@ class Visitor:
             method = self.__getattribute__(name)
         except AttributeError as ex:
             if isinstance(o, Value1):
-                method = self.visit_Value
+                method = self.visit_Value1
             else:
                 raise ex
         methods[name] = method

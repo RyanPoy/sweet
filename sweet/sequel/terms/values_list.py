@@ -1,6 +1,6 @@
 from typing import Self
 
-from sweet.sequel.terms.value import Value1
+from sweet.sequel.terms.value import Value, Value1, Values
 
 
 class ValuesList:
@@ -18,10 +18,10 @@ class ValuesList:
         # add multiple rows
         vs.append([ (3, "jimy", 15), (4, "abc", 8) ])
     """
-    def __init__(self, *vs: Value1) -> None:
-        self.data = []
-        if vs:
-            self.data.append(vs)
+
+    def __init__(self, *args: Values) -> None:
+        self.data: [Values] = []
+        self.append(*args)
 
     def is_empty(self):
         """
@@ -31,21 +31,27 @@ class ValuesList:
         """
         return False if self.data else True
 
-    def append(self, rows: [(Value1,)]) -> Self:
+    def append(self, *args: Values) -> Self:
         """
         Append the row to the ValuesList. All rows must have consistent column length as existing rows.
 
-        :param rows: A list of tuples where each tuple represents a row to be added.
+        :param values: A list of tuples where each tuple represents a row to be added.
         :raises ValueError: If the rows have inconsistent length.
         :return: The current instance of ValuesList.
         """
-        if not rows:
-            return self
-
-        len0 = len(rows[0])
-        for row in rows:
-            if len0 != len(row):
-                raise ValueError("Inconsistent row length")
-        for row in rows:
-            self.data.append(row)
+        args = [ x for x in args if not x.is_empty() ]
+        self.check_values(*args)
+        self.data.extend(args)
         return self
+
+    def check_values(self, *args: Values) -> None:
+        if not args:
+            return
+        len0 = len(args[0])
+        for values in args:
+            if len0 != len(values):
+                raise ValueError("Inconsistent row length")
+
+        for values in self.data:
+            if len0 != len(values):
+                raise ValueError("Inconsistent row length")

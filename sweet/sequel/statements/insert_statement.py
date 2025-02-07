@@ -2,7 +2,7 @@ from typing import Self
 
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.name import Name
-from sweet.sequel.terms.value import Value1
+from sweet.sequel.terms.value import Value1, ValueType, Values
 from sweet.sequel.terms.values_list import ValuesList
 
 
@@ -93,14 +93,14 @@ class InsertStatement:
         """
         return self._values_list
 
-    def insert(self, *values: Value1) -> Self:
+    def insert(self, *args: ValueType) -> Self:
         """
         Adds a new row to the INSERT statement.
 
         :param values: The values to insert into the specified columns.
         :return: The current InsertStatement instance.
         """
-        self.__insert_or_replace(*values)
+        self.__insert_or_replace(*args)
         self.insert_or_update = literal.INSERT
         return self
 
@@ -108,7 +108,7 @@ class InsertStatement:
         self.insert_or_update = literal.INSERT_IGNORE
         return self
 
-    def insert_rows(self, *rows: [Value1]) -> Self:
+    def insert_rows(self, *rows: [ValueType]) -> Self:
         """
         Adds multiple rows to the INSERT statement.
 
@@ -116,7 +116,8 @@ class InsertStatement:
         :return: The current InsertStatement instance.
         """
         if rows:
-            self._values_list.append(rows)
+            values_rows = [ Values(*x) for x in rows ]
+            self._values_list.append(*values_rows)
         self.insert_or_update = literal.INSERT
         return self
 
@@ -143,14 +144,14 @@ class InsertStatement:
         self.insert_or_update = literal.REPLACE
         return self
 
-    def __insert_or_replace(self, *values: Value1) -> Self:
+    def __insert_or_replace(self, *args: ValueType) -> Self:
         """
         Internal method to handle both insert and replace operations.
 
         :param values: The values to insert or replace into the specified columns.
         :return: The current InsertStatement instance.
         """
-        if values:
-            self._values_list.append([values])
+        if args:
+            self._values_list.append(Values(*args))
         return self
 
