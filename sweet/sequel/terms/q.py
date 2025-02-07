@@ -1,8 +1,7 @@
 from typing import Self
 
 from sweet.sequel.terms import Logic
-from sweet.sequel.terms.binary import Binary
-from sweet.sequel.terms.pair import parse
+from sweet.sequel.terms.binary import Binary, parse
 from sweet.utils import DBDataType
 
 
@@ -16,16 +15,14 @@ class Q:
 
         if len(kwargs) == 1:
             symbol, value = next(iter(kwargs.items()))
-            key, op = parse(symbol, value)
-            self.condition = Binary(op, key, value)
+            self.condition = parse(symbol, value)
         else:
             i = 0
             q = None
             for k, v in kwargs.items():
                 if i == 0:
                     q = Q()
-                    key, op = parse(k, v)
-                    q.condition = Binary(op, key, v)
+                    q.condition = parse(k, v)
                 else:
                     q = q & Q(**{k: v})
                 i += 1

@@ -2,6 +2,7 @@ from typing import Self
 
 from sweet.sequel import Operator
 from sweet.sequel.quoting import quote
+from sweet.sequel.terms.binary import parse
 from sweet.sequel.terms.name import Name
 from sweet.utils import is_array
 
@@ -29,10 +30,10 @@ class Pair:
             raise ValueError("Only one parameter is allowed for construction.")
 
         symbol, value = next(iter(kwargs.items()))
-        key, op = parse(symbol, value)
-        self.field = key
-        self.operator = op
-        self.value = value
+        binary = parse(symbol, value)
+        self.field = binary.key
+        self.operator = binary.op
+        self.value = binary.value
 
     def __repr__(self) -> str:
         return f'{self.field} {self.operator} {self.value}'
@@ -52,60 +53,3 @@ class Pair:
             )
 
 
-MAPPING = {
-    ''         : Operator.EQ,
-    'not'      : Operator.EQ.invert(),
-
-    'bt'       : Operator.BETWEEN,
-    'not_bt'   : Operator.BETWEEN.invert(),
-
-    'lt'       : Operator.LT,
-    'not_lt'   : Operator.LT.invert(),
-
-    'lte'      : Operator.LTE,
-    'not_lte'  : Operator.LTE.invert(),
-
-    'gt'       : Operator.GT,
-    'not_gt'   : Operator.GT.invert(),
-
-    'gte'      : Operator.GTE,
-    'not_gte'  : Operator.GTE.invert(),
-
-    'like'     : Operator.LIKE,
-    'not_like' : Operator.LIKE.invert(),
-
-    'regex'    : Operator.REGEX,
-    'not_regex': Operator.REGEX.invert(),
-}
-
-
-def parse(symbol: str, value: any) -> (str | Name, Operator):
-    key, op, seperator = symbol, Operator.EQ, '__'
-    if seperator in symbol:
-        # The symbol represents a general key, such as 'username'
-        parts = symbol.split(seperator)
-        op_str = parts[-1]
-        if op_str in MAPPING:
-            # The symbol represents a special key which included an operator, such as 'username__like'
-            op = MAPPING[op_str]
-            key = seperator.join(parts[:-1])
-            if op in {Operator.BETWEEN, Operator.NOT_BETWEEN} and not (is_array(value) and len(value) == 2):
-                raise ValueError(f'The {op_str} operation expects a list or tuple of length 2, but it is not.')
-
-        if seperator in key:
-            # The new_symbol represents a special key which include a parent schema,
-            # such as 'users__nickname', 'oa__users__nickname'
-            reversed_parts = key.split(seperator)[::-1]
-            key = Name(reversed_parts[0], '.'.join(reversed_parts[1:]))
-
-    if value is None:
-        if op == Operator.EQ:
-            op = Operator.IS
-        elif op == Operator.NOT_EQ:
-            op = Operator.IS_NOT
-    elif is_array(value):
-        if op == Operator.EQ:
-            op = Operator.IN
-        elif op == Operator.NOT_EQ:
-            op = Operator.NOT_IN
-    return key, op
