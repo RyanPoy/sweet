@@ -6,7 +6,6 @@ from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.value import Value
 from sweet.sequel.terms.where import Having, On, Where
 from sweet.utils import DBDataType
 
@@ -61,7 +60,7 @@ class SelectStatement:
             elif c == '*':
                 self.columns.append(literal.STAR)
             else:
-                self.columns.append(Value(c))
+                self.columns.append(c)
 
         return self
 

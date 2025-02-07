@@ -4,7 +4,6 @@ from typing import Self
 from sweet.sequel.terms import Logic, literal
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.name import Name
-from sweet.sequel.terms.value import Value
 from sweet.utils import DBDataType
 
 
@@ -89,10 +88,11 @@ class Fn:
         return self
 
     def __compare(self, op: str, value: DBDataType | Name | Self) -> Self:
-        if isinstance(value, Name):
-            self.cmp_pairs.append((op, value))
-        else:
-            self.cmp_pairs.append((op, Value(value)))
+        # if isinstance(value, Name):
+        #     self.cmp_pairs.append((op, value))
+        # else:
+        #     self.cmp_pairs.append((op, Value(value)))
+        self.cmp_pairs.append((op, value))
         return self
 
 
