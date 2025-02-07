@@ -9,7 +9,7 @@ class Binary:
 
     def __init__(self, op: Operator, key, value: DBDataType | Name = None) -> None:
         self.key: Name | str = key
-        self.value: Name | DBDataType = value
+        self.value: DBDataType | Name = value
         self.op: Operator = op
 
     def invert(self) -> Self:

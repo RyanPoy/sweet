@@ -8,6 +8,7 @@ class Value:
     Usage:
         # initialize
         v = Value(43)
+        v = Value(Name("nickname"))
     """
     def __init__(self, v: DBDataType):
         self.v = v
