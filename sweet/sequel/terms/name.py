@@ -1,3 +1,4 @@
+import copy
 from typing import Optional, Self
 
 from sweet.sequel import Operator
@@ -36,6 +37,11 @@ class Name:
     def as_(self, alias: str) -> Self:
         self.alias = alias
         return self
+
+    def rm_alias(self) -> Self:
+        instance = copy.copy(self)
+        instance.alias = None
+        return instance
 
     def __repr__(self):
         if self.schema_name:
