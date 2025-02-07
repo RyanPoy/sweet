@@ -2,8 +2,7 @@ from typing import Self
 
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.name import Name
-from sweet.sequel.terms.value import Value1, ValueType, Values
-from sweet.sequel.terms.values_list import ValuesList
+from sweet.sequel.terms.values import Value1, ValueType, Values, ValuesList
 
 
 class InsertStatement:

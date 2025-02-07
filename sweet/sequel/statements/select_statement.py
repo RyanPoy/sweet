@@ -5,7 +5,7 @@ from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.value import Value1
+from sweet.sequel.terms.values import Value1
 from sweet.sequel.terms.where import Having, On, Where
 
 

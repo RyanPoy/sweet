@@ -2,7 +2,7 @@ from typing import Self
 
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.value import Value1
+from sweet.sequel.terms.values import Value1
 from sweet.sequel.terms.where import Where
 
 

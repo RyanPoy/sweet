@@ -13,8 +13,7 @@ from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.value import Value, Value1, Values
-from sweet.sequel.terms.values_list import ValuesList
+from sweet.sequel.terms.values import Value, Value1, Values, ValuesList
 from sweet.sequel.quoting import quote, quote_name, quote_condition, quote_value
 from sweet.sequel.terms.where import Filter, Having, On, Where
 

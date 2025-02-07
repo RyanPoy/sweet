@@ -1,7 +1,7 @@
 import copy
 from typing import Optional, Self, TYPE_CHECKING
 
-from sweet.sequel.terms.value import Value1
+from sweet.sequel.terms.values import Value1
 
 if TYPE_CHECKING:
     from sweet.sequel.terms.binary import Binary

@@ -1,7 +1,7 @@
 from typing import Self
 
 from sweet.sequel import Operator
-from sweet.sequel.terms.value import Value1
+from sweet.sequel.terms.values import Value1
 from sweet.utils import is_array
 from sweet.sequel.terms.name import Name
 

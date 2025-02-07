@@ -2,8 +2,7 @@ import unittest
 from datetime import date, datetime
 from decimal import Decimal
 
-from sweet.sequel.terms.value import Values
-from sweet.sequel.terms.values_list import ValuesList
+from sweet.sequel.terms.values import Values, ValuesList
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor

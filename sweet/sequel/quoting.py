@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 
-from sweet.sequel.terms.value import Value1
+from sweet.sequel.terms.values import Value1
 from sweet.utils import binary2str, date2str, datetime2str
 
 

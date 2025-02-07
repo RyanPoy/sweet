@@ -4,7 +4,7 @@ from typing import Self
 from sweet.sequel.terms import Logic, literal
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.name import Name
-from sweet.sequel.terms.value import Value1
+from sweet.sequel.terms.values import Value1
 
 
 class Fn:

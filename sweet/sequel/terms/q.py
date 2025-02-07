@@ -2,7 +2,7 @@ from typing import Self
 
 from sweet.sequel.terms import Logic
 from sweet.sequel.terms.binary import parse
-from sweet.sequel.terms.value import Value1
+from sweet.sequel.terms.values import Value1
 
 
 class Q:
