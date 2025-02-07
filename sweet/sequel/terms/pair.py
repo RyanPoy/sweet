@@ -23,6 +23,7 @@ class Pair:
         # Complex conditions with lists or tuples
         pair = Pair(column1__bt=(5, 15))
     """
+
     def __init__(self, **kwargs) -> None:
         if len(kwargs) > 1:
             raise ValueError("Only one parameter is allowed for construction.")
@@ -45,10 +46,11 @@ class Pair:
     def __basic_eq(self, other: Self) -> bool:
         return self.__class__ == other.__class__ and self.field == other.field \
             and (
-                self.value == other.value or (
+                    self.value == other.value or (
                     isinstance(self.value, (tuple, list)) and isinstance(other.value, (tuple, list)) and list(self.value) == list(other.value)
-                )
             )
+            )
+
 
 MAPPING = {
     ''         : Operator.EQ,
@@ -75,33 +77,35 @@ MAPPING = {
     'regex'    : Operator.REGEX,
     'not_regex': Operator.REGEX.invert(),
 }
-SEPERATOR = '__'
 
 
 def parse(symbol: str, value: any) -> (str | Name, Operator):
-    key, op = symbol, Operator.EQ
-    if SEPERATOR in symbol:
+    key, op, seperator = symbol, Operator.EQ, '__'
+    if seperator in symbol:
         # The symbol represents a general key, such as 'username'
-        vs = symbol.split(SEPERATOR)
-        op_str = vs[-1]
+        parts = symbol.split(seperator)
+        op_str = parts[-1]
         if op_str in MAPPING:
             # The symbol represents a special key which included an operator, such as 'username__like'
             op = MAPPING[op_str]
-            key = SEPERATOR.join(vs[:-1])
-            if (op == Operator.BETWEEN or op == Operator.NOT_BETWEEN) and not (is_array(value) and len(value) == 2):
+            key = seperator.join(parts[:-1])
+            if op in {Operator.BETWEEN, Operator.NOT_BETWEEN} and not (is_array(value) and len(value) == 2):
                 raise ValueError(f'The {op_str} operation expects a list or tuple of length 2, but it is not.')
 
-        if SEPERATOR in key:
+        if seperator in key:
             # The new_symbol represents a special key which include a parent schema,
             # such as 'users__nickname', 'oa__users__nickname'
-            vs = key.split(SEPERATOR)
-            vs.reverse()
-            key = Name(vs[0], '.'.join(vs[1:]))
+            reversed_parts = key.split(seperator)[::-1]
+            key = Name(reversed_parts[0], '.'.join(reversed_parts[1:]))
 
     if value is None:
-        if op == Operator.EQ: op = Operator.IS
-        elif op == Operator.NOT_EQ: op = Operator.IS_NOT
+        if op == Operator.EQ:
+            op = Operator.IS
+        elif op == Operator.NOT_EQ:
+            op = Operator.IS_NOT
     elif is_array(value):
-        if op == Operator.EQ: op = Operator.IN
-        elif op == Operator.NOT_EQ: op = Operator.NOT_IN
+        if op == Operator.EQ:
+            op = Operator.IN
+        elif op == Operator.NOT_EQ:
+            op = Operator.NOT_IN
     return key, op
