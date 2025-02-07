@@ -124,7 +124,11 @@ class Visitor:
             else:
                 self.visit_Name(v, sql)
 
-        sql << self.quote_column_name(p.field)
+        if isinstance(p.field, Name):
+            self.visit_Name(p.field, sql)
+        else:
+            sql << self.quote_column_name(p.field)
+
         sql << f" {str(p.operator)} "
         if p.operator == Operator.BETWEEN or p.operator == Operator.NOT_BETWEEN:
             if isinstance(p.value[0], Name):
