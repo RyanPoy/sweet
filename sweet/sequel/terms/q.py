@@ -2,12 +2,12 @@ from typing import Self
 
 from sweet.sequel.terms import Logic
 from sweet.sequel.terms.binary import parse
-from sweet.sequel.terms.value import Value
+from sweet.sequel.terms.value import Value1
 
 
 class Q:
 
-    def __init__(self, **kwargs: {str: Value}) -> None:
+    def __init__(self, **kwargs: {str: Value1}) -> None:
         self.logic_op = Logic.AND
         self.children = []
         self.binary = None

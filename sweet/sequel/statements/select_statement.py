@@ -5,7 +5,7 @@ from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.value import Value
+from sweet.sequel.terms.value import Value1
 from sweet.sequel.terms.where import Having, On, Where
 
 
@@ -52,7 +52,7 @@ class SelectStatement:
     def from_(self, table: Name | Self) -> Self:
         return self.__from_or_join(self.tables, table)
 
-    def select(self, *columns: Value) -> Self:
+    def select(self, *columns: Value1) -> Self:
         for c in columns:
             if isinstance(c, str) and '*' == c:
                 self.columns.append(literal.STAR)

@@ -2,7 +2,7 @@ from typing import Self
 
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.name import Name
-from sweet.sequel.terms.value import Value
+from sweet.sequel.terms.value import Value1
 from sweet.sequel.terms.values_list import ValuesList
 
 
@@ -93,7 +93,7 @@ class InsertStatement:
         """
         return self._values_list
 
-    def insert(self, *values: Value) -> Self:
+    def insert(self, *values: Value1) -> Self:
         """
         Adds a new row to the INSERT statement.
 
@@ -108,7 +108,7 @@ class InsertStatement:
         self.insert_or_update = literal.INSERT_IGNORE
         return self
 
-    def insert_rows(self, *rows: [Value]) -> Self:
+    def insert_rows(self, *rows: [Value1]) -> Self:
         """
         Adds multiple rows to the INSERT statement.
 
@@ -120,7 +120,7 @@ class InsertStatement:
         self.insert_or_update = literal.INSERT
         return self
 
-    def replace(self, *values: Value) -> Self:
+    def replace(self, *values: Value1) -> Self:
         """
         Adds a new row to the INSERT statement with a REPLACE operation.
 
@@ -131,11 +131,11 @@ class InsertStatement:
         self.insert_or_update = literal.REPLACE
         return self
 
-    def replace_rows(self, *rows: [Value]) -> Self:
+    def replace_rows(self, *rows: [Value1]) -> Self:
         """
         Adds multiple rows with a REPLACE operation for batch processing.
 
-        :param rows: List of tuples representing rows to replace.
+        :param rows: List of tuples repr1esenting rows to replace.
         :return: The current InsertStatement instance.
         """
         if rows:
@@ -143,7 +143,7 @@ class InsertStatement:
         self.insert_or_update = literal.REPLACE
         return self
 
-    def __insert_or_replace(self, *values: Value) -> Self:
+    def __insert_or_replace(self, *values: Value1) -> Self:
         """
         Internal method to handle both insert and replace operations.
 

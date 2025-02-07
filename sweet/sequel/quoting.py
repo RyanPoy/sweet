@@ -1,9 +1,7 @@
-import copy
 from datetime import date, datetime
 from decimal import Decimal
 
-from sweet.sequel.terms.name import Name
-from sweet.sequel.terms.value import Value
+from sweet.sequel.terms.value import Value1
 from sweet.utils import binary2str, date2str, datetime2str
 
 
@@ -11,11 +9,11 @@ def qs(s: str) -> str:
     return s.replace("\\", '\\\\').replace("'", "''")
 
 
-def quote_value(value: Value) -> str:
+def quote_value(value: Value1) -> str:
     return quote(value, "[", "]")
 
 
-def quote_condition(value: Value) -> str:
+def quote_condition(value: Value1) -> str:
     return quote(value, "(", ")")
 
 
@@ -28,7 +26,7 @@ def quote_name(name: str, qchar: str) -> str:
     return f'{qchar}{name}{qchar}'
 
 
-def quote(value: Value, begin: str = "[", end: str = "]") -> str:
+def quote(value: Value1, begin: str = "[", end: str = "]") -> str:
     """Quotes the column value to help prevent"""
     if value is None: return "NULL"
 

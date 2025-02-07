@@ -1,16 +1,16 @@
 from typing import Self
 
 from sweet.sequel import Operator
-from sweet.sequel.terms.value import Value
+from sweet.sequel.terms.value import Value1
 from sweet.utils import is_array
 from sweet.sequel.terms.name import Name
 
 
 class Binary:
 
-    def __init__(self, op: Operator, key, value: Value = None) -> None:
+    def __init__(self, op: Operator, key, value: Value1 = None) -> None:
         self.key: Name | str = key
-        self.value: Value = value
+        self.value: Value1 = value
         self.op: Operator = op
 
     def invert(self) -> Self:
@@ -60,7 +60,7 @@ MAPPING = {
 }
 
 
-def parse(**kwargs: {str: Value}) -> Binary:
+def parse(**kwargs: {str: Value1}) -> Binary:
     if len(kwargs) != 1:
         raise ValueError('Only one parameter is allowed for construction.')
 

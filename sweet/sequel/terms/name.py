@@ -1,7 +1,7 @@
 import copy
 from typing import Optional, Self, TYPE_CHECKING
 
-from sweet.sequel.terms.value import Value
+from sweet.sequel.terms.value import Value1
 
 if TYPE_CHECKING:
     from sweet.sequel.terms.binary import Binary
@@ -62,7 +62,7 @@ class Name:
             return True
         return self.__class__ == other.__class__ and self.value == other.value and self.schema_name == other.schema_name and self.alias == other.alias
 
-    def eq(self, v: Value) -> 'Binary':
+    def eq(self, v: Value1) -> 'Binary':
         if v is None:
             return self._binary(Operator.IS, v)
         elif is_array(v):
@@ -70,45 +70,45 @@ class Name:
         else:
             return self._binary(Operator.EQ, v)
 
-    def not_eq(self, v: Value) -> 'Binary':
+    def not_eq(self, v: Value1) -> 'Binary':
         return self.eq(v).invert()
 
-    def gt(self, v: Value) -> 'Binary':
+    def gt(self, v: Value1) -> 'Binary':
         return self._binary(Operator.GT, v)
 
-    def not_gt(self, v: Value) -> 'Binary':
+    def not_gt(self, v: Value1) -> 'Binary':
         return self.gt(v).invert()
 
-    def gte(self, v: Value) -> 'Binary':
+    def gte(self, v: Value1) -> 'Binary':
         return self._binary(Operator.GTE, v)
 
-    def not_gte(self, v: Value) -> 'Binary':
+    def not_gte(self, v: Value1) -> 'Binary':
         return self.gte(v).invert()
 
-    def lt(self, v: Value) -> 'Binary':
+    def lt(self, v: Value1) -> 'Binary':
         return self._binary(Operator.LT, v)
 
-    def not_lt(self, v: Value) -> 'Binary':
+    def not_lt(self, v: Value1) -> 'Binary':
         return self.lt(v).invert()
 
-    def lte(self, v: Value) -> 'Binary':
+    def lte(self, v: Value1) -> 'Binary':
         return self._binary(Operator.LTE, v)
 
-    def not_lte(self, v: Value) -> 'Binary':
+    def not_lte(self, v: Value1) -> 'Binary':
         return self.lte(v).invert()
 
-    def like(self, v: Value) -> 'Binary':
+    def like(self, v: Value1) -> 'Binary':
         return self._binary(Operator.LIKE, v)
 
-    def not_like(self, v: Value) -> 'Binary':
+    def not_like(self, v: Value1) -> 'Binary':
         return self.like(v).invert()
 
-    def between(self, v: [Value]) -> 'Binary':
+    def between(self, v: [Value1]) -> 'Binary':
         if not (is_array(v) and len(v) == 2):
             raise ValueError('The between function expects a list or tuple of length 2, but it is not.')
         return self._binary(Operator.BETWEEN, v)
 
-    def not_between(self, v: [Value]) -> 'Binary':
+    def not_between(self, v: [Value1]) -> 'Binary':
         if not (is_array(v) and len(v) == 2):
             raise ValueError('The not_between function expects a list or tuple of length 2, but it is not.')
         return self._binary(Operator.NOT_BETWEEN, v)

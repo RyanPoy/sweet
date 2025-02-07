@@ -4,7 +4,7 @@ from typing import Self
 from sweet.sequel.terms import Logic, literal
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.name import Name
-from sweet.sequel.terms.value import Value
+from sweet.sequel.terms.value import Value1
 
 
 class Fn:
@@ -14,7 +14,7 @@ class Fn:
         self.parentheses = parentheses
         self.alias = ""
         self.columns = []
-        self.cmp_pairs: list[(str, Value)] = []
+        self.cmp_pairs: list[(str, Value1)] = []
         self.chain: list[(Logic, Self)] = []
         self.nesting = None
 
@@ -55,27 +55,27 @@ class Fn:
         self.alias = Name(name)
         return self
 
-    def __gt__(self, other: Value) -> Self:
+    def __gt__(self, other: Value1) -> Self:
         self.cmp_pairs.append((">", other))
         return self
 
-    def __ge__(self, other: Value) -> Self:
+    def __ge__(self, other: Value1) -> Self:
         self.cmp_pairs.append((">=", other))
         return self
 
-    def __lt__(self, other: Value) -> Self:
+    def __lt__(self, other: Value1) -> Self:
         self.cmp_pairs.append(("<", other))
         return self
 
-    def __le__(self, other: Value) -> Self:
+    def __le__(self, other: Value1) -> Self:
         self.cmp_pairs.append(("<=", other))
         return self
 
-    def __eq__(self, other: Value) -> Self:
+    def __eq__(self, other: Value1) -> Self:
         self.cmp_pairs.append(("=", other))
         return self
 
-    def __ne__(self, other: Value) -> Self:
+    def __ne__(self, other: Value1) -> Self:
         self.cmp_pairs.append(("<>", other))
         return self
 

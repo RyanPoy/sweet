@@ -13,7 +13,7 @@ from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.value import Value
+from sweet.sequel.terms.value import Value1
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.sequel.quoting import quote, quote_name, quote_condition, quote_value
 from sweet.sequel.terms.where import Filter, Having, On, Where
@@ -114,7 +114,7 @@ class Visitor:
                 sql << quote_condition(b.value)
         return sql
 
-    def visit_Value(self, v: Value, sql: SQLCollector) -> SQLCollector:
+    def visit_Value(self, v: Value1, sql: SQLCollector) -> SQLCollector:
         if isinstance(v, (Name, Fn)):
             return self.visit(v, sql)
         return sql << quote(v)
@@ -275,7 +275,7 @@ class Visitor:
         try:
             method = self.__getattribute__(name)
         except AttributeError as ex:
-            if isinstance(o, Value):
+            if isinstance(o, Value1):
                 method = self.visit_Value
             else:
                 raise ex
