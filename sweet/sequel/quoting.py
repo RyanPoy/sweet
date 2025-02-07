@@ -27,7 +27,6 @@ def quote_name(name: str, qchar: str) -> str:
     return f'{qchar}{name}{qchar}'
 
 
-
 def quote(value: DBDataType | Name, begin: str = "[", end: str = "]") -> str:
     """Quotes the column value to help prevent"""
     if value is None: return "NULL"
