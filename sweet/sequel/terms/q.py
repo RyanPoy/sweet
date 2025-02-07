@@ -52,10 +52,10 @@ class Q:
         ])
 
     def __eq__(self, other):
-        eq = self.__class__ == other.__class__ \
+        equals = self.__class__ == other.__class__ \
              and self.condition == other.condition \
              and len(self.children) == len(other.children)
-        if not eq:
+        if not equals:
             return False
         for i, q in enumerate(self.children):
             if not q.__eq__(other.children[i]):
@@ -63,7 +63,7 @@ class Q:
         return True
 
     def __hash__(self):
-        return hash(f'{self.__class__}-{hash(self.condition)}-{self.logic_op}-{''.join([x.__hash__() for x in self.children])}')
+        return hash(f'{self.__class__}-{str(self.condition)}-{self.logic_op}-{''.join([str(x) for x in self.children])}')
 
     def __and__(self, other) -> Self:
         return self.__combine(other, Logic.AND)
