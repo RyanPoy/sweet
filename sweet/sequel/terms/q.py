@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import Self
 
 from sweet.sequel.terms import Logic
@@ -9,8 +8,6 @@ from sweet.utils import DBDataType
 class Q:
 
     def __init__(self, **kwargs: {str: DBDataType}) -> None:
-        super().__init__()
-
         self.logic_op = Logic.AND
         self.children = []
         self.condition = None

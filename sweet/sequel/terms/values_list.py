@@ -19,8 +19,6 @@ class ValuesList:
         vs.append([ (3, "jimy", 15), (4, "abc", 8) ])
     """
     def __init__(self, *vs: DBDataType) -> None:
-        super().__init__()
-
         self.data = []
         if vs:
             self.data.append(vs)

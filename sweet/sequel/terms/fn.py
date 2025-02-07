@@ -11,7 +11,6 @@ from sweet.utils import DBDataType
 class Fn:
 
     def __init__(self, name: str, parentheses: bool = True) -> None:
-        super().__init__()
         self.name = name
         self.parentheses = parentheses
         self.alias = ""

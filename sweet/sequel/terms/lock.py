@@ -5,7 +5,6 @@ from sweet.sequel.terms.name import Name
 class Lock:
 
     def __init__(self, share: bool = False, nowait: bool = False, skip: bool = False, of: (str,) = ()) -> None:
-        super().__init__()
         self.prefix = Literal("FOR UPDATE")
         if share:
             self.suffix = Literal("SHARE")
