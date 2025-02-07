@@ -3,18 +3,19 @@ from datetime import date, datetime
 from decimal import Decimal
 
 from sweet.sequel.terms.name import Name
-from sweet.utils import DBDataType, binary2str, date2str, datetime2str
+from sweet.sequel.terms.value import Value
+from sweet.utils import binary2str, date2str, datetime2str
 
 
 def qs(s: str) -> str:
     return s.replace("\\", '\\\\').replace("'", "''")
 
 
-def quote_value(value: DBDataType | Name) -> str:
+def quote_value(value: Value) -> str:
     return quote(value, "[", "]")
 
 
-def quote_condition(value: DBDataType | Name) -> str:
+def quote_condition(value: Value) -> str:
     return quote(value, "(", ")")
 
 
@@ -27,7 +28,7 @@ def quote_name(name: str, qchar: str) -> str:
     return f'{qchar}{name}{qchar}'
 
 
-def quote(value: DBDataType | Name, begin: str = "[", end: str = "]") -> str:
+def quote(value: Value, begin: str = "[", end: str = "]") -> str:
     """Quotes the column value to help prevent"""
     if value is None: return "NULL"
 

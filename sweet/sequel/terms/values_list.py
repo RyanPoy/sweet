@@ -1,6 +1,6 @@
 from typing import Self
 
-from sweet.utils import DBDataType
+from sweet.sequel.terms.value import Value
 
 
 class ValuesList:
@@ -18,7 +18,7 @@ class ValuesList:
         # add multiple rows
         vs.append([ (3, "jimy", 15), (4, "abc", 8) ])
     """
-    def __init__(self, *vs: DBDataType) -> None:
+    def __init__(self, *vs: Value) -> None:
         self.data = []
         if vs:
             self.data.append(vs)
@@ -31,7 +31,7 @@ class ValuesList:
         """
         return False if self.data else True
 
-    def append(self, rows: [(DBDataType,)]) -> Self:
+    def append(self, rows: [(Value,)]) -> Self:
         """
         Append the row to the ValuesList. All rows must have consistent column length as existing rows.
 

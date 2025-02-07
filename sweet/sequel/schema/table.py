@@ -3,7 +3,7 @@ from functools import cached_property
 from sweet.sequel.schema.columns import Column
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.terms.name import Name
-from sweet.utils import DBDataType
+from sweet.sequel.terms.value import Value
 
 
 class Table:
@@ -18,7 +18,7 @@ class Table:
             return f'"{self.schema_name}"."{self.name}"'
         return f'"{self.name}"'
 
-    def insert(self, *values: DBDataType) -> InsertStatement:
+    def insert(self, *values: Value) -> InsertStatement:
         return InsertStatement(Name(self.name)).insert(*values)
 
     def __setattr__(self, key, value):

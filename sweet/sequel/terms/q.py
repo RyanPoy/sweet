@@ -1,13 +1,13 @@
 from typing import Self
 
 from sweet.sequel.terms import Logic
-from sweet.sequel.terms.binary import Binary, parse
-from sweet.utils import DBDataType
+from sweet.sequel.terms.binary import parse
+from sweet.sequel.terms.value import Value
 
 
 class Q:
 
-    def __init__(self, **kwargs: {str: DBDataType}) -> None:
+    def __init__(self, **kwargs: {str: Value}) -> None:
         self.logic_op = Logic.AND
         self.children = []
         self.binary = None

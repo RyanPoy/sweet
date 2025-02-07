@@ -7,7 +7,6 @@ from queue import Queue
 import time
 import re
 
-DBDataType = Union[int, float, str, Decimal, bool, date, datetime, list, tuple, None, bytes]
 
 
 # data type transfer variables and functions

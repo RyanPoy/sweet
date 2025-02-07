@@ -2,8 +2,8 @@ from typing import Self
 
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
+from sweet.sequel.terms.value import Value
 from sweet.sequel.terms.where import Where
-from sweet.utils import DBDataType
 
 
 class UpdateStatement:
@@ -49,7 +49,7 @@ class UpdateStatement:
     """
     def __init__(self, table_name: Name):
         self.where_clause = Where()
-        self.sets : {str: DBDataType | Name} = {}
+        self.sets : {str: Value} = {}
         self.table_name: Name = table_name
 
     def set(self, **kwargs) -> Self:

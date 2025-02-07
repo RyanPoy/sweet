@@ -1,15 +1,16 @@
 from typing import Self
 
 from sweet.sequel import Operator
-from sweet.utils import DBDataType, is_array
+from sweet.sequel.terms.value import Value
+from sweet.utils import is_array
 from sweet.sequel.terms.name import Name
 
 
 class Binary:
 
-    def __init__(self, op: Operator, key, value: DBDataType | Name = None) -> None:
+    def __init__(self, op: Operator, key, value: Value = None) -> None:
         self.key: Name | str = key
-        self.value: DBDataType | Name = value
+        self.value: Value = value
         self.op: Operator = op
 
     def invert(self) -> Self:
@@ -59,11 +60,11 @@ MAPPING = {
 }
 
 
-def parse(**kwargs: {str: DBDataType | Name}) -> Binary:
+def parse(**kwargs: {str: Value}) -> Binary:
     if len(kwargs) != 1:
         raise ValueError('Only one parameter is allowed for construction.')
 
-    symbol, value = next(iter(kwargs.items()))  # symbol: str, value: DBDataType | Name
+    symbol, value = next(iter(kwargs.items()))  # symbol: str, value: Value
     key, op, seperator = symbol, Operator.EQ, '__'
     if seperator in symbol:
         # The symbol represents a general key, such as 'username'

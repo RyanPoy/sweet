@@ -1,4 +1,3 @@
-import copy
 from typing import Callable
 
 from sweet.sequel import Operator
@@ -14,10 +13,10 @@ from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
+from sweet.sequel.terms.value import Value
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.sequel.quoting import quote, quote_name, quote_condition, quote_value
 from sweet.sequel.terms.where import Filter, Having, On, Where
-from sweet.utils import DBDataType
 
 
 class Visitor:
@@ -115,7 +114,9 @@ class Visitor:
                 sql << quote_condition(b.value)
         return sql
 
-    def visit_DBDataType(self, v: DBDataType, sql: SQLCollector) -> SQLCollector:
+    def visit_Value(self, v: Value, sql: SQLCollector) -> SQLCollector:
+        if isinstance(v, (Name, Fn)):
+            return self.visit(v, sql)
         return sql << quote(v)
 
     def visit_ValuesList(self, values: ValuesList, sql: SQLCollector) -> SQLCollector:
@@ -274,8 +275,8 @@ class Visitor:
         try:
             method = self.__getattribute__(name)
         except AttributeError as ex:
-            if isinstance(o, DBDataType):
-                method = self.visit_DBDataType
+            if isinstance(o, Value):
+                method = self.visit_Value
             else:
                 raise ex
         methods[name] = method

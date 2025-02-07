@@ -4,7 +4,7 @@ from typing import Self
 from sweet.sequel.terms import Logic, literal
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.name import Name
-from sweet.utils import DBDataType
+from sweet.sequel.terms.value import Value
 
 
 class Fn:
@@ -55,22 +55,22 @@ class Fn:
         self.alias = Name(name)
         return self
 
-    def __gt__(self, other: DBDataType | Name | Self) -> Self:
+    def __gt__(self, other: Value) -> Self:
         return self.__compare(">", other)
 
-    def __ge__(self, other: DBDataType | Name | Self) -> Self:
+    def __ge__(self, other: Value) -> Self:
         return self.__compare(">=", other)
 
-    def __lt__(self, other: DBDataType | Name | Self) -> Self:
+    def __lt__(self, other: Value) -> Self:
         return self.__compare("<", other)
 
-    def __le__(self, other: DBDataType | Name | Self) -> Self:
+    def __le__(self, other: Value) -> Self:
         return self.__compare("<=", other)
 
-    def __eq__(self, other: DBDataType | Name | Self) -> Self:
+    def __eq__(self, other: Value) -> Self:
         return self.__compare("=", other)
 
-    def __ne__(self, other: DBDataType | Name | Self) -> Self:
+    def __ne__(self, other: Value) -> Self:
         return self.__compare("<>", other)
 
     def __and__(self, other: Self) -> Self:
@@ -87,7 +87,7 @@ class Fn:
         self.chain.append((logic_op, other))
         return self
 
-    def __compare(self, op: str, value: DBDataType | Name | Self) -> Self:
+    def __compare(self, op: str, value: Value) -> Self:
         # if isinstance(value, Name):
         #     self.cmp_pairs.append((op, value))
         # else:
