@@ -1,15 +1,13 @@
-from typing import Self, TYPE_CHECKING
+from typing import Self
 
 from sweet.sequel import Operator
 from sweet.utils import DBDataType, is_array
-
-if TYPE_CHECKING:
-    from sweet.sequel.terms.name import Name
+from sweet.sequel.terms.name import Name
 
 
 class Binary:
 
-    def __init__(self, op: Operator, key, value: DBDataType | 'Name' = None) -> None:
+    def __init__(self, op: Operator, key, value: DBDataType | Name = None) -> None:
         self.key: Name | str = key
         self.value: Name | DBDataType = value
         self.op: Operator = op
@@ -61,11 +59,11 @@ MAPPING = {
 }
 
 
-def parse(**kwargs: {str: DBDataType | 'Name'}) -> Binary:
+def parse(**kwargs: {str: DBDataType | Name}) -> Binary:
     if len(kwargs) != 1:
         raise ValueError('Only one parameter is allowed for construction.')
 
-    symbol, value = next(iter(kwargs.items()))  # symbol: str, value: DBDataType | 'Name'
+    symbol, value = next(iter(kwargs.items()))  # symbol: str, value: DBDataType | Name
     key, op, seperator = symbol, Operator.EQ, '__'
     if seperator in symbol:
         # The symbol represents a general key, such as 'username'
@@ -82,8 +80,6 @@ def parse(**kwargs: {str: DBDataType | 'Name'}) -> Binary:
             # The new_symbol represents a special key which include a parent schema,
             # such as 'users__nickname', 'oa__users__nickname'
             reversed_parts = key.split(seperator)[::-1]
-
-            from sweet.sequel.terms.name import Name
             key = Name(reversed_parts[0], '.'.join(reversed_parts[1:]))
 
     if value is None:
