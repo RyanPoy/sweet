@@ -49,9 +49,8 @@ class UpdateStatement:
     """
     def __init__(self, table_name: Name):
         self.where_clause = Where()
-        self.sets : {str: DBDataType} = {}
+        self.sets : {str: DBDataType | Name} = {}
         self.table_name: Name = table_name
-
 
     def set(self, **kwargs) -> Self:
         """

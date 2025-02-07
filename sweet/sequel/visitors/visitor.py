@@ -172,7 +172,11 @@ class Visitor:
             i = 0
             for k, v in stmt.sets.items():
                 if i != 0: sql << ", "
-                sql << f"{self.quote_column_name(k)} = {quote_value(v)}"
+                sql << f"{self.quote_column_name(k)} = "
+                if isinstance(v, Name):
+                    self.visit_Name(v, sql)
+                else:
+                    sql << quote_value(v)
                 i += 1
         self.visit_Where(stmt.where_clause, sql)
         return sql

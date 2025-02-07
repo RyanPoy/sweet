@@ -15,11 +15,17 @@ class TestUpdateStatement(unittest.TestCase):
         self.pg = PostgreSQLVisitor()
         self.table_users = Name("users")
 
-    def test_empty_query(self):
+    def test_empty(self):
         stmt = UpdateStatement(self.table_users)
         self.assertEqual("", self.mysql.sql(stmt))
         self.assertEqual("", self.sqlite.sql(stmt))
         self.assertEqual("", self.pg.sql(stmt))
+
+    def test_update_to_other_column(self):
+        stmt = UpdateStatement(self.table_users).set(foo=Name("bar"))
+        self.assertEqual('UPDATE `users` SET `foo` = `bar`', self.mysql.sql(stmt))
+        self.assertEqual('UPDATE "users" SET "foo" = "bar"', self.sqlite.sql(stmt))
+        self.assertEqual('UPDATE "users" SET "foo" = "bar"', self.pg.sql(stmt))
 
     def test_omit_where(self):
         stmt = UpdateStatement(self.table_users).set(foo="bar")
