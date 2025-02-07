@@ -14,7 +14,7 @@ from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.value import Regexp, Value
+from sweet.sequel.terms.value import Value
 from sweet.sequel.terms.values_list import ValuesList
 from sweet.sequel.quoting import quote, quote_name, quote_condition, quote_value
 from sweet.sequel.terms.where import Filter, Having, On, Where
@@ -117,9 +117,6 @@ class Visitor:
 
     def visit_Value(self, v: Value, sql: SQLCollector) -> SQLCollector:
         return sql << quote(v.v)
-
-    def visit_Regexp(self, r: Regexp, sql: SQLCollector) -> SQLCollector:
-        return sql << "REGEX" << quote(r.v)
 
     def visit_ValuesList(self, values: ValuesList, sql: SQLCollector) -> SQLCollector:
         for i, vs in enumerate(values.data):
