@@ -9,6 +9,7 @@ import re
 
 DBDataType = Union[int, float, str, Decimal, bool, date, datetime, list, tuple, None, bytes]
 
+
 # data type transfer variables and functions
 FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE', 'No', 'no', 'NO')
 ISO_DATE = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'

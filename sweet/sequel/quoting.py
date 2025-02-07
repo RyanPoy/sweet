@@ -46,12 +46,5 @@ def quote(value: DBDataType | Name, begin: str = "[", end: str = "]") -> str:
         return f"'{binary2str(value)}'"
     if tp in (tuple, list):
         return f"{begin}{', '.join([quote(v) for v in value])}{end}"
-    # if tp == Name:
-    #     if value.alias:
-    #         new_value = copy.deepcopy(value)
-    #         new_value.alias = ""
-    #         self.visit_Name(new_value, sql)
-    #     else:
-    #         self.visit_Name(v, sql)
     raise TypeError(f"can't quote '{value.__class__.__name__}' type")
 
