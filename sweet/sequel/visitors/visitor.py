@@ -82,8 +82,8 @@ class Visitor:
     def visit_Q(self, q: Q, sql: SQLCollector) -> SQLCollector:
         if q.invert:
             sql << "NOT "
-        if q.condition:
-            self.visit(q.condition, sql)
+        if q.binary:
+            self.visit(q.binary, sql)
         if q.children:
             sql << "("
             for i, c in enumerate(q.children):

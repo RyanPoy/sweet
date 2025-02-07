@@ -10,19 +10,19 @@ class Q:
     def __init__(self, **kwargs: {str: DBDataType}) -> None:
         self.logic_op = Logic.AND
         self.children = []
-        self.condition = None
+        self.binary = None
         self.invert = False
 
         if len(kwargs) == 1:
             symbol, value = next(iter(kwargs.items()))
-            self.condition = parse(symbol, value)
+            self.binary = parse(symbol, value)
         else:
             i = 0
             q = None
             for k, v in kwargs.items():
                 if i == 0:
                     q = Q()
-                    q.condition = parse(k, v)
+                    q.binary = parse(k, v)
                 else:
                     q = q & Q(**{k: v})
                 i += 1
@@ -30,12 +30,12 @@ class Q:
                 self.children = q.children
 
     def is_empty(self) -> bool:
-        return not self.children and not self.condition
+        return not self.children and not self.binary
 
     def ast(self):
         return {
             'logic'    : self.logic_op,
-            'condition': f"{self.condition}",
+            'condition': f"{self.binary}",
             'children' : [q.ast() for q in self.children],
         }
 
@@ -43,14 +43,14 @@ class Q:
         return ''.join([
             str(self.logic_op),
             "(",
-            f"{self.condition}" if self.condition else "",
+            f"{self.binary}" if self.binary else "",
             ', '.join([str(c) for c in self.children]),
             ")",
         ])
 
     def __eq__(self, other):
         equals = self.__class__ == other.__class__ \
-             and self.condition == other.condition \
+             and self.binary == other.binary \
              and len(self.children) == len(other.children)
         if not equals:
             return False
@@ -60,7 +60,7 @@ class Q:
         return True
 
     def __hash__(self):
-        return hash(f'{self.__class__}-{str(self.condition)}-{self.logic_op}-{''.join([str(x) for x in self.children])}')
+        return hash(f'{self.__class__}-{str(self.binary)}-{self.logic_op}-{''.join([str(x) for x in self.children])}')
 
     def __and__(self, other) -> Self:
         return self.__combine(other, Logic.AND)
@@ -77,9 +77,9 @@ class Q:
         if not isinstance(other, Q):
             raise TypeError("Logical operators can only be applied between two Q objects.")
 
-        if not other.condition and not other.children:
+        if not other.binary and not other.children:
             return self
-        if not self.condition and not self.children:
+        if not self.binary and not self.children:
             return other
 
         q = Q()
