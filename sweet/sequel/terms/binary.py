@@ -61,11 +61,11 @@ MAPPING = {
 }
 
 
-def parse(**kwargs) -> Binary:
+def parse(**kwargs: {str: DBDataType | 'Name'}) -> Binary:
+    if len(kwargs) != 1:
+        raise ValueError('Only one parameter is allowed for construction.')
 
-    kwargs.items()
-
-def parse(symbol: str, value: any) -> Binary:
+    symbol, value = next(iter(kwargs.items()))  # symbol: str, value: DBDataType | 'Name'
     key, op, seperator = symbol, Operator.EQ, '__'
     if seperator in symbol:
         # The symbol represents a general key, such as 'username'

@@ -14,15 +14,14 @@ class Q:
         self.invert = False
 
         if len(kwargs) == 1:
-            symbol, value = next(iter(kwargs.items()))
-            self.binary = parse(symbol, value)
+            self.binary = parse(**kwargs)
         else:
             i = 0
             q = None
             for k, v in kwargs.items():
                 if i == 0:
                     q = Q()
-                    q.binary = parse(k, v)
+                    q.binary = parse(**{k: v})
                 else:
                     q = q & Q(**{k: v})
                 i += 1
