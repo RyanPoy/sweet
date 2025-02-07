@@ -55,13 +55,10 @@ class SelectStatement:
 
     def select(self, *columns: Value) -> Self:
         for c in columns:
-            if isinstance(c, (Name, Fn)):
-                self.columns.append(c)
-            elif c == '*':
+            if isinstance(c, str) and '*' == c:
                 self.columns.append(literal.STAR)
             else:
                 self.columns.append(c)
-
         return self
 
     def force_index(self, *indexes: Name) -> Self:
