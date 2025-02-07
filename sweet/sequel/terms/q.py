@@ -1,7 +1,8 @@
 from typing import Self
 
 from sweet.sequel.terms import Logic
-from sweet.sequel.terms.pair import Pair
+from sweet.sequel.terms.binary import Binary
+from sweet.sequel.terms.pair import parse
 from sweet.utils import DBDataType
 
 
@@ -14,14 +15,17 @@ class Q:
         self.invert = False
 
         if len(kwargs) == 1:
-            self.condition = Pair(**kwargs)
+            symbol, value = next(iter(kwargs.items()))
+            key, op = parse(symbol, value)
+            self.condition = Binary(op, key, value)
         else:
             i = 0
             q = None
             for k, v in kwargs.items():
                 if i == 0:
                     q = Q()
-                    q.condition = Pair(**{k: v})
+                    key, op = parse(k, v)
+                    q.condition = Binary(op, key, v)
                 else:
                     q = q & Q(**{k: v})
                 i += 1
@@ -59,7 +63,7 @@ class Q:
         return True
 
     def __hash__(self):
-        return hash(f'{self.__class__}-{hash(self.condition)}-{self.logic_op}-{''.join([hash(str(x)) for x in self.children])}')
+        return hash(f'{self.__class__}-{hash(self.condition)}-{self.logic_op}-{''.join([x.__hash__() for x in self.children])}')
 
     def __and__(self, other) -> Self:
         return self.__combine(other, Logic.AND)
