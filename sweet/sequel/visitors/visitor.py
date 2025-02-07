@@ -83,7 +83,7 @@ class Visitor:
         if q.invert:
             sql << "NOT "
         if q.condition:
-            self.visit_Pair(q.condition, sql)
+            self.visit(q.condition, sql)
         if q.children:
             sql << "("
             for i, c in enumerate(q.children):
@@ -99,20 +99,20 @@ class Visitor:
             sql << self.quote_column_name(b.key)
         sql << f" {b.op} "
         if b.op == Operator.BETWEEN or b.op == Operator.NOT_BETWEEN:
-            if isinstance(b.value, Name):
-                self.visit(b.value[0], sql)
-                sql << " AND "
-                self.visit(b.value[1], sql)
+            if isinstance(b.value[0], Name):
+                self.visit_Name(b.value[0].rm_alias(), sql)
             else:
                 sql << quote_condition(b.value[0])
-                sql << " AND "
+            sql << " AND "
+            if isinstance(b.value[1], Name):
+                self.visit_Name(b.value[1].rm_alias(), sql)
+            else:
                 sql << quote_condition(b.value[1])
         else:
             if isinstance(b.value, Name):
-                self.visit(b.value, sql)
+                self.visit(b.value.rm_alias(), sql)
             else:
                 sql << quote_condition(b.value)
-
         return sql
 
     def visit_Pair(self, p: Pair, sql: SQLCollector) -> SQLCollector:
