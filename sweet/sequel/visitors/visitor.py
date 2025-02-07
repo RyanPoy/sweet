@@ -1,6 +1,7 @@
 import copy
 from typing import Callable
 
+from sweet.sequel import Operator
 from sweet.sequel.collectors import SQLCollector
 from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
@@ -11,7 +12,6 @@ from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
-from sweet.sequel.terms.pair import Pair, Operator
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.value import Regexp, Value
@@ -113,38 +113,6 @@ class Visitor:
                 self.visit(b.value.rm_alias(), sql)
             else:
                 sql << quote_condition(b.value)
-        return sql
-
-    def visit_Pair(self, p: Pair, sql: SQLCollector) -> SQLCollector:
-        def deal_name_value(v: Name):
-            if v.alias:
-                new_value = copy.deepcopy(v)
-                new_value.alias = ""
-                self.visit_Name(new_value, sql)
-            else:
-                self.visit_Name(v, sql)
-
-        if isinstance(p.field, Name):
-            self.visit_Name(p.field, sql)
-        else:
-            sql << self.quote_column_name(p.field)
-
-        sql << f" {str(p.operator)} "
-        if p.operator == Operator.BETWEEN or p.operator == Operator.NOT_BETWEEN:
-            if isinstance(p.value[0], Name):
-                deal_name_value(p.value[0])
-            else:
-                sql << quote_condition(p.value[0])
-            sql << " AND "
-            if isinstance(p.value[1], Name):
-                deal_name_value(p.value[1])
-            else:
-                sql << quote_condition(p.value[1])
-        else:
-            if isinstance(p.value, Name):
-                deal_name_value(p.value)
-            else:
-                sql << quote_condition(p.value)
         return sql
 
     def visit_Value(self, v: Value, sql: SQLCollector) -> SQLCollector:

@@ -61,6 +61,10 @@ MAPPING = {
 }
 
 
+def parse(**kwargs) -> Binary:
+
+    kwargs.items()
+
 def parse(symbol: str, value: any) -> Binary:
     key, op, seperator = symbol, Operator.EQ, '__'
     if seperator in symbol:
