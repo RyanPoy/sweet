@@ -1,7 +1,6 @@
 from typing import Self
 
 from sweet.sequel.terms import literal
-from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.order import OrderClause, SortedIn

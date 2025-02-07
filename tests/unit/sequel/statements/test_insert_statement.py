@@ -1,6 +1,5 @@
 import unittest
 
-from sweet.sequel.schema.table import Table
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.terms.name import Name
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
@@ -102,13 +101,13 @@ class TestInsertStatement(unittest.TestCase):
         self.assertEqual('INSERT IGNORE INTO "users" VALUES (1)', self.pg.sql(stmt))
 
     def test_insert_column(self):
-        stmt = Table("users").insert(1)
+        stmt = InsertStatement(self.table_users).insert(1)
         self.assertEqual('INSERT INTO `users` VALUES (1)', self.mysql.sql(stmt))
         self.assertEqual('INSERT INTO "users" VALUES (1)', self.sqlite.sql(stmt))
         self.assertEqual('INSERT INTO "users" VALUES (1)', self.pg.sql(stmt))
 
     def test_insert_column_with_chain(self):
-        stmt = Table("users").insert(1, "a", True).insert(2, "b", False)
+        stmt = InsertStatement(self.table_users).insert(1, "a", True).insert(2, "b", False)
         self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)", self.mysql.sql(stmt))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", self.sqlite.sql(stmt))
         self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", self.pg.sql(stmt))

@@ -14,8 +14,8 @@ class Fn:
         self.parentheses = parentheses
         self.alias = ""
         self.columns = []
-        self.cmp_pairs = []
-        self.chain = []
+        self.cmp_pairs: list[(str, Value)] = []
+        self.chain: list[(Logic, Self)] = []
         self.nesting = None
 
     def column(self, *column_names: Name | Literal | Self) -> Self:
@@ -44,7 +44,7 @@ class Fn:
     def distinct(self) -> Self:
         dis = distinct()
         self_copied = copy.deepcopy(self)
-        self_copied.name = dis.name # change self_copied to distinct Fn
+        self_copied.name = dis.name  # change self_copied to distinct Fn
         self_copied.parentheses = False
         new_self = Fn(self.name)
 
@@ -56,43 +56,35 @@ class Fn:
         return self
 
     def __gt__(self, other: Value) -> Self:
-        return self.__compare(">", other)
-
-    def __ge__(self, other: Value) -> Self:
-        return self.__compare(">=", other)
-
-    def __lt__(self, other: Value) -> Self:
-        return self.__compare("<", other)
-
-    def __le__(self, other: Value) -> Self:
-        return self.__compare("<=", other)
-
-    def __eq__(self, other: Value) -> Self:
-        return self.__compare("=", other)
-
-    def __ne__(self, other: Value) -> Self:
-        return self.__compare("<>", other)
-
-    def __and__(self, other: Self) -> Self:
-        return self.__combine(other, Logic.AND)
-
-    def __or__(self, other: Self) -> Self:
-        return self.__combine(other, Logic.OR)
-
-    def __combine(self, other: Self, logic_op: Logic) -> Self:
-        """Combines two Q objects with a logical operator (AND, OR)."""
-        if not isinstance(other, Fn):
-            raise TypeError("Logical operators can only be applied between two Fn objects.")
-
-        self.chain.append((logic_op, other))
+        self.cmp_pairs.append((">", other))
         return self
 
-    def __compare(self, op: str, value: Value) -> Self:
-        # if isinstance(value, Name):
-        #     self.cmp_pairs.append((op, value))
-        # else:
-        #     self.cmp_pairs.append((op, Value(value)))
-        self.cmp_pairs.append((op, value))
+    def __ge__(self, other: Value) -> Self:
+        self.cmp_pairs.append((">=", other))
+        return self
+
+    def __lt__(self, other: Value) -> Self:
+        self.cmp_pairs.append(("<", other))
+        return self
+
+    def __le__(self, other: Value) -> Self:
+        self.cmp_pairs.append(("<=", other))
+        return self
+
+    def __eq__(self, other: Value) -> Self:
+        self.cmp_pairs.append(("=", other))
+        return self
+
+    def __ne__(self, other: Value) -> Self:
+        self.cmp_pairs.append(("<>", other))
+        return self
+
+    def __and__(self, other: Self) -> Self:
+        self.chain.append((Logic.AND, other))
+        return self
+
+    def __or__(self, other: Self) -> Self:
+        self.chain.append((Logic.OR, other))
         return self
 
 
@@ -101,3 +93,4 @@ sum = lambda *columns: Fn("SUM").column(*columns)
 avg = lambda *columns: Fn("AVERAGE").column(*columns)
 sqrt = lambda *columns: Fn("SQRT").column(*columns)
 distinct = lambda *columns: Fn("DISTINCT", False).column(*columns)
+

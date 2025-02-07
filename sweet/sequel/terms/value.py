@@ -7,4 +7,5 @@ if TYPE_CHECKING:
     from sweet.sequel.terms.name import Name
 
 
-Value = Union[int, float, str, Decimal, bool, date, datetime, list, tuple, None, bytes, 'Fn', 'Name']
+Basic = Union[int, float, str, Decimal, bool, date, datetime, list, tuple, None, bytes]
+Value = Union[Basic, 'Fn', 'Name']

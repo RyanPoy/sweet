@@ -1,7 +1,6 @@
 import unittest
 from unittest import TestLoader, TestSuite
 
-from tests.unit.sequel.schema.test_table import TestTable
 from tests.unit.sequel.statements.test_delete_statement import TestDeleteStatement
 from tests.unit.sequel.statements.test_insert_statement import TestInsertStatement
 from tests.unit.sequel.statements.test_select_statement import TestSelectStatement
@@ -18,7 +17,6 @@ if __name__ == '__main__':
     loader = TestLoader()
     suites = TestSuite()
     for case in [
-        TestTable,
         TestDeleteStatement,
         TestInsertStatement,
         TestUpdateStatement,
