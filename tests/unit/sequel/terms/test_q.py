@@ -33,6 +33,12 @@ class TestQ(unittest.TestCase):
             Q(x=1) & object()
         self.assertEqual("Logical operators can only be applied between two Q objects.", str(ctx.exception))
 
+    def test_basic(self):
+        q = Q(price="discounted_price")
+        self.assertEqual("""`price` = 'discounted_price'""", self.mysql.sql(q))
+        self.assertEqual(""""price" = 'discounted_price'""", self.sqlite.sql(q))
+        self.assertEqual(""""price" = 'discounted_price'""", self.pg.sql(q))
+
     def test_or(self):
         q = Q(price__gt="discounted_price") | Q(price="discounted_price")
         self.assertEqual("""(`price` > 'discounted_price' OR `price` = 'discounted_price')""", self.mysql.sql(q))
