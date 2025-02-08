@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
 
-from typing import Any, List, Self, Sequence, Tuple, Union, TYPE_CHECKING
+from typing import Self, Sequence, Tuple, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from sweet.sequel.terms.fn import Fn
