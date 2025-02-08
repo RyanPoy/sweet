@@ -1,17 +1,17 @@
-from typing import Self
+from typing import Optional, Self
 
 from sweet.sequel.terms import Logic
-from sweet.sequel.terms.binary import parse
-from sweet.sequel.terms.values import Value1
+from sweet.sequel.terms.binary import Binary, parse
+from sweet.sequel.terms.values import ValueType
 
 
 class Q:
 
-    def __init__(self, **kwargs: {str: Value1}) -> None:
-        self.logic_op = Logic.AND
-        self.children = []
-        self.binary = None
-        self.invert = False
+    def __init__(self, **kwargs: ValueType) -> None:
+        self.logic_op: Logic = Logic.AND
+        self.children: list[Q] = []
+        self.binary: Optional[Binary] = None
+        self.invert: bool = False
 
         if len(kwargs) == 1:
             self.binary = parse(**kwargs)
@@ -59,7 +59,7 @@ class Q:
         return True
 
     def __hash__(self):
-        return hash(f'{self.__class__}-{str(self.binary)}-{self.logic_op}-{''.join([str(x) for x in self.children])}')
+        return hash(f'{self.__class__}-{str(self.binary)}-{self.logic_op}-{"-".join([str(x) for x in self.children])}')
 
     def __and__(self, other) -> Self:
         return self.__combine(other, Logic.AND)
