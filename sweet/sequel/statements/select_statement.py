@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Self
 
 from sweet.sequel.terms import literal
@@ -35,9 +37,9 @@ class SelectStatement:
     def __init__(self):
         self.tables = []
         self.columns = []
-        self._distinct = None
-        self._limit = 0
-        self._offset = 0
+        self.distinct_ = None
+        self.limit_number = 0
+        self.offset_number = 0
         self.where_clause: Where = Where()
         self.having_clause: Having = Having()
         self.force_indexes = []
@@ -69,11 +71,11 @@ class SelectStatement:
         return self
 
     def distinct(self) -> Self:
-        self._distinct = literal.DISTINCT
+        self.distinct_ = literal.DISTINCT
         return self
 
     def is_distinct_required(self) -> bool:
-        return self._distinct == literal.DISTINCT
+        return self.distinct_ == literal.DISTINCT
 
     def for_update(self, share: bool = False, nowait: bool = False, skip: bool = False, of: (str,) = ()) -> Self:
         self.lock = Lock(share=share, nowait=nowait, skip=skip, of=of)
@@ -83,11 +85,11 @@ class SelectStatement:
         return self.lock is not None
 
     def limit(self, limit) -> Self:
-        self._limit = limit
+        self.limit_number = limit
         return self
 
     def offset(self, offset) -> Self:
-        self._offset = offset
+        self.offset_number = offset
         return self
 
     def where(self, *qs: Q, **kwargs) -> Self:

@@ -1,20 +1,14 @@
 from datetime import date, datetime
 from decimal import Decimal
+from typing import Sequence
 
-from sweet.sequel.terms.values import Value1
+from sweet.sequel.terms.values import RawType, ValueType
 from sweet.utils import binary2str, date2str, datetime2str
 
 
 def qs(s: str) -> str:
     return s.replace("\\", '\\\\').replace("'", "''")
 
-
-def quote_value(value: Value1) -> str:
-    return quote(value, "[", "]")
-
-
-def quote_condition(value: Value1) -> str:
-    return quote(value, "(", ")")
 
 
 def quote_name(name: str, qchar: str) -> str:
@@ -26,7 +20,7 @@ def quote_name(name: str, qchar: str) -> str:
     return f'{qchar}{name}{qchar}'
 
 
-def quote(value: Value1, begin: str = "[", end: str = "]") -> str:
+def quote(value: RawType, begin: str, end: str) -> str:
     """Quotes the column value to help prevent"""
     if value is None: return "NULL"
 
@@ -43,7 +37,7 @@ def quote(value: Value1, begin: str = "[", end: str = "]") -> str:
         return f"'{date2str(value)}'"
     if tp == bytes:
         return f"'{binary2str(value)}'"
-    if tp in (tuple, list):
-        return f"{begin}{', '.join([quote(v) for v in value])}{end}"
+    if issubclass(tp, Sequence):  # list or tuple
+        return f"{begin}{', '.join([quote(v, begin, end) for v in value])}{end}"
     raise TypeError(f"can't quote '{value.__class__.__name__}' type")
 

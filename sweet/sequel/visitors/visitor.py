@@ -13,8 +13,8 @@ from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.values import Value, Value1, Values, ValuesList
-from sweet.sequel.quoting import quote, quote_name, quote_condition, quote_value
+from sweet.sequel.terms.values import RawType, Value, Value1, Values, ValuesList
+from sweet.sequel.quoting import quote, quote_name
 from sweet.sequel.terms.where import Filter, Having, On, Where
 
 
@@ -24,6 +24,15 @@ class Visitor:
 
     def quote_column_name(self, name: str) -> str:
         return quote_name(name, self.qchar)
+
+    def quote_value_of_values(self, value: RawType) -> str:
+        return quote(value, "[", "]")
+
+    def quote_value_of_binary(self, value: RawType) -> str:
+        return quote(value, "(", ")")
+
+    def quote_condition(self, value: RawType) -> str:
+        return quote(value, "[", "]")
 
     def visit_Name(self, n: Name, sql: SQLCollector) -> SQLCollector:
         if n.schema_name:
@@ -96,44 +105,52 @@ class Visitor:
         if b.op == Operator.BETWEEN or b.op == Operator.NOT_BETWEEN:
             tuple_vs = b.value.v
             v = tuple_vs[0].rm_alias() if isinstance(tuple_vs[0], Name) else tuple_vs[0]
-            self.visit_Value(Value(v), sql, True)
+            self.visit_Value(Value(v), sql)
             sql << " AND "
             v = tuple_vs[1].rm_alias() if isinstance(tuple_vs[1], Name) else tuple_vs[1]
-            self.visit_Value(Value(v), sql, True)
+            self.visit_Value(Value(v), sql)
         else:
-            self.visit_Value(b.value, sql, True)
+            self.visit_Value(b.value, sql)
         return sql
 
     def visit_Value1(self, v: Value1, sql: SQLCollector) -> SQLCollector:
         if isinstance(v, (Name, Fn)):
             return self.visit(v, sql)
-        return sql << quote(v)
+        return sql << quote(v, "(", "]")
 
-    def visit_Value(self, value: Value, sql: SQLCollector, for_value=True) -> SQLCollector:
+    def visit_Value(self, value: Value, sql: SQLCollector, for_value=True, in_values=False) -> SQLCollector:
         v = value.v
-        if isinstance(v, (Name, Fn)):
-            return self.visit(v, sql)
         if for_value:
-            sql << quote(v, '(', ')')
+            if isinstance(v, Name):
+                return self.visit(v.rm_alias(), sql)
+            elif isinstance(v, Fn):
+                return self.visit(v, sql)
+            elif in_values:
+                sql << self.quote_value_of_values(v)
+            else:
+                sql << self.quote_value_of_binary(v)
         else:
-            sql << self.quote_column_name(v)
+            if isinstance(v, (Name, Fn)):
+                return self.visit(v, sql)
+            else:
+                sql << self.quote_column_name(v)
         return sql
 
     def visit_Values(self, values: Values, sql: SQLCollector) -> SQLCollector:
         sql << "("
         for i, v in enumerate(values.vs):
             if i != 0: sql << ", "
-            self.visit(v, sql)
+            self.visit_Value(v, sql, in_values=True)
         sql << ")"
         return sql
 
-    def visit_ValuesList(self, values: ValuesList, sql: SQLCollector) -> SQLCollector:
-        if values.is_empty():
+    def visit_ValuesList(self, values_list: ValuesList, sql: SQLCollector) -> SQLCollector:
+        if values_list.is_empty():
             sql << "(NULL)"
         else:
-            for i, values in enumerate(values.data):
+            for i, values in enumerate(values_list.data):
                 if i != 0: sql << ", "
-                self.visit(values, sql)
+                self.visit_Values(values, sql)
         return sql
 
     def visit_Where(self, where: Where, sql: SQLCollector) -> SQLCollector:
@@ -164,7 +181,7 @@ class Visitor:
                 self.visit(c, sql)
             sql << ")"
         sql << " VALUES "
-        self.visit(stmt.values, sql)
+        self.visit_ValuesList(stmt.values, sql)
         return sql
 
     def visit_DeleteStatement(self, stmt: DeleteStatement, sql: SQLCollector) -> SQLCollector:
@@ -188,7 +205,7 @@ class Visitor:
                 if isinstance(v, Name):
                     self.visit_Name(v, sql)
                 else:
-                    sql << quote_value(v)
+                    sql << quote(v, "[", "]")
                 i += 1
         self.visit_Where(stmt.where_clause, sql)
         return sql
@@ -204,7 +221,7 @@ class Visitor:
     def visit_SelectStatement(self, stmt: SelectStatement, sql: SQLCollector, level=0) -> SQLCollector:
         sql << "SELECT "
         if stmt.is_distinct_required() and stmt.columns:
-            self.visit(stmt._distinct, sql)
+            self.visit(stmt.distinct_, sql)
             sql << " "
 
         if not stmt.columns:
@@ -261,8 +278,8 @@ class Visitor:
             for i, order in enumerate(stmt.orders):
                 self.visit(order, sql)
 
-        if stmt._limit:  sql << f" LIMIT {stmt._limit}"
-        if stmt._offset: sql << f" OFFSET {stmt._offset}"
+        if stmt.limit_number:  sql << f" LIMIT {stmt.limit_number}"
+        if stmt.offset_number: sql << f" OFFSET {stmt.offset_number}"
 
         if stmt.lock:
             sql << " "

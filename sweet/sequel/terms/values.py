@@ -17,9 +17,14 @@ RawType = Union[int, float, str, Decimal, bool, date, datetime, Sequence, None, 
 ValueType = Union[RawType, 'Fn', 'Name']
 
 
-# // @todo: Binary 里面应该使用 ValueType 和 Value
-# // @todo: Q 里面应该使用 ValueType 和 Value
-
+# @todo: Binary 里面应该使用 ValueType 和 Value，在处理binary的时候，如果Value有alias，应该把alias去掉，生成新的Value ？
+# @todo: Q 里面应该使用 ValueType 和 Value
+# @todo: Insert table(columns...) values() 这个地方的values方法，里面应该接受ValueType，内部转化为 ValuesList
+# @todo: Update table set key=value 这个地方的key=value，应该使用ValueType，且内部需要把key=value转为Binary
+# @todo: 在Values、ValuesList里面，Value里面的元素是 Sequence，那么用 '[]' 包裹；
+#        在Binary里面的，Value里面的元素如果是Sequence，那么用 '()' 包裹；
+# @todo: Visitor中的 visit_Value 要重构，里面要包装，不要直接用 value.v，而应该包装起来；
+#        因此，对应的 quote_values_value(value: RawType) 也要重构，参数要由RawType变成Value类型
 
 @dataclass
 class Value:
