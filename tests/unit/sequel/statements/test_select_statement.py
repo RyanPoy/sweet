@@ -369,9 +369,9 @@ class TestSelectStatement(unittest.TestCase):
     def test_having_and(self):
         foo, bar = Name('foo'), Name('bar')
         stmt = SelectStatement().from_(self.table_abc).select(foo, fn.sum(bar)).group_by(foo).having((fn.sum(bar) > 1) & (fn.sum(bar) < 100))
-        self.assertEqual('SELECT `foo`, SUM(`bar`) FROM `abc` GROUP BY `foo` HAVING (SUM(`bar`) > 1 AND SUM(`bar`) < 100)', self.mysql.sql(stmt))
-        self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING (SUM("bar") > 1 AND SUM("bar") < 100)', self.sqlite.sql(stmt))
-        self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING (SUM("bar") > 1 AND SUM("bar") < 100)', self.pg.sql(stmt))
+        self.assertEqual('SELECT `foo`, SUM(`bar`) FROM `abc` GROUP BY `foo` HAVING SUM(`bar`) > 1 AND SUM(`bar`) < 100', self.mysql.sql(stmt))
+        self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING SUM("bar") > 1 AND SUM("bar") < 100', self.sqlite.sql(stmt))
+        self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING SUM("bar") > 1 AND SUM("bar") < 100', self.pg.sql(stmt))
 
     def test_having_join_and_equality(self):
         abc_foo = Name('foo', self.table_abc)

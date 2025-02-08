@@ -47,8 +47,6 @@ class Visitor:
         return sql << l.v
 
     def visit_Fn(self, f: Fn, sql: SQLCollector) -> SQLCollector:
-        if f.chain:
-            sql << "("
         sql << f.name
         if f.parentheses:
             sql << "("
@@ -66,12 +64,14 @@ class Visitor:
             self.visit(pair[1], sql)
         for i, (logic_op, child) in enumerate(f.chain):
             sql << f" {str(logic_op)} "
+            if child.chain:
+                sql << "("
             self.visit_Fn(child, sql)
+            if child.chain:
+                sql << ")"
         if f.alias:
             sql << " AS "
             self.visit(f.alias, sql)
-        if f.chain:
-            sql << ")"
         return sql
 
     def visit_Lock(self, l: Lock, sql: SQLCollector) -> SQLCollector:
