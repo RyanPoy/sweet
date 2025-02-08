@@ -22,6 +22,7 @@ ValueType = Union[RawType, 'Fn', 'Name']
 # @todo: Update table set key=value 这个地方的key=value，应该使用ValueType，且内部需要把key=value转为Binary
 # @todo: Visitor中的 visit_Value 要重构，里面要包装，不要直接用 value.v，而应该包装起来；
 #        因此，对应的 quote_values_value(value: RawType) 也要重构，参数要由RawType变成Value类型
+# @todo: Fn 里面有一个parentheses变量，这个变量是给 distinct用的，因为 distinct两边不用加括号，其他要加括号。但是要重构，把parentheses去掉。
 
 @dataclass
 class Value:
