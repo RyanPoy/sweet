@@ -91,26 +91,17 @@ class Visitor:
         return sql
 
     def visit_Binary(self, b: Binary, sql: SQLCollector) -> SQLCollector:
-        if isinstance(b.key, Name):
-            self.visit(b.key, sql)
-        else:
-            sql << self.quote_column_name(b.key)
+        self.visit_Value(b.key, sql, False)
         sql << f" {b.op} "
         if b.op == Operator.BETWEEN or b.op == Operator.NOT_BETWEEN:
-            if isinstance(b.value[0], Name):
-                self.visit_Name(b.value[0].rm_alias(), sql)
-            else:
-                sql << quote_condition(b.value[0])
+            tuple_vs = b.value.v
+            v = tuple_vs[0].rm_alias() if isinstance(tuple_vs[0], Name) else tuple_vs[0]
+            self.visit_Value(Value(v), sql, True)
             sql << " AND "
-            if isinstance(b.value[1], Name):
-                self.visit_Name(b.value[1].rm_alias(), sql)
-            else:
-                sql << quote_condition(b.value[1])
+            v = tuple_vs[1].rm_alias() if isinstance(tuple_vs[1], Name) else tuple_vs[1]
+            self.visit_Value(Value(v), sql, True)
         else:
-            if isinstance(b.value, Name):
-                self.visit(b.value.rm_alias(), sql)
-            else:
-                sql << quote_condition(b.value)
+            self.visit_Value(b.value, sql, True)
         return sql
 
     def visit_Value1(self, v: Value1, sql: SQLCollector) -> SQLCollector:
@@ -118,11 +109,15 @@ class Visitor:
             return self.visit(v, sql)
         return sql << quote(v)
 
-    def visit_Value(self, value: Value, sql: SQLCollector) -> SQLCollector:
+    def visit_Value(self, value: Value, sql: SQLCollector, for_value=True) -> SQLCollector:
         v = value.v
         if isinstance(v, (Name, Fn)):
             return self.visit(v, sql)
-        return sql << quote(v)
+        if for_value:
+            sql << quote(v, '(', ')')
+        else:
+            sql << self.quote_column_name(v)
+        return sql
 
     def visit_Values(self, values: Values, sql: SQLCollector) -> SQLCollector:
         sql << "("

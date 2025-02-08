@@ -1,16 +1,16 @@
-from typing import Self
+from typing import Mapping, Self
 
 from sweet.sequel import Operator
-from sweet.sequel.terms.values import Value1
+from sweet.sequel.terms.values import RawType, Value, Value1, ValueType
 from sweet.utils import is_array
 from sweet.sequel.terms.name import Name
 
 
 class Binary:
 
-    def __init__(self, op: Operator, key, value: Value1 = None) -> None:
-        self.key: Name | str = key
-        self.value: Value1 = value
+    def __init__(self, op: Operator, key: ValueType, value: ValueType = None) -> None:
+        self.key: Value = Value(key)
+        self.value: Value = Value(value)
         self.op: Operator = op
 
     def invert(self) -> Self:
@@ -18,19 +18,10 @@ class Binary:
         return self
 
     def __eq__(self, other: Self) -> bool:
-        if self.__class__ != other.__class__ or self.key != other.key or self.op != other.op:
-            return False
-        if is_array(self.value) and is_array(other.value):
-            return list(self.value) == list(other.value)
-        if not is_array(self.value) and not is_array(other.value):
-            return self.value == other.value
-        return False
+        return self.__class__ == other.__class__ or self.key == other.key or self.op == other.op or self.value == other.value
 
     def __hash__(self) -> str:
-        new_value = self.value
-        if is_array(self.value):
-            new_value = ''.join([str(v) for v in self.value])
-        return f'{self.__class__}-{hash(self.key)}-{hash(new_value)}-{self.op}'
+        return f'{self.__class__}-{hash(self.key)}-{hash(self.value)}-{self.op}'
 
 
 MAPPING = {
@@ -60,7 +51,7 @@ MAPPING = {
 }
 
 
-def parse(**kwargs: {str: Value1}) -> Binary:
+def parse(**kwargs: ValueType) -> Binary:
     if len(kwargs) != 1:
         raise ValueError('Only one parameter is allowed for construction.')
 

@@ -1,7 +1,7 @@
 import unittest
 
 from sweet.sequel.terms.name import Name
-from sweet.sequel.terms.binary import Binary, parse
+from sweet.sequel.terms.binary import parse
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
