@@ -23,7 +23,7 @@ ValueType = Union[RawType, 'Fn', 'Name']
 # @todo: Visitor中的 visit_Value 要重构，里面要包装，不要直接用 value.v，而应该包装起来；
 #        因此，对应的 quote_values_value(value: RawType) 也要重构，参数要由RawType变成Value类型
 # @todo: Fn 里面有一个parentheses变量，这个变量是给 distinct用的，因为 distinct两边不用加括号，其他要加括号。但是要重构，把parentheses去掉。
-
+# @todo: 为了让更多的Python3.x支持，需要把泛型list的地方都用 List，需要把直接用 | 的地方修改为 Union[]的方式
 @dataclass
 class Value:
     v : ValueType
