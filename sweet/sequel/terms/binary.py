@@ -20,8 +20,8 @@ class Binary:
     def __eq__(self, other: Self) -> bool:
         return self.__class__ == other.__class__ or self.key == other.key or self.op == other.op or self.value == other.value
 
-    def __hash__(self) -> str:
-        return f'{self.__class__}-{hash(self.key)}-{hash(self.value)}-{self.op}'
+    def __str__(self) -> str:
+        return f'{self.__class__}-{str(self.key)}-{str(self.value)}-{str(self.op)}'
 
 
 MAPPING = {

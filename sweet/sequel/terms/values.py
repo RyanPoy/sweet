@@ -4,6 +4,8 @@ from decimal import Decimal
 
 from typing import Self, Sequence, Tuple, Union, TYPE_CHECKING
 
+from sweet.sequel.quoting import quote
+
 if TYPE_CHECKING:
     from sweet.sequel.terms.fn import Fn
     from sweet.sequel.terms.name import Name
@@ -27,6 +29,16 @@ ValueType = Union[RawType, 'Fn', 'Name']
 @dataclass
 class Value:
     v : ValueType
+
+    def __str__(self) -> str:
+        from sweet.sequel.terms.fn import Fn
+        from sweet.sequel.terms.name import Name
+        if isinstance(self.v, (Name, Fn)):
+            return str(self.v)
+        return quote(self.v, "","")
+
+    def __hash__(self):
+        return hash(str(self.v))
 
 
 class Values:

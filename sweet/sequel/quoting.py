@@ -1,14 +1,15 @@
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Sequence
+from typing import Sequence, TYPE_CHECKING
 
-from sweet.sequel.terms.values import RawType, ValueType
+if TYPE_CHECKING:
+    from sweet.sequel.terms.values import RawType
+
 from sweet.utils import binary2str, date2str, datetime2str
 
 
 def qs(s: str) -> str:
     return s.replace("\\", '\\\\').replace("'", "''")
-
 
 
 def quote_name(name: str, qchar: str) -> str:
@@ -20,7 +21,7 @@ def quote_name(name: str, qchar: str) -> str:
     return f'{qchar}{name}{qchar}'
 
 
-def quote(value: RawType, begin: str, end: str) -> str:
+def quote(value: 'RawType', begin: str, end: str) -> str:
     """Quotes the column value to help prevent"""
     if value is None: return "NULL"
 

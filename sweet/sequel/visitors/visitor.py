@@ -6,6 +6,7 @@ from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
+from sweet.sequel.terms import Logic
 from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.literal import Literal
@@ -47,6 +48,8 @@ class Visitor:
         return sql << l.v
 
     def visit_Fn(self, f: Fn, sql: SQLCollector) -> SQLCollector:
+        if f.chain:
+            sql << "("
         sql << f.name
         if f.parentheses:
             sql << "("
@@ -72,6 +75,8 @@ class Visitor:
         if f.alias:
             sql << " AS "
             self.visit(f.alias, sql)
+        if f.chain:
+            sql << ")"
         return sql
 
     def visit_Lock(self, l: Lock, sql: SQLCollector) -> SQLCollector:
@@ -87,16 +92,38 @@ class Visitor:
         return sql
 
     def visit_Q(self, q: Q, sql: SQLCollector) -> SQLCollector:
-        if q.invert:
-            sql << "NOT "
-        if q.binary:
-            self.visit(q.binary, sql)
-        if q.children:
-            sql << "("
-            for i, c in enumerate(q.children):
-                if i != 0: sql << f" {str(q.logic_op)} "
-                self.visit_Q(c, sql)
-            sql << ")"
+        def _wrap(node: Q, parent_op: Logic):
+            """根据父节点运算符决定是否给子节点加括号"""
+            if node.operator is None:  # 基础条件无需括号
+                self.visit(node, sql)
+            else:
+                node_priority = 0 if node.operator is None else node.operator.priority()
+                parent_priority = 0 if parent_op is None else parent_op.priority()
+                if node_priority < parent_priority:
+                    # 若子节点运算符优先级低于父节点运算符，则需要加括号
+                    sql << '('
+                    self.visit(node, sql)
+                    sql << ')'
+                else:
+                    self.visit(node, sql)
+
+        if not q.operator:  # 基础条件节点
+            if not q.binaries:
+                sql << "NOT" if q.invert else ""
+            else:
+                if q.invert:
+                    sql << "NOT "
+                for i, binary in enumerate(q.binaries):
+                    if i != 0: sql << f" {Logic.AND} "
+                    self.visit(binary, sql)
+        else:  # 组合条件节点
+            if q.invert:
+                sql << "NOT ("
+            _wrap(q.left, q.operator)
+            sql << f" {str(q.operator)} "
+            _wrap(q.right, q.operator)
+            if q.invert:
+                sql << ")"
         return sql
 
     def visit_Binary(self, b: Binary, sql: SQLCollector) -> SQLCollector:
