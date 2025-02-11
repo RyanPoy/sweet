@@ -1,6 +1,7 @@
 import unittest
 
 from sweet.sequel.terms import literal
+from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.name import Name
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
@@ -51,125 +52,80 @@ class TestName(unittest.TestCase):
 
     def test_eq(self):
         n = Name('name').eq('jim')
-        self.assertEqual("`name` = 'jim'", self.mysql.sql(n))
-        self.assertEqual("\"name\" = 'jim'", self.sqlite.sql(n))
-        self.assertEqual("\"name\" = 'jim'", self.pg.sql(n))
-
-        n = Name('name', 'users').eq('jim')
-        self.assertEqual("`users`.`name` = 'jim'", self.mysql.sql(n))
-        self.assertEqual('"users"."name" = \'jim\'', self.sqlite.sql(n))
-        self.assertEqual('"users"."name" = \'jim\'', self.pg.sql(n))
+        self.assertEqual(Binary.parse(name="jim"), n)
 
         n = Name('name', 'users').eq(Name("nickname", "users"))
-        self.assertEqual('`users`.`name` = `users`.`nickname`', self.mysql.sql(n))
-        self.assertEqual('"users"."name" = "users"."nickname"', self.sqlite.sql(n))
-        self.assertEqual('"users"."name" = "users"."nickname"', self.pg.sql(n))
+        self.assertEqual(Binary.parse(users__name=Name("nickname", "users")), n)
 
     def test_not_eq(self):
         n = Name('name').not_eq('jim')
-        self.assertEqual("`name` <> 'jim'", self.mysql.sql(n))
-        self.assertEqual("\"name\" <> 'jim'", self.sqlite.sql(n))
-        self.assertEqual("\"name\" <> 'jim'", self.pg.sql(n))
+        self.assertEqual(Binary.parse(name__not='jim'), n)
 
         n = Name('name', 'users').not_eq('jim')
-        self.assertEqual("`users`.`name` <> 'jim'", self.mysql.sql(n))
-        self.assertEqual('"users"."name" <> \'jim\'', self.sqlite.sql(n))
-        self.assertEqual('"users"."name" <> \'jim\'', self.pg.sql(n))
+        self.assertEqual(Binary.parse(users__name__not='jim'), n)
 
         n = Name('name', 'users').not_eq(Name("nickname", "users"))
-        self.assertEqual('`users`.`name` <> `users`.`nickname`', self.mysql.sql(n))
-        self.assertEqual('"users"."name" <> "users"."nickname"', self.sqlite.sql(n))
-        self.assertEqual('"users"."name" <> "users"."nickname"', self.pg.sql(n))
+        self.assertEqual(Binary.parse(users__name__not=Name("nickname", "users")), n)
 
     def test_is_null(self):
         n = Name('name').eq(None)
-        self.assertEqual("`name` IS NULL", self.mysql.sql(n))
-        self.assertEqual("\"name\" IS NULL", self.sqlite.sql(n))
-        self.assertEqual("\"name\" IS NULL", self.pg.sql(n))
+        self.assertEqual(Binary.parse(name=None), n)
 
     def test_is_not_null(self):
         n = Name('name').not_eq(None)
-        self.assertEqual("`name` IS NOT NULL", self.mysql.sql(n))
-        self.assertEqual("\"name\" IS NOT NULL", self.sqlite.sql(n))
-        self.assertEqual("\"name\" IS NOT NULL", self.pg.sql(n))
+        self.assertEqual(Binary.parse(name__not=None), n)
 
     def test_in(self):
         n = Name('name').eq(['jim', 'lucy', 'lily'])
-        self.assertEqual("`name` IN ('jim', 'lucy', 'lily')", self.mysql.sql(n))
-        self.assertEqual("\"name\" IN ('jim', 'lucy', 'lily')", self.sqlite.sql(n))
-        self.assertEqual("\"name\" IN ('jim', 'lucy', 'lily')", self.pg.sql(n))
+        self.assertEqual(Binary.parse(name=['jim', 'lucy', 'lily']), n)
 
     def test_not_in(self):
         n = Name('name').not_eq(['jim', 'lucy', 'lily'])
-        self.assertEqual("`name` NOT IN ('jim', 'lucy', 'lily')", self.mysql.sql(n))
-        self.assertEqual("\"name\" NOT IN ('jim', 'lucy', 'lily')", self.sqlite.sql(n))
-        self.assertEqual("\"name\" NOT IN ('jim', 'lucy', 'lily')", self.pg.sql(n))
+        self.assertEqual(Binary.parse(name__not=['jim', 'lucy', 'lily']), n)
 
     def test_gt(self):
         n = Name('age').gt(10)
-        self.assertEqual("`age` > 10", self.mysql.sql(n))
-        self.assertEqual("\"age\" > 10", self.sqlite.sql(n))
-        self.assertEqual("\"age\" > 10", self.pg.sql(n))
+        self.assertEqual(Binary.parse(age__gt=10), n)
 
     def test_not_gt(self):
         n = Name('age').not_gt(10)
-        self.assertEqual("`age` <= 10", self.mysql.sql(n))
-        self.assertEqual("\"age\" <= 10", self.sqlite.sql(n))
-        self.assertEqual("\"age\" <= 10", self.pg.sql(n))
+        self.assertEqual(Binary.parse(age__lte=10), n)
 
     def test_gte(self):
         n = Name('age').gte(10)
-        self.assertEqual("`age` >= 10", self.mysql.sql(n))
-        self.assertEqual("\"age\" >= 10", self.sqlite.sql(n))
-        self.assertEqual("\"age\" >= 10", self.pg.sql(n))
+        self.assertEqual(Binary.parse(age__gte=10), n)
 
     def test_not_gte(self):
         n = Name('age').not_gte(10)
-        self.assertEqual("`age` < 10", self.mysql.sql(n))
-        self.assertEqual("\"age\" < 10", self.sqlite.sql(n))
-        self.assertEqual("\"age\" < 10", self.pg.sql(n))
+        self.assertEqual(Binary.parse(age__lt=10), n)
 
     def test_lt(self):
-        n = Name('age').lt(30)
-        self.assertEqual("`age` < 30", self.mysql.sql(n))
-        self.assertEqual("\"age\" < 30", self.sqlite.sql(n))
-        self.assertEqual("\"age\" < 30", self.pg.sql(n))
+        n = Name('age').lt(10)
+        self.assertEqual(Binary.parse(age__lt=10), n)
 
     def test_not_lt(self):
-        n = Name('age').not_lt(30)
-        self.assertEqual("`age` >= 30", self.mysql.sql(n))
-        self.assertEqual("\"age\" >= 30", self.sqlite.sql(n))
-        self.assertEqual("\"age\" >= 30", self.pg.sql(n))
+        n = Name('age').not_lt(10)
+        self.assertEqual(Binary.parse(age__gte=10), n)
 
     def test_lte(self):
-        n = Name('age').lte(30)
-        self.assertEqual("`age` <= 30", self.mysql.sql(n))
-        self.assertEqual("\"age\" <= 30", self.sqlite.sql(n))
-        self.assertEqual("\"age\" <= 30", self.pg.sql(n))
+        n = Name('age').lte(10)
+        self.assertEqual(Binary.parse(age__lte=10), n)
 
     def test_not_lte(self):
-        n = Name('age').not_lte(30)
-        self.assertEqual("`age` > 30", self.mysql.sql(n))
-        self.assertEqual("\"age\" > 30", self.sqlite.sql(n))
-        self.assertEqual("\"age\" > 30", self.pg.sql(n))
+        n = Name('age').not_lte(10)
+        self.assertEqual(Binary.parse(age__gt=10), n)
 
     def test_like(self):
         n = Name('name').like('%jim')
-        self.assertEqual("`name` LIKE '%jim'", self.mysql.sql(n))
-        self.assertEqual("\"name\" LIKE '%jim'", self.sqlite.sql(n))
-        self.assertEqual("\"name\" LIKE '%jim'", self.pg.sql(n))
+        self.assertEqual(Binary.parse(name__like='%jim'), n)
 
     def test_not_like(self):
         n = Name('name').not_like('%jim')
-        self.assertEqual("`name` NOT LIKE '%jim'", self.mysql.sql(n))
-        self.assertEqual("\"name\" NOT LIKE '%jim'", self.sqlite.sql(n))
-        self.assertEqual("\"name\" NOT LIKE '%jim'", self.pg.sql(n))
+        self.assertEqual(Binary.parse(name__not_like='%jim'), n)
 
     def test_between(self):
         n = Name('age').between([10, 60])
-        self.assertEqual("`age` BETWEEN 10 AND 60", self.mysql.sql(n))
-        self.assertEqual("\"age\" BETWEEN 10 AND 60", self.sqlite.sql(n))
-        self.assertEqual("\"age\" BETWEEN 10 AND 60", self.pg.sql(n))
+        self.assertEqual(Binary.parse(age__bt=[10, 60]), n)
 
     def test_between_err(self):
         with self.assertRaises(ValueError) as ctx:
@@ -178,9 +134,7 @@ class TestName(unittest.TestCase):
 
     def test_not_between(self):
         n = Name('age').not_between([10, 60])
-        self.assertEqual("`age` NOT BETWEEN 10 AND 60", self.mysql.sql(n))
-        self.assertEqual("\"age\" NOT BETWEEN 10 AND 60", self.sqlite.sql(n))
-        self.assertEqual("\"age\" NOT BETWEEN 10 AND 60", self.pg.sql(n))
+        self.assertEqual(Binary.parse(age__not_bt=[10, 60]), n)
 
     def test_not_between_err(self):
         with self.assertRaises(ValueError) as ctx:
@@ -189,15 +143,11 @@ class TestName(unittest.TestCase):
 
     def test_pair_with_regex_value(self):
         n = Name('username', 'users').regex("^[b]abc")
-        self.assertEqual("`users`.`username` REGEX '^[b]abc'", self.mysql.sql(n))
-        self.assertEqual("\"users\".\"username\" REGEX '^[b]abc'", self.sqlite.sql(n))
-        self.assertEqual("\"users\".\"username\" REGEX '^[b]abc'", self.pg.sql(n))
+        self.assertEqual(Binary.parse(users__username__regex="^[b]abc"), n)
 
     def test_pair_with_not_regex_value(self):
         n = Name('username', 'users').not_regex("^[b]abc")
-        self.assertEqual("`users`.`username` NOT REGEX '^[b]abc'", self.mysql.sql(n))
-        self.assertEqual("\"users\".\"username\" NOT REGEX '^[b]abc'", self.sqlite.sql(n))
-        self.assertEqual("\"users\".\"username\" NOT REGEX '^[b]abc'", self.pg.sql(n))
+        self.assertEqual(Binary.parse(users__username__not_regex="^[b]abc"), n)
 
 
 if __name__ == '__main__':

@@ -19,12 +19,9 @@ class Name:
     schema_name: str = None
     alias: str = None
 
-    def schema(self, name: str | Self) -> Self:
-        if isinstance(name, Name):
-            self.schema_name = name.alias if name.alias else name.name
-        elif isinstance(name, str):
-            self.schema_name = name
-        return self
+    def __post_init__(self) -> None:
+        if isinstance(self.schema_name, Name):
+            self.schema_name = self.schema_name.alias if self.schema_name.alias else self.schema_name.name
 
     def as_(self, alias: str) -> Self:
         self.alias = alias
@@ -40,6 +37,8 @@ class Name:
             return True
         if isinstance(other, Literal) and other == STAR and self.name == '*':
             return True
+        if self.__class__ != other.__class__:
+            return False
         return self.name == other.name and self.schema_name == other.schema_name and self.alias == other.alias
 
     def eq(self, v: V) -> 'Binary':
