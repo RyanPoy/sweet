@@ -94,21 +94,21 @@ class TestFn(unittest.TestCase):
 
     def test_sum__and(self):
         func = (fn.sum(Name("foo")) != 1) & (fn.sum(Name("foo")) < 100)
-        self.assertEqual('SUM(`foo`) <> 1 AND SUM(`foo`) < 100', self.mysql.sql(func))
-        self.assertEqual('SUM("foo") <> 1 AND SUM("foo") < 100', self.sqlite.sql(func))
-        self.assertEqual('SUM("foo") <> 1 AND SUM("foo") < 100', self.pg.sql(func))
+        self.assertEqual('(SUM(`foo`) <> 1 AND SUM(`foo`) < 100)', self.mysql.sql(func))
+        self.assertEqual('(SUM("foo") <> 1 AND SUM("foo") < 100)', self.sqlite.sql(func))
+        self.assertEqual('(SUM("foo") <> 1 AND SUM("foo") < 100)', self.pg.sql(func))
 
     def test_sum__or(self):
         func = (fn.sum(Name("foo")) != 1) | (fn.sum(Name("foo")) < 100)
-        self.assertEqual('SUM(`foo`) <> 1 OR SUM(`foo`) < 100', self.mysql.sql(func))
-        self.assertEqual('SUM("foo") <> 1 OR SUM("foo") < 100', self.sqlite.sql(func))
-        self.assertEqual('SUM("foo") <> 1 OR SUM("foo") < 100', self.pg.sql(func))
+        self.assertEqual('(SUM(`foo`) <> 1 OR SUM(`foo`) < 100)', self.mysql.sql(func))
+        self.assertEqual('(SUM("foo") <> 1 OR SUM("foo") < 100)', self.sqlite.sql(func))
+        self.assertEqual('(SUM("foo") <> 1 OR SUM("foo") < 100)', self.pg.sql(func))
 
     def test_sum__and_or_nesting(self):
         func = (fn.sum(Name("foo")) != 1) & ((fn.sum(Name("foo")) < 100) | (fn.sum(Name("bar")) > 20))
-        self.assertEqual('SUM(`foo`) <> 1 AND (SUM(`foo`) < 100 OR SUM(`bar`) > 20)', self.mysql.sql(func))
-        self.assertEqual('SUM("foo") <> 1 AND (SUM("foo") < 100 OR SUM("bar") > 20)', self.sqlite.sql(func))
-        self.assertEqual('SUM("foo") <> 1 AND (SUM("foo") < 100 OR SUM("bar") > 20)', self.pg.sql(func))
+        self.assertEqual('(SUM(`foo`) <> 1 AND ((SUM(`foo`) < 100 OR SUM(`bar`) > 20)))', self.mysql.sql(func))
+        self.assertEqual('(SUM("foo") <> 1 AND ((SUM("foo") < 100 OR SUM("bar") > 20)))', self.sqlite.sql(func))
+        self.assertEqual('(SUM("foo") <> 1 AND ((SUM("foo") < 100 OR SUM("bar") > 20)))', self.pg.sql(func))
 
 
 if __name__ == '__main__':
