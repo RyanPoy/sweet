@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, get_args
 
 from sweet.sequel import Operator
 from sweet.sequel.collectors import SQLCollector
@@ -17,6 +17,7 @@ from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.values import RawType, Value, Value1, Values, ValuesList
 from sweet.sequel.quoting import quote, quote_name
 from sweet.sequel.terms.where import Filter, Having, On, Where
+from sweet.sequel.types import B, K, V, is_B, is_K
 
 
 class Visitor:
@@ -127,18 +128,54 @@ class Visitor:
         return sql
 
     def visit_Binary(self, b: Binary, sql: SQLCollector) -> SQLCollector:
-        self.visit_Value(b.key, sql, False)
+        self.visit_Name(b.key, sql)
         sql << f" {b.op} "
         if b.op == Operator.BETWEEN or b.op == Operator.NOT_BETWEEN:
-            tuple_vs = b.value.v
+            tuple_vs = b.value
             v = tuple_vs[0].rm_alias() if isinstance(tuple_vs[0], Name) else tuple_vs[0]
-            self.visit_Value(Value(v), sql)
+            self.visit_V(v, sql)
             sql << " AND "
             v = tuple_vs[1].rm_alias() if isinstance(tuple_vs[1], Name) else tuple_vs[1]
-            self.visit_Value(Value(v), sql)
+            self.visit_V(v, sql)
         else:
-            self.visit_Value(b.value, sql)
+            self.visit_V(b.value, sql)
         return sql
+
+    def visit_V(self, v: V, sql: SQLCollector) -> SQLCollector:
+        # V: TypeAlias = Union[B, K, List[K], Tuple[K], List[B], Tuple[B], List['V'], Tuple['V']]
+        if is_K(v):
+            self.visit_K(v, sql)
+        elif is_B(v):
+            sql << self.quote_value_of_binary(v)
+        elif isinstance(v, (list, tuple)) and v:
+            sql << "("
+            for i, x in enumerate(v):
+                if i != 0:
+                    sql << ", "
+                self.visit_V(x, sql)
+            sql << ")"
+        return sql
+
+    def visit_K(self, k: K, sql: SQLCollector) -> SQLCollector:
+        if isinstance(k, Name):
+            return self.visit_Name(k, sql)
+        if isinstance(k, Fn):
+            return self.visit_Fn(k, sql)
+        raise ValueError(f"The 'visit_K' method only supports {K} type, but a {k.__class__} type was provided")
+
+    # def visit_Binary(self, b: Binary, sql: SQLCollector) -> SQLCollector:
+    #     self.visit_Value(b.key, sql, False)
+    #     sql << f" {b.op} "
+    #     if b.op == Operator.BETWEEN or b.op == Operator.NOT_BETWEEN:
+    #         tuple_vs = b.value.v
+    #         v = tuple_vs[0].rm_alias() if isinstance(tuple_vs[0], Name) else tuple_vs[0]
+    #         self.visit_Value(Value(v), sql)
+    #         sql << " AND "
+    #         v = tuple_vs[1].rm_alias() if isinstance(tuple_vs[1], Name) else tuple_vs[1]
+    #         self.visit_Value(Value(v), sql)
+    #     else:
+    #         self.visit_Value(b.value, sql)
+    #     return sql
 
     def visit_Value1(self, v: Value1, sql: SQLCollector) -> SQLCollector:
         if isinstance(v, (Name, Fn)):

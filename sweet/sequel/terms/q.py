@@ -1,7 +1,7 @@
 from typing import List, Optional, Self
 
 from sweet.sequel.terms import Logic
-from sweet.sequel.terms.binary import Binary, parse
+from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.values import ValueType
 
 
