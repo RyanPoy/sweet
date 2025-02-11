@@ -45,109 +45,83 @@ class TestName(unittest.TestCase):
         self.assertEqual('"users"."name"', self.pg.sql(n))
 
     def test_sql_of_name_alias(self):
-        alias = Name("id").as_("user_id")
-        self.assertEqual('`id` AS `user_id`', self.mysql.sql(alias))
-        self.assertEqual('"id" AS "user_id"', self.sqlite.sql(alias))
-        self.assertEqual('"id" AS "user_id"', self.pg.sql(alias))
+        n = Name("id").as_("user_id")
+        self.assertEqual('`id` AS `user_id`', self.mysql.sql(n))
+        self.assertEqual('"id" AS "user_id"', self.sqlite.sql(n))
+        self.assertEqual('"id" AS "user_id"', self.pg.sql(n))
 
     def test_eq(self):
-        n = Name('name').eq('jim')
-        self.assertEqual(Binary.parse(name="jim"), n)
-
-        n = Name('name', 'users').eq(Name("nickname", "users"))
-        self.assertEqual(Binary.parse(users__name=Name("nickname", "users")), n)
+        self.assertEqual(Binary.parse(name="jim"), Name('name').eq('jim'))
+        self.assertEqual(Binary.parse(users__name=Name("nickname", "users")), Name('name', 'users').eq(Name("nickname", "users")))
 
     def test_not_eq(self):
-        n = Name('name').not_eq('jim')
-        self.assertEqual(Binary.parse(name__not='jim'), n)
-
-        n = Name('name', 'users').not_eq('jim')
-        self.assertEqual(Binary.parse(users__name__not='jim'), n)
-
-        n = Name('name', 'users').not_eq(Name("nickname", "users"))
-        self.assertEqual(Binary.parse(users__name__not=Name("nickname", "users")), n)
+        self.assertEqual(Binary.parse(name__not='jim'), Name('name').not_eq('jim'))
+        self.assertEqual(Binary.parse(users__name__not='jim'), Name('name', 'users').not_eq('jim'))
+        self.assertEqual(Binary.parse(users__name__not=Name("nickname", "users")), Name('name', 'users').not_eq(Name("nickname", "users")))
 
     def test_is_null(self):
-        n = Name('name').eq(None)
-        self.assertEqual(Binary.parse(name=None), n)
+        self.assertEqual(Binary.parse(name=None), Name('name').eq(None))
 
     def test_is_not_null(self):
-        n = Name('name').not_eq(None)
-        self.assertEqual(Binary.parse(name__not=None), n)
+        self.assertEqual(Binary.parse(name__not=None), Name('name').not_eq(None))
 
     def test_in(self):
-        n = Name('name').eq(['jim', 'lucy', 'lily'])
-        self.assertEqual(Binary.parse(name=['jim', 'lucy', 'lily']), n)
+        self.assertEqual(Binary.parse(name=['jim', 'lucy', 'lily']), Name('name').eq(['jim', 'lucy', 'lily']))
 
     def test_not_in(self):
-        n = Name('name').not_eq(['jim', 'lucy', 'lily'])
-        self.assertEqual(Binary.parse(name__not=['jim', 'lucy', 'lily']), n)
+        self.assertEqual(Binary.parse(name__not=['jim', 'lucy', 'lily']), Name('name').not_eq(['jim', 'lucy', 'lily']))
 
     def test_gt(self):
-        n = Name('age').gt(10)
-        self.assertEqual(Binary.parse(age__gt=10), n)
+        self.assertEqual(Binary.parse(age__gt=10), Name('age').gt(10))
 
     def test_not_gt(self):
-        n = Name('age').not_gt(10)
-        self.assertEqual(Binary.parse(age__lte=10), n)
+        self.assertEqual(Binary.parse(age__lte=10), Name('age').not_gt(10))
 
     def test_gte(self):
-        n = Name('age').gte(10)
-        self.assertEqual(Binary.parse(age__gte=10), n)
+        self.assertEqual(Binary.parse(age__gte=10), Name('age').gte(10))
 
     def test_not_gte(self):
-        n = Name('age').not_gte(10)
-        self.assertEqual(Binary.parse(age__lt=10), n)
+        self.assertEqual(Binary.parse(age__lt=10), Name('age').not_gte(10))
 
     def test_lt(self):
-        n = Name('age').lt(10)
-        self.assertEqual(Binary.parse(age__lt=10), n)
+        self.assertEqual(Binary.parse(age__lt=10), Name('age').lt(10))
 
     def test_not_lt(self):
-        n = Name('age').not_lt(10)
-        self.assertEqual(Binary.parse(age__gte=10), n)
+        self.assertEqual(Binary.parse(age__gte=10), Name('age').not_lt(10))
 
     def test_lte(self):
-        n = Name('age').lte(10)
-        self.assertEqual(Binary.parse(age__lte=10), n)
+        self.assertEqual(Binary.parse(age__lte=10), Name('age').lte(10))
 
     def test_not_lte(self):
-        n = Name('age').not_lte(10)
-        self.assertEqual(Binary.parse(age__gt=10), n)
+        self.assertEqual(Binary.parse(age__gt=10), Name('age').not_lte(10))
 
     def test_like(self):
-        n = Name('name').like('%jim')
-        self.assertEqual(Binary.parse(name__like='%jim'), n)
+        self.assertEqual(Binary.parse(name__like='%jim'), Name('name').like('%jim'))
 
     def test_not_like(self):
-        n = Name('name').not_like('%jim')
-        self.assertEqual(Binary.parse(name__not_like='%jim'), n)
+        self.assertEqual(Binary.parse(name__not_like='%jim'), Name('name').not_like('%jim'))
 
     def test_between(self):
-        n = Name('age').between([10, 60])
-        self.assertEqual(Binary.parse(age__bt=[10, 60]), n)
+        self.assertEqual(Binary.parse(age__bt=[10, 60]), Name('age').between([10, 60]))
 
     def test_between_err(self):
         with self.assertRaises(ValueError) as ctx:
-            n = Name('age').between([10, 60, 30])
+            Name('age').between([10, 60, 30])
         self.assertEqual('The "BETWEEN" operation expects a list or tuple of length 2, but it is not.', str(ctx.exception))
 
     def test_not_between(self):
-        n = Name('age').not_between([10, 60])
-        self.assertEqual(Binary.parse(age__not_bt=[10, 60]), n)
+        self.assertEqual(Binary.parse(age__not_bt=[10, 60]), Name('age').not_between([10, 60]))
 
     def test_not_between_err(self):
         with self.assertRaises(ValueError) as ctx:
-            n = Name('age').not_between([10, 60, 30])
+            Name('age').not_between([10, 60, 30])
         self.assertEqual('The "NOT BETWEEN" operation expects a list or tuple of length 2, but it is not.', str(ctx.exception))
 
     def test_pair_with_regex_value(self):
-        n = Name('username', 'users').regex("^[b]abc")
-        self.assertEqual(Binary.parse(users__username__regex="^[b]abc"), n)
+        self.assertEqual(Binary.parse(users__username__regex="^[b]abc"), Name('username', 'users').regex("^[b]abc"))
 
     def test_pair_with_not_regex_value(self):
-        n = Name('username', 'users').not_regex("^[b]abc")
-        self.assertEqual(Binary.parse(users__username__not_regex="^[b]abc"), n)
+        self.assertEqual(Binary.parse(users__username__not_regex="^[b]abc"), Name('username', 'users').not_regex("^[b]abc"))
 
 
 if __name__ == '__main__':
