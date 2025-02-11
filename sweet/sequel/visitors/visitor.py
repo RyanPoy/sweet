@@ -38,9 +38,9 @@ class Visitor:
 
     def visit_Name(self, n: Name, sql: SQLCollector) -> SQLCollector:
         if n.schema_name:
-            sql << self.quote_column_name(f"{n.schema_name}.{n.value}")
+            sql << self.quote_column_name(f"{n.schema_name}.{n.name}")
         else:
-            sql << self.quote_column_name(n.value)
+            sql << self.quote_column_name(n.name)
         if n.alias:
             sql << " AS " << self.quote_column_name(n.alias)
         return sql

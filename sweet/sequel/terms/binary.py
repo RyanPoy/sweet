@@ -1,13 +1,10 @@
 from dataclasses import dataclass
-from typing import Mapping, Self
+from typing import Self
 
 from sweet.sequel import Operator
-from sweet.sequel.terms.values import RawType, Value, Value1, ValueType
 from sweet.sequel.types import K, V
 from sweet.utils import is_array
 from sweet.sequel.terms.name import Name
-
-
 
 MAPPING = {
     ''         : Operator.EQ,
@@ -82,4 +79,3 @@ class Binary:
             elif op == Operator.NOT_EQ:
                 op = Operator.NOT_IN
         return cls(key, op, value)
-

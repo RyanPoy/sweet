@@ -22,9 +22,9 @@ class TestName(unittest.TestCase):
         self.assertTrue(n1 == n3)
 
     def test_value(self):
-        self.assertEqual("users", Name("users").value)
-        self.assertEqual("name", Name("name").value)
-        self.assertEqual("users.name", Name("users.name").value)
+        self.assertEqual("users", Name("users").name)
+        self.assertEqual("name", Name("name").name)
+        self.assertEqual("users.name", Name("users.name").name)
 
     def test_sql_name_with_schema(self):
         age = Name('age', "users")
@@ -174,7 +174,7 @@ class TestName(unittest.TestCase):
     def test_between_err(self):
         with self.assertRaises(ValueError) as ctx:
             n = Name('age').between([10, 60, 30])
-        self.assertEqual('The between function expects a list or tuple of length 2, but it is not.', str(ctx.exception))
+        self.assertEqual('The "BETWEEN" operation expects a list or tuple of length 2, but it is not.', str(ctx.exception))
 
     def test_not_between(self):
         n = Name('age').not_between([10, 60])
@@ -185,7 +185,7 @@ class TestName(unittest.TestCase):
     def test_not_between_err(self):
         with self.assertRaises(ValueError) as ctx:
             n = Name('age').not_between([10, 60, 30])
-        self.assertEqual('The not_between function expects a list or tuple of length 2, but it is not.', str(ctx.exception))
+        self.assertEqual('The "NOT BETWEEN" operation expects a list or tuple of length 2, but it is not.', str(ctx.exception))
 
     def test_pair_with_regex_value(self):
         n = Name('username', 'users').regex("^[b]abc")
