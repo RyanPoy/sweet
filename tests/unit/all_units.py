@@ -7,7 +7,6 @@ from tests.unit.sequel.statements.test_select_statement import TestSelectStateme
 from tests.unit.sequel.statements.test_update_statement import TestUpdateStatement
 from tests.unit.sequel.terms.test_fn import TestFn
 from tests.unit.sequel.terms.test_lock import TestLock
-from tests.unit.sequel.terms.test_parse import TestParse
 from tests.unit.sequel.terms.test_name import TestName
 from tests.unit.sequel.terms.test_q import TestQ
 from tests.unit.sequel.terms.test_values import TestValues
@@ -21,7 +20,6 @@ if __name__ == '__main__':
         TestInsertStatement,
         TestUpdateStatement,
         TestSelectStatement,
-        TestParse,
         TestQ,
         TestLock,
         TestValues,

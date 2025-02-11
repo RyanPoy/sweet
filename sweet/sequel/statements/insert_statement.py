@@ -3,6 +3,7 @@ from typing import Self
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.values import Value1, ValueType, Values, ValuesList
+from sweet.sequel.types import V
 
 
 class InsertStatement:
@@ -120,7 +121,7 @@ class InsertStatement:
         self.insert_or_update = literal.INSERT
         return self
 
-    def replace(self, *values: Value1) -> Self:
+    def replace(self, *values: V) -> Self:
         """
         Adds a new row to the INSERT statement with a REPLACE operation.
 
@@ -131,7 +132,7 @@ class InsertStatement:
         self.insert_or_update = literal.REPLACE
         return self
 
-    def replace_rows(self, *rows: [Value1]) -> Self:
+    def replace_rows(self, *rows: [V]) -> Self:
         """
         Adds multiple rows with a REPLACE operation for batch processing.
 

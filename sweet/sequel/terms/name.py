@@ -19,13 +19,12 @@ class Name:
     schema_name: str = None
     alias: str = None
 
-    def __post_init__(self) -> None:
-        # if isinstance(schema_name, Name):
-        #     if schema_name.alias:
-        #         self.schema_name = schema_name.alias
-        #     else:
-        #         self.schema_name = schema_name.value
-        pass
+    def schema(self, name: str | Self) -> Self:
+        if isinstance(name, Name):
+            self.schema_name = name.alias if name.alias else name.name
+        elif isinstance(name, str):
+            self.schema_name = name
+        return self
 
     def as_(self, alias: str) -> Self:
         self.alias = alias
@@ -37,14 +36,11 @@ class Name:
         return instance
 
     def __eq__(self, other: Union[Self | Literal | str]) -> bool:
-        eqs = super().__eq__(other)
-        if eqs is True:
-            return True
         if isinstance(other, str) and other == '*' and self.name == '*':
             return True
         if isinstance(other, Literal) and other == STAR and self.name == '*':
             return True
-        return False
+        return self.name == other.name and self.schema_name == other.schema_name and self.alias == other.alias
 
     def eq(self, v: V) -> 'Binary':
         if v is None:

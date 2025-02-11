@@ -2,14 +2,14 @@ from typing import List, Optional, Self
 
 from sweet.sequel.terms import Logic
 from sweet.sequel.terms.binary import Binary
-from sweet.sequel.terms.values import ValueType
+from sweet.sequel.types import V
 
 
 class Q:
-    def __init__(self, **kwargs: ValueType):
+    def __init__(self, **kwargs: V):
         self.binaries: List[Binary] = []
         for k, v in kwargs.items():
-            self.binaries.append(parse(**{k: v}))
+            self.binaries.append(Binary.parse(**{k: v}))
 
         self.operator: Optional[Logic] = None  # None 表示基础条件
         self.left: Optional[Q] = None
@@ -20,12 +20,20 @@ class Q:
         return not self.binaries and not self.right
 
     def __eq__(self, other):
-        return (self.__class__ == other.__class__ and self.left == other.left and self.right == other.right
-                and self.invert == other.invert and self.binaries == other.binaries)
-
-    def __hash__(self):
-        # return hash(f'{self.__class__}-{str(self.left)}-{str(self.right)}-{self.operator}-{"-".join([str(x) for x in self.binaries])}')
-        return hash(f'{self.__class__}-{str(self.left)}-{str(self.right)}-{self.operator}-{"-".join([str(x) for x in self.binaries])}')
+        if not (self.__class__ == other.__class__ and self.left == other.left and self.right == other.right
+                and self.invert == other.invert and self.operator == other.operator):
+            return False
+        if len(self.binaries) != len(other.binaries):
+            return False
+        for i, b1 in enumerate(self.binaries):
+            b2 = other.binaries[i]
+            if b1 != b2:
+                print("*"*10)
+                print(b1)
+                print(b2)
+                print("*"*10)
+                return False
+        return True
 
     def __invert__(self) -> Self:
         q = Q()

@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 B: TypeAlias = Union[int, float, str, Decimal, bool, datetime, date, None, bytes]
 K: TypeAlias = Union['Fn', 'Name']
-V: TypeAlias = Union[B, K, List[K], Tuple[K], List[B], Tuple[B], List['V'], Tuple['V']]
+V: TypeAlias = Union[B, K, List, Tuple, List, Tuple, List, Tuple]
 
 
 def is_B(v) -> bool:

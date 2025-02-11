@@ -150,7 +150,7 @@ class SelectStatement:
 
     def __check_repetitive_tables(self, table, tables) -> Self:
         for t in tables:  # check for repetitive tables
-            if t.value == table.value:
+            if t.name == table.name:
                 return self
         tables.append(table)
         return self

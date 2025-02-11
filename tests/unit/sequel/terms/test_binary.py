@@ -166,6 +166,11 @@ class TestBinary(unittest.TestCase):
         self.assertEqual("\"users\".\"username\" NOT REGEX '^[b]abc'", self.sqlite.sql(b))
         self.assertEqual("\"users\".\"username\" NOT REGEX '^[b]abc'", self.pg.sql(b))
 
+    def test_equals(self):
+        b1 = Binary(Name("pk"), Operator.IN, [1, 2])
+        b2 = Binary(Name("pk"), Operator.IN, [1, 2])
+        self.assertEqual(b1, b2)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -78,11 +78,6 @@ class TestQ(unittest.TestCase):
         self.assertEqual( Q(pk=(1, 2)), Q(pk=(1, 2)) )
         self.assertEqual( Q(pk=(1, 2)), Q(pk=[1, 2]) )
 
-    def test_hash(self):
-        self.assertEqual(hash(Q()), hash(Q()))
-        self.assertEqual( hash(Q(pk=(1, 2))), hash(Q(pk=(1, 2))) )
-        self.assertEqual( hash(Q(pk=(1, 2))), hash(Q(pk=[1, 2])) )
-
 
 if __name__ == '__main__':
     unittest.main()

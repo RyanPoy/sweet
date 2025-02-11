@@ -133,17 +133,18 @@ class Visitor:
         if b.op == Operator.BETWEEN or b.op == Operator.NOT_BETWEEN:
             tuple_vs = b.value
             v = tuple_vs[0].rm_alias() if isinstance(tuple_vs[0], Name) else tuple_vs[0]
-            self.visit_V(v, sql)
+            self.visit_V(v, sql, True)
             sql << " AND "
             v = tuple_vs[1].rm_alias() if isinstance(tuple_vs[1], Name) else tuple_vs[1]
-            self.visit_V(v, sql)
+            self.visit_V(v, sql, True)
         else:
-            self.visit_V(b.value, sql)
+            self.visit_V(b.value, sql, True)
         return sql
 
-    def visit_V(self, v: V, sql: SQLCollector) -> SQLCollector:
+    def visit_V(self, v: V, sql: SQLCollector, ignore_alias=False) -> SQLCollector:
         # V: TypeAlias = Union[B, K, List[K], Tuple[K], List[B], Tuple[B], List['V'], Tuple['V']]
         if is_K(v):
+            v = v.rm_alias()
             self.visit_K(v, sql)
         elif is_B(v):
             sql << self.quote_value_of_binary(v)
@@ -152,7 +153,7 @@ class Visitor:
             for i, x in enumerate(v):
                 if i != 0:
                     sql << ", "
-                self.visit_V(x, sql)
+                self.visit_V(x, sql, ignore_alias)
             sql << ")"
         return sql
 
@@ -162,20 +163,6 @@ class Visitor:
         if isinstance(k, Fn):
             return self.visit_Fn(k, sql)
         raise ValueError(f"The 'visit_K' method only supports {K} type, but a {k.__class__} type was provided")
-
-    # def visit_Binary(self, b: Binary, sql: SQLCollector) -> SQLCollector:
-    #     self.visit_Value(b.key, sql, False)
-    #     sql << f" {b.op} "
-    #     if b.op == Operator.BETWEEN or b.op == Operator.NOT_BETWEEN:
-    #         tuple_vs = b.value.v
-    #         v = tuple_vs[0].rm_alias() if isinstance(tuple_vs[0], Name) else tuple_vs[0]
-    #         self.visit_Value(Value(v), sql)
-    #         sql << " AND "
-    #         v = tuple_vs[1].rm_alias() if isinstance(tuple_vs[1], Name) else tuple_vs[1]
-    #         self.visit_Value(Value(v), sql)
-    #     else:
-    #         self.visit_Value(b.value, sql)
-    #     return sql
 
     def visit_Value1(self, v: Value1, sql: SQLCollector) -> SQLCollector:
         if isinstance(v, (Name, Fn)):
