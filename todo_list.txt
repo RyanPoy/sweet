@@ -40,7 +40,7 @@ Binary：
 
 Fn + Name
    这两者很像，都可以放到Binary里面
-   两者都可以做 gt，lt，... 的操作，生成 Binary？
+√   两者都可以做 gt，lt，... 的操作，生成 Binary？
 
 
 

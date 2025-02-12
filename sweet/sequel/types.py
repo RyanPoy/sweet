@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
@@ -42,32 +44,55 @@ def str_V() -> str:
 # Basic data type
 RawType: TypeAlias = Union[None, bool, str, bytes, int, float, Decimal, date, datetime]
 
+
+@dataclass
+class Raw:
+    data: RawType
+
+    def __post_init__(self):
+        if not isinstance(self.data, RawType):
+            raise TypeError(f"Raw initialize accept {RawType}, but got '{self.data.__class__.__name__}'")
+
+    def quote(self):
+        if self.data is None:
+            return "NULL"
+
+        tp = type(self.data)
+        if tp == str:  # Todos: if tp in (str, ActiveSupport::Multibyte::Chars):
+            return f"'{quoting.qs(self.data)}'"
+        if tp == bool:
+            return '1' if self.data is True else '0'
+        if tp in (Decimal, int, float):  # BigDecimals need to be put in a non-normalized form and quoted.
+            return str(self.data)
+        if tp == datetime:
+            return f"'{utils.datetime2str(self.data)}'"
+        if tp == date:
+            return f"'{utils.date2str(self.data)}'"
+        if tp == bytes:
+            return f"'{utils.binary2str(self.data)}'"
+
+
 # Array
 ArrayType: TypeAlias = Union[Tuple, List]
 
 
 @dataclass
-class Raw:
-    value: RawType
+class Array:
+    data: List
 
-    def __post_init__(self):
-        if not isinstance(self.value, RawType):
-            raise TypeError(f"Raw initialize accept {RawType}, but got '{self.value.__class__.__name__}'")
+    def __post_init__(self) -> None:
+        self.data = self._normalize()
 
-    def quote(self):
-        if self.value is None:
-            return "NULL"
+    def _normalize(self):
+        from sweet.sequel.terms.name_fn import Name, Fn
+        def _(vs, lst: List) -> List:
+            for x in vs:
+                if isinstance(x, RawType):
+                    lst.append(Raw(x))
+                elif isinstance(x, (Fn, Name)):
+                    lst.append(x)
+                elif isinstance(x, ArrayType):
+                    lst.append(_(x, []))
+            return lst
 
-        tp = type(self.value)
-        if tp == str:  # Todos: if tp in (str, ActiveSupport::Multibyte::Chars):
-            return f"'{quoting.qs(self.value)}'"
-        if tp == bool:
-            return '1' if self.value is True else '0'
-        if tp in (Decimal, int, float):  # BigDecimals need to be put in a non-normalized form and quoted.
-            return str(self.value)
-        if tp == datetime:
-            return f"'{utils.datetime2str(self.value)}'"
-        if tp == date:
-            return f"'{utils.date2str(self.value)}'"
-        if tp == bytes:
-            return f"'{utils.binary2str(self.value)}'"
+        return _(self.data, [])
