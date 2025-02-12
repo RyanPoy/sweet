@@ -27,7 +27,7 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT * FROM "abc"', self.pg.sql(stmt))
 
     def test_select__table_schema(self):
-        stmt = SelectStatement().from_(Name("abc", "schema1"))
+        stmt = SelectStatement().from_(Name("abc", schema_name="schema1"))
         self.assertEqual('SELECT * FROM `schema1`.`abc`', self.mysql.sql(stmt))
         self.assertEqual('SELECT * FROM "schema1"."abc"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT * FROM "schema1"."abc"', self.pg.sql(stmt))
@@ -69,8 +69,8 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT "foo", "bar" FROM "abc"', self.pg.sql(stmt))
 
     def test_select_multiple_tables(self):
-        stmt = SelectStatement().from_(self.table_abc).select(Name("foo", self.table_abc.name)) \
-            .from_(self.table_efg).select(Name("bar", self.table_efg.name))
+        stmt = (SelectStatement().from_(self.table_abc).select(Name("foo", schema_name=self.table_abc.name))
+                .from_(self.table_efg).select(Name("bar", schema_name=self.table_efg.name)))
         self.assertEqual('SELECT `abc`.`foo`, `efg`.`bar` FROM `abc`, `efg`', self.mysql.sql(stmt))
         self.assertEqual('SELECT "abc"."foo", "efg"."bar" FROM "abc", "efg"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "abc"."foo", "efg"."bar" FROM "abc", "efg"', self.pg.sql(stmt))
@@ -263,7 +263,7 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT * FROM "abc" WHERE "abc"."foo" = 1 AND "abc"."bar" = "abc"."baz"', self.pg.sql(stmt))
 
     def test_where_field_equals_where_not(self):
-        stmt = SelectStatement().from_(self.table_abc).where(~Q(foo=1)).where(bar=Name('baz', self.table_abc.name))
+        stmt = SelectStatement().from_(self.table_abc).where(~Q(foo=1)).where(bar=Name('baz', schema_name=self.table_abc.name))
         self.assertEqual('SELECT * FROM `abc` WHERE NOT `foo` = 1 AND `bar` = `abc`.`baz`', self.mysql.sql(stmt))
         self.assertEqual('SELECT * FROM "abc" WHERE NOT "foo" = 1 AND "bar" = "abc"."baz"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT * FROM "abc" WHERE NOT "foo" = 1 AND "bar" = "abc"."baz"', self.pg.sql(stmt))
@@ -344,7 +344,9 @@ class TestSelectStatement(unittest.TestCase):
     def test_group_by__alias_with_join(self):
         table1 = Name("table1").as_("t1")
         bar = Name("bar", table1.alias).as_("bar01")
-        stmt = SelectStatement().from_(self.table_abc).join(table1).on(abc__id=Name("t_ref", table1.alias)).select(fn.sum(Name("foo")), bar).group_by(bar)
+        stmt = (SelectStatement().from_(self.table_abc).join(table1)
+                .on(abc__id=Name("t_ref", schema_name=table1.alias))
+                .select(fn.sum(Name("foo")), bar).group_by(bar))
         self.assertEqual('SELECT SUM(`foo`), `t1`.`bar` AS `bar01` FROM `abc` JOIN `table1` AS `t1` ON `abc`.`id` = `t1`.`t_ref` GROUP BY `bar01`',
                          self.mysql.sql(stmt))
         self.assertEqual('SELECT SUM("foo"), "t1"."bar" AS "bar01" FROM "abc" JOIN "table1" AS "t1" ON "abc"."id" = "t1"."t_ref" GROUP BY "bar01"',
@@ -360,7 +362,7 @@ class TestSelectStatement(unittest.TestCase):
 
     def test_having_greater_than(self):
         foo, bar = Name('foo'), Name('bar')
-        stmt = SelectStatement().from_(self.table_abc).select(foo, fn.sum(bar)).group_by(foo).having(fn.sum(bar) > 1)
+        stmt = SelectStatement().from_(self.table_abc).select(foo, fn.sum(bar)).group_by(foo).having(fn.sum(bar).gt(1))
 
         self.assertEqual('SELECT `foo`, SUM(`bar`) FROM `abc` GROUP BY `foo` HAVING SUM(`bar`) > 1', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING SUM("bar") > 1', self.sqlite.sql(stmt))
@@ -368,7 +370,7 @@ class TestSelectStatement(unittest.TestCase):
 
     def test_having_and(self):
         foo, bar = Name('foo'), Name('bar')
-        stmt = SelectStatement().from_(self.table_abc).select(foo, fn.sum(bar)).group_by(foo).having((fn.sum(bar) > 1) & (fn.sum(bar) < 100))
+        stmt = SelectStatement().from_(self.table_abc).select(foo, fn.sum(bar)).group_by(foo).having((fn.sum(bar).gt(1)) & (fn.sum(bar).lt(100)))
         self.assertEqual('SELECT `foo`, SUM(`bar`) FROM `abc` GROUP BY `foo` HAVING (SUM(`bar`) > 1 AND SUM(`bar`) < 100)', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING (SUM("bar") > 1 AND SUM("bar") < 100)', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING (SUM("bar") > 1 AND SUM("bar") < 100)', self.pg.sql(stmt))
@@ -385,7 +387,7 @@ class TestSelectStatement(unittest.TestCase):
             .select(abc_foo, fn.sum(efg_bar), abc_buz)
             .group_by(abc_foo)
             .having(abc__buz="fiz")
-            .having(fn.sum(efg_bar) > 100)
+            .having(fn.sum(efg_bar).gt(100))
         )
 
         self.assertEqual('SELECT `abc`.`foo`, SUM(`efg`.`bar`), `abc`.`buz` FROM `abc` JOIN `efg` ON `abc`.`foo` = `efg`.`foo` '
@@ -484,8 +486,8 @@ class TestSelectStatement(unittest.TestCase):
     def test_select__multiple_tables(self):
         table_abc = Name("abc").as_("t0")
         table_efg = Name("efg").as_("t1")
-        foo = Name('foo', table_abc)
-        bar = Name('bar', table_efg)
+        foo = Name('foo', schema_name=table_abc)
+        bar = Name('bar', schema_name=table_efg)
         stmt = SelectStatement().from_(table_abc).select(foo).from_(table_efg).select(bar)
         self.assertEqual('SELECT `t0`.`foo`, `t1`.`bar` FROM `abc` AS `t0`, `efg` AS `t1`', self.mysql.sql(stmt))
         self.assertEqual('SELECT "t0"."foo", "t1"."bar" FROM "abc" AS "t0", "efg" AS "t1"', self.sqlite.sql(stmt))
@@ -510,7 +512,7 @@ class TestSelectStatement(unittest.TestCase):
     def test_extraneous_quotes(self):
         t1 = Name("table1").as_("t1")
         t2 = Name("table2").as_("t2")
-        stmt = SelectStatement().from_(t1).join(t2).on(t1__value__bt=(Name("start", t2), Name("end", t2))).select(Name("value", t1))
+        stmt = SelectStatement().from_(t1).join(t2).on(t1__value__bt=(Name("start", schema_name=t2), Name("end", schema_name=t2))).select(Name("value", schema_name=t1))
         self.assertEqual('SELECT `t1`.`value` FROM `table1` AS `t1` JOIN `table2` AS `t2` ON `t1`.`value` BETWEEN `t2`.`start` AND `t2`.`end`', self.mysql.sql(stmt))
         self.assertEqual('SELECT "t1"."value" FROM "table1" AS "t1" JOIN "table2" AS "t2" ON "t1"."value" BETWEEN "t2"."start" AND "t2"."end"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "t1"."value" FROM "table1" AS "t1" JOIN "table2" AS "t2" ON "t1"."value" BETWEEN "t2"."start" AND "t2"."end"', self.pg.sql(stmt))

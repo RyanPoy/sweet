@@ -264,8 +264,10 @@ class Visitor:
                     self.visit(c, sql)
                 elif is_V(c):
                     sql << self.quote_column_name(c)
+                elif isinstance(c, Value):
+                    self.visit(c, sql)
                 else:
-                    raise ValueError(f'SelectStatement column must be a {str_V()}, but get {c.__type__}')
+                    raise ValueError(f'SelectStatement column must be a {str_V()}, but get {c.__class__}')
 
         if stmt.tables:
             sql << " FROM "

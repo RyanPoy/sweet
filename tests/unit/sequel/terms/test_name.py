@@ -28,7 +28,7 @@ class TestName(unittest.TestCase):
         self.assertEqual("users.name", Name("users.name").name)
 
     def test_sql_name_with_schema(self):
-        age = Name('age', "users")
+        age = Name('age', schema_name="users")
         self.assertEqual('`users`.`age`', self.mysql.sql(age))
         self.assertEqual('"users"."age"', self.sqlite.sql(age))
         self.assertEqual('"users"."age"', self.pg.sql(age))

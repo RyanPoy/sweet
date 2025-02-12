@@ -10,6 +10,7 @@ from tests.unit.sequel.terms.test_lock import TestLock
 from tests.unit.sequel.terms.test_name import TestName
 from tests.unit.sequel.terms.test_q import TestQ
 from tests.unit.sequel.terms.test_values import TestValues
+from tests.unit.sequel.test_raw import TestRaw
 
 
 if __name__ == '__main__':
@@ -25,6 +26,7 @@ if __name__ == '__main__':
         TestValues,
         TestName,
         TestFn,
+        TestRaw,
     ]:
         suites.addTests(loader.loadTestsFromTestCase(case))
     unittest.TextTestRunner().run(suites)
