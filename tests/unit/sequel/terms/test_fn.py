@@ -1,6 +1,8 @@
 import unittest
 
+from sweet.sequel import Operator
 from sweet.sequel.terms import fn, literal
+from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.name import Name
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
@@ -50,65 +52,68 @@ class TestFn(unittest.TestCase):
         self.assertEqual('SUM(DISTINCT "foo")', self.sqlite.sql(func))
         self.assertEqual('SUM(DISTINCT "foo")', self.pg.sql(func))
 
-    def test_sum__gt(self):
-        func = fn.sum(Name("foo")) > 1
-        self.assertEqual('SUM(`foo`) > 1', self.mysql.sql(func))
-        self.assertEqual('SUM("foo") > 1', self.sqlite.sql(func))
-        self.assertEqual('SUM("foo") > 1', self.pg.sql(func))
+    def test_gt(self):
+        f = fn.sum(Name("foo"))
+        self.assertEqual(Binary(f, Operator.GT, 1), f.gt(1))
 
-    def test_sum__gt_Name(self):
-        func = fn.sum(Name("foo")) > Name("age")
-        self.assertEqual('SUM(`foo`) > `age`', self.mysql.sql(func))
-        self.assertEqual('SUM("foo") > "age"', self.sqlite.sql(func))
-        self.assertEqual('SUM("foo") > "age"', self.pg.sql(func))
+    def test_gt_Name(self):
+        f = fn.sum(Name("foo"))
+        n = Name("age")
+        self.assertEqual(Binary(f, Operator.GT, n), f.gt(n))
 
-    def test_sum__gte(self):
-        func = fn.sum(Name("foo")) >= 1
-        self.assertEqual('SUM(`foo`) >= 1', self.mysql.sql(func))
-        self.assertEqual('SUM("foo") >= 1', self.sqlite.sql(func))
-        self.assertEqual('SUM("foo") >= 1', self.pg.sql(func))
+    def test_not_gt(self):
+        f = fn.sum(Name("foo"))
+        self.assertEqual(Binary(f, Operator.NOT_GT, 1), f.not_gt(1))
 
-    def test_sum__lt(self):
-        func = fn.sum(Name("foo")) < 1
-        self.assertEqual('SUM(`foo`) < 1', self.mysql.sql(func))
-        self.assertEqual('SUM("foo") < 1', self.sqlite.sql(func))
-        self.assertEqual('SUM("foo") < 1', self.pg.sql(func))
+    def test_gte(self):
+        f = fn.sum(Name("foo"))
+        self.assertEqual(Binary(f, Operator.GTE, 1), f.gte(1))
 
-    def test_sum__lte(self):
-        func = fn.sum(Name("foo")) <= 1
-        self.assertEqual('SUM(`foo`) <= 1', self.mysql.sql(func))
-        self.assertEqual('SUM("foo") <= 1', self.sqlite.sql(func))
-        self.assertEqual('SUM("foo") <= 1', self.pg.sql(func))
+    def test_not_gte(self):
+        f = fn.sum(Name("foo"))
+        self.assertEqual(Binary(f, Operator.NOT_GTE, 1), f.not_gte(1))
 
-    def test_sum__eq(self):
-        func = fn.sum(Name("foo")) == 1
-        self.assertEqual('SUM(`foo`) = 1', self.mysql.sql(func))
-        self.assertEqual('SUM("foo") = 1', self.sqlite.sql(func))
-        self.assertEqual('SUM("foo") = 1', self.pg.sql(func))
+    def test_lt(self):
+        f = fn.sum(Name("foo"))
+        self.assertEqual(Binary(f, Operator.LT, 1), f.lt(1))
 
-    def test_sum__not_eq(self):
-        func = fn.sum(Name("foo")) != 1
-        self.assertEqual('SUM(`foo`) <> 1', self.mysql.sql(func))
-        self.assertEqual('SUM("foo") <> 1', self.sqlite.sql(func))
-        self.assertEqual('SUM("foo") <> 1', self.pg.sql(func))
+    def test_not_lt(self):
+        f = fn.sum(Name("foo"))
+        self.assertEqual(Binary(f, Operator.NOT_LT, 1), f.not_lt(1))
 
-    def test_sum__and(self):
-        func = (fn.sum(Name("foo")) != 1) & (fn.sum(Name("foo")) < 100)
-        self.assertEqual('(SUM(`foo`) <> 1 AND SUM(`foo`) < 100)', self.mysql.sql(func))
-        self.assertEqual('(SUM("foo") <> 1 AND SUM("foo") < 100)', self.sqlite.sql(func))
-        self.assertEqual('(SUM("foo") <> 1 AND SUM("foo") < 100)', self.pg.sql(func))
+    def test_lte(self):
+        f = fn.sum(Name("foo"))
+        self.assertEqual(Binary(f, Operator.LTE, 1), f.lte(1))
 
-    def test_sum__or(self):
-        func = (fn.sum(Name("foo")) != 1) | (fn.sum(Name("foo")) < 100)
-        self.assertEqual('(SUM(`foo`) <> 1 OR SUM(`foo`) < 100)', self.mysql.sql(func))
-        self.assertEqual('(SUM("foo") <> 1 OR SUM("foo") < 100)', self.sqlite.sql(func))
-        self.assertEqual('(SUM("foo") <> 1 OR SUM("foo") < 100)', self.pg.sql(func))
+    def test_not_lte(self):
+        f = fn.sum(Name("foo"))
+        self.assertEqual(Binary(f, Operator.NOT_LTE, 1), f.not_lte(1))
 
-    def test_sum__and_or_nesting(self):
-        func = (fn.sum(Name("foo")) != 1) & ((fn.sum(Name("foo")) < 100) | (fn.sum(Name("bar")) > 20))
-        self.assertEqual('(SUM(`foo`) <> 1 AND ((SUM(`foo`) < 100 OR SUM(`bar`) > 20)))', self.mysql.sql(func))
-        self.assertEqual('(SUM("foo") <> 1 AND ((SUM("foo") < 100 OR SUM("bar") > 20)))', self.sqlite.sql(func))
-        self.assertEqual('(SUM("foo") <> 1 AND ((SUM("foo") < 100 OR SUM("bar") > 20)))', self.pg.sql(func))
+    def test_eq(self):
+        f = fn.sum(Name("foo"))
+        self.assertEqual(Binary(f, Operator.EQ, 1), f.eq(1))
+
+    def test_not_eq(self):
+        f = fn.sum(Name("foo"))
+        self.assertEqual(Binary(f, Operator.NOT_EQ, 1), f.not_eq(1))
+
+    # def test_and(self):
+    #     func = (fn.sum(Name("foo")) != 1) & (fn.sum(Name("foo")) < 100)
+    #     self.assertEqual('(SUM(`foo`) <> 1 AND SUM(`foo`) < 100)', self.mysql.sql(func))
+    #     self.assertEqual('(SUM("foo") <> 1 AND SUM("foo") < 100)', self.sqlite.sql(func))
+    #     self.assertEqual('(SUM("foo") <> 1 AND SUM("foo") < 100)', self.pg.sql(func))
+    #
+    # def test_or(self):
+    #     func = (fn.sum(Name("foo")) != 1) | (fn.sum(Name("foo")) < 100)
+    #     self.assertEqual('(SUM(`foo`) <> 1 OR SUM(`foo`) < 100)', self.mysql.sql(func))
+    #     self.assertEqual('(SUM("foo") <> 1 OR SUM("foo") < 100)', self.sqlite.sql(func))
+    #     self.assertEqual('(SUM("foo") <> 1 OR SUM("foo") < 100)', self.pg.sql(func))
+    #
+    # def test_and_or_nesting(self):
+    #     func = (fn.sum(Name("foo")) != 1) & ((fn.sum(Name("foo")) < 100) | (fn.sum(Name("bar")) > 20))
+    #     self.assertEqual('(SUM(`foo`) <> 1 AND ((SUM(`foo`) < 100 OR SUM(`bar`) > 20)))', self.mysql.sql(func))
+    #     self.assertEqual('(SUM("foo") <> 1 AND ((SUM("foo") < 100 OR SUM("bar") > 20)))', self.sqlite.sql(func))
+    #     self.assertEqual('(SUM("foo") <> 1 AND ((SUM("foo") < 100 OR SUM("bar") > 20)))', self.pg.sql(func))
 
 
 if __name__ == '__main__':

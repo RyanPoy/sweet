@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-from typing import Self
+from typing import List, Self, Union
 
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.values import Value1
+from sweet.sequel.terms.values import Value
 from sweet.sequel.terms.where import Having, On, Where
+from sweet.sequel.types import K, V, is_K
 
 
 class SelectStatement:
@@ -36,7 +37,7 @@ class SelectStatement:
 
     def __init__(self):
         self.tables = []
-        self.columns = []
+        self.columns: List[K | Value | literal.Literal] = []
         self.distinct_ = None
         self.limit_number = 0
         self.offset_number = 0
@@ -54,12 +55,14 @@ class SelectStatement:
     def from_(self, table: Name | Self) -> Self:
         return self.__from_or_join(self.tables, table)
 
-    def select(self, *columns: Value1) -> Self:
+    def select(self, *columns: Union[V | literal.Literal]) -> Self:
         for c in columns:
             if isinstance(c, str) and '*' == c:
                 self.columns.append(literal.STAR)
-            else:
+            if is_K(c) or isinstance(c, literal.Literal):
                 self.columns.append(c)
+            else:
+                self.columns.append(Value(c))
         return self
 
     def force_index(self, *indexes: Name) -> Self:

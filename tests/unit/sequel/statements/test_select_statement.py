@@ -484,8 +484,8 @@ class TestSelectStatement(unittest.TestCase):
     def test_select__multiple_tables(self):
         table_abc = Name("abc").as_("t0")
         table_efg = Name("efg").as_("t1")
-        foo = Name('foo').schema(table_abc)
-        bar = Name('bar').schema(table_efg)
+        foo = Name('foo', table_abc)
+        bar = Name('bar', table_efg)
         stmt = SelectStatement().from_(table_abc).select(foo).from_(table_efg).select(bar)
         self.assertEqual('SELECT `t0`.`foo`, `t1`.`bar` FROM `abc` AS `t0`, `efg` AS `t1`', self.mysql.sql(stmt))
         self.assertEqual('SELECT "t0"."foo", "t1"."bar" FROM "abc" AS "t0", "efg" AS "t1"', self.sqlite.sql(stmt))
@@ -510,7 +510,7 @@ class TestSelectStatement(unittest.TestCase):
     def test_extraneous_quotes(self):
         t1 = Name("table1").as_("t1")
         t2 = Name("table2").as_("t2")
-        stmt = SelectStatement().from_(t1).join(t2).on(t1__value__bt=(Name("start").schema(t2), Name("end").schema(t2))).select(Name("value").schema(t1))
+        stmt = SelectStatement().from_(t1).join(t2).on(t1__value__bt=(Name("start", t2), Name("end", t2))).select(Name("value", t1))
         self.assertEqual('SELECT `t1`.`value` FROM `table1` AS `t1` JOIN `table2` AS `t2` ON `t1`.`value` BETWEEN `t2`.`start` AND `t2`.`end`', self.mysql.sql(stmt))
         self.assertEqual('SELECT "t1"."value" FROM "table1" AS "t1" JOIN "table2" AS "t2" ON "t1"."value" BETWEEN "t2"."start" AND "t2"."end"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "t1"."value" FROM "table1" AS "t1" JOIN "table2" AS "t2" ON "t1"."value" BETWEEN "t2"."start" AND "t2"."end"', self.pg.sql(stmt))

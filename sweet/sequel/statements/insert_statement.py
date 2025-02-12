@@ -2,7 +2,7 @@ from typing import Self
 
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.name import Name
-from sweet.sequel.terms.values import Value1, ValueType, Values, ValuesList
+from sweet.sequel.terms.values import Values, ValuesList
 from sweet.sequel.types import V
 
 
@@ -93,13 +93,7 @@ class InsertStatement:
         """
         return self._values_list
 
-    def insert(self, *args: ValueType) -> Self:
-        """
-        Adds a new row to the INSERT statement.
-
-        :param values: The values to insert into the specified columns.
-        :return: The current InsertStatement instance.
-        """
+    def insert(self, *args: V) -> Self:
         self.__insert_or_replace(*args)
         self.insert_or_update = literal.INSERT
         return self
@@ -108,7 +102,7 @@ class InsertStatement:
         self.insert_or_update = literal.INSERT_IGNORE
         return self
 
-    def insert_rows(self, *rows: [ValueType]) -> Self:
+    def insert_rows(self, *rows: [V]) -> Self:
         """
         Adds multiple rows to the INSERT statement.
 
@@ -144,7 +138,7 @@ class InsertStatement:
         self.insert_or_update = literal.REPLACE
         return self
 
-    def __insert_or_replace(self, *args: ValueType) -> Self:
+    def __insert_or_replace(self, *args: V) -> Self:
         """
         Internal method to handle both insert and replace operations.
 

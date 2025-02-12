@@ -1,4 +1,4 @@
-from typing import Callable, get_args
+from typing import Callable
 
 from sweet.sequel import Operator
 from sweet.sequel.collectors import SQLCollector
@@ -6,7 +6,7 @@ from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
-from sweet.sequel.terms import Logic
+from sweet.sequel.terms import Logic, literal
 from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.fn import Fn
 from sweet.sequel.terms.literal import Literal
@@ -14,10 +14,10 @@ from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
 from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.values import RawType, Value, Value1, Values, ValuesList
+from sweet.sequel.terms.values import Value, Values, ValuesList
 from sweet.sequel.quoting import quote, quote_name
 from sweet.sequel.terms.where import Filter, Having, On, Where
-from sweet.sequel.types import B, K, V, is_B, is_K
+from sweet.sequel.types import B, K, V, is_B, is_K, is_V, str_K, str_V
 
 
 class Visitor:
@@ -27,13 +27,13 @@ class Visitor:
     def quote_column_name(self, name: str) -> str:
         return quote_name(name, self.qchar)
 
-    def quote_value_of_values(self, value: RawType) -> str:
+    def quote_value_of_values(self, value: B) -> str:
         return quote(value, "[", "]")
 
-    def quote_value_of_binary(self, value: RawType) -> str:
+    def quote_value_of_binary(self, value: B) -> str:
         return quote(value, "(", ")")
 
-    def quote_condition(self, value: RawType) -> str:
+    def quote_condition(self, value: B) -> str:
         return quote(value, "[", "]")
 
     def visit_Name(self, n: Name, sql: SQLCollector) -> SQLCollector:
@@ -49,35 +49,20 @@ class Visitor:
         return sql << l.v
 
     def visit_Fn(self, f: Fn, sql: SQLCollector) -> SQLCollector:
-        if f.chain:
-            sql << "("
-        sql << f.name
-        if f.parentheses:
-            sql << "("
-        else:
-            sql << " "
-        if f.nesting:
-            self.visit_Fn(f.nesting, sql)
-        for i, column in enumerate(f.columns):
+        sql << f.name << "("
+        if f.is_distinct():
+            self.visit_Literal(literal.DISTINCT, sql) << " "
+        for i, c in enumerate(f.columns):
             if i != 0: sql << ", "
-            self.visit(column, sql)
-        if f.parentheses:
-            sql << ")"
-        for i, pair in enumerate(f.cmp_pairs):
-            sql << f" {pair[0]} "
-            self.visit(pair[1], sql)
-        for i, (logic_op, child) in enumerate(f.chain):
-            sql << f" {str(logic_op)} "
-            if child.chain:
-                sql << "("
-            self.visit_Fn(child, sql)
-            if child.chain:
-                sql << ")"
+            if isinstance(c, literal.Literal):
+                self.visit_Literal(c, sql)
+            elif is_K(c):
+                self.visit_K(c, sql)
+            else:
+                raise ValueError(f'Fn column must be a {str_K()} or Literal，but get {c.__type__}')
+        sql << ")"
         if f.alias:
-            sql << " AS "
-            self.visit(f.alias, sql)
-        if f.chain:
-            sql << ")"
+            sql << " AS " << self.quote_column_name(f.alias)
         return sql
 
     def visit_Lock(self, l: Lock, sql: SQLCollector) -> SQLCollector:
@@ -163,11 +148,6 @@ class Visitor:
         if isinstance(k, Fn):
             return self.visit_Fn(k, sql)
         raise ValueError(f"The 'visit_K' method only supports {K} type, but a {k.__class__} type was provided")
-
-    def visit_Value1(self, v: Value1, sql: SQLCollector) -> SQLCollector:
-        if isinstance(v, (Name, Fn)):
-            return self.visit(v, sql)
-        return sql << quote(v, "(", "]")
 
     def visit_Value(self, value: Value, sql: SQLCollector, for_value=True, in_values=False) -> SQLCollector:
         v = value.v
@@ -280,7 +260,12 @@ class Visitor:
         else:
             for i, c in enumerate(stmt.columns):
                 if i != 0: sql << ", "
-                self.visit(c, sql)
+                if is_K(c):
+                    self.visit(c, sql)
+                elif is_V(c):
+                    sql << self.quote_column_name(c)
+                else:
+                    raise ValueError(f'SelectStatement column must be a {str_V()}, but get {c.__type__}')
 
         if stmt.tables:
             sql << " FROM "
@@ -351,12 +336,6 @@ class Visitor:
         name = f'visit_{o.__class__.__name__}'
         if name in methods:
             return methods[name]
-        try:
-            method = self.__getattribute__(name)
-        except AttributeError as ex:
-            if isinstance(o, Value1):
-                method = self.visit_Value1
-            else:
-                raise ex
+        method = self.__getattribute__(name)
         methods[name] = method
         return method
