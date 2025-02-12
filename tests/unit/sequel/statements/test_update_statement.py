@@ -1,7 +1,7 @@
 import unittest
 
 from sweet.sequel.statements.update_statement import UpdateStatement
-from sweet.sequel.terms.name import Name
+from sweet.sequel.terms.name_fn import Name
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor

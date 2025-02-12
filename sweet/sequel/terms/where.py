@@ -1,6 +1,6 @@
 from typing import Self
 
-from sweet.sequel.terms.fn import Fn
+from sweet.sequel.terms.name_fn import Fn
 from sweet.sequel.terms.q import Q
 
 

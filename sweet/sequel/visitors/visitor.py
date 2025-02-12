@@ -8,11 +8,10 @@ from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
 from sweet.sequel.terms import Logic, literal
 from sweet.sequel.terms.binary import Binary
-from sweet.sequel.terms.fn import Fn
+from sweet.sequel.terms.name_fn import Name, Fn
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
-from sweet.sequel.terms.name import Name
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.values import Value, Values, ValuesList
 from sweet.sequel.quoting import quote, quote_name

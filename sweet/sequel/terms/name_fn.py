@@ -1,11 +1,13 @@
 from __future__ import annotations
 import copy
 from dataclasses import dataclass
-from typing import Self, Sequence, TYPE_CHECKING
+from typing import List, Self, Sequence, TYPE_CHECKING, Union
+
+from sweet.sequel.terms.literal import Literal, STAR
 
 if TYPE_CHECKING: from sweet.sequel.terms.binary import Binary
 
-from sweet.sequel.types import V
+from sweet.sequel.types import K, V, is_K
 from sweet.utils import is_array
 from sweet.sequel import Operator
 
@@ -85,3 +87,67 @@ class ExtKey:
     def _binary(self, op, v) -> 'Binary':
         from sweet.sequel.terms.binary import Binary
         return Binary(self, op=op, value=v)
+
+
+###############################
+#################################
+######################################
+##########################################
+@dataclass
+class Name(ExtKey):
+    schema_name: str = None
+
+    def __post_init__(self) -> None:
+        if isinstance(self.schema_name, Name):
+            self.schema_name = self.schema_name.alias if self.schema_name.alias else self.schema_name.name
+
+    def __eq__(self, other: Union[Self | Literal | str]) -> bool:
+        if isinstance(other, str) and other == '*' and self.name == '*':
+            return True
+        if isinstance(other, Literal) and other == STAR and self.name == '*':
+            return True
+        if self.__class__ != other.__class__:
+            return False
+        return self.name == other.name and self.schema_name == other.schema_name and self.alias == other.alias
+
+
+###############################
+#################################
+######################################
+##########################################
+
+@dataclass
+class Fn(ExtKey):
+    columns: List[K | Literal] = None
+    _distinct: bool = False
+
+    def __post_init__(self) -> None:
+        if self.columns is None:
+            self.columns = []
+
+    def column(self, *column_names: Union[K | str]) -> Self:
+        for c in column_names:
+            if c == '*' or c == STAR:
+                self.columns.append(STAR)
+            elif isinstance(c, Literal):
+                self.columns.append(c)
+            elif is_K(c):
+                self.columns.append(c.rm_alias())
+            elif isinstance(c, str):
+                self.columns.append(Name(c))
+            else:
+                raise ValueError(f"Support Name and Literal，but got[{c.__class__}] ")
+        return self
+
+    def is_distinct(self) -> bool:
+        return self._distinct
+
+    def distinct(self) -> Self:
+        self._distinct = True
+        return self
+
+
+Count = lambda *columns: Fn("COUNT").column(*columns)
+Sum = lambda *columns: Fn("SUM").column(*columns)
+Avg = lambda *columns: Fn("AVERAGE").column(*columns)
+Sqrt = lambda *columns: Fn("SQRT").column(*columns)

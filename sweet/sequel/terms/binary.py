@@ -2,9 +2,9 @@ from dataclasses import dataclass
 from typing import Self
 
 from sweet.sequel import Operator
+from sweet.sequel.terms.name_fn import Name
 from sweet.sequel.types import K, V
 from sweet.utils import is_array
-from sweet.sequel.terms.name import Name
 
 MAPPING = {
     ''         : Operator.EQ,

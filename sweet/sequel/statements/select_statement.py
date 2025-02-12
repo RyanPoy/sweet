@@ -4,7 +4,7 @@ from typing import List, Self, Union
 
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.lock import Lock
-from sweet.sequel.terms.name import Name
+from sweet.sequel.terms.name_fn import Name
 from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.values import Value

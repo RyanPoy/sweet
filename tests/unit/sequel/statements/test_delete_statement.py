@@ -1,7 +1,7 @@
 import unittest
 
 from sweet.sequel.statements.delete_statement import DeleteStatement
-from sweet.sequel.terms.name import Name
+from sweet.sequel.terms.name_fn import Name
 from sweet.sequel.terms.q import Q
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor

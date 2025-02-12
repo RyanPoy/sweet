@@ -1,5 +1,5 @@
 from enum import Enum
-from sweet.sequel.terms.name import Name
+from sweet.sequel.terms.name_fn import Name
 
 
 class SortedIn(Enum):

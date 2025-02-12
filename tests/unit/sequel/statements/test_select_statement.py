@@ -2,8 +2,8 @@ import unittest
 from datetime import date
 
 from sweet.sequel.statements.select_statement import SelectStatement
-from sweet.sequel.terms import fn, literal
-from sweet.sequel.terms.name import Name
+from sweet.sequel.terms.name_fn import Count, Name, Sqrt, Sum
+from sweet.sequel.terms.literal import STAR
 from sweet.sequel.terms.order import SortedIn
 from sweet.sequel.terms.q import Q
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
@@ -310,35 +310,35 @@ class TestSelectStatement(unittest.TestCase):
 
     def test_group_by__count_star(self):
         foo = Name("foo")
-        stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, fn.count(literal.STAR))
+        stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, Count(STAR))
         self.assertEqual('SELECT `foo`, COUNT(*) FROM `abc` GROUP BY `foo`', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo", COUNT(*) FROM "abc" GROUP BY "foo"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo", COUNT(*) FROM "abc" GROUP BY "foo"', self.pg.sql(stmt))
 
     def test_group_by__count_field(self):
         foo = Name("foo")
-        stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, fn.count(Name("bar")))
+        stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, Count(Name("bar")))
         self.assertEqual('SELECT `foo`, COUNT(`bar`) FROM `abc` GROUP BY `foo`', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo", COUNT("bar") FROM "abc" GROUP BY "foo"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo", COUNT("bar") FROM "abc" GROUP BY "foo"', self.pg.sql(stmt))
 
     def test_group_by__count_distinct(self):
         foo = Name("foo")
-        stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, fn.count(literal.STAR).distinct())
+        stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, Count(STAR).distinct())
         self.assertEqual('SELECT `foo`, COUNT(DISTINCT *) FROM `abc` GROUP BY `foo`', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY "foo"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo", COUNT(DISTINCT *) FROM "abc" GROUP BY "foo"', self.pg.sql(stmt))
 
     def test_group_by__sum_distinct(self):
         foo = Name("foo")
-        stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, fn.sum(Name("bar")).distinct())
+        stmt = SelectStatement().from_(self.table_abc).group_by(foo).select(foo, Sum(Name("bar")).distinct())
         self.assertEqual('SELECT `foo`, SUM(DISTINCT `bar`) FROM `abc` GROUP BY `foo`', self.mysql.sql(stmt))
         self.assertEqual('SELECT "foo", SUM(DISTINCT "bar") FROM "abc" GROUP BY "foo"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT "foo", SUM(DISTINCT "bar") FROM "abc" GROUP BY "foo"', self.pg.sql(stmt))
 
     def test_group_by__alias(self):
         bar = Name("bar").as_("bar01")
-        stmt = SelectStatement().from_(self.table_abc).select(fn.sum(Name("foo")), bar).group_by(bar)
+        stmt = SelectStatement().from_(self.table_abc).select(Sum(Name("foo")), bar).group_by(bar)
         self.assertEqual('SELECT SUM(`foo`), `bar` AS `bar01` FROM `abc` GROUP BY `bar01`', self.mysql.sql(stmt))
         self.assertEqual('SELECT SUM("foo"), "bar" AS "bar01" FROM "abc" GROUP BY "bar01"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT SUM("foo"), "bar" AS "bar01" FROM "abc" GROUP BY "bar01"', self.pg.sql(stmt))
@@ -349,7 +349,7 @@ class TestSelectStatement(unittest.TestCase):
     #     bar = Name("bar", schema_name=table1.alias).as_("bar01")
     #     stmt = (SelectStatement().from_(self.table_abc).join(table1)
     #             .on(abc__id=Name("t_ref", schema_name=table1.alias))
-    #             .select(fn.sum(Name("foo")), bar).group_by(bar))
+    #             .select(Sum(Name("foo")), bar).group_by(bar))
     #     self.assertEqual('SELECT SUM(`foo`), `t1`.`bar` AS `bar01` FROM `abc` JOIN `table1` AS `t1` ON `abc`.`id` = `t1`.`t_ref` GROUP BY `bar01`',
     #                      self.mysql.sql(stmt))
     #     self.assertEqual('SELECT SUM("foo"), "t1"."bar" AS "bar01" FROM "abc" JOIN "table1" AS "t1" ON "abc"."id" = "t1"."t_ref" GROUP BY "bar01"',
@@ -366,7 +366,7 @@ class TestSelectStatement(unittest.TestCase):
     # def test_having_greater_than(self):
     #     """@todo: fix bug"""
     #     foo, bar = Name('foo'), Name('bar')
-    #     stmt = SelectStatement().from_(self.table_abc).select(foo, fn.sum(bar)).group_by(foo).having(fn.sum(bar).gt(1))
+    #     stmt = SelectStatement().from_(self.table_abc).select(foo, Sum(bar)).group_by(foo).having(Sum(bar).gt(1))
     #
     #     self.assertEqual('SELECT `foo`, SUM(`bar`) FROM `abc` GROUP BY `foo` HAVING SUM(`bar`) > 1', self.mysql.sql(stmt))
     #     self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING SUM("bar") > 1', self.sqlite.sql(stmt))
@@ -375,7 +375,7 @@ class TestSelectStatement(unittest.TestCase):
     # def test_having_and(self):
     #     """@todo: fix bug"""
     #     foo, bar = Name('foo'), Name('bar')
-    #     stmt = SelectStatement().from_(self.table_abc).select(foo, fn.sum(bar)).group_by(foo).having((fn.sum(bar).gt(1)) & (fn.sum(bar).lt(100)))
+    #     stmt = SelectStatement().from_(self.table_abc).select(foo, Sum(bar)).group_by(foo).having((Sum(bar).gt(1)) & (Sum(bar).lt(100)))
     #     self.assertEqual('SELECT `foo`, SUM(`bar`) FROM `abc` GROUP BY `foo` HAVING (SUM(`bar`) > 1 AND SUM(`bar`) < 100)', self.mysql.sql(stmt))
     #     self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING (SUM("bar") > 1 AND SUM("bar") < 100)', self.sqlite.sql(stmt))
     #     self.assertEqual('SELECT "foo", SUM("bar") FROM "abc" GROUP BY "foo" HAVING (SUM("bar") > 1 AND SUM("bar") < 100)', self.pg.sql(stmt))
@@ -390,10 +390,10 @@ class TestSelectStatement(unittest.TestCase):
     #     stmt = (
     #         SelectStatement().from_(self.table_abc).join(self.table_efg)
     #         .on(abc__foo=efg_foo)
-    #         .select(abc_foo, fn.sum(efg_bar), abc_buz)
+    #         .select(abc_foo, Sum(efg_bar), abc_buz)
     #         .group_by(abc_foo)
     #         .having(abc__buz="fiz")
-    #         .having(fn.sum(efg_bar).gt(100))
+    #         .having(Sum(efg_bar).gt(100))
     #     )
     #
     #     self.assertEqual('SELECT `abc`.`foo`, SUM(`efg`.`bar`), `abc`.`buz` FROM `abc` JOIN `efg` ON `abc`.`foo` = `efg`.`foo` '
@@ -432,7 +432,7 @@ class TestSelectStatement(unittest.TestCase):
 
     def test_order_by__alias(self):
         bar = Name("bar").as_("bar01")
-        stmt = SelectStatement().from_(self.table_abc).select(fn.sum(Name("foo")), bar).order_by(bar)
+        stmt = SelectStatement().from_(self.table_abc).select(Sum(Name("foo")), bar).order_by(bar)
         self.assertEqual('SELECT SUM(`foo`), `bar` AS `bar01` FROM `abc` ORDER BY `bar01`', self.mysql.sql(stmt))
         self.assertEqual('SELECT SUM("foo"), "bar" AS "bar01" FROM "abc" ORDER BY "bar01"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT SUM("foo"), "bar" AS "bar01" FROM "abc" ORDER BY "bar01"', self.pg.sql(stmt))
@@ -456,14 +456,14 @@ class TestSelectStatement(unittest.TestCase):
     #     self.assertEqual('SELECT "foo"+"bar" "biz" FROM "abc"', self.mysql.sql(stmt))
 
     def test_alias_functions(self):
-        stmt = SelectStatement().from_(self.table_abc).select(fn.count(literal.STAR).as_("foo"))
+        stmt = SelectStatement().from_(self.table_abc).select(Count(STAR).as_("foo"))
         self.assertEqual('SELECT COUNT(*) AS `foo` FROM `abc`', self.mysql.sql(stmt))
         self.assertEqual('SELECT COUNT(*) AS "foo" FROM "abc"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT COUNT(*) AS "foo" FROM "abc"', self.pg.sql(stmt))
 
     def test_alias_function_using_as_nested(self):
         """ We don't show aliases of fields that are arguments of a function. """
-        stmt = SelectStatement().from_(self.table_abc).select(fn.sqrt(fn.count(literal.STAR).as_("foo")).as_("bar"))
+        stmt = SelectStatement().from_(self.table_abc).select(Sqrt(Count(STAR).as_("foo")).as_("bar"))
         self.assertEqual('SELECT SQRT(COUNT(*)) AS `bar` FROM `abc`', self.mysql.sql(stmt))
         self.assertEqual('SELECT SQRT(COUNT(*)) AS "bar" FROM "abc"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT SQRT(COUNT(*)) AS "bar" FROM "abc"', self.pg.sql(stmt))

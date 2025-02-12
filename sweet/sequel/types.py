@@ -1,14 +1,13 @@
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
-from typing import List, Tuple, TypeAlias, TYPE_CHECKING, Union, get_args, get_type_hints
+from typing import List, Tuple, TypeAlias, TYPE_CHECKING, Union
 
 from sweet import utils
 from sweet.sequel import quoting
 
 if TYPE_CHECKING:
-    from sweet.sequel.terms.fn import Fn
-    from sweet.sequel.terms.name import Name
+    from sweet.sequel.terms.name_fn import Name, Fn
 
 B: TypeAlias = Union[int, float, str, Decimal, bool, datetime, date, None, bytes]
 K: TypeAlias = Union['Fn', 'Name']
@@ -20,8 +19,7 @@ def is_B(o) -> bool:
 
 
 def is_K(o) -> bool:
-    from sweet.sequel.terms.fn import Fn
-    from sweet.sequel.terms.name import Name
+    from sweet.sequel.terms.name_fn import Name, Fn
     return isinstance(o, (Fn, Name))
 
 

@@ -1,7 +1,7 @@
 from typing import Self
 
 from sweet.sequel.terms import literal
-from sweet.sequel.terms.name import Name
+from sweet.sequel.terms.name_fn import Name
 from sweet.sequel.terms.values import Values, ValuesList
 from sweet.sequel.types import V
 

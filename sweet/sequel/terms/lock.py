@@ -1,5 +1,5 @@
 from sweet.sequel.terms.literal import Literal
-from sweet.sequel.terms.name import Name
+from sweet.sequel.terms.name_fn import Name
 
 
 class Lock:

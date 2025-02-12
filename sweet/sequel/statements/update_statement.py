@@ -1,6 +1,6 @@
 from typing import Mapping, Self
 
-from sweet.sequel.terms.name import Name
+from sweet.sequel.terms.name_fn import Name
 from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.where import Where
 
