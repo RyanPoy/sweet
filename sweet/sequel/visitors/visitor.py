@@ -1,12 +1,12 @@
 from typing import Callable, List, Tuple, Union
-
+from sweet.sequel.logic import Logic
 from sweet.sequel import Operator
 from sweet.sequel.collectors import SQLCollector
 from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.statements.update_statement import UpdateStatement
-from sweet.sequel.terms import Logic, literal
+from sweet.sequel.terms import literal
 from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.name_fn import Name, Fn
 from sweet.sequel.terms.literal import Literal

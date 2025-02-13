@@ -1,6 +1,6 @@
 from typing import List, Optional, Self
 
-from sweet.sequel.terms import Logic
+from sweet.sequel.logic import Logic
 from sweet.sequel.terms.binary import Binary
 
 
