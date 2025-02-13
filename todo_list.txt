@@ -20,8 +20,8 @@
 
 Binary：
    √ key、op、value
-   Key 可以接收 RawType, Fn, Name；接收到RawType的时候，内部要转为 the Value class，方便后面的quote
-   value 可以接收 B、K 和 Array，接收到 B的时候，内部要转为 the Value class，方便后面的quote
+   √ Key 可以接收 RawType, Fn, Name；接收到RawType的时候，内部要转为 the Value class，方便后面的quote
+   √ value 可以接收 B、K 和 Array，接收到 B的时候，内部要转为 the Value class，方便后面的quote
 
 
 SelectStatement：

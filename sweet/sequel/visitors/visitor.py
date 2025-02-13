@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, List, Tuple, Union
 
 from sweet.sequel import Operator
 from sweet.sequel.collectors import SQLCollector
@@ -13,10 +13,10 @@ from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.values import Value, Values, ValuesList
+from sweet.sequel.terms.values import Value, Values
 from sweet.sequel.quoting import quote, quote_name
 from sweet.sequel.terms.where import Filter, Having, On, Where
-from sweet.sequel.types import Array, B, K, Raw, V, is_B, is_K, is_V, str_K, str_V
+from sweet.sequel.types import Array, ArrayType, B, K, Raw, RawType, V, is_B, is_K, is_V, str_K, str_V
 
 
 class Visitor:
@@ -126,11 +126,29 @@ class Visitor:
         return sql
 
     def visit_Raw(self, a: Raw, sql: SQLCollector) -> SQLCollector:
-        return sql << self.quote_value_of_values(a.data)
+        return sql << a.quote()
 
     def visit_Array(self, a: Array, sql: SQLCollector) -> SQLCollector:
-        return sql << self.quote_value_of_binary(a.data)
-
+        def _visit_seq(seq: Union[List, Tuple]):
+            sql << "("
+            for i, x in enumerate(seq):
+                if i != 0:
+                    sql << ", "
+                if isinstance(x, RawType):
+                    sql << Raw(x).quote()
+                elif isinstance(x, Raw):
+                    sql << x.quote()
+                elif isinstance(x, Array):
+                    self.visit_Array(x, sql)
+                elif isinstance(x, ArrayType):
+                    _visit_seq(x)
+                elif isinstance(x, (Name, Fn)):
+                    self.visit(x, sql)
+                else:
+                    raise TypeError(f"Got a unavailable element type {x.__class__.__name__}")
+            sql << ")"
+        _visit_seq(a.data)
+        return sql
 
     def visit_V(self, v: V, sql: SQLCollector, ignore_alias=False) -> SQLCollector:
         # V: TypeAlias = Union[B, K, List[K], Tuple[K], List[B], Tuple[B], List['V'], Tuple['V']]
@@ -174,20 +192,15 @@ class Visitor:
         return sql
 
     def visit_Values(self, values: Values, sql: SQLCollector) -> SQLCollector:
-        sql << "("
-        for i, v in enumerate(values.vs):
+        if values.is_empty():
+            return sql << "(NULL)"
+        for i, vs in enumerate(values.data):
             if i != 0: sql << ", "
-            self.visit_Value(v, sql, in_values=True)
-        sql << ")"
-        return sql
-
-    def visit_ValuesList(self, values_list: ValuesList, sql: SQLCollector) -> SQLCollector:
-        if values_list.is_empty():
-            sql << "(NULL)"
-        else:
-            for i, values in enumerate(values_list.data):
-                if i != 0: sql << ", "
-                self.visit_Values(values, sql)
+            sql << "("
+            for j, v in enumerate(vs.data):
+                if j != 0: sql << ", "
+                self.visit(v, sql)
+            sql << ")"
         return sql
 
     def visit_Where(self, where: Where, sql: SQLCollector) -> SQLCollector:

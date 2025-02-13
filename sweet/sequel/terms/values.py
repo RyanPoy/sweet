@@ -1,62 +1,42 @@
 from dataclasses import dataclass
-from typing import Self, Tuple, TYPE_CHECKING
+from typing import List, Self, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from sweet.sequel.terms.fn import Fn
     from sweet.sequel.terms.name import Name
 
 from sweet.sequel.quoting import quote
-from sweet.sequel.types import V
-
+from sweet.sequel.types import Array, ArrayType, V
 
 
 @dataclass
 class Value:
-
     v: V
     #
     # def __hash__(self):
     #     return hash(str(self.v))
     #
 
+
 class Values:
 
-    def __init__(self, *args: V) -> None:
-        self.vs: Tuple[Value, ...] = tuple(Value(x) for x in args)
-
-    def is_empty(self):
-        return self.vs is None or len(self.vs) == 0
-
-    def __len__(self) -> int:
-        return len(self.vs)
-
-    def __eq__(self, other: Self) -> bool:
-        return self.__class__ == other.__class__ and self.vs == other.vs
-
-
-class ValuesList:
-
-    def __init__(self, *args: Values) -> None:
-        self.data: [Values] = []
+    def __init__(self, *args: ArrayType) -> None:
+        self.data: List[Array] = []
         self.append(*args)
 
-    def is_empty(self):
-        return False if self.data else True
+    def append(self, *args: ArrayType) -> Self:
+        for i, x in enumerate(args):
+            if not isinstance(x, ArrayType):
+                raise TypeError(f"Values class only accepts List or Tuple, but got an {x.__class__.__name__}")
+            if i != 0:
+                if len(x) != self.data[0].length():
+                    raise ValueError("Inconsistent element length")
 
-    def append(self, *args: Values) -> Self:
-        args = [x for x in args if not x.is_empty()]
-        self.check_values(*args)
-        self.data.extend(args)
+            self.data.append(Array(x))
         return self
 
-    def check_values(self, *args: Values) -> None:
-        if not args:
-            return
-        len0 = len(args[0])
-        for values in args:
-            if len0 != len(values):
-                raise ValueError("Inconsistent row length")
+    def is_empty(self):
+        return self.data is None or len(self.data) == 0
 
-        for values in self.data:
-            if len0 != len(values):
-                raise ValueError("Inconsistent row length")
+    def __eq__(self, other: Self) -> bool:
+        return self.__class__ == other.__class__ and self.data == other.data

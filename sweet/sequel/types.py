@@ -64,10 +64,10 @@ class Raw:
             return '1' if self.data is True else '0'
         if tp in (Decimal, int, float):  # BigDecimals need to be put in a non-normalized form and quoted.
             return str(self.data)
-        if tp == datetime:
-            return f"'{utils.datetime2str(self.data)}'"
         if tp == date:
             return f"'{utils.date2str(self.data)}'"
+        if tp == datetime:
+            return f"'{utils.datetime2str(self.data)}'"
         if tp == bytes:
             return f"'{utils.binary2str(self.data)}'"
 
