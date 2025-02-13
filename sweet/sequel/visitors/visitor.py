@@ -128,9 +128,9 @@ class Visitor:
     def visit_Raw(self, a: Raw, sql: SQLCollector) -> SQLCollector:
         return sql << a.quote()
 
-    def visit_Array(self, a: Array, sql: SQLCollector) -> SQLCollector:
+    def visit_Array(self, a: Array, sql: SQLCollector, to_insert=False) -> SQLCollector:
         def _visit_seq(seq: Union[List, Tuple]):
-            sql << "("
+            sql << ("[" if to_insert else "(")
             for i, x in enumerate(seq):
                 if i != 0:
                     sql << ", "
@@ -146,7 +146,7 @@ class Visitor:
                     self.visit(x, sql)
                 else:
                     raise TypeError(f"Got a unavailable element type {x.__class__.__name__}")
-            sql << ")"
+            sql << ("]" if to_insert else ")")
         _visit_seq(a.data)
         return sql
 
@@ -199,7 +199,10 @@ class Visitor:
             sql << "("
             for j, v in enumerate(vs.data):
                 if j != 0: sql << ", "
-                self.visit(v, sql)
+                if isinstance(v, Array):
+                    self.visit_Array(v, sql, True)
+                else:
+                    self.visit(v, sql)
             sql << ")"
         return sql
 
@@ -231,7 +234,7 @@ class Visitor:
                 self.visit(c, sql)
             sql << ")"
         sql << " VALUES "
-        self.visit_ValuesList(stmt.values, sql)
+        self.visit_Values(stmt.values, sql)
         return sql
 
     def visit_DeleteStatement(self, stmt: DeleteStatement, sql: SQLCollector) -> SQLCollector:

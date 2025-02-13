@@ -12,7 +12,7 @@
 
 # 增加一个Array的class，对ArrayType进行封装，让Visitor更加好处理
 √ class Array:
-    v: Array
+    v: ArrayType
 
 √ Fn + Name
    这两者很像，都可以放到Binary里面
