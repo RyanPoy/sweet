@@ -97,8 +97,19 @@ class TestArray(unittest.TestCase):
         name = Name("username")
         s = '2025-02-13 10:03:20'
         now = datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
-        array = Array([1, "1", now, fn, name, [1, "1", now, fn, name, [1, "1", now, fn, name]]])
-        self.assertEqual(array.data, [Raw(1), Raw("1"), Raw(now), fn, name, [Raw(1), Raw("1"), Raw(now), fn, name, [Raw(1), Raw("1"), Raw(now), fn, name]]])
+        array = Array([
+            1, "1", now, fn, name, [
+                1, "1", now, fn, name, [
+                    1, "1", now, fn, name]
+                ]
+            ])
+        self.assertEqual([
+            Raw(1), Raw("1"), Raw(now), fn, name, Array([
+                Raw(1), Raw("1"), Raw(now), fn, name, Array([
+                    Raw(1), Raw("1"), Raw(now), fn, name])
+                ])
+            ], array.data
+        )
 
     def test_sql(self):
         fn = Sum("age")

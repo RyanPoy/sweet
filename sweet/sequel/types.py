@@ -80,8 +80,8 @@ ArrayType: TypeAlias = Union[Tuple, List]
 class Array:
     data: List
 
-    def __post_init__(self) -> None:
-        self.data = self._normalize()
+    def __init__(self, data: List = None):
+        self.data = self.__normalize(data)
 
     def length(self) -> int:
         return len(self.data)
@@ -89,16 +89,17 @@ class Array:
     def valid_for_between(self) -> bool:
         return self.length() == 2
 
-    def _normalize(self):
+    def __normalize(self, vs: List) -> List:
         from sweet.sequel.terms.name_fn import Name, Fn
-        def _(vs, lst: List) -> List:
-            for x in vs:
-                if isinstance(x, RawType):
-                    lst.append(Raw(x))
-                elif isinstance(x, (Fn, Name)):
-                    lst.append(x)
-                elif isinstance(x, ArrayType):
-                    lst.append(_(x, []))
-            return lst
+        lst = []
+        for x in vs:
+            if isinstance(x, RawType):
+                lst.append(Raw(x))
+            elif isinstance(x, ArrayType):
+                lst.append(Array(x))
+            elif isinstance(x, (Raw, Fn, Name, Array)):
+                lst.append(x)
+            else:
+                raise TypeError(f"Array initialize only accepts List、Tuple、RawType，but got {x.__class__.__name__}")
+        return lst
 
-        return _(self.data, [])
