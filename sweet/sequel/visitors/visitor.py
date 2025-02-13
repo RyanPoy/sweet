@@ -16,7 +16,7 @@ from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.values import Value, Values, ValuesList
 from sweet.sequel.quoting import quote, quote_name
 from sweet.sequel.terms.where import Filter, Having, On, Where
-from sweet.sequel.types import B, K, V, is_B, is_K, is_V, str_K, str_V
+from sweet.sequel.types import Array, B, K, Raw, V, is_B, is_K, is_V, str_K, str_V
 
 
 class Visitor:
@@ -115,15 +115,22 @@ class Visitor:
         self.visit_Name(b.key, sql)
         sql << f" {b.op} "
         if b.op == Operator.BETWEEN or b.op == Operator.NOT_BETWEEN:
-            tuple_vs = b.value
+            tuple_vs = b.value.data
             v = tuple_vs[0].rm_alias() if isinstance(tuple_vs[0], Name) else tuple_vs[0]
             self.visit_V(v, sql, True)
             sql << " AND "
             v = tuple_vs[1].rm_alias() if isinstance(tuple_vs[1], Name) else tuple_vs[1]
             self.visit_V(v, sql, True)
         else:
-            self.visit_V(b.value, sql, True)
+            self.visit(b.value, sql)
         return sql
+
+    def visit_Raw(self, a: Raw, sql: SQLCollector) -> SQLCollector:
+        return sql << self.quote_value_of_values(a.data)
+
+    def visit_Array(self, a: Array, sql: SQLCollector) -> SQLCollector:
+        return sql << self.quote_value_of_binary(a.data)
+
 
     def visit_V(self, v: V, sql: SQLCollector, ignore_alias=False) -> SQLCollector:
         # V: TypeAlias = Union[B, K, List[K], Tuple[K], List[B], Tuple[B], List['V'], Tuple['V']]

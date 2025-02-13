@@ -83,6 +83,12 @@ class Array:
     def __post_init__(self) -> None:
         self.data = self._normalize()
 
+    def length(self) -> int:
+        return len(self.data)
+
+    def valid_for_between(self) -> bool:
+        return self.length() == 2
+
     def _normalize(self):
         from sweet.sequel.terms.name_fn import Name, Fn
         def _(vs, lst: List) -> List:

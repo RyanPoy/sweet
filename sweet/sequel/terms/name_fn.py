@@ -97,9 +97,14 @@ class ExtKey:
 class Name(ExtKey):
     schema_name: str = None
 
-    def __post_init__(self) -> None:
-        if isinstance(self.schema_name, Name):
-            self.schema_name = self.schema_name.alias if self.schema_name.alias else self.schema_name.name
+    def __init__(self, name: str, schema_name: Union[str | Name] = None):
+        super().__init__(name, None)
+        if schema_name is None or isinstance(schema_name, str):
+            self.schema_name = schema_name
+        elif isinstance(schema_name, Name):
+            self.schema_name = schema_name.alias if schema_name.alias else schema_name.name
+        else:
+            raise TypeError(f"Name initialize schema_name with str or Name, but got a {schema_name.__class__.__name__}")
 
     def __eq__(self, other: Union[Self | Literal | str]) -> bool:
         if isinstance(other, str) and other == '*' and self.name == '*':

@@ -52,7 +52,8 @@ class TestName(unittest.TestCase):
 
     def test_eq(self):
         self.assertEqual(Binary.parse(name="jim"), Name('name').eq('jim'))
-        self.assertEqual(Binary.parse(users__name=Name("nickname", "users")), Name('name', 'users').eq(Name("nickname", "users")))
+        n = Name("nickname", "users")
+        self.assertEqual(Binary.parse(users__name=n), Name('name', 'users').eq(n))
 
     def test_not_eq(self):
         self.assertEqual(Binary.parse(name__not='jim'), Name('name').not_eq('jim'))

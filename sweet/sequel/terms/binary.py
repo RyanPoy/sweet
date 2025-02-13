@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Self
+from typing import Self, Union
 
 from sweet.sequel import Operator
-from sweet.sequel.terms.name_fn import Name
-from sweet.sequel.types import K, V
+from sweet.sequel.terms.name_fn import Fn, Name
+from sweet.sequel.types import Array, ArrayType, Raw, RawType
 from sweet.utils import is_array
 
 MAPPING = {
@@ -35,20 +35,35 @@ MAPPING = {
 
 @dataclass
 class Binary:
-    key: K
+    key: Union[Raw, Name, Fn]
     op: Operator
-    value: V
+    value: Union[Raw, Name, Fn, Array]
 
-    def __post_init__(self) -> None:
-        if isinstance(self.value, list):
-            self.value = tuple(self.value)
-        if isinstance(self.key, str):
-            self.key = Name(self.key)
-        if self.op in {Operator.BETWEEN, Operator.NOT_BETWEEN} and not (is_array(self.value) and len(self.value) == 2):
+    def __init__(self, key: Union[RawType, Name, Fn], op: Operator, value: Union[RawType, Name, Fn, ArrayType]):
+        if isinstance(key, RawType):
+            self.key = Raw(key)
+        elif isinstance(key, (Name, Fn)):
+            self.key = key
+        else:
+            raise TypeError(f"key must be a RawType，Name, Fn. But got {key.__class__}")
+
+        self.op = op
+
+        if isinstance(value, RawType):
+            self.value = Raw(value)
+        elif isinstance(value, (Name, Fn)):
+            self.value = value
+        elif isinstance(value, (list, tuple)):
+            self.value = Array(value)
+        else:
+            raise TypeError(f"key must be a RawType，Name, Fn, List, Tuple. But got {key.__class__}")
+
+        if (self.op in {Operator.BETWEEN, Operator.NOT_BETWEEN} and
+                not (isinstance(self.value, Array) and self.value.valid_for_between())):
             raise ValueError(f'The "{self.op}" operation expects a list or tuple of length 2, but it is not.')
 
     @classmethod
-    def parse(cls, **kwargs: V) -> Self:
+    def parse(cls, **kwargs: Union[RawType, Name, Fn, ArrayType]) -> Self:
         if len(kwargs) != 1:
             raise ValueError('Only one parameter is allowed for construction.')
 
@@ -66,7 +81,7 @@ class Binary:
                 # The new_symbol represents a special key which include a parent schema,
                 # such as 'users__nickname', 'oa__users__nickname'
                 reversed_parts = key.split(seperator)[::-1]
-                key = Name(reversed_parts[0], '.'.join(reversed_parts[1:]))
+                key = Name(reversed_parts[0], schema_name='.'.join(reversed_parts[1:]))
 
         if value is None:
             if op == Operator.EQ:
@@ -78,4 +93,7 @@ class Binary:
                 op = Operator.IN
             elif op == Operator.NOT_EQ:
                 op = Operator.NOT_IN
+
+        if isinstance(key, str):
+            key = Name(key)
         return cls(key, op, value)
