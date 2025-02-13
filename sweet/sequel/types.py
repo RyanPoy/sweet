@@ -3,43 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
-from typing import List, Tuple, TypeAlias, TYPE_CHECKING, Union
+from typing import List, Tuple, TypeAlias, Union
 
 from sweet import utils
 from sweet.sequel import quoting
-
-if TYPE_CHECKING:
-    from sweet.sequel.terms.name_fn import Name, Fn
-
-B: TypeAlias = Union[int, float, str, Decimal, bool, datetime, date, None, bytes]
-K: TypeAlias = Union['Fn', 'Name']
-V: TypeAlias = Union[B, K, List, Tuple]
-
-
-def is_B(o) -> bool:
-    return isinstance(o, B)
-
-
-def is_K(o) -> bool:
-    from sweet.sequel.terms.name_fn import Name, Fn
-    return isinstance(o, (Fn, Name))
-
-
-def is_V(o) -> bool:
-    return is_B(o) or is_K(o) or isinstance(o, (list, tuple))
-
-
-def str_B() -> str:
-    return 'int, float, str, Decimal, bool, datetime, date, None, bytes'
-
-
-def str_K() -> str:
-    return 'Fn, Name'
-
-
-def str_V() -> str:
-    return f'{str_B()}, {str_K()}, List, Tuple'
-
 
 # Basic data type
 RawType: TypeAlias = Union[None, bool, str, bytes, int, float, Decimal, date, datetime]
@@ -97,9 +64,8 @@ class Array:
                 lst.append(Raw(x))
             elif isinstance(x, ArrayType):
                 lst.append(Array(x))
-            elif isinstance(x, (Raw, Fn, Name, Array)):
+            elif isinstance(x, (Raw, Name, Fn, Array)):
                 lst.append(x)
             else:
                 raise TypeError(f"Array initialize only accepts List、Tuple、RawType，but got {x.__class__.__name__}")
         return lst
-

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Self, Union
 
 from sweet.sequel import Operator
-from sweet.sequel.terms.name_fn import Fn, Name
+from sweet.sequel.terms.name_fn import Name, Fn
 from sweet.sequel.types import Array, ArrayType, Raw, RawType
 from sweet.utils import is_array
 

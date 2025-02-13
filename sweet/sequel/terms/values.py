@@ -1,21 +1,5 @@
-from dataclasses import dataclass
-from typing import List, Self, Tuple, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from sweet.sequel.terms.fn import Fn
-    from sweet.sequel.terms.name import Name
-
-from sweet.sequel.quoting import quote
-from sweet.sequel.types import Array, ArrayType, V
-
-
-@dataclass
-class Value:
-    v: V
-    #
-    # def __hash__(self):
-    #     return hash(str(self.v))
-    #
+from typing import List, Self
+from sweet.sequel.types import Array, ArrayType
 
 
 class Values:

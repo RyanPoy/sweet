@@ -13,10 +13,10 @@ from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
 from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.values import Value, Values
+from sweet.sequel.terms.values import Values
 from sweet.sequel.quoting import quote, quote_name
 from sweet.sequel.terms.where import Filter, Having, On, Where
-from sweet.sequel.types import Array, ArrayType, B, K, Raw, RawType, V, is_B, is_K, is_V, str_K, str_V
+from sweet.sequel.types import Array, ArrayType, Raw, RawType
 
 
 class Visitor:
@@ -26,13 +26,13 @@ class Visitor:
     def quote_column_name(self, name: str) -> str:
         return quote_name(name, self.qchar)
 
-    def quote_value_of_values(self, value: B) -> str:
+    def quote_value_of_values(self, value: RawType) -> str:
         return quote(value, "[", "]")
 
-    def quote_value_of_binary(self, value: B) -> str:
+    def quote_value_of_binary(self, value: RawType) -> str:
         return quote(value, "(", ")")
 
-    def quote_condition(self, value: B) -> str:
+    def quote_condition(self, value: RawType) -> str:
         return quote(value, "[", "]")
 
     def visit_Name(self, n: Name, sql: SQLCollector) -> SQLCollector:
@@ -53,12 +53,12 @@ class Visitor:
             self.visit_Literal(literal.DISTINCT, sql) << " "
         for i, c in enumerate(f.columns):
             if i != 0: sql << ", "
-            if isinstance(c, literal.Literal):
-                self.visit_Literal(c, sql)
-            elif is_K(c):
-                self.visit_K(c, sql)
+            if isinstance(c, (Raw, Name, Fn, Literal)):
+                self.visit(c, sql)
+            elif isinstance(c, RawType):
+                self.visit_Raw(Raw(c), sql)
             else:
-                raise ValueError(f'Fn column must be a {str_K()} or Literal，but get {c.__type__}')
+                raise ValueError(f'Fn column must be a RawType, Raw, Name, Fn, Literal，but got {c.__class__.__name__}')
         sql << ")"
         if f.alias:
             sql << " AS " << self.quote_column_name(f.alias)
@@ -148,47 +148,6 @@ class Visitor:
                     raise TypeError(f"Got a unavailable element type {x.__class__.__name__}")
             sql << ("]" if to_insert else ")")
         _visit_seq(a.data)
-        return sql
-
-    def visit_V(self, v: V, sql: SQLCollector, ignore_alias=False) -> SQLCollector:
-        # V: TypeAlias = Union[B, K, List[K], Tuple[K], List[B], Tuple[B], List['V'], Tuple['V']]
-        if is_K(v):
-            v = v.rm_alias()
-            self.visit_K(v, sql)
-        elif is_B(v):
-            sql << self.quote_value_of_binary(v)
-        elif isinstance(v, (list, tuple)) and v:
-            sql << "("
-            for i, x in enumerate(v):
-                if i != 0:
-                    sql << ", "
-                self.visit_V(x, sql, ignore_alias)
-            sql << ")"
-        return sql
-
-    def visit_K(self, k: K, sql: SQLCollector) -> SQLCollector:
-        if isinstance(k, Name):
-            return self.visit_Name(k, sql)
-        if isinstance(k, Fn):
-            return self.visit_Fn(k, sql)
-        raise ValueError(f"The 'visit_K' method only supports {K} type, but a {k.__class__} type was provided")
-
-    def visit_Value(self, value: Value, sql: SQLCollector, for_value=True, in_values=False) -> SQLCollector:
-        v = value.v
-        if for_value:
-            if isinstance(v, Name):
-                return self.visit(v.rm_alias(), sql)
-            elif isinstance(v, Fn):
-                return self.visit(v, sql)
-            elif in_values:
-                sql << self.quote_value_of_values(v)
-            else:
-                sql << self.quote_value_of_binary(v)
-        else:
-            if isinstance(v, (Name, Fn)):
-                return self.visit(v, sql)
-            else:
-                sql << self.quote_column_name(v)
         return sql
 
     def visit_Values(self, values: Values, sql: SQLCollector) -> SQLCollector:
@@ -282,14 +241,12 @@ class Visitor:
         else:
             for i, c in enumerate(stmt.columns):
                 if i != 0: sql << ", "
-                if is_K(c):
+                if isinstance(c, (Raw, Name, Fn, Literal)):
                     self.visit(c, sql)
-                elif is_V(c):
-                    sql << self.quote_column_name(c)
-                elif isinstance(c, Value):
-                    self.visit(c, sql)
+                elif isinstance(c, RawType):
+                    self.visit_Raw(Raw(c), sql)
                 else:
-                    raise ValueError(f'SelectStatement column must be a {str_V()}, but get {c.__class__}')
+                    raise ValueError(f'SelectStatement column must be a Raw, RawType, Name, Fn, Literal, but got {c.__class__.__name__}')
 
         if stmt.tables:
             sql << " FROM "

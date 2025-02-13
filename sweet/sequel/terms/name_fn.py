@@ -1,13 +1,13 @@
 from __future__ import annotations
 import copy
 from dataclasses import dataclass
-from typing import List, Self, Sequence, TYPE_CHECKING, Union
+from typing import List, Self, Sequence, TYPE_CHECKING, TypeAlias, Union
 
 from sweet.sequel.terms.literal import Literal, STAR
+from sweet.sequel.types import Raw, RawType
 
 if TYPE_CHECKING: from sweet.sequel.terms.binary import Binary
 
-from sweet.sequel.types import K, V, is_K
 from sweet.utils import is_array
 from sweet.sequel import Operator
 
@@ -26,7 +26,7 @@ class ExtKey:
         instance.alias = None
         return instance
 
-    def eq(self, v: V) -> 'Binary':
+    def eq(self, v) -> 'Binary':
         if v is None:
             return self._binary(Operator.IS, v)
         elif is_array(v):
@@ -34,7 +34,7 @@ class ExtKey:
         else:
             return self._binary(Operator.EQ, v)
 
-    def not_eq(self, v: V) -> 'Binary':
+    def not_eq(self, v) -> 'Binary':
         if v is None:
             return self._binary(Operator.IS_NOT, v)
         elif is_array(v):
@@ -42,34 +42,34 @@ class ExtKey:
         else:
             return self._binary(Operator.NOT_EQ, v)
 
-    def gt(self, v: V) -> 'Binary':
+    def gt(self, v) -> 'Binary':
         return self._binary(Operator.GT, v)
 
-    def not_gt(self, v: V) -> 'Binary':
+    def not_gt(self, v) -> 'Binary':
         return self._binary(Operator.NOT_GT, v)
 
-    def gte(self, v: V) -> 'Binary':
+    def gte(self, v) -> 'Binary':
         return self._binary(Operator.GTE, v)
 
-    def not_gte(self, v: V) -> 'Binary':
+    def not_gte(self, v) -> 'Binary':
         return self._binary(Operator.NOT_GTE, v)
 
-    def lt(self, v: V) -> 'Binary':
+    def lt(self, v) -> 'Binary':
         return self._binary(Operator.LT, v)
 
-    def not_lt(self, v: V) -> 'Binary':
+    def not_lt(self, v) -> 'Binary':
         return self._binary(Operator.NOT_LT, v)
 
-    def lte(self, v: V) -> 'Binary':
+    def lte(self, v) -> 'Binary':
         return self._binary(Operator.LTE, v)
 
-    def not_lte(self, v: V) -> 'Binary':
+    def not_lte(self, v) -> 'Binary':
         return self._binary(Operator.NOT_LTE, v)
 
-    def like(self, v: V) -> 'Binary':
+    def like(self, v) -> 'Binary':
         return self._binary(Operator.LIKE, v)
 
-    def not_like(self, v: V) -> 'Binary':
+    def not_like(self, v) -> 'Binary':
         return self._binary(Operator.NOT_LIKE, v)
 
     def between(self, v: Sequence[V]) -> 'Binary':
@@ -121,22 +121,23 @@ class Name(ExtKey):
 ######################################
 ##########################################
 
+
 @dataclass
 class Fn(ExtKey):
-    columns: List[K | Literal] = None
+    columns: List[Union[RawType, Name, Fn, Literal]] = None
     _distinct: bool = False
 
     def __post_init__(self) -> None:
         if self.columns is None:
             self.columns = []
 
-    def column(self, *column_names: Union[K | str]) -> Self:
+    def column(self, *column_names: Union[Union[RawType, Name, Fn, Literal]]) -> Self:
         for c in column_names:
             if c == '*' or c == STAR:
                 self.columns.append(STAR)
             elif isinstance(c, Literal):
                 self.columns.append(c)
-            elif is_K(c):
+            elif isinstance(c, (Name, Fn)):
                 self.columns.append(c.rm_alias())
             elif isinstance(c, str):
                 self.columns.append(Name(c))
@@ -156,3 +157,7 @@ Count = lambda *columns: Fn("COUNT").column(*columns)
 Sum = lambda *columns: Fn("SUM").column(*columns)
 Avg = lambda *columns: Fn("AVERAGE").column(*columns)
 Sqrt = lambda *columns: Fn("SQRT").column(*columns)
+
+
+# @todo: mv ColumnType to terms/__init__.py
+ColumnType: TypeAlias = Union[RawType, Raw, Name, Fn, Literal]

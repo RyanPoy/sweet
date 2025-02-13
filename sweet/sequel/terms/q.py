@@ -2,11 +2,10 @@ from typing import List, Optional, Self
 
 from sweet.sequel.terms import Logic
 from sweet.sequel.terms.binary import Binary
-from sweet.sequel.types import V
 
 
 class Q:
-    def __init__(self, **kwargs: V):
+    def __init__(self, **kwargs):
         self.binaries: List[Binary] = []
         for k, v in kwargs.items():
             self.binaries.append(Binary.parse(**{k: v}))

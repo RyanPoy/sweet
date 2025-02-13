@@ -3,7 +3,7 @@ from typing import Self
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.name_fn import Name
 from sweet.sequel.terms.values import Values
-from sweet.sequel.types import ArrayType, V
+from sweet.sequel.types import ArrayType
 
 
 class InsertStatement:
