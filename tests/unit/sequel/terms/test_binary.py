@@ -171,6 +171,59 @@ class TestBinary(unittest.TestCase):
         b2 = Binary(Name("pk"), Operator.IN, [1, 2])
         self.assertEqual(b1, b2)
 
+    def test_logic_and(self):
+        b1 = Binary(Name("pk"), Operator.IN, [1, 2])
+        b2 = Binary(Name("name"), Operator.LIKE, '%jim')
+        b3 = Binary(Name("age"), Operator.GT, 40)
+        b = b1 & b2 & b3
+
+        self.assertEqual('(`pk` IN (1, 2)) AND (`name` LIKE \'%jim\') AND (`age` > 40)', self.mysql.sql(b))
+        self.assertEqual('("pk" IN (1, 2)) AND ("name" LIKE \'%jim\') AND ("age" > 40)', self.sqlite.sql(b))
+        self.assertEqual('("pk" IN (1, 2)) AND ("name" LIKE \'%jim\') AND ("age" > 40)', self.pg.sql(b))
+
+    def test_logic_or(self):
+        b1 = Binary(Name("pk"), Operator.IN, [1, 2])
+        b2 = Binary(Name("name"), Operator.LIKE, '%jim')
+        b3 = Binary(Name("age"), Operator.GT, 40)
+        b = b1 | b2 | b3
+
+        self.assertEqual('(`pk` IN (1, 2)) OR (`name` LIKE \'%jim\') OR (`age` > 40)', self.mysql.sql(b))
+        self.assertEqual('("pk" IN (1, 2)) OR ("name" LIKE \'%jim\') OR ("age" > 40)', self.sqlite.sql(b))
+        self.assertEqual('("pk" IN (1, 2)) OR ("name" LIKE \'%jim\') OR ("age" > 40)', self.pg.sql(b))
+
+    def test_logic_invert(self):
+        b1 = Binary(Name("pk"), Operator.IN, [1, 2])
+        b2 = Binary(Name("name"), Operator.LIKE, '%jim')
+        b3 = Binary(Name("age"), Operator.GT, 40)
+        b = ~b1 & ~b2 & ~b3
+
+        self.assertEqual('NOT (`pk` IN (1, 2)) AND NOT (`name` LIKE \'%jim\') AND NOT (`age` > 40)', self.mysql.sql(b))
+        self.assertEqual('NOT ("pk" IN (1, 2)) AND NOT ("name" LIKE \'%jim\') AND NOT ("age" > 40)', self.sqlite.sql(b))
+        self.assertEqual('NOT ("pk" IN (1, 2)) AND NOT ("name" LIKE \'%jim\') AND NOT ("age" > 40)', self.pg.sql(b))
+
+        b1 = Binary(Name("pk"), Operator.IN, [1, 2])
+        b2 = Binary(Name("name"), Operator.LIKE, '%jim')
+        b3 = Binary(Name("age"), Operator.GT, 40)
+        b = ~b1 | ~b2 | ~b3
+
+        self.assertEqual('NOT (`pk` IN (1, 2)) OR NOT (`name` LIKE \'%jim\') OR NOT (`age` > 40)', self.mysql.sql(b))
+        self.assertEqual('NOT ("pk" IN (1, 2)) OR NOT ("name" LIKE \'%jim\') OR NOT ("age" > 40)', self.sqlite.sql(b))
+        self.assertEqual('NOT ("pk" IN (1, 2)) OR NOT ("name" LIKE \'%jim\') OR NOT ("age" > 40)', self.pg.sql(b))
+
+    def test_logic_complex(self):
+        b1 = Binary(Name("id"), Operator.EQ, 1)
+        b2 = Binary(Name("name"), Operator.NOT_EQ, 'jim')
+        b3 = Binary(Name("age"), Operator.GT, 40)
+        b4 = Binary(Name("gender"), Operator.EQ, 'f')
+        b5 = Binary(Name("score"), Operator.LT, 60)
+        b6 = Binary(Name("country"), Operator.BETWEEN, ['USA', 'RP'])
+
+        b = (~b1 | b2) & ~(b3 | b4 & (b5 | ~b6))
+
+        self.assertEqual("""(NOT (`id` = 1) OR (`name` <> 'jim')) AND NOT ((`age` > 40) OR (`gender` = 'f') AND ((`score` < 60) OR NOT (`country` BETWEEN 'USA' AND 'RP')))""", self.mysql.sql(b))
+        self.assertEqual("""(NOT ("id" = 1) OR ("name" <> 'jim')) AND NOT (("age" > 40) OR ("gender" = 'f') AND (("score" < 60) OR NOT ("country" BETWEEN 'USA' AND 'RP')))""", self.sqlite.sql(b))
+        self.assertEqual("""(NOT ("id" = 1) OR ("name" <> 'jim')) AND NOT (("age" > 40) OR ("gender" = 'f') AND (("score" < 60) OR NOT ("country" BETWEEN 'USA' AND 'RP')))""", self.pg.sql(b))
+
 
 if __name__ == '__main__':
     unittest.main()

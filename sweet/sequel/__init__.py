@@ -3,6 +3,8 @@ from enum import Enum
 
 
 class Operator(Enum):
+    Empty = ''
+
     IS = "IS"
     IS_NOT = "IS NOT"
     IN = "IN"
@@ -59,6 +61,9 @@ class Operator(Enum):
             return Operator.REGEX
         else:
             raise ValueError(f"Can't support {self.value}")
+
+    def is_empty(self) -> bool:
+        return self == Operator.Empty
 
     def __str__(self) -> str:
         return self.value

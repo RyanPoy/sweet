@@ -112,17 +112,39 @@ class Visitor:
         return sql
 
     def visit_Binary(self, b: Binary, sql: SQLCollector) -> SQLCollector:
-        self.visit_Name(b.key, sql)
-        sql << f" {b.op} "
-        if b.op == Operator.BETWEEN or b.op == Operator.NOT_BETWEEN:
-            tuple_vs = b.value.data
-            v = tuple_vs[0].rm_alias() if isinstance(tuple_vs[0], Name) else tuple_vs[0]
-            self.visit(v, sql)
-            sql << " AND "
-            v = tuple_vs[1].rm_alias() if isinstance(tuple_vs[1], Name) else tuple_vs[1]
-            self.visit(v, sql)
+        def _visit_data_binary(b: Binary):
+            self.visit_Name(b.key, sql)
+            sql << f" {b.op} "
+            if b.op == Operator.BETWEEN or b.op == Operator.NOT_BETWEEN:
+                tuple_vs = b.value.data
+                v = tuple_vs[0].rm_alias() if isinstance(tuple_vs[0], Name) else tuple_vs[0]
+                self.visit(v, sql)
+                sql << " AND "
+                v = tuple_vs[1].rm_alias() if isinstance(tuple_vs[1], Name) else tuple_vs[1]
+                self.visit(v, sql)
+            else:
+                self.visit(b.value, sql)
+
+        def _visit_logic_binary(b: Binary, parent_logic: Logic):
+            """根据父节点运算符决定是否给子节点加括号"""
+            node_priority = 0 if b.logic is None else b.logic.priority()
+            parent_priority = 0 if parent_logic is None else parent_logic.priority()
+            if node_priority < parent_priority:
+                # 若子节点运算符优先级低于父节点运算符，则需要加括号
+                if b.inverted: sql << "NOT "
+                sql << '('
+                self.visit_Binary(b, sql)
+                sql << ')'
+            else:
+                if b.inverted: sql << "NOT "
+                self.visit_Binary(b, sql)
+
+        if b.for_logic():
+            _visit_logic_binary(b.left, b.logic)
+            sql << f" {str(b.logic)} "
+            _visit_logic_binary(b.right, b.logic)
         else:
-            self.visit(b.value, sql)
+            _visit_data_binary(b)
         return sql
 
     def visit_Raw(self, a: Raw, sql: SQLCollector) -> SQLCollector:

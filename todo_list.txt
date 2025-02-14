@@ -23,9 +23,10 @@
    √ key、op、value
    √ Key 可以接收 RawType, Fn, Name；接收到RawType的时候，内部要转为 the Value class，方便后面的quote
    √ value 可以接收 RawType、Fn, Name 和 Array，接收到 B的时候，内部要转为 the Value class，方便后面的quote
+   √ 要支持 or 和 not 和 and 操作，即：支持与或非
 
 
-SelectStatement：
+√ SelectStatement：
   select_cope：
     可以是 RawType、Fn、Name。例如：select `username`；select sum(age)
     可以是 B 类型，即：基本类型。例如：select 1, 'abc'
