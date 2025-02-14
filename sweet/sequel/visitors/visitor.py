@@ -117,10 +117,10 @@ class Visitor:
         if b.op == Operator.BETWEEN or b.op == Operator.NOT_BETWEEN:
             tuple_vs = b.value.data
             v = tuple_vs[0].rm_alias() if isinstance(tuple_vs[0], Name) else tuple_vs[0]
-            self.visit_V(v, sql, True)
+            self.visit(v, sql)
             sql << " AND "
             v = tuple_vs[1].rm_alias() if isinstance(tuple_vs[1], Name) else tuple_vs[1]
-            self.visit_V(v, sql, True)
+            self.visit(v, sql)
         else:
             self.visit(b.value, sql)
         return sql

@@ -11,6 +11,7 @@
 √ ArrayType: TypeAlias = Union[List | Tuple]
 
 # 增加一个Array的class，对ArrayType进行封装，让Visitor更加好处理
+# 注意，在 Insert xxx Values 中，Array需要用 [] 连接，其他地方用 () 连接
 √ class Array:
     v: ArrayType
 

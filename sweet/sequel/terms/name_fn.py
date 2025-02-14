@@ -115,6 +115,8 @@ class Name(ExtKey):
             return False
         return self.name == other.name and self.schema_name == other.schema_name and self.alias == other.alias
 
+    def copy(self) -> Self:
+        return copy.deepcopy(self)
 
 ###############################
 #################################

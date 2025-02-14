@@ -5,6 +5,7 @@ from tests.unit.sequel.statements.test_delete_statement import TestDeleteStateme
 from tests.unit.sequel.statements.test_insert_statement import TestInsertStatement
 from tests.unit.sequel.statements.test_select_statement import TestSelectStatement
 from tests.unit.sequel.statements.test_update_statement import TestUpdateStatement
+from tests.unit.sequel.terms.test_binary import TestBinary
 from tests.unit.sequel.terms.test_fn import TestFn
 from tests.unit.sequel.terms.test_lock import TestLock
 from tests.unit.sequel.terms.test_name import TestName
@@ -21,6 +22,7 @@ if __name__ == '__main__':
         TestInsertStatement,
         TestUpdateStatement,
         TestSelectStatement,
+        TestBinary,
         TestQ,
         TestLock,
         TestValues,
