@@ -13,7 +13,6 @@ from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
 from sweet.sequel.terms.values import Values
-from sweet.sequel.quoting import quote, quote_name
 from sweet.sequel.terms.filter import Filter
 from sweet.sequel.types import Array, ArrayType, Raw, RawType
 
@@ -23,16 +22,9 @@ class Visitor:
     qchar = '"'
 
     def quote_column_name(self, name: str) -> str:
-        return quote_name(name, self.qchar)
-
-    def quote_value_of_values(self, value: RawType) -> str:
-        return quote(value, "[", "]")
-
-    def quote_value_of_binary(self, value: RawType) -> str:
-        return quote(value, "(", ")")
-
-    def quote_condition(self, value: RawType) -> str:
-        return quote(value, "[", "]")
+        pointer = "."
+        name = name.replace("__", pointer)
+        return '.'.join([ f'{self.qchar}{x}{self.qchar}' for x in name.split(pointer) ])
 
     def visit_Name(self, n: Name, sql: SQLCollector) -> SQLCollector:
         if n.schema_name:

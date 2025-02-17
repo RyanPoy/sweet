@@ -160,6 +160,3 @@ Sum = lambda *columns: Fn("SUM").column(*columns)
 Avg = lambda *columns: Fn("AVERAGE").column(*columns)
 Sqrt = lambda *columns: Fn("SQRT").column(*columns)
 
-
-# @todo: mv ColumnType to terms/__init__.py
-ColumnType: TypeAlias = Union[RawType, Raw, Name, Fn, Literal]

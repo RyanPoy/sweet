@@ -29,7 +29,7 @@
 √ Q变成一个方法，返回Binary，方便初始化 Binary
 
 √ SelectStatement：
-  select_cope：
+  √ select_cope：
     可以是 RawType、Fn、Name。例如：select `username`；select sum(age)
     可以是 B 类型，即：基本类型。例如：select 1, 'abc'
     可以是 Array类型，但其实内部会展开，并且用 [] 连接起来？
@@ -45,8 +45,6 @@
 
 
 
-# @todo: Q 里面应该使用 ValueType 和 Value
-# @todo: Insert table(columns...) values() 这个地方的values方法，里面应该接受ValueType，内部转化为 ValuesList
 # @todo: Update table set key=value 这个地方的key=value，应该使用ValueType，且内部需要把key=value转为Binary
 # @todo: Visitor中的 visit_Value 要重构，里面要包装，不要直接用 value.v，而应该包装起来；
 #        因此，对应的 quote_values_value(value: RawType) 也要重构，参数要由RawType变成Value类型

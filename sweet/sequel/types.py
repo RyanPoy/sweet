@@ -4,9 +4,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
 from typing import List, Tuple, TypeAlias, Union
-
 from sweet import utils
-from sweet.sequel import quoting
 
 # Basic data type
 RawType: TypeAlias = Union[None, bool, str, bytes, int, float, Decimal, date, datetime]
@@ -26,7 +24,8 @@ class Raw:
 
         tp = type(self.data)
         if tp == str:  # Todos: if tp in (str, ActiveSupport::Multibyte::Chars):
-            return f"'{quoting.qs(self.data)}'"
+            s = self.data.replace("\\", '\\\\').replace("'", "''")
+            return f"'{s}'"
         if tp == bool:
             return '1' if self.data is True else '0'
         if tp in (Decimal, int, float):  # BigDecimals need to be put in a non-normalized form and quoted.
