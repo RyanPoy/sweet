@@ -75,10 +75,6 @@ class Binary:
                     not (isinstance(self.value, Array) and self.value.valid_for_between())):
                 raise ValueError(f'The "{self.op}" operation expects a list or tuple of length 2, but it is not.')
 
-    @classmethod
-    def new_empty(cls) -> Self:
-        return cls(None, Operator.Empty, None)
-
     def for_logic(self) -> bool:
         return self.op.is_empty()
 
@@ -94,7 +90,7 @@ class Binary:
         return self.__logic(Logic.OR, other)
 
     def __logic(self, logic: Logic, other: Self) -> Self:
-        b = self.__class__.new_empty()
+        b = self.__class__(None, Operator.Empty, None)
         b.logic = logic
         b.left = self
         b.right = other

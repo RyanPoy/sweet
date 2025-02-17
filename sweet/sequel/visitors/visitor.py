@@ -1,7 +1,6 @@
 from typing import Callable, List, Tuple, Union
-from sweet.sequel.logic import Logic
-from sweet.sequel import Operator
 from sweet.sequel.collectors import SQLCollector
+from sweet.sequel.logic import Logic
 from sweet.sequel.statements.delete_statement import DeleteStatement
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.statements.select_statement import SelectStatement
@@ -78,7 +77,7 @@ class Visitor:
     def visit_Binary(self, b: Binary, sql: SQLCollector) -> SQLCollector:
         def _visit_data_binary(node: Binary):
             if node.is_a_between_operation():
-                self.visit_Name(node.key, sql)
+                self.visit(node.key, sql)
                 sql << f" {node.op.invert() if node.inverted else node.op} "
                 tuple_vs = node.value.data
                 v = tuple_vs[0].rm_alias() if isinstance(tuple_vs[0], Name) else tuple_vs[0]
@@ -87,13 +86,13 @@ class Visitor:
                 v = tuple_vs[1].rm_alias() if isinstance(tuple_vs[1], Name) else tuple_vs[1]
                 self.visit(v, sql)
             elif node.is_a_special_operation():
-                self.visit_Name(node.key, sql)
+                self.visit(node.key, sql)
                 sql << f" {node.op.invert() if node.inverted else node.op} "
                 self.visit(node.value, sql)
             else:
                 if node.inverted:
                     sql << "NOT "
-                self.visit_Name(node.key, sql)
+                self.visit(node.key, sql)
                 sql << f" {node.op} "
                 self.visit(node.value, sql)
 
@@ -159,9 +158,21 @@ class Visitor:
 
     def visit_Filter(self, filter: Filter, sql: SQLCollector) -> SQLCollector:
         if not filter.is_empty():
+            last_logic = None
             for i, q in enumerate(filter.filters):
                 if i != 0: sql << f" AND "
+                if q.for_logic() and q.logic.priority() < Logic.AND.priority():
+                    sql << "("
                 self.visit(q, sql)
+                if q.for_logic() and q.logic.priority() < Logic.AND.priority():
+                    sql << ")"
+                last_logic = q.logic
+        # if not filter.is_empty():
+        #     chain = filter.filters[0]
+        #     for i, q in enumerate(filter.filters):
+        #         if i != 0:
+        #             chain = chain & q
+        #     self.visit((chain, sql))
         return sql
 
     def visit_InsertStatement(self, stmt: InsertStatement, sql: SQLCollector) -> SQLCollector:
