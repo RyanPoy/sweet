@@ -6,7 +6,6 @@ from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.name_fn import Count, Name, Sqrt, Sum
 from sweet.sequel.terms.literal import STAR
 from sweet.sequel.terms.order import SortedIn
-from sweet.sequel.terms.q import Q
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
