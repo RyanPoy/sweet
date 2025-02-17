@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass
 from typing import Self, Union
 
@@ -44,6 +45,7 @@ class Binary:
     left: 'Binary' = None
     right: 'Binary' = None
     inverted: bool = False
+    parent: 'Binary' = None
 
     def __init__(self, key: Union[RawType, Name, Fn], op: Operator, value: Union[RawType, Name, Fn, ArrayType]) -> None:
         if op.is_empty():
@@ -81,8 +83,9 @@ class Binary:
         return self.op.is_empty()
 
     def __invert__(self) -> Self:
-        self.inverted = not self.inverted
-        return self
+        b = copy.deepcopy(self)
+        b.inverted = not b.inverted
+        return b
 
     def __and__(self, other: Self) -> Self:
         return self.__logic(Logic.AND, other)
@@ -95,6 +98,8 @@ class Binary:
         b.logic = logic
         b.left = self
         b.right = other
+        self.parent = b
+        other.parent = b
         return b
 
     @classmethod
@@ -132,3 +137,9 @@ class Binary:
         if isinstance(key, str):
             key = Name(key)
         return cls(key, op, value)
+
+    def is_a_special_operation(self) -> bool:
+        return self.op in { Operator.IS, Operator.IS_NOT, Operator.IN, Operator.NOT_IN, Operator.LIKE, Operator.NOT_LIKE, Operator.REGEX, Operator.NOT_REGEX }
+
+    def is_a_between_operation(self) -> bool:
+        return self.op in { Operator.BETWEEN, Operator.NOT_BETWEEN }

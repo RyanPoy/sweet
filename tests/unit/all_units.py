@@ -9,7 +9,7 @@ from tests.unit.sequel.terms.test_binary import TestBinary
 from tests.unit.sequel.terms.test_fn import TestFn
 from tests.unit.sequel.terms.test_lock import TestLock
 from tests.unit.sequel.terms.test_name import TestName
-from tests.unit.sequel.terms.test_q import TestQ
+# from tests.unit.sequel.terms.test_q import TestQ
 from tests.unit.sequel.terms.test_values import TestValues
 from tests.unit.sequel.test_raw import TestArray, TestRaw
 
@@ -23,7 +23,7 @@ if __name__ == '__main__':
         TestUpdateStatement,
         TestSelectStatement,
         TestBinary,
-        TestQ,
+        # TestQ,
         TestLock,
         TestValues,
         TestName,

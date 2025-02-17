@@ -19,11 +19,16 @@
    这两者很像，都可以放到Binary里面
    两者都可以做 gt，lt，... 的操作，生成 Binary
 
-√ Binary：
+ Binary：
    √ key、op、value
    √ Key 可以接收 RawType, Fn, Name；接收到RawType的时候，内部要转为 the Value class，方便后面的quote
    √ value 可以接收 RawType、Fn, Name 和 Array，接收到 B的时候，内部要转为 the Value class，方便后面的quote
-   √ 要支持 or 和 not 和 and 操作，即：支持与或非
+   √ 要支持通过k=v的方式来解析Binary，可以考虑类似于：Binary.parse(username='abc')
+    要支持 or 和 not 和 and 操作，即：支持与或非：
+      1、括号判断，通过优先级，如果node.priority == 0，表示当前后面没有内容了。可以不用()包裹。
+      2、node.priority < parent.priority，则加括号
+      3、如果parent_node也取非，理论上
+      4、如果是一个date_binary，理论上，做非操作的时候，是不需要再生成新的Logic_Q的，可以直接copy，然后再直接invert=True
 
 
 √ SelectStatement：
@@ -37,10 +42,8 @@
                   如果是Array的时候，最终生成quoted_str，需要用() 连接起来？。
 
 Where 和 Having：
-  参数传递：
-    - 是Q，Q本身可以有 与或非逻辑，而Q里面本身封装了一个Binary。
-    - 是k=v，这种模式，但这个模式也会被转换为Q
-    - 为什么是Q，而不是Binary？主要是不想让Binary加入更多的 与或非 逻辑，让其能专注于做自己的事情
+  封装了Binary的集合
+
 
 Q：封装在Where 和 Having的内部
   有很多方式能生成 Q：

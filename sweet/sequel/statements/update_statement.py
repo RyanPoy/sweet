@@ -1,8 +1,9 @@
-from typing import Mapping, Self
+from typing import List, Self
 
+from sweet.sequel import Operator
+from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.name_fn import Name
-from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.where import Where
+from sweet.sequel.terms.filter import Filter
 
 
 class UpdateStatement:
@@ -47,8 +48,8 @@ class UpdateStatement:
         MySQLVisitor().sql(stmt)
     """
     def __init__(self, table_name: Name):
-        self.where_clause = Where()
-        self.sets : Mapping[str, Value1] = {}
+        self.where_clause: Filter = Filter()
+        self.sets : List[Binary] = []
         self.table_name: Name = table_name
 
     def set(self, **kwargs) -> Self:
@@ -62,17 +63,12 @@ class UpdateStatement:
             stmt.set(is_active=True)
         """
         for k, v in kwargs.items():
-            self.sets[k] = v
+            b = Binary.parse(**{k: v})
+            b.op = Operator.EQ
+            self.sets.append(b)
         return self
 
-    def where(self, *qs: Q, **kwargs) -> Self:
-        """
-        Add filtering conditions for the UPDATE statement.
-
-        :param qs: `Q` objects represents filter conditions.
-        :param kwargs: keyword arguments for creating filter conditions. (e.g., `id=1`)
-        :return: The current UpdateStatement instance
-        """
-        self.where_clause.append(*qs, **kwargs)
+    def where(self, *bs: Binary, **kwargs) -> Self:
+        self.where_clause.add(*bs, **kwargs)
         return self
 

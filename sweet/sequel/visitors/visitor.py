@@ -12,10 +12,9 @@ from sweet.sequel.terms.name_fn import Name, Fn
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
-from sweet.sequel.terms.q import Q
 from sweet.sequel.terms.values import Values
 from sweet.sequel.quoting import quote, quote_name
-from sweet.sequel.terms.where import Filter, Having, On, Where
+from sweet.sequel.terms.filter import Filter
 from sweet.sequel.types import Array, ArrayType, Raw, RawType
 
 
@@ -76,73 +75,44 @@ class Visitor:
             self.visit(l.suffix, sql)
         return sql
 
-    def visit_Q(self, q: Q, sql: SQLCollector) -> SQLCollector:
-        def _wrap(node: Q, parent_op: Logic):
-            """根据父节点运算符决定是否给子节点加括号"""
-            if node.operator is None:  # 基础条件无需括号
-                self.visit(node, sql)
-            else:
-                node_priority = 0 if node.operator is None else node.operator.priority()
-                parent_priority = 0 if parent_op is None else parent_op.priority()
-                if node_priority < parent_priority:
-                    # 若子节点运算符优先级低于父节点运算符，则需要加括号
-                    sql << '('
-                    self.visit(node, sql)
-                    sql << ')'
-                else:
-                    self.visit(node, sql)
-
-        if not q.operator:  # 基础条件节点
-            if not q.binaries:
-                sql << "NOT" if q.invert else ""
-            else:
-                if q.invert:
-                    sql << "NOT "
-                for i, binary in enumerate(q.binaries):
-                    if i != 0: sql << f" {Logic.AND} "
-                    self.visit(binary, sql)
-        else:  # 组合条件节点
-            if q.invert:
-                sql << "NOT ("
-            _wrap(q.left, q.operator)
-            sql << f" {str(q.operator)} "
-            _wrap(q.right, q.operator)
-            if q.invert:
-                sql << ")"
-        return sql
-
     def visit_Binary(self, b: Binary, sql: SQLCollector) -> SQLCollector:
-        def _visit_data_binary(b: Binary):
-            self.visit_Name(b.key, sql)
-            sql << f" {b.op} "
-            if b.op == Operator.BETWEEN or b.op == Operator.NOT_BETWEEN:
-                tuple_vs = b.value.data
+        def _visit_data_binary(node: Binary):
+            if node.is_a_between_operation():
+                self.visit_Name(node.key, sql)
+                sql << f" {node.op.invert() if node.inverted else node.op} "
+                tuple_vs = node.value.data
                 v = tuple_vs[0].rm_alias() if isinstance(tuple_vs[0], Name) else tuple_vs[0]
                 self.visit(v, sql)
                 sql << " AND "
                 v = tuple_vs[1].rm_alias() if isinstance(tuple_vs[1], Name) else tuple_vs[1]
                 self.visit(v, sql)
+            elif node.is_a_special_operation():
+                self.visit_Name(node.key, sql)
+                sql << f" {node.op.invert() if node.inverted else node.op} "
+                self.visit(node.value, sql)
             else:
-                self.visit(b.value, sql)
-
-        def _visit_logic_binary(b: Binary, parent_logic: Logic):
-            """根据父节点运算符决定是否给子节点加括号"""
-            node_priority = 0 if b.logic is None else b.logic.priority()
-            parent_priority = 0 if parent_logic is None else parent_logic.priority()
-            if node_priority < parent_priority:
-                # 若子节点运算符优先级低于父节点运算符，则需要加括号
-                if b.inverted: sql << "NOT "
-                sql << '('
-                self.visit_Binary(b, sql)
-                sql << ')'
-            else:
-                if b.inverted: sql << "NOT "
-                self.visit_Binary(b, sql)
+                if node.inverted:
+                    sql << "NOT "
+                self.visit_Name(node.key, sql)
+                sql << f" {node.op} "
+                self.visit(node.value, sql)
 
         if b.for_logic():
-            _visit_logic_binary(b.left, b.logic)
+            if b.inverted:
+                sql << "NOT "
+            if b.inverted and b.right is not None:
+                sql << "("
+            elif b.parent is not None and b.right is not None:
+                if b.logic.priority() < b.parent.logic.priority():
+                    sql << '('
+            self.visit_Binary(b.left, sql)
             sql << f" {str(b.logic)} "
-            _visit_logic_binary(b.right, b.logic)
+            self.visit_Binary(b.right, sql)
+            if b.inverted and b.right is not None:
+                sql << ")"
+            elif b.parent is not None and b.right is not None: # 表示是一个logic关系的组合
+                if b.logic.priority() < b.parent.logic.priority():
+                    sql << ')'
         else:
             _visit_data_binary(b)
         return sql
@@ -187,18 +157,8 @@ class Visitor:
             sql << ")"
         return sql
 
-    def visit_Where(self, where: Where, sql: SQLCollector) -> SQLCollector:
-        return self._visit_Filter("WHERE", where, sql)
-
-    def visit_Having(self, having: Having, sql: SQLCollector) -> SQLCollector:
-        return self._visit_Filter("HAVING", having, sql)
-
-    def visit_On(self, on: On, sql: SQLCollector) -> SQLCollector:
-        return self._visit_Filter("ON", on, sql)
-
-    def _visit_Filter(self, scope: str, filter: Filter, sql: SQLCollector) -> SQLCollector:
-        if not filter.empty():
-            sql << f" {scope} "
+    def visit_Filter(self, filter: Filter, sql: SQLCollector) -> SQLCollector:
+        if not filter.is_empty():
             for i, q in enumerate(filter.filters):
                 if i != 0: sql << f" AND "
                 self.visit(q, sql)
@@ -221,7 +181,9 @@ class Visitor:
     def visit_DeleteStatement(self, stmt: DeleteStatement, sql: SQLCollector) -> SQLCollector:
         sql << "DELETE FROM "
         self.visit(stmt.table_name, sql)
-        self.visit_Where(stmt.where_clause, sql)
+        if not stmt.where_clause.is_empty():
+            sql << " WHERE "
+            self.visit_Filter(stmt.where_clause, sql)
         return sql
 
     def visit_UpdateStatement(self, stmt: UpdateStatement, sql: SQLCollector) -> SQLCollector:
@@ -232,16 +194,13 @@ class Visitor:
         sql = self.visit(stmt.table_name, sql)
         if stmt.sets:
             sql << " SET "
-            i = 0
-            for k, v in stmt.sets.items():
+            for i, b in enumerate(stmt.sets):
                 if i != 0: sql << ", "
-                sql << f"{self.quote_column_name(k)} = "
-                if isinstance(v, Name):
-                    self.visit_Name(v, sql)
-                else:
-                    sql << quote(v, "[", "]")
-                i += 1
-        self.visit_Where(stmt.where_clause, sql)
+                self.visit_Binary(b, sql)
+        if not stmt.where_clause.is_empty():
+            sql << ' WHERE '
+            self.visit_Filter(stmt.where_clause, sql)
+
         return sql
 
     def visit_OrderClause(self, order: OrderClause, sql: SQLCollector) -> SQLCollector:
@@ -285,7 +244,9 @@ class Visitor:
             for i, table in enumerate(stmt.join_tables):
                 if i != 0: sql << ", "
                 self.visit(table, sql)
-            self.visit_On(stmt.on_clause, sql)
+            if stmt.on_clause:
+                sql << " ON "
+                self.visit_Filter(stmt.on_clause, sql)
 
         if stmt.force_indexes:
             sql << " FORCE INDEX ("
@@ -301,7 +262,9 @@ class Visitor:
                 self.visit(index, sql)
             sql << ")"
 
-        self.visit_Where(stmt.where_clause, sql)
+        if not stmt.where_clause.is_empty():
+            sql << ' WHERE '
+            self.visit_Filter(stmt.where_clause, sql)
 
         if stmt.groups:
             sql << " GROUP BY "
@@ -309,8 +272,9 @@ class Visitor:
                 if i != 0: sql << ", "
                 self.visit(c, sql)
 
-        if not stmt.having_clause.empty():
-            self.visit_Having(stmt.having_clause, sql)
+        if not stmt.having_clause.is_empty():
+            sql << " HAVING "
+            self.visit_Filter(stmt.having_clause, sql)
 
         if stmt.orders:
             sql << " ORDER BY "
@@ -342,3 +306,4 @@ class Visitor:
         method = self.__getattribute__(name)
         methods[name] = method
         return method
+

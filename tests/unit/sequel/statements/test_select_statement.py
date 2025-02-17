@@ -2,6 +2,7 @@ import unittest
 from datetime import date
 
 from sweet.sequel.statements.select_statement import SelectStatement
+from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.name_fn import Count, Name, Sqrt, Sum
 from sweet.sequel.terms.literal import STAR
 from sweet.sequel.terms.order import SortedIn
@@ -265,7 +266,7 @@ class TestSelectStatement(unittest.TestCase):
     #     self.assertEqual('SELECT * FROM "abc" WHERE "abc"."foo" = 1 AND "abc"."bar" = "abc"."baz"', self.pg.sql(stmt))
 
     def test_where_field_equals_where_not(self):
-        stmt = SelectStatement().from_(self.table_abc).where(~Q(foo=1)).where(bar=Name('baz', schema_name=self.table_abc.name))
+        stmt = SelectStatement().from_(self.table_abc).where(~Binary.parse(foo=1)).where(bar=Name('baz', schema_name=self.table_abc.name))
         self.assertEqual('SELECT * FROM `abc` WHERE NOT `foo` = 1 AND `bar` = `abc`.`baz`', self.mysql.sql(stmt))
         self.assertEqual('SELECT * FROM "abc" WHERE NOT "foo" = 1 AND "bar" = "abc"."baz"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT * FROM "abc" WHERE NOT "foo" = 1 AND "bar" = "abc"."baz"', self.pg.sql(stmt))
@@ -283,7 +284,7 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual("SELECT * FROM \"abc\" WHERE \"foo\" REGEX 'r^b'", self.pg.sql(stmt))
 
     def test_ignore_empty_criterion_where(self):
-        stmt = SelectStatement().from_(self.table_abc).where(Q())
+        stmt = SelectStatement().from_(self.table_abc).where()
         self.assertEqual("SELECT * FROM `abc`", self.mysql.sql(stmt))
         self.assertEqual("SELECT * FROM \"abc\"", self.sqlite.sql(stmt))
         self.assertEqual("SELECT * FROM \"abc\"", self.pg.sql(stmt))

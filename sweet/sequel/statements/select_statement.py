@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from typing import List, Self, Union
-
+from sweet.sequel.terms.binary import Binary
+from sweet.sequel.terms.filter import Filter
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.name_fn import Name, Fn
 from sweet.sequel.terms.order import OrderClause, SortedIn
-from sweet.sequel.terms.q import Q
-from sweet.sequel.terms.where import Having, On, Where
 from sweet.sequel.types import Raw, RawType
 
 
@@ -39,13 +38,13 @@ class SelectStatement:
         self.distinct_ = None
         self.limit_number = 0
         self.offset_number = 0
-        self.where_clause: Where = Where()
-        self.having_clause: Having = Having()
+        self.where_clause: Filter = Filter()
+        self.having_clause: Filter = Filter()
         self.force_indexes = []
         self.use_indexes = []
         self.lock = None
         self.join_tables = []
-        self.on_clause : On = On()
+        self.on_clause: Filter = Filter()
         self.groups = []
         self.orders : [OrderClause] = []
         self.parent = None
@@ -93,26 +92,19 @@ class SelectStatement:
         self.offset_number = offset
         return self
 
-    def where(self, *qs: Q, **kwargs) -> Self:
-        """
-        Add filtering conditions for the SELECT statement.
-
-        :param qs: `Q` objects represents filter conditions.
-        :param kwargs: keyword arguments for creating filter conditions. (e.g., `id=1`)
-        :return: The current UpdateStatement instance
-        """
-        self.where_clause.append(*qs, **kwargs)
+    def where(self, *bs: Binary, **kwargs) -> Self:
+        self.where_clause.add(*bs, **kwargs)
         return self
 
-    def having(self, *qs: Q, **kwargs) -> Self:
-        self.having_clause.append(*qs, **kwargs)
+    def having(self, *bs: Binary, **kwargs) -> Self:
+        self.having_clause.add(*bs, **kwargs)
         return self
 
     def join(self, table: Name | Self) -> Self:
         return self.__from_or_join(self.join_tables, table)
 
-    def on(self, *qs: Q, **kwargs) -> Self:
-        self.on_clause.append(*qs, **kwargs)
+    def on(self, *bs: Binary, **kwargs) -> Self:
+        self.on_clause.add(*bs, **kwargs)
         return self
 
     def group_by(self, *column_names: Name) -> Self:
