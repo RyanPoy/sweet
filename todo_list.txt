@@ -26,6 +26,7 @@
    √ 要支持通过k=v的方式来解析Binary，可以考虑类似于：Binary.parse(username='abc')
    √ 要支持 or 和 not 和 and 操作，即：支持与或非：
 
+√ Q变成一个方法，返回Binary，方便初始化 Binary
 
 √ SelectStatement：
   select_cope：
@@ -40,20 +41,7 @@
 √ Where 和 Having：
   封装了Binary的集合
 
-
- Q变成一个方法，返回Binary，供model使用
-
-Q：封装在Where 和 Having的内部
-  有很多方式能生成 Q：
-  - Q(k=v)；Q(k__gt=v)
-  - Name("age").eq(1)；Name("age").gt(2)
-  - Fn("Sum").column(str|Name).eq(1); Fn.gt(3)
-
-
-
-
-
-Select + Update + Delete => Where + Having => Q => Binary => Value + K + Array
+√ Select + Update + Delete => Where + Having => Q => Binary => Value + K + Array
 
 
 

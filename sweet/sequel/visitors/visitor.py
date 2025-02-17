@@ -1,3 +1,4 @@
+import copy
 from typing import Callable, List, Tuple, Union
 from sweet.sequel.collectors import SQLCollector
 from sweet.sequel.logic import Logic
@@ -163,16 +164,12 @@ class Visitor:
                 if i != 0: sql << f" AND "
                 if q.for_logic() and q.logic.priority() < Logic.AND.priority():
                     sql << "("
+                if isinstance(q.value, (Name, Fn)):
+                    q.value = copy.deepcopy(q.value).rm_alias()
                 self.visit(q, sql)
                 if q.for_logic() and q.logic.priority() < Logic.AND.priority():
                     sql << ")"
                 last_logic = q.logic
-        # if not filter.is_empty():
-        #     chain = filter.filters[0]
-        #     for i, q in enumerate(filter.filters):
-        #         if i != 0:
-        #             chain = chain & q
-        #     self.visit((chain, sql))
         return sql
 
     def visit_InsertStatement(self, stmt: InsertStatement, sql: SQLCollector) -> SQLCollector:
