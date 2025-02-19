@@ -6,97 +6,68 @@ from typing import Dict, List
 
 class BaseDriver(ABC):
     def __init__(self, **db_config):
-        """
-        kwargs contain:
-            db,
-            user='root',
-            password='',
-            host='localhost',
-            port=3306,
-            charset='utf8',
-            show_sql=False
-        """
-        self.db_config = db_config
-        self.db_config['init_command'] = "SET sql_mode = 'ANSI_QUOTES';"
-
-        self.pool = None
         self._local_connection = ContextVar('connection')  # 协程局部变量，用于存储连接
 
     @abstractmethod
     async def init_pool(self, minsize=1, maxsize=10):
         raise NotImplemented
 
+    @abstractmethod
     async def close_pool(self):
         """ close the connection pool """
-        await self._release_connection()
-        if self.pool:
-            self.pool.close()
-            await self.pool.wait_closed()
+        raise NotImplemented
 
-    async def _get_connection(self):
+    @abstractmethod
+    async def get_connection(self):
         """ get the connection of current coroutine """
-        connection = self._local_connection.get(None)
-        if connection is None:
-            connection = await self.pool.acquire()
-            await self._set_autocommit(connection)
-            self._local_connection.set(connection)
-        return connection
+        raise NotImplemented
 
-    async def _set_autocommit(self, conn):
-        await conn.autocommit(True)
-
-    async def _cancel_autocommit(self, conn):
-        await conn.autocommit(False)
-
-    async def _release_connection(self):
-        """ release the connection of current coroutine """
-        connection = self._local_connection.get(None)
-        if connection:
-            self._local_connection.set(None)
-            await self.pool.release(connection)
+    @abstractmethod
+    async def set_autocommit(self, conn, auto=True):
+        raise NotImplemented
 
     @asynccontextmanager
     async def transaction(self):
         conn = None
         try:
-            conn = await self._get_connection()
-            await self._cancel_autocommit(conn)
+            conn = await self.get_connection()
+            await self.set_autocommit(conn, False)
             yield self
             await conn.commit()
         except Exception as e:
             if conn: await conn.rollback()
             raise
         finally:
-            if conn: await self._set_autocommit(conn)
+            if conn: await self.set_autocommit(conn)
 
     async def fetchone(self, sql, *params):
         """Returns the first row returned for the given query."""
-        async with self.__execute(sql, *params) as cursor:
+        async with self._execute(sql, *params) as cursor:
             return await cursor.fetchone()
 
     async def fetchall(self, sql, *params):
         """Returns a row list for the given query and parameters."""
-        async with self.__execute(sql, *params) as cursor:
+        async with self._execute(sql, *params) as cursor:
             return await cursor.fetchall()
 
     async def execute_lastrowid(self, sql, *params):
         """Executes the given query, returning the lastrowid from the query."""
-        async with self.__execute(sql, *params) as cursor:
+        async with self._execute(sql, *params) as cursor:
             return cursor.lastrowid
 
     async def execute_rowcount(self, sql, *params):
         """Executes the given query, returning the rowcount from the query."""
-        async with self.__execute(sql, *params) as cursor:
+        async with self._execute(sql, *params) as cursor:
             return cursor.rowcount
 
     async def execute(self, sql, *params):
         """Executes the given query, returning the rowcount from the query."""
-        async with self.__execute(sql, *params):
+        async with self._execute(sql, *params):
             return self
 
     @asynccontextmanager
-    async def __execute(self, sql, *params):
-        connection = await self._get_connection()
+    async def _execute(self, sql, *params):
+        connection = await self.get_connection()
         cursor = None
         try:
             cursor = await connection.cursor()

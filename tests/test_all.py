@@ -2,6 +2,7 @@ import unittest
 from unittest import TestLoader, TestSuite
 
 from tests.integration.sweet.database.test_mysql_driver import TestMySQLDriver
+from tests.integration.sweet.database.test_sqlite_driver import TestSQLiteDriver
 from tests.integration.sweet.model.schema.test_columns import TestColumns
 from tests.unit.sequel.statements.test_delete_statement import TestDeleteStatement
 from tests.unit.sequel.statements.test_insert_statement import TestInsertStatement
@@ -36,6 +37,7 @@ if __name__ == '__main__':
 
         # integration tests
         TestMySQLDriver,
+        TestSQLiteDriver,
         TestColumns,
     ]:
         suites.addTests(loader.loadTestsFromTestCase(case))
