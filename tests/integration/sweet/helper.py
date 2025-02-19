@@ -29,4 +29,4 @@ async def close(driver: Driver) -> None:
     try:
         await driver.close_pool()
     except:
-        pass
+        raise
