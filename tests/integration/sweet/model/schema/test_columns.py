@@ -41,7 +41,6 @@ class TestColumns(unittest.IsolatedAsyncioTestCase):
     async def test_columns(self):
         """测试插入和查询功能."""
         expected = Columns()
-        print('begin,'*50)
         expected.append(Column(name="column_int", kind=ColumnType.Integer, limit=0, null="YES", default=None, key="", extra="", precision=0, scale=0))
         expected.append(Column(name="column_tinyint", kind="tinyint", limit=0, null=True, default=None, key="", extra="", precision=0, scale=0))
         expected.append(Column(name="column_smallint", kind="smallint", limit=0, null=True, default=None, key="", extra="", precision=0, scale=0))

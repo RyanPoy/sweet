@@ -3,8 +3,6 @@ from contextlib import asynccontextmanager
 from contextvars import ContextVar
 from typing import Dict, List
 
-import aiomysql
-
 
 class BaseDriver(ABC):
     def __init__(self, **db_config):
@@ -24,11 +22,9 @@ class BaseDriver(ABC):
         self.pool = None
         self._local_connection = ContextVar('connection')  # 协程局部变量，用于存储连接
 
+    @abstractmethod
     async def init_pool(self, minsize=1, maxsize=10):
-        """ initialize connection pool
-        """
-        self.pool = await aiomysql.create_pool(minsize=minsize, maxsize=maxsize, echo=True, **self.db_config)
-        return self
+        raise NotImplemented
 
     async def close_pool(self):
         """ close the connection pool """
