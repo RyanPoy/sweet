@@ -1,0 +1,1 @@
+执行 test_sqlite_driver.py，没法正常结束，一直hang住，应该和异步的使用方式有问题

@@ -7,8 +7,8 @@ from tests.integration.sweet import helper
 class TestColumns(unittest.IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self):
-        self.driver = await helper.init_mysql()
-        await self.driver.execute("""
+        self.mysql_driver = await helper.init_mysql()
+        await self.mysql_driver.execute("""
             create table if not exists table_types (
                 column_int int , 
                 column_tinyint tinyint , 
@@ -21,11 +21,11 @@ class TestColumns(unittest.IsolatedAsyncioTestCase):
                 column_longtext longtext , 
                 column_mediumtext mediumtext , 
                 column_boolean boolean , 
-                column_float float , 
+                column_float float not null default 3.5, 
                 column_double double , 
                 column_decimal decimal , 
                 column_numeric numeric , 
-                column_date date , 
+                column_date date, 
                 column_datetime datetime , 
                 column_timestamp timestamp , 
                 column_time time , 
@@ -34,11 +34,27 @@ class TestColumns(unittest.IsolatedAsyncioTestCase):
             )"""
         )
 
-    async def asyncTearDown(self):
-        await self.driver.execute("drop table if exists table_types")
-        await helper.close(self.driver)
+        self.sqlite_driver = await helper.init_sqlite()
+        await self.sqlite_driver.execute("""
+            create table if not exists table_types (
+                column_integer integer not null default 30,
+                column_text text,
+                column_real real,
+                column_date date,
+                column_datetime datetime,
+                column_time time,
+                column_blob blob
+            )"""
+        )
 
-    async def test_columns(self):
+    async def asyncTearDown(self):
+        await self.mysql_driver.execute("drop table if exists table_types")
+        await self.sqlite_driver.execute("drop table if exists table_types")
+
+        await helper.close(self.mysql_driver)
+        await helper.close(self.sqlite_driver)
+
+    async def test_mysql_columns(self):
         """测试插入和查询功能."""
         expected = Columns()
         expected.append(Column(name="column_int", kind=ColumnType.Integer, limit=0, null="YES", default=None, key="", extra="", precision=0, scale=0))
@@ -52,7 +68,7 @@ class TestColumns(unittest.IsolatedAsyncioTestCase):
         expected.append(Column(name="column_longtext", kind="longtext", limit=0, null=True, default=None, key="", extra="", precision=0, scale=0))
         expected.append(Column(name="column_mediumtext", kind="mediumtext", limit=0, null=True, default=None, key="", extra="", precision=0, scale=0))
         expected.append(Column(name="column_boolean", kind="tinyint", limit=1, null=True, default=None, key="", extra="", precision=0, scale=0))
-        expected.append(Column(name="column_float", kind="float", limit=0, null=True, default=None, key="", extra="", precision=0, scale=0))
+        expected.append(Column(name="column_float", kind="float", limit=0, null=False, default='3.5', key="", extra="", precision=0, scale=0))
         expected.append(Column(name="column_double", kind="double", limit=0, null=True, default=None, key="", extra="", precision=0, scale=0))
         expected.append(Column(name="column_decimal", kind="decimal", limit=0, null=True, default=None, key="", extra="", precision=10, scale=0))
         expected.append(Column(name="column_numeric", kind="numeric", limit=0, null=True, default=None, key="", extra="", precision=10, scale=0))
@@ -63,7 +79,22 @@ class TestColumns(unittest.IsolatedAsyncioTestCase):
         expected.append(Column(name="column_blob", kind="blob", limit=0, null=True, default=None, key="", extra="", precision=0, scale=0))
         expected.append(Column(name="column_varbinary", kind="varbinary", limit=1024, null=True, default=None, key="", extra="", precision=0, scale=0))
 
-        cs = await Columns.of(self.driver, 'table_types')
+        cs = await Columns.of(self.mysql_driver, 'table_types')
+        for i, e in enumerate(expected.data):
+            self.assertEqual(str(e), str(list(cs.data)[i]))
+        self.assertEqual(expected, cs)
+
+    async def test_sqlite_columns(self):
+        expected = Columns()
+        expected.append(Column(name="column_integer", kind="integer", limit=0, null=False, default="30", key="", extra="0", precision=0, scale=0))
+        expected.append(Column(name="column_text", kind="text", limit=0, null=True, default=None, key="", extra="0", precision=0, scale=0))
+        expected.append(Column(name="column_real", kind="real", limit=0, null=True, default=None, key="", extra="0", precision=0, scale=0))
+        expected.append(Column(name="column_date", kind="date", limit=0, null=True, default=None, key="", extra="0", precision=0, scale=0))
+        expected.append(Column(name="column_datetime", kind="datetime", limit=0, null=True, default=None, key="", extra="0", precision=0, scale=0))
+        expected.append(Column(name="column_time", kind="time", limit=0, null=True, default=None, key="", extra="0", precision=0, scale=0))
+        expected.append(Column(name="column_blob", kind="blob", limit=0, null=True, default=None, key="", extra="0", precision=0, scale=0))
+
+        cs = await Columns.of(self.sqlite_driver, 'table_types')
         for i, e in enumerate(expected.data):
             self.assertEqual(str(e), str(list(cs.data)[i]))
         self.assertEqual(expected, cs)

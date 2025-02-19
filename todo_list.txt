@@ -1,4 +1,4 @@
-关于sweet的sequel的数据设计。
+√ 关于sweet的sequel的数据设计。
 
 # 表示基本数据类型, Literal很重要
 √ RawType: TypeAlias = Union[int | float | str | Decimal | bool | datetime | date | None | bytes | Literal]
@@ -42,3 +42,5 @@
   封装了Binary的集合
 
 √ Select + Update + Delete => Where + Having => Q => Binary => Value + K + Array
+
+

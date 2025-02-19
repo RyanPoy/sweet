@@ -3,7 +3,7 @@ from enum import Enum, auto
 from typing import List, Self, Set
 
 from sweet.database.driver import Driver
-from sweet.utils import extract_number, extract_numbers
+from sweet.utils import extract_number, extract_numbers, to_bool
 
 
 class ColumnType(Enum):
@@ -74,9 +74,7 @@ class Column:
     def __init__(self, **kwargs) -> None:
         self.name = kwargs.get('name', '')
         self.limit = kwargs.get('limit', 0)
-        self.null = kwargs.get('null', 'YES')
-        if not isinstance(self.null, bool):
-            self.null = self.null == 'YES'
+        self.null = to_bool(kwargs.get('null', 'YES'))
         self.default = kwargs.get('default', '')
         self.key = kwargs.get('key', '')
         self.extra = kwargs.get('extra', '')
@@ -91,7 +89,10 @@ class Column:
             return
 
         kind = self.kind
-        if kind in {'int', 'tinyint', 'smallint', 'mediumint', 'bigint'}:
+        if isinstance(kind, str):
+            kind = kind.lower()
+
+        if kind in {'int', 'tinyint', 'smallint', 'mediumint', 'bigint', 'integer'}:
             self.kind = ColumnType.Integer
         elif kind.startswith('tinyint'):
             self.kind = ColumnType.Integer
@@ -110,7 +111,7 @@ class Column:
                 self.limit = limit
         elif kind in {'text', 'mediumtext', 'longtext'}:
             self.kind = ColumnType.Text
-        elif kind in {'float', 'double'}:
+        elif kind in {'float', 'double', 'real'}:
             self.kind = ColumnType.Float
         elif kind.startswith('decimal'):
             self.kind = ColumnType.Decimal
