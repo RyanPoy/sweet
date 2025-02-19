@@ -1,4 +1,3 @@
-from contextvars import ContextVar
 from typing import Dict, List
 from sweet.database.driver.base_driver import BaseDriver
 import aiomysql
