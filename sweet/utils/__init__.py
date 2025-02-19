@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Tuple, Union
 
 from sweet.utils.inflection import *
 from datetime import datetime, date
@@ -7,12 +7,25 @@ from queue import Queue
 import time
 import re
 
-
-
 # data type transfer variables and functions
 FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE', 'No', 'no', 'NO')
 ISO_DATE = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
 ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
+
+
+def extract_number(s: str, default: int) -> int:
+    match = re.search(r'\((\d+)\)', s)
+    if match:
+        return int(match.group(1))
+    return default
+
+
+def extract_numbers(s: str, default: Tuple[int, int]) -> Tuple:
+    # 使用正则表达式提取括号内的多个数字
+    match = re.search(r'\((\d+),\s*(\d+)\)', s)
+    if match:
+        return int(match.group(1)), int(match.group(2))
+    return default   # 如果没有找到匹配，返回 None
 
 
 def to_bool(v):
@@ -222,10 +235,3 @@ class mydict(dict):
         if k in self:
             return self[k]
         return super().__getattribute__(k)
-
-
-class Q(Queue):
-    def get(self, block=True, timeout=None):
-        if self.qsize() <= 0:
-            return None
-        return super().get(block=block, timeout=timeout)

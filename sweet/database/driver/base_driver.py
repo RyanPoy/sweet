@@ -1,9 +1,12 @@
+from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
+from typing import Dict, List
+
 import aiomysql
 
 
-class Driver:
+class BaseDriver(ABC):
     def __init__(self, **db_config):
         """
         kwargs contain:
@@ -105,3 +108,7 @@ class Driver:
             yield cursor
         finally:
             if cursor: await cursor.close()
+
+    @abstractmethod
+    async def columns(self, table_name: str) -> List[Dict]:
+        raise NotImplemented

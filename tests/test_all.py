@@ -1,6 +1,8 @@
 import unittest
 from unittest import TestLoader, TestSuite
 
+from tests.integration.sweet.database.test_mysql_driver import TestMySQLDriver
+from tests.integration.sweet.model.schema.test_columns import TestColumns
 from tests.unit.sequel.statements.test_delete_statement import TestDeleteStatement
 from tests.unit.sequel.statements.test_insert_statement import TestInsertStatement
 from tests.unit.sequel.statements.test_select_statement import TestSelectStatement
@@ -18,6 +20,7 @@ if __name__ == '__main__':
     loader = TestLoader()
     suites = TestSuite()
     for case in [
+        # unit tests
         TestDeleteStatement,
         TestInsertStatement,
         TestUpdateStatement,
@@ -30,6 +33,10 @@ if __name__ == '__main__':
         TestFn,
         TestRaw,
         TestArray,
+
+        # integration tests
+        TestMySQLDriver,
+        TestColumns,
     ]:
         suites.addTests(loader.loadTestsFromTestCase(case))
     unittest.TextTestRunner().run(suites)

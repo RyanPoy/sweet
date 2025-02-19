@@ -1,17 +1,165 @@
 from dataclasses import dataclass, field
-from typing import List
+from enum import Enum, auto
+from typing import List, Self, Set
+
+from sweet.database.driver import Driver
+from sweet.utils import extract_number, extract_numbers
+
+
+class ColumnType(Enum):
+    Unavailable = auto()
+    # mysql: int, tinyint, smallint, mediumint, bigint
+    # sqlite: integer
+    # postgresql: integer, bigint, smallint
+    Integer = auto()
+
+    # mysql: varchar, char, text
+    # sqlite: text
+    # postgresql: varchar, char, text
+    String = auto()
+
+    # mysql: text, longtext, mediumtext
+    # sqlite: text
+    # postgresql: text
+    Text = auto()
+
+    # mysql: boolean, tinyint(1)
+    # sqlite: integer
+    # postgresql: boolean
+    Boolean = auto()
+
+    # mysql: float, double, Decimal
+    # sqlite: real
+    # postgresql: real, double, precision
+    Float = auto()
+
+    # mysql: decimal, numeric
+    # sqlite: real
+    # postgresql: decimal, numeric
+    Decimal = auto()
+
+    # mysql: date (YYYY-MM-DD)
+    # sqlite: date
+    # postgresql: date
+    Date = auto()
+
+    # mysql: datetime, timestamp
+    # sqlite: datetime
+    # postgresql: timestamp(无时区), timestamptz(有时区)
+    Datetime = auto()
+
+    # mysql: time
+    # sqlite: time
+    # postgresql: time
+    Time = auto()
+
+    # mysql: blob, varbinary
+    # sqlite: blob
+    # postgresql: by
+    Binary = auto()
 
 
 @dataclass
 class Column:
-    pass
+    name: str = field(init=False)
+    kind: ColumnType = field(init=False)
+    limit: int = field(init=False)
+    null: bool = field(init=False)
+    default: str = field(init=False)
+    key: str = field(init=False)
+    extra: str = field(init=False)
+    precision: int = field(init=False)
+    scale: int = field(init=False)
+
+    def __init__(self, **kwargs) -> None:
+        self.name = kwargs.get('name', '')
+        self.limit = kwargs.get('limit', 0)
+        self.null = kwargs.get('null', 'YES')
+        if not isinstance(self.null, bool):
+            self.null = self.null == 'YES'
+        self.default = kwargs.get('default', '')
+        self.key = kwargs.get('key', '')
+        self.extra = kwargs.get('extra', '')
+        self.precision = kwargs.get('precision', 0)
+        self.scale = kwargs.get('scale', 0)
+        self.kind = kwargs.get('kind', ColumnType.Unavailable)
+
+        self.__post_init__()
+
+    def __post_init__(self) -> None:
+        if isinstance(self.kind, ColumnType):
+            return
+
+        kind = self.kind
+        if kind in {'int', 'tinyint', 'smallint', 'mediumint', 'bigint'}:
+            self.kind = ColumnType.Integer
+        elif kind.startswith('tinyint'):
+            self.kind = ColumnType.Integer
+            limit = extract_number(kind, None)
+            if limit is not None:
+                self.limit = limit
+        elif kind.startswith('varchar'):
+            self.kind = ColumnType.String
+            limit = extract_number(kind, None)
+            if limit is not None:
+                self.limit = limit
+        elif kind.startswith('char'):
+            self.kind = ColumnType.String
+            limit = extract_number(kind, None)
+            if limit is not None:
+                self.limit = limit
+        elif kind in {'text', 'mediumtext', 'longtext'}:
+            self.kind = ColumnType.Text
+        elif kind in {'float', 'double'}:
+            self.kind = ColumnType.Float
+        elif kind.startswith('decimal'):
+            self.kind = ColumnType.Decimal
+            precision, scale = extract_numbers(kind, (None, None))
+            if not (precision is None and scale is None):
+                self.precision = precision
+                self.scale = scale
+        elif kind == 'numeric':
+            self.kind = ColumnType.Decimal
+        elif kind == 'date':
+            self.kind = ColumnType.Date
+        elif kind in {'datetime', 'timestamp'}:
+            self.kind = ColumnType.Datetime
+        elif kind == 'time':
+            self.kind = ColumnType.Time
+        elif kind == 'blob':
+            self.kind = ColumnType.Binary
+            self.limit = 1024
+        elif kind.startswith('varbinary'):
+            self.kind = ColumnType.Binary
+            limit = extract_number(kind, None)
+            if limit is not None:
+                self.limit = limit
+        elif kind == 'boolean':
+            self.kind = ColumnType.Boolean
+        else:
+            raise TypeError(f'Can not parse column kind: {kind}')
 
 
 @dataclass
 class Columns:
     data: List[Column] = field(init=False, default_factory=list)
 
-    def append(self, col: Column):
+    @classmethod
+    async def of(cls, driver: Driver, table_name) -> Self:
+        cs = cls()
+        rows = await driver.columns(table_name)
+        for i, r in enumerate(rows):
+            cs.append(Column(
+                name=r['name'], null=r['null'], key=r['key'], default=r['default'],
+                extra=r['extra'], kind=r['kind']
+            ))
+        return cs
+
+    def append(self, col: Column) -> Self:
         self.data.append(col)
+        return self
 
 
+@dataclass
+class Table:
+    columns: Columns

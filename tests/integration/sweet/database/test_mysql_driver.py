@@ -1,21 +1,12 @@
-import asyncio
 import unittest
 
-from sweet.database.driver import *
+from tests.integration.sweet import helper
 
 
-class TestMysqlDriver(unittest.IsolatedAsyncioTestCase):
+class TestMySQLDriver(unittest.IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self):
-        """Initialize MySQL Driver."""
-        self.driver = Driver(**{
-            "host"    : "127.0.0.1",
-            "port"    : 3306,
-            "user"    : "root",
-            "password": "",
-            "db"      : "sweet",
-        })
-        await self.driver.init_pool(1, 1)
+        self.driver = await helper.init_mysql()
         await self.driver.execute("""
             CREATE TABLE IF NOT EXISTS foos (
                 id INT PRIMARY KEY AUTO_INCREMENT,
@@ -26,10 +17,7 @@ class TestMysqlDriver(unittest.IsolatedAsyncioTestCase):
 
     async def asyncTearDown(self):
         await self.driver.execute("""DROP TABLE IF EXISTS foos;""")
-        try:
-            await self.driver.close_pool()
-        except:
-            pass
+        await helper.close(self.driver)
 
     async def test_insert_and_select(self):
         """测试插入和查询功能."""
