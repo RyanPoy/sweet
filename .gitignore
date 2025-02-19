@@ -3,5 +3,6 @@ __pycache__
 .DS_Store
 .idea
 sweet.iml
+sweet.sqlite
 poetry.lock
 venv/
