@@ -1,3 +1,4 @@
+import copy
 from asyncio import Queue
 from typing import Dict, List
 
@@ -16,16 +17,15 @@ class SQLiteDriver(BaseDriver):
         """
         super().__init__()
         self.db_config = db_config
-
+        self.db_config['check_same_thread'] = False
         self.pool = None
-        self.db_name = db_config.get('db')
 
     async def init_pool(self, minsize=1, maxsize=10):
         """ initialize connection pool
         """
         self.pool = Queue(maxsize + 2)
         for x in range(maxsize):
-            conn = await aiosqlite.connect(self.db_name, check_same_thread=False)
+            conn = await aiosqlite.connect(self.db_config['db'], check_same_thread=self.db_config['check_same_thread'])
             await self.pool.put(conn)
         return self
 
