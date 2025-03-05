@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import List, Self, Set
+from typing import List, Optional, Self, Set
 
 from sweet.database.driver import Driver
 from sweet.utils import extract_number, extract_numbers, to_bool
@@ -30,7 +30,7 @@ class ColumnType(Enum):
 
     # mysql: float, double, Decimal
     # sqlite: real
-    # postgresql: real, double, precision
+    # postgresql: real, double precision
     Float = auto()
 
     # mysql: decimal, numeric
@@ -111,7 +111,7 @@ class Column:
                 self.limit = limit
         elif kind in {'text', 'mediumtext', 'longtext'}:
             self.kind = ColumnType.Text
-        elif kind in {'float', 'double', 'real'}:
+        elif kind in {'float', 'double', 'real', 'double precision'}:
             self.kind = ColumnType.Float
         elif kind.startswith('decimal'):
             self.kind = ColumnType.Decimal
@@ -123,11 +123,13 @@ class Column:
             self.kind = ColumnType.Decimal
         elif kind == 'date':
             self.kind = ColumnType.Date
-        elif kind in {'datetime', 'timestamp'}:
+        elif kind in {'datetime', 'timestamp', 'timestamptz'}:
             self.kind = ColumnType.Datetime
-        elif kind == 'time':
+        elif kind.startswith('timestamptz') or kind.startswith('timestamp'):
+            self.kind = ColumnType.Datetime
+        elif kind == 'time' or kind.startswith('time'):
             self.kind = ColumnType.Time
-        elif kind == 'blob':
+        elif kind in {'blob', 'bytea', 'byte'}:
             self.kind = ColumnType.Binary
             self.limit = 1024
         elif kind.startswith('varbinary'):
@@ -160,6 +162,11 @@ class Columns:
         self.data.append(col)
         return self
 
+    def find_by_name(self, name) -> Optional[Column]:
+        for c in self.data:
+            if c.name == name:
+                return c
+        return None
 
 @dataclass
 class Table:
