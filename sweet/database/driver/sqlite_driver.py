@@ -1,4 +1,4 @@
-import copy
+import asyncio
 from asyncio import Queue
 from typing import Dict, List
 
@@ -31,17 +31,18 @@ class SQLiteDriver(BaseDriver):
 
     async def close_pool(self):
         """ close the connection pool """
-        self._release_connection()
+        await self._release_connection()
         if self.pool:
             while not self.pool.empty():
                 conn = await self.pool.get()
                 await conn.close()
 
-    def _release_connection(self):
+    async def _release_connection(self):
         """ release the connection of current coroutine """
         connection = self._local_connection.get(None)
         if connection:
             self._local_connection.set(None)
+            await self.pool.put(connection)
 
     async def get_connection(self):
         """ get the connection of current coroutine """
