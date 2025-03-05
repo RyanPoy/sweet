@@ -1,6 +1,7 @@
 import os.path
 
 from sweet.database.driver import Driver, MySQLDriver
+from sweet.database.driver.postgresql_driver import PostgreSQLDriver
 from sweet.database.driver.sqlite_driver import SQLiteDriver
 
 
@@ -25,8 +26,18 @@ async def init_sqlite() -> Driver:
     return sqlite
 
 
+async def init_postgres():
+    pg = PostgreSQLDriver(**{
+        "host"    : "127.0.0.1",
+        "port"    : 5432,
+        "user"    : "postgres",
+        "password": "",
+        "db"      : "sweet",
+    })
+    await pg.init_pool()
+    return pg
+
+
 async def close(driver: Driver) -> None:
-    try:
-        await driver.close_pool()
-    except:
-        raise
+    await driver.close_pool()
+

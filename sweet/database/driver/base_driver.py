@@ -74,7 +74,10 @@ class BaseDriver(ABC):
             await cursor.execute(sql, params)
             yield cursor
         finally:
-            if cursor: await cursor.close()
+            if cursor:
+                r = cursor.close()
+                if r is not None:
+                    await r
 
     @abstractmethod
     async def columns(self, table_name: str) -> List[Dict]:
