@@ -1,6 +1,5 @@
-from enum import Enum
-
 from sweet.model.columns import Column, Columns, Table
+from sweet.model.objects import Objects
 from sweet.utils import classproperty, tableize
 
 
@@ -9,6 +8,9 @@ class Consts:
 
 
 class Model:
+
+    __records_class__ = Objects
+
     @classproperty
     def table(cls) -> Table:
         return getattr(cls, Consts.table_name)
@@ -16,6 +18,10 @@ class Model:
     @classproperty
     def columns(cls) -> Columns:
         return cls.table.columns
+
+    @classproperty
+    def objects(cls):
+        return cls.__records_class__(cls)
 
     def __init_subclass__(cls, **kwargs):
         col_names = [k for k, v in cls.__dict__.items() if issubclass(type(v), Column)]
@@ -27,5 +33,8 @@ class Model:
                 delattr(cls, n)
             if Consts.table_name not in cls.__dict__:
                 setattr(cls, Consts.table_name, table)
+
+        # if Consts.records not in cls.__dict__:
+        #     setattr(cls, Consts.records, cls)
 
         super().__init_subclass__(**kwargs)
