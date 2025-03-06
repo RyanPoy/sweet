@@ -38,6 +38,17 @@ async def init_postgres():
     return pg
 
 
+async def init_model_env_for_mysql(self):
+    pass
+
+
+async def init_model_env_for_sqllit(self):
+    pass
+
+
+async def init_model_env_for_pg(self):
+    pass
+
+
 async def close(driver: Driver) -> None:
     await driver.close_pool()
-

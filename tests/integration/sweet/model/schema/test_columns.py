@@ -1,6 +1,6 @@
 import unittest
 
-from sweet.model.schema.columns import Column, ColumnKind, Columns
+from sweet.model.schema._column import Column, ColumnKind, Columns
 from tests.integration.sweet import helper
 
 
