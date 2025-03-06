@@ -1,12 +1,12 @@
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import List, Optional, Self, Set
+from typing import List, Optional, Self
 
 from sweet.database.driver import Driver
 from sweet.utils import extract_number, extract_numbers, to_bool
 
 
-class ColumnType(Enum):
+class ColumnKind(Enum):
     Unavailable = auto()
     # mysql: int, tinyint, smallint, mediumint, bigint
     # sqlite: integer
@@ -62,7 +62,7 @@ class ColumnType(Enum):
 @dataclass
 class Column:
     name: str = field(init=False)
-    kind: ColumnType = field(init=False)
+    kind: ColumnKind = field(init=False)
     limit: int = field(init=False)
     null: bool = field(init=False)
     default: str = field(init=False)
@@ -80,12 +80,12 @@ class Column:
         self.extra = kwargs.get('extra', '')
         self.precision = kwargs.get('precision', 0)
         self.scale = kwargs.get('scale', 0)
-        self.kind = kwargs.get('kind', ColumnType.Unavailable)
+        self.kind = kwargs.get('kind', ColumnKind.Unavailable)
 
         self.__post_init__()
 
     def __post_init__(self) -> None:
-        if isinstance(self.kind, ColumnType):
+        if isinstance(self.kind, ColumnKind):
             return
 
         kind = self.kind
@@ -93,59 +93,59 @@ class Column:
             kind = kind.lower()
 
         if kind in {'int', 'tinyint', 'smallint', 'mediumint', 'bigint', 'integer'}:
-            self.kind = ColumnType.Integer
+            self.kind = ColumnKind.Integer
         elif kind.startswith('tinyint'):
-            self.kind = ColumnType.Integer
+            self.kind = ColumnKind.Integer
             limit = extract_number(kind, None)
             if limit is not None:
                 self.limit = limit
         elif kind.startswith('varchar'):
-            self.kind = ColumnType.String
+            self.kind = ColumnKind.String
             limit = extract_number(kind, None)
             if limit is not None:
                 self.limit = limit
         elif kind.startswith('char'):
-            self.kind = ColumnType.String
+            self.kind = ColumnKind.String
             limit = extract_number(kind, None)
             if limit is not None:
                 self.limit = limit
         elif kind in {'text', 'mediumtext', 'longtext'}:
-            self.kind = ColumnType.Text
+            self.kind = ColumnKind.Text
         elif kind in {'float', 'double', 'real', 'double precision'}:
-            self.kind = ColumnType.Float
+            self.kind = ColumnKind.Float
         elif kind.startswith('decimal'):
-            self.kind = ColumnType.Decimal
+            self.kind = ColumnKind.Decimal
             precision, scale = extract_numbers(kind, (None, None))
             if not (precision is None and scale is None):
                 self.precision = precision
                 self.scale = scale
         elif kind == 'numeric':
-            self.kind = ColumnType.Decimal
+            self.kind = ColumnKind.Decimal
         elif kind == 'date':
-            self.kind = ColumnType.Date
+            self.kind = ColumnKind.Date
         elif kind in {'datetime', 'timestamp', 'timestamptz'}:
-            self.kind = ColumnType.Datetime
+            self.kind = ColumnKind.Datetime
         elif kind.startswith('timestamptz') or kind.startswith('timestamp'):
-            self.kind = ColumnType.Datetime
+            self.kind = ColumnKind.Datetime
         elif kind == 'time' or kind.startswith('time'):
-            self.kind = ColumnType.Time
+            self.kind = ColumnKind.Time
         elif kind in {'blob', 'bytea', 'byte'}:
-            self.kind = ColumnType.Binary
+            self.kind = ColumnKind.Binary
             self.limit = 1024
         elif kind.startswith('varbinary'):
-            self.kind = ColumnType.Binary
+            self.kind = ColumnKind.Binary
             limit = extract_number(kind, None)
             if limit is not None:
                 self.limit = limit
         elif kind == 'boolean':
-            self.kind = ColumnType.Boolean
+            self.kind = ColumnKind.Boolean
         else:
             raise TypeError(f'Can not parse column kind: {kind}')
 
 
 @dataclass
 class Columns:
-    data: List[Column] = field(init=False, default_factory=list)
+    data: List[Column] = field(default_factory=list)
 
     @classmethod
     async def of(cls, driver: Driver, table_name) -> Self:
@@ -168,6 +168,8 @@ class Columns:
                 return c
         return None
 
+
 @dataclass
 class Table:
+    name: str
     columns: Columns

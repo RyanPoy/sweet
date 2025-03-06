@@ -1,6 +1,6 @@
 import unittest
 
-from sweet.model.schema.columns import Column, ColumnType, Columns
+from sweet.model.schema.columns import Column, ColumnKind, Columns
 from tests.integration.sweet import helper
 
 
@@ -81,7 +81,7 @@ class TestColumns(unittest.IsolatedAsyncioTestCase):
     async def test_mysql_columns(self):
         """测试插入和查询功能."""
         expected = Columns()
-        expected.append(Column(name="column_int", kind=ColumnType.Integer, limit=0, null="YES", default=None, key="", extra="", precision=0, scale=0))
+        expected.append(Column(name="column_int", kind=ColumnKind.Integer, limit=0, null="YES", default=None, key="", extra="", precision=0, scale=0))
         expected.append(Column(name="column_tinyint", kind="tinyint", limit=0, null=True, default=None, key="", extra="", precision=0, scale=0))
         expected.append(Column(name="column_smallint", kind="smallint", limit=0, null=True, default=None, key="", extra="", precision=0, scale=0))
         expected.append(Column(name="column_mediumint", kind="mediumint", limit=0, null=True, default=None, key="", extra="", precision=0, scale=0))
