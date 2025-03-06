@@ -1,6 +1,13 @@
 import unittest
 
+from tests.helper import User
+
 
 class TestModel(unittest.TestCase):
-    pass
 
+    def test_table_name(self):
+        self.assertEqual("users", User.table.table_name)
+
+
+if __name__ == '__main__':
+    unittest.main()
