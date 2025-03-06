@@ -23,8 +23,11 @@ class TestColumn(unittest.TestCase):
             id = IntColumn()
             name = CharColumn("demo_name")
 
-        self.assertEqual('demo_name', Demo.table.name.name)
-        self.assertEqual('id', Demo.table.id.name)
+        self.assertEqual('demo_name', Demo.table.columns.name.name)
+        self.assertEqual('id', Demo.table.columns.id.name)
+
+        self.assertEqual('demo_name', Demo.columns.name.name)
+        self.assertEqual('id', Demo.columns.id.name)
 
 
 if __name__ == '__main__':

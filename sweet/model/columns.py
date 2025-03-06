@@ -1,7 +1,8 @@
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
 from time import time
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Self, Set, Union
 
 
 class Column:
@@ -168,19 +169,28 @@ class TimeColumn(Column):
                          validators=validators)
 
 
+@dataclass
+class Columns:
+    data: Dict[str, Column] = field(default_factory=dict)
+
+    def add(self, field_name: str, col: Column) -> Self:
+        if field_name in self.data:
+            raise ValueError(f"'Table' object exits column {field_name}")
+        self.data[field_name] = col
+        return self
+
+    def __getattr__(self, name):
+        if name in self.data:
+            return self.data[name]
+        return super().__getattribute__(name)
+
+    def get(self, name: str) -> Optional[Column]:
+        return self.columns.get(name, None)
+
+
+@dataclass
 class Table:
     def __init__(self, name: str) -> None:
-        self.__table_name__: str = name
-        self.__pk__: Optional[Column] = None
-
-    @property
-    def pk(self) -> Column:
-        return self.__pk__
-
-    @pk.setter
-    def pk(self, value: Column):
-        self.__pk__ = value
-
-    @property
-    def table_name(self) -> str:
-        return self.__table_name__
+        self.name: str = name
+        # self.pk: Optional[Column] = None
+        self.columns: Columns = Columns()
