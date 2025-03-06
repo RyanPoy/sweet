@@ -1,12 +1,12 @@
 import unittest
 
-from tests.integration.sweet import helper
+from tests.integration import integration_helper
 
 
 class TestSQLiteDriver(unittest.IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self):
-        self.driver = await helper.init_sqlite()
+        self.driver = await integration_helper.init_sqlite()
         await self.driver.execute("""
             CREATE TABLE IF NOT EXISTS \"foos\" (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,7 +17,7 @@ class TestSQLiteDriver(unittest.IsolatedAsyncioTestCase):
 
     async def asyncTearDown(self):
         await self.driver.execute("""DROP TABLE IF EXISTS \"foos\";""")
-        await helper.close(self.driver)
+        await integration_helper.close(self.driver)
 
     async def test_insert_and_select(self):
         """测试插入和查询功能."""
