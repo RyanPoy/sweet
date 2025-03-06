@@ -6,6 +6,7 @@ from tests.integration.sweet.database.test_postgres_driver import TestPostgreSQL
 from tests.integration.sweet.database.test_sqlite_driver import TestSQLiteDriver
 from tests.integration.sweet.model.schema.test_columns import TestColumns
 from tests.unit.model.test_column import TestColumn
+from tests.unit.model.test_model import TestModel
 from tests.unit.sequel.statements.test_delete_statement import TestDeleteStatement
 from tests.unit.sequel.statements.test_insert_statement import TestInsertStatement
 from tests.unit.sequel.statements.test_select_statement import TestSelectStatement
@@ -43,6 +44,7 @@ if __name__ == '__main__':
         TestSQLiteDriver,
         TestPostgreSQLDriver,
         TestColumns,
+        TestModel,
     ]:
         suites.addTests(loader.loadTestsFromTestCase(case))
     unittest.TextTestRunner().run(suites)
