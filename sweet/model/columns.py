@@ -1,8 +1,7 @@
-from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
 from time import time
-from typing import Dict, List, Optional, Self, Set, Union
+from typing import List, Optional, Union
 
 
 class Column:
@@ -26,6 +25,7 @@ class Column:
     def __set_name__(self, owner, name):
         if self.name is None:
             self.name = name
+
 
 class CharColumn(Column):
     """
@@ -169,5 +169,18 @@ class TimeColumn(Column):
 
 
 class Table:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, name: str) -> None:
+        self.__table_name__: str = name
+        self.__pk__: Optional[Column] = None
+
+    @property
+    def pk(self) -> Column:
+        return self.__pk__
+
+    @pk.setter
+    def pk(self, value: Column):
+        self.__pk__ = value
+
+    @property
+    def table_name(self) -> str:
+        return self.__table_name__
