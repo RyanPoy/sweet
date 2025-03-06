@@ -172,6 +172,11 @@ class TestBinary(unittest.TestCase):
         b2 = Binary(Name("pk"), Operator.IN, [1, 2])
         self.assertEqual(b1, b2)
 
+    def test_not_equals(self):
+        b1 = Binary(Name("pk"), Operator.IN, [1, 2]) & Binary(Name("name"), Operator.EQ, "Lily")
+        b2 = Binary(Name("pk"), Operator.IN, [1, 2])
+        self.assertNotEqual(b1, b2)
+
     def test_logic_and(self):
         b1 = Binary(Name("pk"), Operator.IN, [1, 2])
         b2 = Binary(Name("name"), Operator.LIKE, '%jim')

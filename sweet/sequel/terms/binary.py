@@ -77,11 +77,14 @@ class Binary:
         return (self.op.is_empty() and self.key is None and self.value is None) or (self.op.is_empty() and self.key == Raw(None) and self.value == Raw(None)) and self.left is None
 
     def __eq__(self, other) -> bool:
-        if super().__eq__(other):
-            return True
+        if self.__class__ != other.__class__:
+            return False
+
         if self.is_empty() and other.is_empty():
             return True
-        return False
+
+        return (self.key == other.key and self.op == other.op and self.value == other.value and self.logic == other.logic and
+                self.left == other.right and self.right == other.right and self.inverted == other.inverted and self.parent == other.parent)
 
     def __invert__(self) -> Self:
         b = copy.deepcopy(self)
