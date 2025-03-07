@@ -1,3 +1,4 @@
+from sweet.database.driver.sqlite_driver import SQLiteDriver
 from sweet.model.columns import Column, Columns, Table
 from sweet.model.objects import Objects
 from sweet.utils import classproperty, tableize
@@ -5,6 +6,7 @@ from sweet.utils import classproperty, tableize
 
 class Consts:
     table_name = '__table_name__'
+    db_driver = '__db_driver__'
 
 
 class Model:
@@ -34,7 +36,7 @@ class Model:
             if Consts.table_name not in cls.__dict__:
                 setattr(cls, Consts.table_name, table)
 
-        # if Consts.records not in cls.__dict__:
-        #     setattr(cls, Consts.records, cls)
+        if Consts.db_driver not in cls.__dict__:
+            setattr(cls, Consts.db_driver, SQLiteDriver)
 
         super().__init_subclass__(**kwargs)

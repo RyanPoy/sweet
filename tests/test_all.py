@@ -21,7 +21,7 @@ from tests.unit.sequel.terms.test_values import TestValues
 from tests.unit.sequel.test_raw import TestArray, TestRaw
 
 
-if __name__ == '__main__':
+def main():
     loader = TestLoader()
     suites = TestSuite()
     for case in [
@@ -50,3 +50,8 @@ if __name__ == '__main__':
     ]:
         suites.addTests(loader.loadTestsFromTestCase(case))
     unittest.TextTestRunner().run(suites)
+
+
+if __name__ == '__main__':
+    main()
+
