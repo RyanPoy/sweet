@@ -25,9 +25,10 @@ class TestObjects(unittest.TestCase):
         objs1 = User.objects.filter(id=10)
         objs2 = objs1.filter(name="username")
         self.assertNotEqual(objs1.binary, objs2.binary)
+        self.assertNotEqual(self.pg.sql(objs1.binary), self.pg.sql(objs2.binary))
 
     def test_all(self):
-        users = User.objects.filter(id=10).filter(name="username").all()
+        users = User.objects.filter(id=10).filter(name="username").all().sql()
         self.assertNotEqual(users, 1)
 
 
