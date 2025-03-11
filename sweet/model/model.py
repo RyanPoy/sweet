@@ -10,7 +10,6 @@ class Consts:
 
 
 class Model:
-
     __records_class__ = Objects
 
     @classproperty

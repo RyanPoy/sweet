@@ -1,6 +1,8 @@
-#coding: utf8
 import unittest
-from sweet.utils import *
+from datetime import date, datetime
+from decimal import Decimal
+
+from sweet.utils import str2date, str2datetime, to_bool, to_decimal, to_f, to_i
 
 
 class TestUtils(unittest.TestCase):
@@ -31,7 +33,7 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(to_bool('True'))
         self.assertTrue(to_bool({'A': 'A'}))
         self.assertTrue(to_bool([1]))
-        self.assertTrue(to_bool((2)))
+        self.assertTrue(to_bool((2,)))
         self.assertTrue(to_bool('yes'))
         self.assertTrue(to_bool('Yes'))
         self.assertTrue(to_bool('YES'))
@@ -57,7 +59,7 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(date(2009, 10, 10), str2date('2009-10-10 10:10:10'))
 
     def test_str2datetime(self):
-        self.assertEqual(datetime(2009, 10, 10, 10, 10, 10, 0), str2datetime('2009-10-10 10:10:10'))
+        self.assertEqual(datetime(2009, 10, 10, 10, 10, 10), str2datetime('2009-10-10 10:10:10'))
         self.assertEqual(datetime(2009, 10, 10, 10, 10, 10, 100000), str2datetime('2009-10-10 10:10:10.100000'))
         self.assertEqual(datetime(2009, 10, 10, 10, 10, 10, 100), str2datetime('2009-10-10 10:10:10.000100'))
         self.assertEqual(datetime(2009, 10, 10, 0, 0, 0, 0), str2datetime('2009-10-10'))

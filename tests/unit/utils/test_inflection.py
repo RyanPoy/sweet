@@ -1,6 +1,6 @@
-#coding: utf8
 import unittest
-from sweet.utils import *
+
+from sweet.utils import javaize, pluralize, pythonize, singularize
 
 
 class TestInflection(unittest.TestCase):
