@@ -18,9 +18,10 @@ async def init_mysql() -> Driver:
 
 
 async def init_sqlite() -> Driver:
-    db_name = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'sweet.sqlite'))
+    db_name = ':memory:'
     sqlite = SQLiteDriver(**{
         "db": db_name,
+        'memory': True
     })
     await sqlite.init_pool()
     return sqlite
