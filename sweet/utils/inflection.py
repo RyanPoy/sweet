@@ -62,12 +62,12 @@ singularize_rules = [
 
 
 def singularize(word):
-    '''Singularizes English nouns.'''
+    """Singularizes English nouns."""
     return singularize_or_pluralize(word, singularize_rules, singularize_irregular_words)
 
 
 def pluralize(word):
-    '''Pluralizes English nouns.'''
+    """Pluralizes English nouns."""
     return singularize_or_pluralize(word, pluralize_rules, pluralize_irregular_words)
 
 
