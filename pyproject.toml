@@ -1,29 +1,16 @@
-[[tool.poetry.source]]
-name = "tsinghua"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-
 [project]
 name = "sweet"
 version = "0.1.0"
 description = "python3 web framework looks like rails"
+license = { text = "MIT" }
 authors = [
     {name = "ryanpoy",email = "ryanpoy@gmail.com"}
 ]
-license = {text = "MIT"}
 readme = "README.md"
-requires-python = "3.13.1"
+requires-python = ">=3.13"
 dependencies = [
-    "wheel (>=0.41.2,<0.42.0)",
-    "aiomysql (>=0.2.0,<0.3.0)",
-    "pymysql (>=1.1.1,<1.2.0)",
-    "aiosqlite (>=0.20.0,<0.21.0)",
-    "packaging (>=24.2,<25.0)",
-    "asyncpg (>=0.30.0,<0.31.0)",
-    "py-spy (>=0.4.0,<0.5.0)",
+    "aiomysql>=0.2.0",
+    "aiosqlite>=0.21.0",
+    "asyncpg>=0.30.0",
+    "pymysql>=1.1.1",
 ]
-
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-
