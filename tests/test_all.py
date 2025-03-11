@@ -19,6 +19,7 @@ from tests.unit.sequel.terms.test_name import TestName
 from tests.unit.sequel.terms.test_q import TestQ
 from tests.unit.sequel.terms.test_values import TestValues
 from tests.unit.sequel.test_raw import TestArray, TestRaw
+from tests.integration.for_mysql.test_environment import TestEnvironment
 from tests.unit.utils.test_inflection import TestInflection
 from tests.unit.utils.test_utils import TestUtils
 
@@ -51,6 +52,7 @@ def main():
         TestColumns,
         TestModel,
         TestObjects,
+        TestEnvironment,
     ]:
         suites.addTests(loader.loadTestsFromTestCase(case))
     unittest.TextTestRunner().run(suites)

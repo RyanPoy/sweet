@@ -11,23 +11,24 @@ class Environment:
     def __init__(self, **settings):
         self.driver = None
 
-
     def init_db(self, **settings):
         DATABASE = 'DATABASE'
-        db = settings.get(DATABASE, {})
-        if not db:
+        db_settings = settings.get(DATABASE, {})
+        if not db_settings:
             raise EnvironmentError("'DATABASE' environment does not exists")
 
         DRIVER = 'DRIVER'
-        driver = db.get(DRIVER, None)
-        if driver == 'mysql':
-            driver_class = MySQLDriver()
-        elif driver == 'sqlite':
-            driver_class = SQLiteDriver()
-        elif driver == 'postgres':
-            driver_class = PostgreSQLDriver()
-        elif not driver:
+        driver_settings = db_settings.get(DRIVER, None)
+        if driver_settings == 'mysql':
+            driver_class = MySQLDriver
+        elif driver_settings == 'sqlite':
+            driver_class = SQLiteDriver
+        elif driver_settings == 'postgres':
+            driver_class = PostgreSQLDriver
+        elif not driver_settings:
             raise EnvironmentError("DATABASE['DRIVER'] environment does not exists")
         else:
-            raise EnvironmentError(f"'{driver}' driver is not supported")
+            raise EnvironmentError(f"'{driver_settings}' driver is not supported")
+
+        self.driver = driver_class(**driver_settings)
         return self.driver
