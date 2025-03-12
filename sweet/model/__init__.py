@@ -1,18 +1,23 @@
+from sweet.database.driver.base_driver import BaseDriver
+from sweet.model import consts
 from sweet.model.columns import Column, Columns, Table
 from sweet.model.objects import Objects
 from sweet.environment import Environment
 from sweet.utils import classproperty, tableize
 
 
-async def init(env: Environment):
+async def init(env: Environment) -> BaseDriver:
     db = env.db_driver(**env.db_settings)
     await db.init_pool()
-    setattr(Objects, Consts.db_adapter, db)
+    setattr(Objects, consts.db_adapter, db)
+    setattr(Objects, consts.sql_visitor, env.sql_visitor)
+    return db
 
 
-class Consts:
-    table_name = '__table_name__'
-    db_adapter = '__db_adapter__'
+async def release():
+    db = getattr(Objects, consts.db_adapter, None)
+    if db is not None:
+        await db.close_pool()
 
 
 class Model:
@@ -20,7 +25,7 @@ class Model:
 
     @classproperty
     def table(cls) -> Table:
-        return getattr(cls, Consts.table_name)
+        return getattr(cls, consts.table_name)
 
     @classproperty
     def columns(cls) -> Columns:
@@ -38,7 +43,7 @@ class Model:
                 col = getattr(cls, n)
                 table.columns.add(n, col)
                 delattr(cls, n)
-            if Consts.table_name not in cls.__dict__:
-                setattr(cls, Consts.table_name, table)
+            if consts.table_name not in cls.__dict__:
+                setattr(cls, consts.table_name, table)
 
         super().__init_subclass__(**kwargs)

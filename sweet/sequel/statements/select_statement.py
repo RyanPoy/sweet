@@ -130,7 +130,7 @@ class SelectStatement:
             cs.append(table)
             table.parent = self  # set parent SelectStatement
         else:
-            raise ValueError(f"from_ method only accepts Table, Alias, or Query as arguments. But got {tp}")
+            raise ValueError(f"from_ method only accepts Name or SelectStatement as arguments. But got {tp}")
         return self
 
     def __check_circular_reference(self, ss) -> bool:

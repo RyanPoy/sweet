@@ -1,8 +1,11 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
+from functools import cached_property
 from time import time
 from typing import Dict, List, Optional, Self, Set, Union
+
+from sweet.sequel.terms.name_fn import Name
 
 
 class Column:
@@ -191,6 +194,21 @@ class Columns:
 @dataclass
 class Table:
     def __init__(self, name: str) -> None:
-        self.name: str = name
+        self.__name: str = name
+        self.__name_named: Name = Name(self.__name)
+
         # self.pk: Optional[Column] = None
         self.columns: Columns = Columns()
+
+    @property
+    def name(self):
+        return self.__name
+
+    @name.setter
+    def name(self, value):
+        self.__name = value
+        self.__name_named = Name(self.name)
+
+    @property
+    def name_named(self):
+        return self.__name_named
