@@ -2,12 +2,13 @@ import unittest
 
 from sweet.model.schema._column import Column, ColumnKind, Columns
 from tests.integration import integration_helper
+from tests.integration.integration_helper import DB_TYPE
 
 
 class TestColumns(unittest.IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self):
-        self.mysql_driver = await integration_helper.init_mysql()
+        self.mysql_driver = await integration_helper.init_db(DB_TYPE.mysql)
         await self.mysql_driver.execute("""
             create table if not exists table_types (
                 column_int int , 
@@ -34,7 +35,7 @@ class TestColumns(unittest.IsolatedAsyncioTestCase):
             )"""
         )
 
-        self.sqlite_driver = await integration_helper.init_sqlite()
+        self.sqlite_driver = await integration_helper.init_db(DB_TYPE.sqlite)
         await self.sqlite_driver.execute("""
             create table if not exists table_types (
                 column_integer integer not null default 30,
@@ -47,7 +48,7 @@ class TestColumns(unittest.IsolatedAsyncioTestCase):
             )"""
         )
 
-        self.pg_driver = await integration_helper.init_postgres()
+        self.pg_driver = await integration_helper.init_db(DB_TYPE.pg)
         await self.pg_driver.execute("""
             create table if not exists table_types (
                 column_integer integer default 10 not null,

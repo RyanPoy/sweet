@@ -1,12 +1,13 @@
 import unittest
 
 from tests.integration import integration_helper
+from tests.integration.integration_helper import DB_TYPE
 
 
 class TestMySQLDriver(unittest.IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self):
-        self.driver = await integration_helper.init_mysql()
+        self.driver = await integration_helper.init_db(DB_TYPE.mysql)
         await self.driver.execute("""
             CREATE TABLE IF NOT EXISTS `foos` (
                 id INT PRIMARY KEY AUTO_INCREMENT,

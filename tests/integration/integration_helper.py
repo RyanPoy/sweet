@@ -1,54 +1,29 @@
-import os.path
+from enum import StrEnum
 
-from sweet.database.driver import Driver, MySQLDriver
-from sweet.database.driver.postgresql_driver import PostgreSQLDriver
-from sweet.database.driver.sqlite_driver import SQLiteDriver
-
-
-async def init_mysql() -> Driver:
-    mysql = MySQLDriver(**{
-        "host"    : "127.0.0.1",
-        "port"    : 3306,
-        "user"    : "root",
-        "password": "",
-        "db"      : "sweet",
-    })
-    await mysql.init_pool()
-    return mysql
+from sweet.database.driver import Driver
+from sweet.environment import Environment
+from tests.helper import settings_mysql, settings_postgresql, settings_sqlite
 
 
-async def init_sqlite() -> Driver:
-    db_name = ':memory:'
-    sqlite = SQLiteDriver(**{
-        "db": db_name,
-        'memory': True
-    })
-    await sqlite.init_pool()
-    return sqlite
+class DB_TYPE(StrEnum):
+    mysql = "mysql"
+    sqlite = "sqlite"
+    pg = "postgresql"
 
 
-async def init_postgres():
-    pg = PostgreSQLDriver(**{
-        "host"    : "127.0.0.1",
-        "port"    : 5432,
-        "user"    : "postgres",
-        "password": "",
-        "db"      : "sweet",
-    })
-    await pg.init_pool()
-    return pg
-
-
-async def init_model_env_for_mysql(self):
-    pass
-
-
-async def init_model_env_for_sqllit(self):
-    pass
-
-
-async def init_model_env_for_pg(self):
-    pass
+async def init_db(db_type: DB_TYPE) -> Driver:
+    match db_type:
+        case DB_TYPE.mysql:
+            env = Environment(settings_mysql)
+        case DB_TYPE.sqlite:
+            env = Environment(settings_sqlite)
+        case DB_TYPE.pg:
+            env = Environment(settings_postgresql)
+        case invalid_type:
+            raise ValueError(f"Can not support {invalid_type}")
+    db = env.db_driver(**env.db_settings)
+    await db.init_pool()
+    return db
 
 
 async def close(driver: Driver) -> None:

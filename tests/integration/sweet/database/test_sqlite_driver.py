@@ -1,12 +1,13 @@
 import unittest
 
 from tests.integration import integration_helper
+from tests.integration.integration_helper import DB_TYPE
 
 
 class TestSQLiteDriver(unittest.IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self):
-        self.driver = await integration_helper.init_sqlite()
+        self.driver = await integration_helper.init_db(DB_TYPE.sqlite)
         await self.driver.execute("""
             CREATE TABLE IF NOT EXISTS \"foos\" (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -1,12 +1,13 @@
 import unittest
 
 from tests.integration import integration_helper
+from tests.integration.integration_helper import DB_TYPE
 
 
 class TestPostgreSQLDriver(unittest.IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self):
-        self.driver = await integration_helper.init_postgres()
+        self.driver = await integration_helper.init_db(DB_TYPE.pg)
         await self.driver.execute("""
             CREATE TABLE IF NOT EXISTS "foos" (
                 id SERIAL PRIMARY KEY,
