@@ -1,5 +1,5 @@
 from sweet.model.columns import CharColumn, IntColumn
-from sweet.model.model import Model
+from sweet.model import Model
 
 
 class UserRoles(Model):

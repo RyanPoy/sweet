@@ -1,7 +1,7 @@
 import unittest
 
 from sweet.model.columns import BinaryColumn, CharColumn, IntColumn, TextColumn
-from sweet.model.model import Model
+from sweet.model import Model
 
 
 class TestColumn(unittest.TestCase):

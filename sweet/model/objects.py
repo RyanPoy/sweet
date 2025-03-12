@@ -1,7 +1,9 @@
 from typing import List, Self, TYPE_CHECKING
 
+from sweet.utils import classproperty
+
 if TYPE_CHECKING:
-    from sweet.model import Model
+    from sweet.model import Consts, Model
 
 from sweet.sequel.statements.select_statement import SelectStatement
 from sweet.sequel.terms.binary import Binary, Q
@@ -13,6 +15,10 @@ class Objects:
         self.model_class = model_class
         self.binary = None
         self._execute_func = None
+
+    @classproperty
+    def adapter(cls):
+        return getattr(cls, Consts.db_adapter)
 
     def filter(self, **kwargs) -> Self:
         binary = Q(**kwargs)
