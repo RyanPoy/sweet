@@ -24,18 +24,20 @@ class TestObjects(unittest.IsolatedAsyncioTestCase):
         objs1 = User.objects.filter(id=10)
         objs2 = objs1.filter(name="username")
         self.assertNotEqual(objs1.binary, objs2.binary)
-        # self.assertNotEqual(self.pg.sql(objs1.binary), self.pg.sql(objs2.binary))
+        for i, env in enumerate(self.envs):
+            visitor = env.sql_visitor()
+            self.assertNotEqual(visitor.sql_visitor().sql(objs1.binary), visitor.sql(objs2.binary))
 
     async def test_all(self):
         objs = User.objects.filter(id=10).filter(name="username").all()
-        expecteds = [
+        expectations = [
             """SELECT * FROM `users` WHERE `id` = 10 AND `name` = 'username'""",
             """SELECT * FROM "users" WHERE "id" = 10 AND "name" = 'username'""",
             """SELECT * FROM "users" WHERE "id" = 10 AND "name" = 'username'""",
         ]
         for i, env in enumerate(self.envs):
+            expected = expectations[i]
             async with db.using(env) as driver:
-                expected = expecteds[i]
                 sql = objs.sql()
                 self.assertEqual(expected, sql, f'Environment[{driver.__class__.__name__}]')
 
