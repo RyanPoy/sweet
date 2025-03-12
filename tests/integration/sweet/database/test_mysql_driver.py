@@ -1,13 +1,12 @@
 import unittest
 
-from tests.integration import integration_helper
-from tests.integration.integration_helper import DB_TYPE
+from tests.helper.db import DB_TYPE, close, init_db
 
 
 class TestMySQLDriver(unittest.IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self):
-        self.driver = await integration_helper.init_db(DB_TYPE.mysql)
+        self.driver = await init_db(DB_TYPE.mysql)
         await self.driver.execute("""
             CREATE TABLE IF NOT EXISTS `foos` (
                 id INT PRIMARY KEY AUTO_INCREMENT,
@@ -18,7 +17,7 @@ class TestMySQLDriver(unittest.IsolatedAsyncioTestCase):
 
     async def asyncTearDown(self):
         await self.driver.execute("""DROP TABLE IF EXISTS `foos`;""")
-        await integration_helper.close(self.driver)
+        await close(self.driver)
 
     async def test_insert_and_select(self):
         """测试插入和查询功能."""

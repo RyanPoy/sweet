@@ -1,14 +1,13 @@
 import unittest
 
 from sweet.model.schema._column import Column, ColumnKind, Columns
-from tests.integration import integration_helper
-from tests.integration.integration_helper import DB_TYPE
+from tests.helper.db import DB_TYPE, close, init_db
 
 
 class TestColumns(unittest.IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self):
-        self.mysql_driver = await integration_helper.init_db(DB_TYPE.mysql)
+        self.mysql_driver = await init_db(DB_TYPE.mysql)
         await self.mysql_driver.execute("""
             create table if not exists table_types (
                 column_int int , 
@@ -35,7 +34,7 @@ class TestColumns(unittest.IsolatedAsyncioTestCase):
             )"""
         )
 
-        self.sqlite_driver = await integration_helper.init_db(DB_TYPE.sqlite)
+        self.sqlite_driver = await init_db(DB_TYPE.sqlite)
         await self.sqlite_driver.execute("""
             create table if not exists table_types (
                 column_integer integer not null default 30,
@@ -48,7 +47,7 @@ class TestColumns(unittest.IsolatedAsyncioTestCase):
             )"""
         )
 
-        self.pg_driver = await integration_helper.init_db(DB_TYPE.pg)
+        self.pg_driver = await init_db(DB_TYPE.pg)
         await self.pg_driver.execute("""
             create table if not exists table_types (
                 column_integer integer default 10 not null,
@@ -75,9 +74,9 @@ class TestColumns(unittest.IsolatedAsyncioTestCase):
         await self.sqlite_driver.execute("drop table if exists table_types")
         await self.pg_driver.execute("drop table if exists table_types")
 
-        await integration_helper.close(self.mysql_driver)
-        await integration_helper.close(self.sqlite_driver)
-        await integration_helper.close(self.pg_driver)
+        await close(self.mysql_driver)
+        await close(self.sqlite_driver)
+        await close(self.pg_driver)
 
     async def test_mysql_columns(self):
         """测试插入和查询功能."""
