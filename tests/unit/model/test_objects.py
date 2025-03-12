@@ -26,7 +26,7 @@ class TestObjects(unittest.IsolatedAsyncioTestCase):
         self.assertNotEqual(objs1.binary, objs2.binary)
         for i, env in enumerate(self.envs):
             visitor = env.sql_visitor()
-            self.assertNotEqual(visitor.sql_visitor().sql(objs1.binary), visitor.sql(objs2.binary))
+            self.assertNotEqual(visitor.sql(objs1.binary), visitor.sql(objs2.binary))
 
     async def test_all(self):
         objs = User.objects.filter(id=10).filter(name="username").all()

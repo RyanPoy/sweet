@@ -1,9 +1,7 @@
-from typing import Tuple, Union
-
+from typing import Optional, Tuple
 from sweet.utils.inflection import *
 from datetime import datetime, date
 from decimal import Decimal
-from queue import Queue
 import time
 import re
 
@@ -13,19 +11,19 @@ ISO_DATE = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
 ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
 
 
-def extract_number(s: str, default: int) -> int:
+def extract_number(s: str, default: Optional[int]) -> Optional[int]:
     match = re.search(r'\((\d+)\)', s)
     if match:
         return int(match.group(1))
     return default
 
 
-def extract_numbers(s: str, default: Tuple[int, int]) -> Tuple:
+def extract_numbers(s: str, default: Optional[Tuple[int, int]]) -> Optional[Tuple]:
     # 使用正则表达式提取括号内的多个数字
     match = re.search(r'\((\d+),\s*(\d+)\)', s)
     if match:
         return int(match.group(1)), int(match.group(2))
-    return default   # 如果没有找到匹配，返回 None
+    return default  # 如果没有找到匹配，返回 None
 
 
 def to_bool(v):
@@ -223,6 +221,7 @@ class classproperty:
     for x in range(10):
         print Foo.value
     """
+
     def __init__(self, fget): self.fget = fget
 
     def __get__(self, owner_self, owner_cls): return self.fget(owner_cls)
