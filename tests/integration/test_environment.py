@@ -2,7 +2,11 @@ import unittest
 
 
 class TestEnvironment(unittest.TestCase):
-    pass
+
+    def test_init_db_environment(self):
+        settings_list = dict(
+
+        )
 
 
 if __name__ == '__main__':
