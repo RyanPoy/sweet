@@ -2,27 +2,28 @@ from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 
+
 class BaseDriver(ABC):
     def __init__(self, **db_config):
         self._local_connection = ContextVar('connection')  # 协程局部变量，用于存储连接
 
     @abstractmethod
     async def init_pool(self, minsize=1, maxsize=10):
-        raise NotImplemented
+        raise NotImplementedError
 
     @abstractmethod
     async def close_pool(self):
         """ close the connection pool """
-        raise NotImplemented
+        raise NotImplementedError
 
     @abstractmethod
     async def get_connection(self):
         """ get the connection of current coroutine """
-        raise NotImplemented
+        raise NotImplementedError
 
     @abstractmethod
     async def set_autocommit(self, conn, auto=True):
-        raise NotImplemented
+        raise NotImplementedError
 
     @asynccontextmanager
     async def transaction(self):
@@ -32,7 +33,7 @@ class BaseDriver(ABC):
             await self.set_autocommit(conn, False)
             yield self
             await conn.commit()
-        except Exception as e:
+        except Exception:
             if conn: await conn.rollback()
             raise
         finally:
@@ -79,4 +80,4 @@ class BaseDriver(ABC):
 
     @abstractmethod
     async def columns(self, table_name: str) -> list[dict]:
-        raise NotImplemented
+        raise NotImplementedError
