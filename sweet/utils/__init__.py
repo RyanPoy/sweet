@@ -6,7 +6,7 @@ import re
 
 # data type transfer variables and functions
 FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE', 'No', 'no', 'NO')
-ISO_DATE = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
+ISO_DATE     = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
 ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
 
 
@@ -27,36 +27,34 @@ def extract_numbers(s: str, default: Optional[Tuple[int, int]]) -> Optional[Tupl
 
 def to_bool(v):
     """ convert something to a boolean  """
-    if not v:           return False
-    if is_str(v):       v = v.strip()
+    if not v:               return False
+    if is_str(v):           v = v.strip()
     if v in FALSE_VALUES:   return False
-    if not v:           return False
+    if not v:               return False
     return True
 
 
 def to_i(v):
-    if v is True:
-        return 1
-    if v is False:
-        return 0
+    if v is True: return 1
+    if v is False: return 0
     try:
         return int(v)
-    except:  # noqa: E722
+    except Exception as _:
         return 0
 
 
 def to_f(v):
     try:
         return float(v)
-    except:
+    except Exception as _:
         return 0.0
 
 
 def to_decimal(v):
-    if is_decimal(v):   return v
+    if is_decimal(v): return v
     try:
         return Decimal(v)
-    except:
+    except Exception as _:
         return Decimal(0)
 
 
@@ -85,11 +83,11 @@ def str2datetime(s):
         try:
             d = str2date(string)
             return datetime(d.year, d.month, d.day)
-        except:
+        except Exception as _:
             iso_string = string.strip()
             pos = iso_string.rfind('.')
             if pos != -1:
-                iso_string[:pos]
+                # iso_string[:pos]
                 microsec = microseconds(iso_string[pos:])
             else:
                 microsec = 0

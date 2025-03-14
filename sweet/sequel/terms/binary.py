@@ -66,7 +66,7 @@ class Binary:
         elif isinstance(value, (list, tuple)):
             self.value = Array(value)
         else:
-            raise TypeError(f"key must be a RawType，Name, Fn, List, Tuple. But got {key.__class__}")
+            raise TypeError(f"key must be a RawType，Name, Fn, List, tuple. But got {key.__class__}")
 
         if (self.op in {Operator.BETWEEN, Operator.NOT_BETWEEN} and
                 not (isinstance(self.value, Array) and self.value.valid_for_between())):

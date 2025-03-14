@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
-from typing import List, Tuple, TypeAlias
+from typing import TypeAlias
 from sweet import utils
 
 # Basic data type
@@ -39,14 +39,14 @@ class Raw:
 
 
 # Array
-ArrayType: TypeAlias = Tuple | List
+ArrayType: TypeAlias = tuple | list
 
 
 @dataclass
 class Array:
-    data: List
+    data: list
 
-    def __init__(self, data: List = None):
+    def __init__(self, data: list = None):
         self.data = self.__normalize(data)
 
     def length(self) -> int:
@@ -55,7 +55,7 @@ class Array:
     def valid_for_between(self) -> bool:
         return self.length() == 2
 
-    def __normalize(self, vs: List) -> List:
+    def __normalize(self, vs: list) -> list:
         from sweet.sequel.terms.name_fn import Name, Fn
         lst = []
         for x in vs:
@@ -66,5 +66,5 @@ class Array:
             elif isinstance(x, (Raw, Name, Fn, Array)):
                 lst.append(x)
             else:
-                raise TypeError(f"Array initialize only accepts List、Tuple、RawType，but got {x.__class__.__name__}")
+                raise TypeError(f"Array initialize only accepts list、tuple、RawType，but got {x.__class__.__name__}")
         return lst

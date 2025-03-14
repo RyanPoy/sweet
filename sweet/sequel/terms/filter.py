@@ -10,7 +10,7 @@ from sweet.sequel.types import ArrayType, RawType
 
 @dataclass
 class Filter:
-    filters: List[Binary] = field(init=False)
+    filters: list[Binary] = field(init=False)
 
     def __post_init__(self) -> None:
         self.filters = []

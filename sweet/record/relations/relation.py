@@ -1,9 +1,5 @@
-#coding: utf8
-from collections import OrderedDict as oDict
-from sweet.utils.inflection import *
 from sweet.utils import import_object, Q
 import copy
-
 
 relation_q = Q()
 

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import List, Optional, Self
+from typing import Optional, Self
 
 from sweet.database.driver import Driver
 from sweet.utils import extract_number, extract_numbers, to_bool
@@ -145,7 +145,7 @@ class Column:
 
 @dataclass
 class Columns:
-    data: List[Column] = field(default_factory=list)
+    data: list[Column] = field(default_factory=list)
 
     @classmethod
     async def of(cls, driver: Driver, table_name) -> Self:

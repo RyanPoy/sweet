@@ -1,17 +1,17 @@
-from typing import List, Self
+from typing import Self
 from sweet.sequel.types import Array, ArrayType
 
 
 class Values:
 
     def __init__(self, *args: ArrayType) -> None:
-        self.data: List[Array] = []
+        self.data: list[Array] = []
         self.append(*args)
 
     def append(self, *args: ArrayType) -> Self:
         for i, x in enumerate(args):
             if not isinstance(x, ArrayType):
-                raise TypeError(f"Values class only accepts List or Tuple, but got an {x.__class__.__name__}")
+                raise TypeError(f"Values class only accepts list or tuple, but got an {x.__class__.__name__}")
             if i != 0:
                 if len(x) != self.data[0].length():
                     raise ValueError("Inconsistent element length")

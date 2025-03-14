@@ -1,5 +1,5 @@
 [tool.ruff]
-ignore = ["E701"]
+ignore = ["E701", "E731", "E741"]
 
 [tool.uv.pip]
 extra-index-url = ["https://pypi.tuna.tsinghua.edu.cn/simple"]

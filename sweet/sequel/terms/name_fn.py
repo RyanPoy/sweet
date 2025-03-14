@@ -157,7 +157,7 @@ class Fn(ExtType):
         return self
 
 
-Count = lambda *columns: Fn("COUNT").column(*columns)  # noqa: E731
-Sum = lambda *columns: Fn("SUM").column(*columns)  # noqa: E731
-Avg = lambda *columns: Fn("AVERAGE").column(*columns)  # noqa: E731
-Sqrt = lambda *columns: Fn("SQRT").column(*columns)  # noqa: E731
+Count = lambda *columns: Fn("COUNT").column(*columns)
+Sum = lambda *columns: Fn("SUM").column(*columns)
+Avg = lambda *columns: Fn("AVERAGE").column(*columns)
+Sqrt = lambda *columns: Fn("SQRT").column(*columns)

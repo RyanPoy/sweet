@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import List, Self
+from typing import Self
 from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.filter import Filter
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.lock import Lock
-from sweet.sequel.terms.name_fn import ExtType, Name, Fn
+from sweet.sequel.terms.name_fn import ExtType, Name
 from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.types import Raw, RawType
 
@@ -34,7 +34,7 @@ class SelectStatement:
     """
     def __init__(self):
         self.tables = []
-        self.columns: List[Raw | ExtType | literal.Literal] = []
+        self.columns: list[Raw | ExtType | literal.Literal] = []
         self.distinct_ = None
         self.limit_number = 0
         self.offset_number = 0

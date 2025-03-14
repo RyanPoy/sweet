@@ -91,7 +91,7 @@ def singularize_or_pluralize(word, rules, irregular_words):
             match = re.search(patten, word, re.IGNORECASE)
             if match:
                 for k, group in enumerate(match.groups()):
-                    if group == None:
+                    if group is None:
                         replacement = replacement.replace('\\%s' % str(k + 1), '')
                 return re.sub(patten, replacement, word)
         return word

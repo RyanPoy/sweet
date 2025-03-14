@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import Callable, Tuple
+from typing import Callable
 from sweet.sequel.collectors import SQLCollector
 from sweet.sequel.logic import Logic
 from sweet.sequel.statements.delete_statement import DeleteStatement
@@ -153,9 +153,8 @@ class Visitor:
 
     def visit_Filter(self, filter: Filter, sql: SQLCollector) -> SQLCollector:
         if not filter.is_empty():
-            last_logic = None
             for i, q in enumerate(filter.filters):
-                if i != 0: sql << f" AND "
+                if i != 0: sql << " AND "
                 if q.for_logic() and q.logic.priority() < Logic.AND.priority():
                     sql << "("
                 if isinstance(q.value, (Name, Fn)):
@@ -163,12 +162,11 @@ class Visitor:
                 self.visit(q, sql)
                 if q.for_logic() and q.logic.priority() < Logic.AND.priority():
                     sql << ")"
-                last_logic = q.logic
         return sql
 
     def visit_InsertStatement(self, stmt: InsertStatement, sql: SQLCollector) -> SQLCollector:
         self.visit(stmt.insert_or_update, sql)
-        sql << f" INTO "
+        sql << " INTO "
         sql = self.visit(stmt.table_name, sql)
         if stmt.columns:
             sql << " ("
@@ -192,7 +190,7 @@ class Visitor:
         if not stmt.sets:
             return sql
 
-        sql << f"UPDATE "
+        sql << "UPDATE "
         sql = self.visit(stmt.table_name, sql)
         if stmt.sets:
             sql << " SET "
