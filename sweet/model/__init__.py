@@ -3,7 +3,8 @@ from sweet.model import consts
 from sweet.model.columns import Column, Columns, Table
 from sweet.model.objects import Objects
 from sweet.environment import Environment
-from sweet.utils import classproperty, tableize
+from sweet.utils import classproperty
+from sweet.utils.inflection import tableize
 
 
 async def init(env: Environment) -> BaseDriver:

@@ -1,6 +1,6 @@
 import unittest
 
-from sweet.utils import javaize, pluralize, pythonize, singularize
+from sweet.utils.inflection import javaize, pluralize, pythonize, singularize
 
 
 class TestInflection(unittest.TestCase):

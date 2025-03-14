@@ -1,40 +1,39 @@
-#coding: utf8
 from sweet.utils import is_str, is_num, is_blank_str
 from functools import partial
 import re
 
 
-############### validators ###############
 class PresenceValidator:
-    
+
     def validate(self, value, allow_blank=True):
         if value is None:
             return False
         if allow_blank:
             return True
-        if is_str(value) and is_blank_str(value): # 字符串要单独处理
+        if is_str(value) and is_blank_str(value):  # 字符串要单独处理
             return allow_blank
-        if value != 0 and not value: # emplty list, tuple, set, dict, str, unicode:
+        if value != 0 and not value:  # emplty list, tuple, set, dict, str, unicode:
             return False
         return True
-    
-    
+
+
 class InclusionValidator:
-    
-    def validate(self, value, in_values=[], allow_null=False, allow_blank=False):
+
+    def validate(self, value, in_values=None, allow_null=False, allow_blank=False):
         if value is None:
             return allow_null
         if is_str(value) and is_blank_str(value):
             return allow_blank
-        if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
+        if value != 0 and not value:  # empty list, tuple, set, dict, str, unicode
             return allow_blank
+        in_values = in_values or []
         return value in in_values
 
 
 class NumericalityValidator:
-    
-    def validate(self, value, allow_null=False, greater_than=None, greater_than_or_equal_to=None, 
-                    equal_to=None, less_than=None, less_than_or_equal_to=None, odd=None, even=None):
+
+    def validate(self, value, allow_null=False, greater_than=None, greater_than_or_equal_to=None,
+                 equal_to=None, less_than=None, less_than_or_equal_to=None, odd=None, even=None):
         if value is None:
             return allow_null
         if not is_num(value):
@@ -43,12 +42,12 @@ class NumericalityValidator:
             except ValueError as _:
                 return False
         if (greater_than and value <= greater_than) or \
-            (greater_than_or_equal_to and value < greater_than_or_equal_to) or \
-            (equal_to and value != equal_to) or \
-            (less_than and value >= less_than) or \
-            (less_than_or_equal_to and value > less_than_or_equal_to):
+                (greater_than_or_equal_to and value < greater_than_or_equal_to) or \
+                (equal_to and value != equal_to) or \
+                (less_than and value >= less_than) or \
+                (less_than_or_equal_to and value > less_than_or_equal_to):
             return False
-        
+
         if odd is True and value % 2 == 0:
             return False
         if odd is False and value % 2 != 0:
@@ -60,68 +59,64 @@ class NumericalityValidator:
             return False
 
         return True
-        
+
 
 class AcceptanceValidator:
-    
+
     def validate(self, value, allow_null=True):
         if allow_null:
             return True
         return value is not None
-    
-    
+
+
 class LengthValidator:
-    
+
     def validate(self, value, allow_null=True, allow_blank=True, _is=None, minimum=None, maximum=None):
         if value is None:
             return allow_null
         if is_str(value) and is_blank_str(value):
             return allow_blank
-        if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
+        if value != 0 and not value:  # empty list, tuple, set, dict, str, unicode
             return allow_blank
         if (_is and len(value) != _is) or \
-            (minimum and len(value) < minimum) or \
-            (maximum and len(value) > maximum):  
+                (minimum and len(value) < minimum) or \
+                (maximum and len(value) > maximum):
             return False
         return True
 
 
 class ConfirmationValidator:
-    
+
     def validate(self, value, confirmation_value):
         return confirmation_value == value
 
 
 class FormatValidator:
-    
+
     def validate(self, value, _with, allow_null=True, allow_blank=True):
         if value is None:
             return allow_null
         if is_str(value) and is_blank_str(value):
             return allow_blank
-        if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
+        if value != 0 and not value:  # empty list, tuple, set, dict, str, unicode
             return allow_blank
         return True if re.match(_with, value) else False
 
-    
+
 class ExclusionValidator:
-    
-    def validate(self, value, exclusion_values=[], allow_null=False, allow_blank=False):
+
+    def validate(self, value, exclusion_values=None, allow_null=False, allow_blank=False):
         if value is None:
             return allow_null
         if is_str(value) and is_blank_str(value):
             return allow_blank
-        if value != 0 and not value: # empty list, tuple, set, dict, str, unicode
+        if value != 0 and not value:  # empty list, tuple, set, dict, str, unicode
             return allow_blank
+        exclusion_values = exclusion_values or []
         return value not in exclusion_values
 
 
-
-#########################################
-############# validations ###############
-#########################################
 class Validates:
-
     # store the validate partial function
     # the format is :
     # {
@@ -154,7 +149,6 @@ class Validates:
 
 
 def validates(method_name, on='save'):
-
     def _(record, method_name):
         return getattr(record, method_name)()
 
@@ -162,8 +156,8 @@ def validates(method_name, on='save'):
     Validates.add(p, on)
 
 
-def validates_of(attr_names, presence={}, uniqueness={}, format={}, length={}, 
-                    inclusion={}, exclusion={}, numericality={}, confirmation={}):
+def validates_of(attr_names, presence=None, uniqueness=None, format=None, length=None,
+                 inclusion=None, exclusion=None, numericality=None, confirmation=None):
     if presence:        validates_presence_of(attr_names, **presence)
     if uniqueness:      validates_uniqueness_of(attr_names, **uniqueness)
     if format:          validates_format_of(attr_names, **format)
@@ -172,7 +166,7 @@ def validates_of(attr_names, presence={}, uniqueness={}, format={}, length={},
     if exclusion:       validates_exclusion_of(attr_names, **inclusion)
     if numericality:    validates_numericality_of(attr_names, **numericality)
     if confirmation:    validates_confirmation_of(attr_names, **confirmation)
-    
+
 
 def validates_presence_of(attr_names, allow_blank=True, on='save', msg='can not blank.'):
     p = partial(_validates_of, validator=PresenceValidator(), validate_attrs=_merge(attr_names), msg=msg, allow_blank=allow_blank)
@@ -188,40 +182,41 @@ def validates_uniqueness_of(attr_names, on='save', msg='has already been taken')
                 record.add_error(attr_name, msg)
                 validate = False
         return validate
+
     p = partial(_, attr_names=attr_names, msg=msg)
     Validates.add(p, on)
 
 
 def validates_format_of(attr_names, _with, allow_null=False, allow_blank=False, on='save', msg='format error.'):
-    p = partial(_validates_of, validator=FormatValidator(), validate_attrs=_merge(attr_names), msg=msg, _with=_with, 
-                            allow_null=allow_null, allow_blank=allow_blank)
+    p = partial(_validates_of, validator=FormatValidator(), validate_attrs=_merge(attr_names), msg=msg, _with=_with,
+                allow_null=allow_null, allow_blank=allow_blank)
     Validates.add(p, on)
 
 
-def validates_length_of(attr_names, _is=None, minimum=None, maximum=None, allow_null=False, allow_blank=False, 
+def validates_length_of(attr_names, _is=None, minimum=None, maximum=None, allow_null=False, allow_blank=False,
                         on='save', msg='length unavailable error'):
-    p = partial(_validates_of, validator=LengthValidator(), validate_attrs=_merge(attr_names), msg=msg, _is=_is, minimum=minimum, maximum=maximum, 
-                            allow_null=allow_null, allow_blank=allow_blank)
+    p = partial(_validates_of, validator=LengthValidator(), validate_attrs=_merge(attr_names), msg=msg, _is=_is, minimum=minimum, maximum=maximum,
+                allow_null=allow_null, allow_blank=allow_blank)
     Validates.add(p, on)
 
-    
+
 def validates_inclusion_of(attr_names, in_values, allow_null=False, allow_blank=False, on='save', msg='inclusion error'):
-    p = partial(_validates_of, validator=InclusionValidator(), validate_attrs=_merge(attr_names), msg=msg, in_values=in_values, 
-                            allow_null=allow_null, allow_blank=allow_blank)
+    p = partial(_validates_of, validator=InclusionValidator(), validate_attrs=_merge(attr_names), msg=msg, in_values=in_values,
+                allow_null=allow_null, allow_blank=allow_blank)
     Validates.add(p, on)
 
 
 def validates_exclusion_of(attr_names, exclusion_values, allow_null=False, allow_blank=False, on='save', msg='inclusion error'):
-    p = partial(_validates_of, validator=ExclusionValidator(), validate_attrs=_merge(attr_names), msg=msg, exclusion_values=exclusion_values, 
-                            allow_null=allow_null, allow_blank=allow_blank)
+    p = partial(_validates_of, validator=ExclusionValidator(), validate_attrs=_merge(attr_names), msg=msg, exclusion_values=exclusion_values,
+                allow_null=allow_null, allow_blank=allow_blank)
     Validates.add(p, on)
 
 
-def validates_numericality_of(attr_names, greater_than=None, greater_than_or_equal_to=None, equal_to=None, less_than=None, 
-                                less_than_or_equal_to=None, odd=None, even=None, on='save', msg="numericality error"):
-    p = partial(_validates_of, validator=NumericalityValidator(), validate_attrs=_merge(attr_names), msg=msg, greater_than=greater_than, 
-                            greater_than_or_equal_to=greater_than_or_equal_to, equal_to=equal_to, less_than=less_than, 
-                            less_than_or_equal_to=less_than_or_equal_to, odd=odd, even=even)
+def validates_numericality_of(attr_names, greater_than=None, greater_than_or_equal_to=None, equal_to=None, less_than=None,
+                              less_than_or_equal_to=None, odd=None, even=None, on='save', msg="numericality error"):
+    p = partial(_validates_of, validator=NumericalityValidator(), validate_attrs=_merge(attr_names), msg=msg, greater_than=greater_than,
+                greater_than_or_equal_to=greater_than_or_equal_to, equal_to=equal_to, less_than=less_than,
+                less_than_or_equal_to=less_than_or_equal_to, odd=odd, even=even)
     Validates.add(p, on)
 
 
@@ -237,6 +232,7 @@ def validates_confirmation_of(attr_names, on='save', msg='confirmation error'):
                 record.add_error(attr_name, msg)
                 validate = False
         return validate
+
     p = partial(_, attr_names=attr_names, msg=msg)
     Validates.add(p, on)
 
@@ -253,4 +249,4 @@ def _validates_of(record, validator, validate_attrs, msg, *args, **kwargs):
 def _merge(attr_names):
     if isinstance(attr_names, str):
         attr_names = [attr_names]
-    return [ attr_name for attr_name in attr_names if attr_name and attr_name.strip() ]
+    return [attr_name for attr_name in attr_names if attr_name and attr_name.strip()]

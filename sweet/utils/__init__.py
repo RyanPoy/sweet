@@ -1,5 +1,4 @@
 from typing import Optional, Tuple
-from sweet.utils.inflection import *
 from datetime import datetime, date
 from decimal import Decimal
 import time
@@ -36,11 +35,13 @@ def to_bool(v):
 
 
 def to_i(v):
-    if v is True:   return 1
-    if v is False:  return 0
+    if v is True:
+        return 1
+    if v is False:
+        return 0
     try:
         return int(v)
-    except:
+    except:  # noqa: E722
         return 0
 
 
