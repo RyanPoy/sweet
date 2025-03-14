@@ -53,7 +53,7 @@ class PostgreSQLDriver(BaseDriver):
     @asynccontextmanager
     async def transaction(self):
         conn = await self.get_connection()
-        async with conn.transaction() as tx:
+        async with conn.transaction():
             yield self
 
     async def fetchone(self, sql, *params):
