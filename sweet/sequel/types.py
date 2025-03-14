@@ -23,18 +23,18 @@ class Raw:
             return "NULL"
 
         tp = type(self.data)
-        if tp == str:  # Todos: if tp in (str, ActiveSupport::Multibyte::Chars):
+        if tp is str:  # Todos: if tp in (str, ActiveSupport::Multibyte::Chars):
             s = self.data.replace("\\", '\\\\').replace("'", "''")
             return f"'{s}'"
-        if tp == bool:
+        if tp is bool:
             return '1' if self.data is True else '0'
         if tp in (Decimal, int, float):  # BigDecimals need to be put in a non-normalized form and quoted.
             return str(self.data)
-        if tp == date:
+        if tp is date:
             return f"'{utils.date2str(self.data)}'"
-        if tp == datetime:
+        if tp is datetime:
             return f"'{utils.datetime2str(self.data)}'"
-        if tp == bytes:
+        if tp is bytes:
             return f"'{utils.binary2str(self.data)}'"
 
 
