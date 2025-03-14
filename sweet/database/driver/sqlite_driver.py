@@ -1,5 +1,4 @@
 from asyncio import Queue
-from typing import Dict
 
 from sweet.database.driver.base_driver import BaseDriver
 import aiosqlite
@@ -59,7 +58,7 @@ class SQLiteDriver(BaseDriver):
             conn.isolation_level = 'DEFERRED'
         return self
 
-    async def columns(self, table_name: str) -> list[Dict]:
+    async def columns(self, table_name: str) -> list[dict]:
         sql = f"PRAGMA table_info({table_name})"
         rows = await self.fetchall(sql)
         # names = ('cid', 'name', 'type', 'notnull', 'default', 'is_pk')

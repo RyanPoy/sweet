@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
 from time import time
-from typing import Dict, Optional, Self
+from typing import Optional, Self
 
 from sweet.sequel.terms.name_fn import Name
 
@@ -175,7 +175,7 @@ class TimeColumn(Column):
 
 @dataclass
 class Columns:
-    data: Dict[str, Column] = field(default_factory=dict)
+    data: dict[str, Column] = field(default_factory=dict)
 
     def add(self, field_name: str, col: Column) -> Self:
         if field_name in self.data:

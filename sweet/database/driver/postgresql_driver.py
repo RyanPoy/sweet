@@ -1,6 +1,5 @@
 import copy
 from contextlib import asynccontextmanager
-from typing import Dict
 
 import asyncpg
 
@@ -93,7 +92,7 @@ class PostgreSQLDriver(BaseDriver):
         connection = await self.get_connection()
         return await connection.fetch(sql, *params)
 
-    async def columns(self, table_name: str) -> list[Dict]:
+    async def columns(self, table_name: str) -> list[dict]:
         sql = f"SELECT column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_name = '{table_name}'"
 
         rows = await self.fetchall(sql)
