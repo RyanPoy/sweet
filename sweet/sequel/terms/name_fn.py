@@ -14,7 +14,7 @@ from sweet.sequel import Operator
 
 
 @dataclass
-class ExtKey:
+class ExtType:
     name: str
     alias: str = None
 
@@ -95,7 +95,7 @@ class ExtKey:
 ######################################
 ##########################################
 @dataclass
-class Name(ExtKey):
+class Name(ExtType):
     schema_name: str = None
 
     def __init__(self, name: str, schema_name: str | Name = None):
@@ -127,15 +127,15 @@ class Name(ExtKey):
 
 
 @dataclass
-class Fn(ExtKey):
-    columns: List[RawType | ExtKey | Literal] = None
+class Fn(ExtType):
+    columns: List[RawType | ExtType | Literal] = None
     _distinct: bool = False
 
     def __post_init__(self) -> None:
         if self.columns is None:
             self.columns = []
 
-    def column(self, *column_names: RawType | ExtKey | Literal) -> Self:
+    def column(self, *column_names: RawType | ExtType | Literal) -> Self:
         for c in column_names:
             if c == '*' or c == STAR:
                 self.columns.append(STAR)

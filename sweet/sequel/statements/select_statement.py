@@ -5,7 +5,7 @@ from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.filter import Filter
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.lock import Lock
-from sweet.sequel.terms.name_fn import Name, Fn
+from sweet.sequel.terms.name_fn import ExtType, Name, Fn
 from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.types import Raw, RawType
 
@@ -34,7 +34,7 @@ class SelectStatement:
     """
     def __init__(self):
         self.tables = []
-        self.columns: List[Raw | Name | Fn | literal.Literal] = []
+        self.columns: List[Raw | ExtType | literal.Literal] = []
         self.distinct_ = None
         self.limit_number = 0
         self.offset_number = 0
@@ -52,11 +52,11 @@ class SelectStatement:
     def from_(self, table: Name | Self) -> Self:
         return self.__from_or_join(self.tables, table)
 
-    def select(self, *columns: RawType | Name | Fn | literal.Literal) -> Self:
+    def select(self, *columns: RawType | ExtType | literal.Literal) -> Self:
         for c in columns:
             if c == '*':
                 self.columns.append(literal.STAR)
-            if isinstance(c, (Fn, Name, literal.Literal)):
+            if isinstance(c, (ExtType, literal.Literal)):
                 self.columns.append(c)
             else:
                 self.columns.append(Raw(c))

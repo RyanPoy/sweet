@@ -6,7 +6,7 @@ from typing import Self
 
 from sweet.sequel import Operator
 from sweet.sequel.logic import Logic
-from sweet.sequel.terms.name_fn import ExtKey, Name, Fn
+from sweet.sequel.terms.name_fn import ExtType, Name
 from sweet.sequel.types import Array, ArrayType, Raw, RawType
 from sweet.utils import is_array
 
@@ -39,9 +39,9 @@ MAPPING = {
 
 @dataclass
 class Binary:
-    key: Raw | ExtKey
+    key: Raw | ExtType
     op: Operator
-    value: Raw | ExtKey | Array
+    value: Raw | ExtType | Array
 
     logic: Logic = None
     left: 'Binary' = None
@@ -49,10 +49,10 @@ class Binary:
     inverted: bool = False
     parent: 'Binary' = None
 
-    def __init__(self, key: RawType | ExtKey, op: Operator, value: RawType | ExtKey | ArrayType) -> None:
+    def __init__(self, key: RawType | ExtType, op: Operator, value: RawType | ExtType | ArrayType) -> None:
         if isinstance(key, RawType):
             self.key = Raw(key)
-        elif issubclass(key.__class__, ExtKey): # Fn | Name
+        elif isinstance(key, ExtType):  # Fn | Name
             self.key = key
         else:
             raise TypeError(f"key must be a RawType，Name, Fn. But got {key.__class__}")
@@ -61,7 +61,7 @@ class Binary:
 
         if isinstance(value, RawType):
             self.value = Raw(value)
-        elif issubclass(value.__class__, ExtKey): # Fn | Name
+        elif isinstance(value, ExtType):  # Fn | Name
             self.value = value
         elif isinstance(value, (list, tuple)):
             self.value = Array(value)
@@ -76,7 +76,8 @@ class Binary:
         return self.op.is_empty()
 
     def is_empty(self) -> bool:
-        return (self.op.is_empty() and self.key is None and self.value is None) or (self.op.is_empty() and self.key == Raw(None) and self.value == Raw(None)) and self.left is None
+        return (self.op.is_empty() and self.key is None and self.value is None) or (
+                    self.op.is_empty() and self.key == Raw(None) and self.value == Raw(None)) and self.left is None
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -120,7 +121,7 @@ class Binary:
         return cls(None, Operator.Empty, None)
 
     @classmethod
-    def parse(cls, **kwargs: RawType | Name | Fn | ArrayType) -> Self:
+    def parse(cls, **kwargs: RawType | ExtType | ArrayType) -> Self:
         if len(kwargs) != 1:
             raise ValueError('Only one parameter is allowed for construction.')
 
@@ -162,7 +163,7 @@ class Binary:
         return self.op in {Operator.BETWEEN, Operator.NOT_BETWEEN}
 
 
-def Q(**kwargs: RawType | Name | Fn | ArrayType) -> Binary:
+def Q(**kwargs: RawType | ExtType | ArrayType) -> Binary:
     b = None
     for k, v in kwargs.items():
         if b is None:
