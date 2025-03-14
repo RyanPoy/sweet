@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from typing import List, Self, Union
+from typing import List, Self
 
 from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.name_fn import Fn, Name
@@ -13,7 +15,7 @@ class Filter:
     def __post_init__(self) -> None:
         self.filters = []
 
-    def add(self, *bs: Binary, **kwargs: Union[RawType, Name, Fn, ArrayType]) -> Self:
+    def add(self, *bs: Binary, **kwargs: RawType | Name | Fn | ArrayType) -> Self:
         for b in bs:
             if not isinstance(b, Binary):
                 raise Exception(f"Filter add method only accepts the Binary type, but got {b.__class__.__name__}")

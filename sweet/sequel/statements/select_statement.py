@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Self, Union
+from typing import List, Self
 from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.filter import Filter
 from sweet.sequel.terms import literal
@@ -34,7 +34,7 @@ class SelectStatement:
     """
     def __init__(self):
         self.tables = []
-        self.columns: List[Union[Raw, Name, Fn, literal.Literal]] = []
+        self.columns: List[Raw | Name | Fn | literal.Literal] = []
         self.distinct_ = None
         self.limit_number = 0
         self.offset_number = 0
@@ -52,7 +52,7 @@ class SelectStatement:
     def from_(self, table: Name | Self) -> Self:
         return self.__from_or_join(self.tables, table)
 
-    def select(self, *columns: Union[RawType, Name, Fn, literal.Literal]) -> Self:
+    def select(self, *columns: RawType | Name | Fn | literal.Literal) -> Self:
         for c in columns:
             if c == '*':
                 self.columns.append(literal.STAR)

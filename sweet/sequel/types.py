@@ -3,11 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
-from typing import List, Tuple, TypeAlias, Union
+from typing import List, Tuple, TypeAlias
 from sweet import utils
 
 # Basic data type
-RawType: TypeAlias = Union[None, bool, str, bytes, int, float, Decimal, date, datetime]
+RawType: TypeAlias = None | bool | str | bytes | int | float | Decimal | date | datetime
 
 
 @dataclass
@@ -39,7 +39,7 @@ class Raw:
 
 
 # Array
-ArrayType: TypeAlias = Union[Tuple, List]
+ArrayType: TypeAlias = Tuple | List
 
 
 @dataclass

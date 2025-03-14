@@ -19,8 +19,9 @@ class TestRaw(unittest.TestCase):
         customerObj = object()
         with self.assertRaises(TypeError) as ctx:
             Raw(customerObj)
-        self.assertEqual("Raw initialize accept typing.Union[NoneType, bool, str, bytes, int, float, decimal.Decimal, datetime.date, datetime.datetime], "
-                         "but got 'object'", str(ctx.exception))
+        self.assertEqual(
+            "Raw initialize accept None | bool | str | bytes | int | float | decimal.Decimal | datetime.date | datetime.datetime, but got 'object'",
+            str(ctx.exception))
 
     def test_quote(self):
         self.assertEqual("NULL", Raw(None).quote())
@@ -101,14 +102,14 @@ class TestArray(unittest.TestCase):
             1, "1", now, fn, name, [
                 1, "1", now, fn, name, [
                     1, "1", now, fn, name]
-                ]
-            ])
+            ]
+        ])
         self.assertEqual([
             Raw(1), Raw("1"), Raw(now), fn, name, Array([
                 Raw(1), Raw("1"), Raw(now), fn, name, Array([
                     Raw(1), Raw("1"), Raw(now), fn, name])
-                ])
-            ], array.data
+            ])
+        ], array.data
         )
 
     def test_sql(self):
@@ -127,4 +128,3 @@ class TestArray(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

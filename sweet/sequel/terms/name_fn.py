@@ -1,12 +1,13 @@
 from __future__ import annotations
 import copy
 from dataclasses import dataclass
-from typing import List, Self, Sequence, TYPE_CHECKING, TypeAlias, Union
+from typing import List, Self, Sequence, TYPE_CHECKING
 
 from sweet.sequel.terms.literal import Literal, STAR
-from sweet.sequel.types import Raw, RawType
+from sweet.sequel.types import RawType
 
-if TYPE_CHECKING: from sweet.sequel.terms.binary import Binary
+if TYPE_CHECKING:
+    from sweet.sequel.terms.binary import Binary
 
 from sweet.utils import is_array
 from sweet.sequel import Operator
@@ -72,10 +73,10 @@ class ExtKey:
     def not_like(self, v) -> 'Binary':
         return self._binary(Operator.NOT_LIKE, v)
 
-    def between(self, v: Sequence[V]) -> 'Binary':
+    def between(self, v: Sequence) -> 'Binary':
         return self._binary(Operator.BETWEEN, v)
 
-    def not_between(self, v: Sequence[V]) -> 'Binary':
+    def not_between(self, v: Sequence) -> 'Binary':
         return self._binary(Operator.NOT_BETWEEN, v)
 
     def regex(self, v: str) -> 'Binary':
@@ -97,7 +98,7 @@ class ExtKey:
 class Name(ExtKey):
     schema_name: str = None
 
-    def __init__(self, name: str, schema_name: Union[str | Name] = None):
+    def __init__(self, name: str, schema_name: str | Name = None):
         super().__init__(name, None)
         if schema_name is None or isinstance(schema_name, str):
             self.schema_name = schema_name
@@ -106,7 +107,7 @@ class Name(ExtKey):
         else:
             raise TypeError(f"Name initialize schema_name with str or Name, but got a {schema_name.__class__.__name__}")
 
-    def __eq__(self, other: Union[Self | Literal | str]) -> bool:
+    def __eq__(self, other: Self | Literal | str) -> bool:
         if isinstance(other, str) and other == '*' and self.name == '*':
             return True
         if isinstance(other, Literal) and other == STAR and self.name == '*':
@@ -118,6 +119,7 @@ class Name(ExtKey):
     def copy(self) -> Self:
         return copy.deepcopy(self)
 
+
 ###############################
 #################################
 ######################################
@@ -126,14 +128,14 @@ class Name(ExtKey):
 
 @dataclass
 class Fn(ExtKey):
-    columns: List[Union[RawType, Name, Fn, Literal]] = None
+    columns: List[RawType | ExtKey | Literal] = None
     _distinct: bool = False
 
     def __post_init__(self) -> None:
         if self.columns is None:
             self.columns = []
 
-    def column(self, *column_names: Union[Union[RawType, Name, Fn, Literal]]) -> Self:
+    def column(self, *column_names: RawType | ExtKey | Literal) -> Self:
         for c in column_names:
             if c == '*' or c == STAR:
                 self.columns.append(STAR)
@@ -155,8 +157,7 @@ class Fn(ExtKey):
         return self
 
 
-Count = lambda *columns: Fn("COUNT").column(*columns)
-Sum = lambda *columns: Fn("SUM").column(*columns)
-Avg = lambda *columns: Fn("AVERAGE").column(*columns)
-Sqrt = lambda *columns: Fn("SQRT").column(*columns)
-
+Count = lambda *columns: Fn("COUNT").column(*columns)  # noqa: E731
+Sum = lambda *columns: Fn("SUM").column(*columns)  # noqa: E731
+Avg = lambda *columns: Fn("AVERAGE").column(*columns)  # noqa: E731
+Sqrt = lambda *columns: Fn("SQRT").column(*columns)  # noqa: E731

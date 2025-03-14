@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import copy
 from dataclasses import dataclass
-from typing import Self, Union
+from typing import Self
 
 from sweet.sequel import Operator
 from sweet.sequel.logic import Logic
-from sweet.sequel.terms.name_fn import Name, Fn
+from sweet.sequel.terms.name_fn import ExtKey, Name, Fn
 from sweet.sequel.types import Array, ArrayType, Raw, RawType
 from sweet.utils import is_array
 
@@ -37,9 +39,9 @@ MAPPING = {
 
 @dataclass
 class Binary:
-    key: Union[Raw, Name, Fn]
+    key: Raw | ExtKey
     op: Operator
-    value: Union[Raw, Name, Fn, Array]
+    value: Raw | ExtKey | Array
 
     logic: Logic = None
     left: 'Binary' = None
@@ -47,10 +49,10 @@ class Binary:
     inverted: bool = False
     parent: 'Binary' = None
 
-    def __init__(self, key: Union[RawType, Name, Fn], op: Operator, value: Union[RawType, Name, Fn, ArrayType]) -> None:
+    def __init__(self, key: RawType | ExtKey, op: Operator, value: RawType | ExtKey | ArrayType) -> None:
         if isinstance(key, RawType):
             self.key = Raw(key)
-        elif isinstance(key, (Name, Fn)):
+        elif issubclass(key.__class__, ExtKey): # Fn | Name
             self.key = key
         else:
             raise TypeError(f"key must be a RawType，Name, Fn. But got {key.__class__}")
@@ -59,7 +61,7 @@ class Binary:
 
         if isinstance(value, RawType):
             self.value = Raw(value)
-        elif isinstance(value, (Name, Fn)):
+        elif issubclass(value.__class__, ExtKey): # Fn | Name
             self.value = value
         elif isinstance(value, (list, tuple)):
             self.value = Array(value)
@@ -118,7 +120,7 @@ class Binary:
         return cls(None, Operator.Empty, None)
 
     @classmethod
-    def parse(cls, **kwargs: Union[RawType, Name, Fn, ArrayType]) -> Self:
+    def parse(cls, **kwargs: RawType | Name | Fn | ArrayType) -> Self:
         if len(kwargs) != 1:
             raise ValueError('Only one parameter is allowed for construction.')
 
@@ -160,7 +162,7 @@ class Binary:
         return self.op in {Operator.BETWEEN, Operator.NOT_BETWEEN}
 
 
-def Q(**kwargs: Union[RawType, Name, Fn, ArrayType]) -> Binary:
+def Q(**kwargs: RawType | Name | Fn | ArrayType) -> Binary:
     b = None
     for k, v in kwargs.items():
         if b is None:

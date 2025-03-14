@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import copy
-from typing import Callable, List, Tuple, Union
+from typing import Callable, List, Tuple
 from sweet.sequel.collectors import SQLCollector
 from sweet.sequel.logic import Logic
 from sweet.sequel.statements.delete_statement import DeleteStatement
@@ -113,7 +115,7 @@ class Visitor:
         return sql << a.quote()
 
     def visit_Array(self, a: Array, sql: SQLCollector, to_insert=False) -> SQLCollector:
-        def _visit_seq(seq: Union[List, Tuple]):
+        def _visit_seq(seq: List | Tuple):
             sql << ("[" if to_insert else "(")
             for i, x in enumerate(seq):
                 if i != 0:

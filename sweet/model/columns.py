@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
-from functools import cached_property
 from time import time
-from typing import Dict, List, Optional, Self, Set, Union
+from typing import Dict, List, Optional, Self
 
 from sweet.sequel.terms.name_fn import Name
 
@@ -140,7 +141,7 @@ class DateColumn(Column):
     postgresql: date
     """
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: Union[date, datetime, str] = None,
+    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: date | datetime | str = None,
                  unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
@@ -153,7 +154,7 @@ class DatetimeColumn(Column):
     postgresql: timestamp(无时区), timestamptz(有时区)
     """
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: Union[date, datetime, str] = None,
+    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: date | datetime | str = None,
                  unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
@@ -166,7 +167,7 @@ class TimeColumn(Column):
     postgresql: time
     """
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: Union[time, date, datetime, str] = None,
+    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: time | date | datetime | str = None,
                  unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
