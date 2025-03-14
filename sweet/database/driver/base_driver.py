@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
-from typing import Dict, List
+from typing import Dict
 
 
 class BaseDriver(ABC):
@@ -80,5 +80,5 @@ class BaseDriver(ABC):
                     await r
 
     @abstractmethod
-    async def columns(self, table_name: str) -> List[Dict]:
+    async def columns(self, table_name: str) -> list[Dict]:
         raise NotImplemented

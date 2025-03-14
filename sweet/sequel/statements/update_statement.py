@@ -1,4 +1,4 @@
-from typing import List, Self
+from typing import Self
 
 from sweet.sequel import Operator
 from sweet.sequel.terms.binary import Binary
@@ -49,7 +49,7 @@ class UpdateStatement:
     """
     def __init__(self, table_name: Name):
         self.where_clause: Filter = Filter()
-        self.sets : List[Binary] = []
+        self.sets : list[Binary] = []
         self.table_name: Name = table_name
 
     def set(self, **kwargs) -> Self:

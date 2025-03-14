@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
 from time import time
-from typing import Dict, List, Optional, Self
+from typing import Dict, Optional, Self
 
 from sweet.sequel.terms.name_fn import Name
 
@@ -12,7 +12,7 @@ from sweet.sequel.terms.name_fn import Name
 class Column:
 
     def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: any = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None) -> None:
+                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None) -> None:
         self.name = name
         self.is_pk = is_pk
         self.is_null = is_null
@@ -40,7 +40,7 @@ class CharColumn(Column):
     """
 
     def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: str = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None, length: int = 64):
+                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None, length: int = 64):
         self.length = length
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
@@ -64,7 +64,7 @@ class TextColumn(CharColumn):
     """
 
     def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: str = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None, length: int = 1024):
+                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None, length: int = 1024):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators, length=length)
 
@@ -77,7 +77,7 @@ class BinaryColumn(CharColumn):
     """
 
     def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: str = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None, length: int = 1024):
+                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None, length: int = 1024):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators, length=length)
 
@@ -90,7 +90,7 @@ class IntColumn(Column):
     """
 
     def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: int = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None):
+                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
@@ -103,7 +103,7 @@ class BooleanColumn(Column):
     """
 
     def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: bool = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None):
+                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
@@ -116,7 +116,7 @@ class FloatColumn(Column):
     """
 
     def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: float = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None):
+                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
@@ -129,7 +129,7 @@ class DecimalColumn(Column):
     """
 
     def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: Decimal = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None):
+                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
@@ -142,7 +142,7 @@ class DateColumn(Column):
     """
 
     def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: date | datetime | str = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None):
+                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
@@ -155,7 +155,7 @@ class DatetimeColumn(Column):
     """
 
     def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: date | datetime | str = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None):
+                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
@@ -168,7 +168,7 @@ class TimeColumn(Column):
     """
 
     def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: time | date | datetime | str = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[List] = None):
+                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 

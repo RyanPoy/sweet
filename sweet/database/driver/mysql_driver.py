@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict
 from sweet.database.driver.base_driver import BaseDriver
 import aiomysql
 
@@ -54,7 +54,7 @@ class MySQLDriver(BaseDriver):
     async def set_autocommit(self, conn, auto=True):
         await conn.autocommit(auto)
 
-    async def columns(self, table_name: str) -> List[Dict]:
+    async def columns(self, table_name: str) -> list[Dict]:
         sql = f"SHOW COLUMNS FROM `{table_name}`"
         rows = await self.fetchall(sql)
         # Field | Type | Null | Key | Default | Extra |
