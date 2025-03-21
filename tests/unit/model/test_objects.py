@@ -41,6 +41,9 @@ class TestObjects(unittest.IsolatedAsyncioTestCase):
                 sql = objs.sql()
                 self.assertEqual(expected, sql, f'Environment[{driver.__class__.__name__}]')
 
+    async def test_first(self):
+        pass
+
 
 if __name__ == '__main__':
     unittest.main()

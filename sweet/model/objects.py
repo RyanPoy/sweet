@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from typing import Self, TYPE_CHECKING
 
+from sweet.sequel.terms.name_fn import Count
 from sweet.sequel.visitors.visitor import Visitor
 from sweet.utils import classproperty
 from sweet.model import consts
@@ -46,17 +49,24 @@ class Objects:
         self._execute_func = self.all
         return self
 
-    def first(self) -> 'Model':
-        stmt = SelectStatement().limit(1)
-        stmt.from_(self.model_class.table.name)
-        stmt.where(self.binary)
-        return self.model_class()
+    def first(self) -> 'Model' | None:
+        stmt = (SelectStatement().from_(self.model_class.table.name)
+                .where(self.binary).limit(1))
+        sql = self.sql_visitor.sql(stmt)
+        return self.adapter.fetchone(sql)
 
-    def last(self) -> 'Model':
-        stmt = SelectStatement()
-        stmt.from_(self.model_class.table.name)
-        stmt.where(self.binary)
-        return self.model_class()
+    def last(self) -> 'Model' | None:
+        stmt = (SelectStatement().from_(self.model_class.table.name)
+                .where(self.binary).select(Count()))
+        sql = self.sql_visitor.sql(stmt)
+        cnt = self.adapter.fetchone(sql)
+        if not cnt:
+            return None
+
+        stmt = (SelectStatement().from_(self.model_class.table.name)
+                .where(self.binary).limit(1).offset(cnt))
+        sql = self.sql_visitor.sql(stmt)
+        return self.adapter.fetchone(sql)
 
     def sql(self):
         if self._execute_func == self.all:
