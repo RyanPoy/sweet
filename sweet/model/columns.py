@@ -4,15 +4,15 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
 from time import time
-from typing import Optional, Self
+from typing import Self
 
 from sweet.sequel.terms.name_fn import Name
 
 
 class Column:
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: any = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None) -> None:
+    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: any = None,
+                 unique: bool = False, db_index: bool = False, description: str = None, validators: list = None) -> None:
         self.name = name
         self.is_pk = is_pk
         self.is_null = is_null
@@ -39,8 +39,8 @@ class CharColumn(Column):
     postgresql: varchar, char, text
     """
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: str = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None, length: int = 64):
+    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: str = None,
+                 unique: bool = False, db_index: bool = False, description: str = None, validators: list = None, length: int = 64):
         self.length = length
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
@@ -63,8 +63,8 @@ class TextColumn(CharColumn):
     postgresql: text
     """
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: str = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None, length: int = 1024):
+    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: str = None,
+                 unique: bool = False, db_index: bool = False, description: str = None, validators: list = None, length: int = 1024):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators, length=length)
 
@@ -76,8 +76,8 @@ class BinaryColumn(CharColumn):
     postgresql: by
     """
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: str = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None, length: int = 1024):
+    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: str = None,
+                 unique: bool = False, db_index: bool = False, description: str = None, validators: list = None, length: int = 1024):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators, length=length)
 
@@ -89,8 +89,8 @@ class IntColumn(Column):
     postgresql: integer, bigint, smallint
     """
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: int = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
+    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: int = None,
+                 unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
@@ -102,8 +102,8 @@ class BooleanColumn(Column):
     postgresql: boolean
     """
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: bool = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
+    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: bool = None,
+                 unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
@@ -115,8 +115,8 @@ class FloatColumn(Column):
     postgresql: real, double precision
     """
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: float = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
+    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: float = None,
+                 unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
@@ -128,8 +128,8 @@ class DecimalColumn(Column):
     postgresql: decimal, numeric
     """
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: Decimal = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
+    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: Decimal = None,
+                 unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
@@ -141,8 +141,8 @@ class DateColumn(Column):
     postgresql: date
     """
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: date | datetime | str = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
+    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: date | datetime | str = None,
+                 unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
@@ -154,8 +154,8 @@ class DatetimeColumn(Column):
     postgresql: timestamp(无时区), timestamptz(有时区)
     """
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: date | datetime | str = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
+    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: date | datetime | str = None,
+                 unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
@@ -167,8 +167,8 @@ class TimeColumn(Column):
     postgresql: time
     """
 
-    def __init__(self, name: Optional[str] = None, is_pk: bool = False, is_null: bool = False, default: time | date | datetime | str = None,
-                 unique: bool = False, db_index: bool = False, description: Optional[str] = None, validators: Optional[list] = None):
+    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: time | date | datetime | str = None,
+                 unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
@@ -188,7 +188,7 @@ class Columns:
             return self.data[name]
         return super().__getattribute__(name)
 
-    def get(self, name: str) -> Optional[Column]:
+    def get(self, name: str) -> Column:
         return self.columns.get(name, None)
 
 
@@ -198,7 +198,7 @@ class Table:
         self.__name: str = name
         self.__name_named: Name = Name(self.__name)
 
-        # self.pk: Optional[Column] = None
+        # self.pk: Column = None
         self.columns: Columns = Columns()
 
     @property

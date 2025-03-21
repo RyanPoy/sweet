@@ -1,4 +1,6 @@
-from typing import Optional, Tuple
+from __future__ import annotations
+
+from typing import Tuple
 from datetime import datetime, date
 from decimal import Decimal
 import time
@@ -10,14 +12,14 @@ ISO_DATE     = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
 ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
 
 
-def extract_number(s: str, default: Optional[int]) -> Optional[int]:
+def extract_number(s: str, default: int | None) -> int | None:
     match = re.search(r'\((\d+)\)', s)
     if match:
         return int(match.group(1))
     return default
 
 
-def extract_numbers(s: str, default: Optional[Tuple[int, int]]) -> Optional[Tuple]:
+def extract_numbers(s: str, default: Tuple[int, int] | None) -> Tuple[int, int] | None:
     # 使用正则表达式提取括号内的多个数字
     match = re.search(r'\((\d+),\s*(\d+)\)', s)
     if match:
@@ -192,12 +194,6 @@ def import_object(name):
     Imports an object by name.
 
     import_object('x.y.z') is equivalent to 'from x.y import z'.
-
-    >>> import tornado.escape
-    >>> import_object('tornado.escape') is tornado.escape
-    True
-    >>> import_object('tornado.escape.utf8') is tornado.escape.utf8
-    True
     """
     parts = name.split('.')
     obj = __import__('.'.join(parts[:-1]), None, None, [parts[-1]], 0)

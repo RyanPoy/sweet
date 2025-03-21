@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional, Self
+from typing import Self
 
 from sweet.database.driver import Driver
 from sweet.utils import extract_number, extract_numbers, to_bool
@@ -162,7 +164,7 @@ class Columns:
         self.data.append(col)
         return self
 
-    def find_by_name(self, name) -> Optional[Column]:
+    def find_by_name(self, name) -> Column | None:
         for c in self.data:
             if c.name == name:
                 return c
