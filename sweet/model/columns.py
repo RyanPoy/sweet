@@ -43,7 +43,7 @@ class Column:
             return
         try:
             self._value = self._purify(value)
-        except (ValueError, decimal.InvalidOperation) as ex:
+        except (ValueError, decimal.InvalidOperation, AttributeError) as _:
             raise ValueError(f"Can't purify {value}, it's a {value.__class__.__name__} type.")
 
     @abstractmethod
@@ -106,6 +106,9 @@ class BinaryColumn(CharColumn):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators, length=length)
 
+    def _purify(self, value):
+        return value.encode("UTF8")
+
 
 class IntColumn(Column):
     """
@@ -152,7 +155,7 @@ class FloatColumn(Column):
                          validators=validators)
 
     def _purify(self, value):
-        utils.to_f(value)
+        return utils.to_f(value)
 
 
 class DecimalColumn(Column):
@@ -216,8 +219,7 @@ class TimeColumn(Column):
                          validators=validators)
 
     def _purify(self, value):
-        dt = utils.str2datetime(str(value))
-        return dt.time()
+        return utils.str2time(str(value))
 
 
 @dataclass

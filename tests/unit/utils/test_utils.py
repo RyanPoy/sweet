@@ -64,6 +64,11 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(datetime(2009, 10, 10, 10, 10, 10, 100), str2datetime('2009-10-10 10:10:10.000100'))
         self.assertEqual(datetime(2009, 10, 10, 0, 0, 0, 0), str2datetime('2009-10-10'))
 
+        self.assertEqual(datetime(2009, 10, 10, 10, 10, 10), str2datetime('2009/10/10 10:10:10'))
+        self.assertEqual(datetime(2009, 10, 10, 10, 10, 10, 100000), str2datetime('2009/10/10 10:10:10.100000'))
+        self.assertEqual(datetime(2009, 10, 10, 10, 10, 10, 100), str2datetime('2009/10/10 10:10:10.000100'))
+        self.assertEqual(datetime(2009, 10, 10, 0, 0, 0, 0), str2datetime('2009/10/10'))
+
     def test_str2date_when_empty_string(self):
         self.assertEqual(None, str2date(''))
         self.assertEqual(None, str2date('  '))

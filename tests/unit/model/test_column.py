@@ -1,4 +1,6 @@
 import unittest
+from datetime import date, datetime, time
+from decimal import Decimal
 
 from sweet.model.columns import BinaryColumn, BooleanColumn, CharColumn, DateColumn, DatetimeColumn, DecimalColumn, FloatColumn, IntColumn, TextColumn, \
     TimeColumn
@@ -30,19 +32,55 @@ class TestColumn(unittest.TestCase):
         self.assertEqual('demo_name', Demo.columns.name.name)
         self.assertEqual('id', Demo.columns.id.name)
 
-    # def test_value(self):
-    #     CharColumn().value = "abc"
-    #     TextColumn().value = "abc"
-    #     BinaryColumn().value = "abc"
-    #     IntColumn().value = "abc"
-    #     BooleanColumn().value = "abc"
-    #     FloatColumn().value = "abc"
-    #     DecimalColumn().value = "abc"
-    #     DateColumn().value = "abc"
-    #     DatetimeColumn().value = "abc"
-    #     TimeColumn().value = "abc"
+    def test_value(self):
+        col = CharColumn()
+        col.value = "abc"
+        self.assertEqual("abc", col.value)
+
+        col = TextColumn()
+        col.value = "abc"
+        self.assertEqual("abc", col.value)
+
+        col = BinaryColumn()
+        col.value = "abc"
+        self.assertEqual(b"abc", col.value)
+
+        col = IntColumn()
+        col.value = 10
+        self.assertEqual(10, col.value)
+
+        col = BooleanColumn()
+        col.value = "y"
+        self.assertTrue(col.value)
+
+        col.value = "n"
+        self.assertFalse(col.value)
+
+        col = FloatColumn()
+        col.value = " 12.33"
+        self.assertEqual(12.33, col.value)
+
+        col = DecimalColumn()
+        col.value = "12.45"
+        self.assertEqual(Decimal("12.45"), col.value)
+
+        col = DateColumn()
+        col.value = "2016-10-9"
+        self.assertEqual(date(2016, 10, 9), col.value)
+
+        col = DatetimeColumn()
+        col.value = "2016-10-9 11:12:3"
+        self.assertEqual(datetime(2016, 10, 9, 11, 12, 3), col.value)
+
+        col = TimeColumn()
+        col.value = "11:12:3"
+        self.assertEqual(time(11, 12, 3), col.value)
 
     def test_value_error(self):
+        with self.assertRaises(ValueError) as ex:
+            BinaryColumn().value = 19
+        self.assertEqual("Can't purify 19, it's a int type.", str(ex.exception))
+
         with self.assertRaises(ValueError) as ex:
             IntColumn().value = "abc"
         self.assertEqual("Can't purify abc, it's a str type.", str(ex.exception))

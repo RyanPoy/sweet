@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, date
+from datetime import datetime, date, time as Time
 from decimal import Decimal
 import time
 import re
@@ -46,7 +46,7 @@ binary2str = lambda v: v.decode("utf-8")  # Used to convert from BLOBs to String
 microseconds = lambda t: to_i((to_f(t) % 1) * 1000000)  # '0.123456' -> 123456; '1.123456' -> 123456
 
 
-ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
+ISO_DATETIME = r'^(\d{4})[-/](\d{1,2})[-/](\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
 def str2datetime(s) -> datetime | None:
     def __fast_str2datetime(string):
         """ Doesn't handle time zones. """
@@ -89,7 +89,7 @@ def str2datetime(s) -> datetime | None:
     return __fast_str2datetime(s) or __fallback_str2datetime(s)
 
 
-ISO_DATE = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
+ISO_DATE = r'^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$'
 def str2date(s) -> date | None:
     def __fast_str2date(string):
         if re.match(ISO_DATE, string):
@@ -120,6 +120,19 @@ def str2date(s) -> date | None:
     if not s.strip():       return None
     return __fast_str2date(s) or __fallback_str2date(s)
 
+ISO_TIME = r'^(\d{1,2}):(\d{1,2}):(\d{1,2})$'
+def str2time(s) -> Time | None:
+    if s is None:           return None
+    if is_time(s):          return s
+    if is_datetime(s):      return s.time()
+    if is_date(s):          return s.time()
+    if not is_str(s):       return s
+    if not s.strip():       return None
+    if re.match(ISO_TIME, s):
+        subs = re.split(ISO_TIME, s)
+        return Time(to_i(subs[1]), to_i(subs[2]), to_i(subs[3]))
+    raise ValueError
+
 
 # check the object type functions
 is_num = lambda obj: isinstance(obj, (int, float, Decimal))
@@ -131,6 +144,7 @@ is_true = lambda obj: isinstance(obj, bool) and obj is True
 is_false = lambda obj: isinstance(obj, bool) and obj is False
 is_date = lambda obj: isinstance(obj, date)
 is_datetime = lambda obj: isinstance(obj, datetime)
+is_time = lambda obj: isinstance(obj, Time)
 is_hash = lambda obj: isinstance(obj, dict)
 is_array = lambda obj: isinstance(obj, (tuple, list))
 is_set = lambda obj: isinstance(obj, set)
