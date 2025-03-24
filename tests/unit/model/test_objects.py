@@ -3,10 +3,12 @@ import unittest
 from sweet.environment import Environment
 from sweet.model import Model
 from sweet.model.objects import Objects
-from tests.helper import User, db, settings_mysql, settings_postgresql, settings_sqlite
+from tests.helper import db, settings_mysql, settings_postgresql, settings_sqlite
+from tests.helper.models import User
 
 
 class TestObjects(unittest.IsolatedAsyncioTestCase):
+
     def setUp(self):
         self.mysql_env = Environment(settings_mysql)
         self.sqlite_env = Environment(settings_sqlite)
@@ -41,8 +43,19 @@ class TestObjects(unittest.IsolatedAsyncioTestCase):
                 sql = objs.sql()
                 self.assertEqual(expected, sql, f'Environment[{driver.__class__.__name__}]')
 
-    async def test_first(self):
-        pass
+    async def test_insert_and_first(self):
+
+        expectations = [
+            """SELECT * FROM `users` LIMIT 1""",
+            """SELECT * FROM "users" LIMIT 1""",
+            """SELECT * FROM "users" LIMIT 1""",
+        ]
+        # user = User(id=1, name=20)
+        # for i, env in enumerate(self.envs):
+        #     u = User.objects.insert(user.dict())
+        #     async with db.using(env):
+        #         u = await User.objects.first()
+        #         self.assertEqual(u, '')
 
 
 if __name__ == '__main__':

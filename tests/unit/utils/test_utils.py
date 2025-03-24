@@ -1,6 +1,6 @@
 import unittest
 from datetime import date, datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from sweet.utils import str2date, str2datetime, to_bool, to_decimal, to_f, to_i
 
@@ -10,30 +10,30 @@ class TestUtils(unittest.TestCase):
     def test_to_i(self):
         self.assertEqual(9, to_i(9))
         self.assertEqual(9, to_i('9'))
-        self.assertEqual(0, to_i('9p'))
+        self.assertRaises(ValueError, to_i, '9p')
 
     def test_to_f(self):
         self.assertEqual(9.0, to_f(9))
         self.assertEqual(9.0, to_f('9'))
-        self.assertEqual(0.0, to_f('9p'))
+        self.assertRaises(ValueError, to_f, '9p')
 
     def test_to_decimal(self):
         d = Decimal(1)
         self.assertEqual(d, to_decimal(d))
         self.assertEqual(Decimal(9), to_decimal(9))
-        self.assertEqual(Decimal(0), to_decimal('9c'))
+        self.assertRaises(InvalidOperation, to_decimal, '9c')
 
     def test_to_bool_true(self):
-        self.assertTrue(to_bool('abc'))
+        self.assertFalse(to_bool('abc'))
         self.assertTrue(to_bool(1))
         self.assertTrue(to_bool(True))
         self.assertTrue(to_bool('T'))
         self.assertTrue(to_bool('t'))
         self.assertTrue(to_bool('true'))
         self.assertTrue(to_bool('True'))
-        self.assertTrue(to_bool({'A': 'A'}))
-        self.assertTrue(to_bool([1]))
-        self.assertTrue(to_bool((2,)))
+        self.assertFalse(to_bool({'A': 'A'}))
+        self.assertFalse(to_bool([1]))
+        self.assertFalse(to_bool((2,)))
         self.assertTrue(to_bool('yes'))
         self.assertTrue(to_bool('Yes'))
         self.assertTrue(to_bool('YES'))
