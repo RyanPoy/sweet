@@ -42,30 +42,24 @@ class Objects:
         return objs
 
     def all(self) -> Self:
-        stmt = SelectStatement()
-        stmt.from_(self.model_class.table.name_named)
-        stmt.where(self.binary)
+        stmt = SelectStatement().from_(self.model_class.table.name_named).where(self.binary)
         self.stmt = stmt
         self._execute_func = self.all
         return self
 
     def first(self) -> 'Model' | None:
-        stmt = (SelectStatement().from_(self.model_class.table.name)
-                .where(self.binary).limit(1))
+        stmt = SelectStatement().from_(self.model_class.table.name_named).where(self.binary).limit(1)
         sql = self.sql_visitor.sql(stmt)
         return self.adapter.fetchone(sql)
 
     def last(self) -> 'Model' | None:
-        stmt = (SelectStatement().from_(self.model_class.table.name)
-                .where(self.binary).select(Count()))
-        sql = self.sql_visitor.sql(stmt)
+        stmt = SelectStatement().from_(self.model_class.table.name_named).where(self.binary)
+        sql = self.sql_visitor.sql(stmt.select(Count()))
         cnt = self.adapter.fetchone(sql)
         if not cnt:
             return None
 
-        stmt = (SelectStatement().from_(self.model_class.table.name)
-                .where(self.binary).limit(1).offset(cnt))
-        sql = self.sql_visitor.sql(stmt)
+        sql = self.sql_visitor.sql(stmt.limit(1).offset(cnt))
         return self.adapter.fetchone(sql)
 
     def sql(self):

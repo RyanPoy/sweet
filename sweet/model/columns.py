@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import decimal
+from abc import abstractmethod
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
 from time import time
 from typing import Self
 
+from sweet import utils
 from sweet.sequel.terms.name_fn import Name
 
 
@@ -14,6 +17,7 @@ class Column:
     def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: any = None,
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None) -> None:
         self.name = name
+        self._value = None
         self.is_pk = is_pk
         self.is_null = is_null
         self.default = default
@@ -24,12 +28,30 @@ class Column:
 
         self._check_after_init()
 
-    def _check_after_init(self):
-        pass
-
     def __set_name__(self, owner, name):
         if self.name is None:
             self.name = name
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        if value is None:
+            self._value = None
+            return
+        try:
+            self._value = self._purify(value)
+        except (ValueError, decimal.InvalidOperation) as ex:
+            raise ValueError(f"Can't purify {value}, it's a {value.__class__.__name__} type.")
+
+    @abstractmethod
+    def _purify(self, value):
+        raise NotImplementedError
+
+    def _check_after_init(self):
+        pass
 
 
 class CharColumn(Column):
@@ -54,6 +76,9 @@ class CharColumn(Column):
         finally:
             if err or self.length <= 0:
                 raise ValueError(f"The length must be greater than zero, but got {self.length}")
+
+    def _purify(self, value):
+        return str(value)
 
 
 class TextColumn(CharColumn):
@@ -94,6 +119,9 @@ class IntColumn(Column):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
+    def _purify(self, value):
+        return utils.to_i(value)
+
 
 class BooleanColumn(Column):
     """
@@ -106,6 +134,9 @@ class BooleanColumn(Column):
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
+
+    def _purify(self, value):
+        return utils.to_bool(value)
 
 
 class FloatColumn(Column):
@@ -120,6 +151,9 @@ class FloatColumn(Column):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
+    def _purify(self, value):
+        utils.to_f(value)
+
 
 class DecimalColumn(Column):
     """
@@ -132,6 +166,9 @@ class DecimalColumn(Column):
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
+
+    def _purify(self, value):
+        return utils.to_decimal(value)
 
 
 class DateColumn(Column):
@@ -146,6 +183,9 @@ class DateColumn(Column):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
+    def _purify(self, value):
+        return utils.str2date(str(value))
+
 
 class DatetimeColumn(Column):
     """
@@ -159,6 +199,9 @@ class DatetimeColumn(Column):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
+    def _purify(self, value):
+        return utils.str2datetime(str(value))
+
 
 class TimeColumn(Column):
     """
@@ -171,6 +214,10 @@ class TimeColumn(Column):
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
         super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
+
+    def _purify(self, value):
+        dt = utils.str2datetime(str(value))
+        return dt.time()
 
 
 @dataclass

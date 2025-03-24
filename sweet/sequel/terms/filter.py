@@ -17,6 +17,7 @@ class Filter:
 
     def add(self, *bs: Binary, **kwargs: RawType | ExtType | ArrayType) -> Self:
         for b in bs:
+            if b is None: continue
             if not isinstance(b, Binary):
                 raise Exception(f"Filter add method only accepts the Binary type, but got {b.__class__.__name__}")
             self.filters.append(b)
