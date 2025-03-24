@@ -48,3 +48,8 @@ class Model:
                 setattr(cls, consts.table_name, table)
 
         super().__init_subclass__(**kwargs)
+
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+

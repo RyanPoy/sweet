@@ -1,15 +1,9 @@
 from __future__ import annotations
 
-from typing import Tuple
 from datetime import datetime, date
 from decimal import Decimal
 import time
 import re
-
-# data type transfer variables and functions
-FALSE_VALUES = (None, '', 0, '0', 'f', 'F', 'false', 'FALSE', 'No', 'no', 'NO')
-ISO_DATE     = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
-ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
 
 
 def extract_number(s: str, default: int | None) -> int | None:
@@ -19,7 +13,7 @@ def extract_number(s: str, default: int | None) -> int | None:
     return default
 
 
-def extract_numbers(s: str, default: Tuple[int, int] | None) -> Tuple[int, int] | None:
+def extract_numbers(s: str, default: tuple[int, int] | None) -> tuple[int, int] | None:
     # 使用正则表达式提取括号内的多个数字
     match = re.search(r'\((\d+),\s*(\d+)\)', s)
     if match:
@@ -27,38 +21,21 @@ def extract_numbers(s: str, default: Tuple[int, int] | None) -> Tuple[int, int] 
     return default  # 如果没有找到匹配，返回 None
 
 
-def to_bool(v):
+def to_bool(v) -> bool:
     """ convert something to a boolean  """
-    if not v:               return False
-    if is_str(v):           v = v.strip()
-    if v in FALSE_VALUES:   return False
-    if not v:               return False
-    return True
+    if not v:     return False
+    if is_str(v): v = v.strip().lower()
+    return v in (1, "1", 't', 'true', 'y', 'yes')
 
 
 def to_i(v):
     if v is True: return 1
     if v is False: return 0
-    try:
-        return int(v)
-    except Exception as _:
-        return 0
+    return int(v)
 
 
-def to_f(v):
-    try:
-        return float(v)
-    except Exception as _:
-        return 0.0
-
-
-def to_decimal(v):
-    if is_decimal(v): return v
-    try:
-        return Decimal(v)
-    except Exception as _:
-        return Decimal(0)
-
+to_f = lambda v: float(v)
+to_decimal = lambda v: v if is_decimal(v) else Decimal(v)
 
 datetime2str = lambda dt, format='%Y-%m-%d %H:%M:%S': dt.strftime(format)
 date2str = lambda d, format='%Y-%m-%d': d.strftime(format)
@@ -66,16 +43,16 @@ date2str = lambda d, format='%Y-%m-%d': d.strftime(format)
 datetime2date = lambda dt: date(dt.year, dt.month, dt.day)
 str2binary = lambda v: v.encode('utf-8')  # Used to convert from Strings to BLOBs
 binary2str = lambda v: v.decode("utf-8")  # Used to convert from BLOBs to Strings
-
 microseconds = lambda t: to_i((to_f(t) % 1) * 1000000)  # '0.123456' -> 123456; '1.123456' -> 123456
 
 
-def str2datetime(s):
+ISO_DATETIME = r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
+def str2datetime(s) -> datetime | None:
     def __fast_str2datetime(string):
         """ Doesn't handle time zones. """
         if re.match(ISO_DATETIME, string):
             subs = re.split(ISO_DATETIME, string)
-            microsec = to_i((to_f(subs[7]) * 1000000))
+            microsec = to_i((to_f(subs[7] or 0) * 1000000))
             return datetime(to_i(subs[1]), to_i(subs[2]), to_i(subs[3]),
                             to_i(subs[4]), to_i(subs[5]), to_i(subs[6]),
                             microsec)
@@ -112,7 +89,8 @@ def str2datetime(s):
     return __fast_str2datetime(s) or __fallback_str2datetime(s)
 
 
-def str2date(s):
+ISO_DATE = r'^(\d{4})-(\d{1,2})-(\d{1,2})$'
+def str2date(s) -> date | None:
     def __fast_str2date(string):
         if re.match(ISO_DATE, string):
             subs = re.split(ISO_DATE, string)
@@ -160,7 +138,6 @@ is_set = lambda obj: isinstance(obj, set)
 
 def replace_multiple(s: str, groups: [(str, str), ]) -> str:
     """
-
     :rtype: object
     """
     for g in groups:
@@ -223,7 +200,6 @@ class classproperty:
 
 
 class mydict(dict):
-
     def __getattr__(self, k):
         if k in self:
             return self[k]
