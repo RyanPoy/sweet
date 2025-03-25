@@ -1,7 +1,7 @@
 import unittest
 
 from sweet.sequel.terms.name_fn import Name
-from tests.helper.models import User
+from tests.helper import User
 
 
 class TestModel(unittest.TestCase):

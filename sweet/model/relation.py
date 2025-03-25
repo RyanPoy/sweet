@@ -12,6 +12,3 @@ class Relation:
     def sql(self) -> str:
         return self.visitor.sql(self.stmt)
 
-    def exec(self):
-        pass
-

@@ -3,8 +3,7 @@ import unittest
 from sweet.environment import Environment
 from sweet.model import Model
 from sweet.model.objects import Objects
-from tests.helper import db, settings_mysql, settings_postgresql, settings_sqlite
-from tests.helper.models import User
+from tests.helper import db, settings_mysql, settings_postgresql, settings_sqlite, User
 
 
 class TestObjects(unittest.IsolatedAsyncioTestCase):
