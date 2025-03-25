@@ -257,7 +257,7 @@ class TestSelectStatement(unittest.TestCase):
         self.assertEqual('SELECT * FROM "abc" JOIN "efg" ON "abc"."id" = "efg"."id" WHERE "abc"."foo" = "efg"."bar"', self.pg.sql(stmt))
 
     def test_where_field_equals_where(self):
-        stmt = SelectStatement().from_(self.table_abc).where(abc__foo=1).where(abc__bar=Name('baz', self.table_abc.name))
+        stmt = SelectStatement().from_(self.table_abc).where(abc__foo=1, abc__bar=Name('baz', self.table_abc.name))
         self.assertEqual('SELECT * FROM `abc` WHERE `abc`.`foo` = 1 AND `abc`.`bar` = `abc`.`baz`', self.mysql.sql(stmt))
         self.assertEqual('SELECT * FROM "abc" WHERE "abc"."foo" = 1 AND "abc"."bar" = "abc"."baz"', self.sqlite.sql(stmt))
         self.assertEqual('SELECT * FROM "abc" WHERE "abc"."foo" = 1 AND "abc"."bar" = "abc"."baz"', self.pg.sql(stmt))
