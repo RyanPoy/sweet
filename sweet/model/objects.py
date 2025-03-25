@@ -6,7 +6,7 @@ from typing import Self, TYPE_CHECKING
 from sweet.sequel.terms.name_fn import Count
 from sweet.sequel.visitors.visitor import Visitor
 from sweet.utils import classproperty
-from sweet.model import consts
+from sweet.model import Column, consts
 
 if TYPE_CHECKING:
     from sweet.model import Model
@@ -44,6 +44,9 @@ class Objects:
         :param kwargs:
         :return:
         """
+        for k, v in kwargs.items():
+            if not self.model_class.table.has_column(k):
+                raise Column.DoesNotExist(k, self.model_class.table.name)
         objs = self._copy()
         objs._select_stmt.where(**kwargs)
         return objs

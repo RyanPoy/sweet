@@ -7,9 +7,10 @@ from sweet.utils import classproperty
 from sweet.utils.inflection import tableize
 
 
-async def init(env: Environment) -> BaseDriver:
+async def init(env: Environment, do_connect=True) -> BaseDriver:
     db = env.db_driver(**env.db_settings)
-    await db.init_pool()
+    if do_connect:
+        await db.init_pool()
     setattr(Objects, consts.db_adapter, db)
     setattr(Objects, consts.sql_visitor, env.sql_visitor)
     return db

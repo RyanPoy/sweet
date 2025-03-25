@@ -1,7 +1,28 @@
-# model进行__init__的时候，要根据column的类型，从而进行数据的强制类型转化
-# model进行from__db的时候，要根据column的类型，把数据进行强制类型转化
-# model需要支持从一个dict初始化，因为从db里面找到的时候，就是一些记录
+√ # model进行__init__的时候，要根据column的类型，从而进行数据的强制类型转化
+√ # model进行from__db的时候，要根据column的类型，把数据进行强制类型转化
+# model的查询
+model.objects.filter()
+model.objects.sql()
+model.objects.all()
+model.objects.limit(1).first()
+model.objects.last()
+model.objects.count()
+model.objects.exist()
+model.objects.max()
+model.objects.min()
+model.objects.avg()
 
+# model的创建
+model.objects.create()
+model.objects.bulk_create()
+注意：bulk_create()的时候，怎么给model的id赋值呢？
+
+# model的修改
+model.objects.update()
+model.objects.bulk_update()
+
+
+# integration tests中，使用db的连接，需要性能改进，不能每次都去连接，应该共用连接池
 
 =======================
 √ 关于sweet的sequel的数据设计。

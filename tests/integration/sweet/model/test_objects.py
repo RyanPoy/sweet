@@ -1,7 +1,7 @@
 import unittest
 
 from sweet.environment import Environment
-from sweet.model import Model
+from sweet.model import Column, Model
 from sweet.model.objects import Objects
 from tests.helper import db, settings_mysql, settings_postgresql, settings_sqlite, User
 
@@ -16,6 +16,7 @@ class TestObjects(unittest.IsolatedAsyncioTestCase):
 
     def test_init_from_model(self):
         class Demo(Model): pass
+
         objs = Demo.objects
         self.assertIsInstance(objs, Objects)
         self.assertIs(objs.model_class, Demo)
@@ -27,6 +28,12 @@ class TestObjects(unittest.IsolatedAsyncioTestCase):
         for i, env in enumerate(self.envs):
             async with db.using(env):
                 self.assertNotEqual(objs1.sql(), objs2.sql())
+
+    async def test_filter__error_if_column_is_not_exists(self):
+        with self.assertRaises(Column.DoesNotExist) as ex:
+            User.objects.filter(not_exist_column_name="whatever")
+        msg = str(ex.exception)
+        self.assertEqual(f"The column 'not_exist_column_name' does not exist in '{User.table.name}' table", msg)
 
     async def test_all(self):
         objs = User.objects.filter(id=10).filter(name="username")
@@ -41,19 +48,18 @@ class TestObjects(unittest.IsolatedAsyncioTestCase):
                 sql = objs.sql()
                 self.assertEqual(expected, sql, f'Environment[{driver.__class__.__name__}]')
 
-    # async def test_insert_and_first(self):
-    #
-    #     expectations = [
-    #         """SELECT * FROM `users` LIMIT 1""",
-    #         """SELECT * FROM "users" LIMIT 1""",
-    #         """SELECT * FROM "users" LIMIT 1""",
-    #     ]
-    #     user = User(id=1, name=20)
-    #     for i, env in enumerate(self.envs):
-    #         u = User.objects.insert(user.dict())
-    #         async with db.using(env):
-    #             u = await User.objects.first()
-    #             self.assertEqual(u, '')
+    async def test_insert_and_first(self):
+        expectations = [
+            """SELECT * FROM `users` LIMIT 1""",
+            """SELECT * FROM "users" LIMIT 1""",
+            """SELECT * FROM "users" LIMIT 1""",
+        ]
+        user = User(id=1, name=20)
+        for i, env in enumerate(self.envs):
+            u = User.objects.insert(user.dict())
+            async with db.using(env):
+                u = await User.objects.first()
+                self.assertEqual(u, '')
 
 
 if __name__ == '__main__':

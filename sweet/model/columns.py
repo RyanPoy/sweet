@@ -13,6 +13,10 @@ from sweet.sequel.terms.name_fn import Name
 
 
 class Column:
+    class DoesNotExist(Exception):
+        def __init__(self, column_name, table_name):
+            msg = f"The column '{column_name}' does not exist in '{table_name}' table"
+            super().__init__(msg)  # 调用父类的构造函数
 
     def __init__(self, name: str = None, pk: bool = False, is_null: bool = False, default: any = None,
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None) -> None:
@@ -238,7 +242,7 @@ class Columns:
         return super().__getattribute__(name)
 
     def get(self, name: str) -> Column:
-        return self.columns.get(name, None)
+        return self.data.get(name, None)
 
 
 @dataclass
@@ -260,5 +264,8 @@ class Table:
         self.__name_named = Name(self.name)
 
     @property
-    def name_named(self):
+    def name_named(self) -> Name:
         return self.__name_named
+
+    def has_column(self, name) -> bool:
+        return self.columns.get(name) is not None
