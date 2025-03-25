@@ -24,7 +24,6 @@ class TestUtils(unittest.TestCase):
         self.assertRaises(InvalidOperation, to_decimal, '9c')
 
     def test_to_bool_true(self):
-        self.assertFalse(to_bool('abc'))
         self.assertTrue(to_bool(1))
         self.assertTrue(to_bool(True))
         self.assertTrue(to_bool('T'))
@@ -39,6 +38,7 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(to_bool('YES'))
 
     def test_to_bool_false(self):
+        self.assertFalse(to_bool('abc'))
         self.assertFalse(to_bool(''))
         self.assertFalse(to_bool('   '))
         self.assertFalse(to_bool(0))
