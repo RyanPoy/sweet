@@ -50,13 +50,11 @@ ISO_DATETIME = r'^(\d{4})[-/](\d{1,2})[-/](\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2}
 def str2datetime(s) -> datetime | None:
     def __fast_str2datetime(string):
         """ Doesn't handle time zones. """
-        if re.match(ISO_DATETIME, string):
-            subs = re.split(ISO_DATETIME, string)
-            microsec = to_i((to_f(subs[7] or 0) * 1000000))
-            return datetime(to_i(subs[1]), to_i(subs[2]), to_i(subs[3]),
-                            to_i(subs[4]), to_i(subs[5]), to_i(subs[6]),
-                            microsec)
-        return None
+        if not re.match(ISO_DATETIME, string):
+            return None
+        subs = re.split(ISO_DATETIME, string)
+        micro_sec = to_i((to_f(subs[7] or 0) * 1000000))
+        return datetime(to_i(subs[1]), to_i(subs[2]), to_i(subs[3]), to_i(subs[4]), to_i(subs[5]), to_i(subs[6]), micro_sec)
 
     def __fallback_str2datetime(string):
         try:
@@ -67,9 +65,9 @@ def str2datetime(s) -> datetime | None:
             pos = iso_string.rfind('.')
             if pos != -1:
                 # iso_string[:pos]
-                microsec = microseconds(iso_string[pos:])
+                micro_sec = microseconds(iso_string[pos:])
             else:
-                microsec = 0
+                micro_sec = 0
 
             tm_struct, err = None, None
             for format_str in ['%Y-%m-%d %H:%M:%S', '%Y/%m/%d %H:%M:%S', '%Y-%m-%d', '%Y/%m/%d']:
@@ -80,8 +78,7 @@ def str2datetime(s) -> datetime | None:
                     err = ex
             if tm_struct is None:
                 raise err
-            return datetime(tm_struct.tm_year, tm_struct.tm_mon, tm_struct.tm_mday, tm_struct.tm_hour, tm_struct.tm_min,
-                            tm_struct.tm_sec, microsec)
+            return datetime(tm_struct.tm_year, tm_struct.tm_mon, tm_struct.tm_mday, tm_struct.tm_hour, tm_struct.tm_min, tm_struct.tm_sec, micro_sec)
 
     if s is None:     return None
     if not is_str(s): return s
