@@ -31,7 +31,7 @@ class TestObjects(unittest.IsolatedAsyncioTestCase):
             self.assertNotEqual(visitor.sql(objs1.binary), visitor.sql(objs2.binary))
 
     async def test_all(self):
-        objs = User.objects.filter(id=10).filter(name="username").all()
+        objs = User.objects.filter(id=10).filter(name="username")
         expectations = [
             """SELECT * FROM `users` WHERE `id` = 10 AND `name` = 'username'""",
             """SELECT * FROM "users" WHERE "id" = 10 AND "name" = 'username'""",
@@ -40,7 +40,7 @@ class TestObjects(unittest.IsolatedAsyncioTestCase):
         for i, env in enumerate(self.envs):
             expected = expectations[i]
             async with db.using(env) as driver:
-                sql = objs.sql()
+                sql = objs.all().sql()
                 self.assertEqual(expected, sql, f'Environment[{driver.__class__.__name__}]')
 
     async def test_insert_and_first(self):
