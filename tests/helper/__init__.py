@@ -3,20 +3,20 @@ from sweet.model import Model
 
 
 class UserRoles(Model):
-    user_id = IntColumn()  # ForeignKey('users.id'), is_pk=True),
-    role_id = IntColumn()  # ForeignKey('roles.id'), is_pk=True)
+    user_id = IntColumn()  # ForeignKey('users.id'), pk=True),
+    role_id = IntColumn()  # ForeignKey('roles.id'), pk=True)
 
 
 class Membership(Model):
     """ has_many_and_belongs_to :through 需要中间模型 """
-    id = IntColumn(is_pk=True)
+    id = IntColumn(pk=True)
     user_id = IntColumn()  # ForeignKey('users.id')
     team_id = IntColumn()  # ForeignKey('teams.id')
 
 
 class Profile(Model):
     """ Profile 表 (has_one) """
-    id = IntColumn(is_pk=True)
+    id = IntColumn(pk=True)
     user_id = IntColumn()  # ForeignKey('users.id')
     address_id = IntColumn()  # ForeignKey('addresses.id') # for has_one :through
     # user = relationship("User", back_populates="profile")
@@ -24,13 +24,13 @@ class Profile(Model):
 
 class Address(Model):
     """ Address 表 (has_one :through) """
-    id = IntColumn(is_pk=True)
+    id = IntColumn(pk=True)
     city = CharColumn(length=32)
 
 
 class Post(Model):
     """ Posts 表 (has_many) """
-    id = IntColumn(is_pk=True)
+    id = IntColumn(pk=True)
     title = CharColumn()
     user_id = IntColumn()  # ForeignKey('users.id')
     # user = relationship("User", back_populates="posts")
@@ -38,21 +38,21 @@ class Post(Model):
 
 class Role(Model):
     """ Roles 表 (has_many_and_belongs_to) """
-    id = IntColumn(is_pk=True)
+    id = IntColumn(pk=True)
     name = CharColumn()
     # users = relationship("User", secondary=user_roles, back_populates="roles")
 
 
 class Team(Model):
     """ Teams 表 (has_many :through) """
-    id = IntColumn(is_pk=True)
+    id = IntColumn(pk=True)
     name = CharColumn()
     # users = relationship("User", secondary="memberships", back_populates="teams")
 
 
 class Organization(Model):
     """ Organizations 表 (belongs_to :through) """
-    id = IntColumn(is_pk=True)
+    id = IntColumn(pk=True)
     name = CharColumn()
     # teams = relationship("Team", back_populates="organization")
     # users = relationship("User", secondary="teams", back_populates="organizations")
@@ -60,7 +60,7 @@ class Organization(Model):
 
 class User(Model):
     """ Users 表 """
-    id = IntColumn(is_pk=True)
+    id = IntColumn(pk=True)
     name = CharColumn()
 
     # # has_one
