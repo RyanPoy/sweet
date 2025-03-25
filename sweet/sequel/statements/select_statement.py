@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Self
 from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.filter import Filter
@@ -10,6 +11,7 @@ from sweet.sequel.terms.order import OrderClause, SortedIn
 from sweet.sequel.types import Raw, RawType
 
 
+@dataclass
 class SelectStatement:
     """
     SELECT
@@ -32,22 +34,21 @@ class SelectStatement:
           ├── columns
           └── DESC / ASC
     """
-    def __init__(self):
-        self.tables = []
-        self.columns: list[Raw | ExtType | literal.Literal] = []
-        self.distinct_ = None
-        self.limit_number = 0
-        self.offset_number = 0
-        self.where_clause: Filter = Filter()
-        self.having_clause: Filter = Filter()
-        self.force_indexes = []
-        self.use_indexes = []
-        self.lock = None
-        self.join_tables = []
-        self.on_clause: Filter = Filter()
-        self.groups = []
-        self.orders : [OrderClause] = []
-        self.parent = None
+    tables: list = field(init=False, default_factory=list)
+    columns: list[Raw | ExtType | literal.Literal] = field(init=False, default_factory=list)
+    distinct_: literal.Literal = None
+    limit_number: int = 0
+    offset_number: int = 0
+    where_clause: Filter = field(init=False, default_factory=Filter)
+    having_clause: Filter = field(init=False, default_factory=Filter)
+    force_indexes: [] = field(init=False, default_factory=list)
+    use_indexes: [] = field(init=False, default_factory=list)
+    lock: Lock = None
+    join_tables: [] = field(init=False, default_factory=list)
+    on_clause: Filter = field(init=False, default_factory=Filter)
+    groups: [] = field(init=False, default_factory=list)
+    orders: [OrderClause] = field(init=False, default_factory=list)
+    parent: Self = None
 
     def from_(self, table: Name | Self) -> Self:
         return self.__from_or_join(self.tables, table)
