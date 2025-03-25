@@ -7,7 +7,7 @@ from tests.integration.sweet.database.test_sqlite_driver import TestSQLiteDriver
 from tests.integration.sweet.model.schema.test_columns import TestColumns
 from tests.unit.model.test_column import TestColumn
 from tests.unit.model.test_model import TestModel
-from tests.unit.model.test_objects import TestObjects
+from tests.integration.sweet.model.test_objects import TestObjects
 from tests.unit.sequel.statements.test_delete_statement import TestDeleteStatement
 from tests.unit.sequel.statements.test_insert_statement import TestInsertStatement
 from tests.unit.sequel.statements.test_select_statement import TestSelectStatement
