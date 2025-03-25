@@ -14,11 +14,11 @@ from sweet.sequel.terms.name_fn import Name
 
 class Column:
 
-    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: any = None,
+    def __init__(self, name: str = None, pk: bool = False, is_null: bool = False, default: any = None,
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None) -> None:
         self.name = name
         self._value = None
-        self.is_pk = is_pk
+        self.pk = pk
         self.is_null = is_null
         self.default = default
         self.unique = unique
@@ -61,10 +61,10 @@ class CharColumn(Column):
     postgresql: varchar, char, text
     """
 
-    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: str = None,
+    def __init__(self, name: str = None, pk: bool = False, is_null: bool = False, default: str = None,
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None, length: int = 64):
         self.length = length
-        super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
+        super().__init__(name=name, pk=pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
     def _check_after_init(self):
@@ -88,9 +88,9 @@ class TextColumn(CharColumn):
     postgresql: text
     """
 
-    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: str = None,
+    def __init__(self, name: str = None, pk: bool = False, is_null: bool = False, default: str = None,
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None, length: int = 1024):
-        super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
+        super().__init__(name=name, pk=pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators, length=length)
 
 
@@ -101,9 +101,9 @@ class BinaryColumn(CharColumn):
     postgresql: by
     """
 
-    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: str = None,
+    def __init__(self, name: str = None, pk: bool = False, is_null: bool = False, default: str = None,
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None, length: int = 1024):
-        super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
+        super().__init__(name=name, pk=pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators, length=length)
 
     def _purify(self, value):
@@ -117,9 +117,9 @@ class IntColumn(Column):
     postgresql: integer, bigint, smallint
     """
 
-    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: int = None,
+    def __init__(self, name: str = None, pk: bool = False, is_null: bool = False, default: int = None,
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
-        super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
+        super().__init__(name=name, pk=pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
     def _purify(self, value):
@@ -133,9 +133,9 @@ class BooleanColumn(Column):
     postgresql: boolean
     """
 
-    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: bool = None,
+    def __init__(self, name: str = None, pk: bool = False, is_null: bool = False, default: bool = None,
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
-        super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
+        super().__init__(name=name, pk=pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
     def _purify(self, value):
@@ -149,9 +149,9 @@ class FloatColumn(Column):
     postgresql: real, double precision
     """
 
-    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: float = None,
+    def __init__(self, name: str = None, pk: bool = False, is_null: bool = False, default: float = None,
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
-        super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
+        super().__init__(name=name, pk=pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
     def _purify(self, value):
@@ -165,9 +165,9 @@ class DecimalColumn(Column):
     postgresql: decimal, numeric
     """
 
-    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: Decimal = None,
+    def __init__(self, name: str = None, pk: bool = False, is_null: bool = False, default: Decimal = None,
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
-        super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
+        super().__init__(name=name, pk=pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
     def _purify(self, value):
@@ -181,9 +181,9 @@ class DateColumn(Column):
     postgresql: date
     """
 
-    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: date | datetime | str = None,
+    def __init__(self, name: str = None, pk: bool = False, is_null: bool = False, default: date | datetime | str = None,
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
-        super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
+        super().__init__(name=name, pk=pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
     def _purify(self, value):
@@ -197,9 +197,9 @@ class DatetimeColumn(Column):
     postgresql: timestamp(无时区), timestamptz(有时区)
     """
 
-    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: date | datetime | str = None,
+    def __init__(self, name: str = None, pk: bool = False, is_null: bool = False, default: date | datetime | str = None,
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
-        super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
+        super().__init__(name=name, pk=pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
     def _purify(self, value):
@@ -213,9 +213,9 @@ class TimeColumn(Column):
     postgresql: time
     """
 
-    def __init__(self, name: str = None, is_pk: bool = False, is_null: bool = False, default: time | date | datetime | str = None,
+    def __init__(self, name: str = None, pk: bool = False, is_null: bool = False, default: time | date | datetime | str = None,
                  unique: bool = False, db_index: bool = False, description: str = None, validators: list = None):
-        super().__init__(name=name, is_pk=is_pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
+        super().__init__(name=name, pk=pk, is_null=is_null, default=default, unique=unique, db_index=db_index, description=description,
                          validators=validators)
 
     def _purify(self, value):
