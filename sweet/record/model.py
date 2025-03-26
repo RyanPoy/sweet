@@ -274,7 +274,7 @@ class Model(metaclass=ModelMetaClass):
             r = cls.__relations__[rn]
             r.preload(models)
 
-    @classproperty
+    @class_property
     def objects(cls):
         rs = cls.db.records(cls.__tablename__)
         rs.set_model_class(cls)

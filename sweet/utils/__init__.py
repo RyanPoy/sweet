@@ -188,7 +188,7 @@ def import_object(name):
     return getattr(obj, parts[-1])
 
 
-class classproperty:
+class class_property:
     """
     A decorate for class method. Use it like this:
     

@@ -3,7 +3,7 @@ from sweet.model import consts
 from sweet.model.columns import Column, Columns, Table
 from sweet.model.objects import Objects
 from sweet.environment import Environment
-from sweet.utils import classproperty
+from sweet.utils import class_property
 from sweet.utils.inflection import tableize
 
 
@@ -25,15 +25,15 @@ async def release():
 class Model:
     __records_class__ = Objects
 
-    @classproperty
+    @class_property
     def table(cls) -> Table:
         return getattr(cls, consts.table_name)
 
-    @classproperty
+    @class_property
     def columns(cls) -> Columns:
         return cls.table.columns
 
-    @classproperty
+    @class_property
     def objects(cls):
         return cls.__records_class__(cls)
 

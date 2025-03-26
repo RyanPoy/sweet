@@ -5,7 +5,7 @@ from typing import Self, TYPE_CHECKING
 
 from sweet.sequel.terms.name_fn import Count
 from sweet.sequel.visitors.visitor import Visitor
-from sweet.utils import classproperty
+from sweet.utils import class_property
 from sweet.model import Column, consts
 
 if TYPE_CHECKING:
@@ -30,11 +30,11 @@ class Objects:
     def _select_stmt(self, value: SelectStatement) -> None:
         self.__select_stmt = value
 
-    @classproperty
+    @class_property
     def adapter(cls):
         return getattr(cls, consts.db_adapter)
 
-    @classproperty
+    @class_property
     def sql_visitor(cls) -> Visitor:
         return getattr(cls, consts.sql_visitor)()
 
