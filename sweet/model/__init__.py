@@ -25,14 +25,17 @@ async def release():
 class Model:
     __records_class__ = Objects
 
+    # noinspection PyMethodParameters
     @class_property
     def table(cls) -> Table:
         return getattr(cls, consts.table_name)
 
+    # noinspection PyMethodParameters
     @class_property
     def columns(cls) -> Columns:
         return cls.table.columns
 
+    # noinspection PyMethodParameters
     @class_property
     def objects(cls):
         return cls.__records_class__(cls)

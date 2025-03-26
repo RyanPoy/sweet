@@ -30,10 +30,12 @@ class Objects:
     def _select_stmt(self, value: SelectStatement) -> None:
         self.__select_stmt = value
 
+    # noinspection PyMethodParameters
     @class_property
     def adapter(cls):
         return getattr(cls, consts.db_adapter)
 
+    # noinspection PyMethodParameters
     @class_property
     def sql_visitor(cls) -> Visitor:
         return getattr(cls, consts.sql_visitor)()
