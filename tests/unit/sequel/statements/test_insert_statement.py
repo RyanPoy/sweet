@@ -1,5 +1,3 @@
-import unittest
-
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.terms.name_fn import Name
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
@@ -7,129 +5,137 @@ from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
 
 
-class TestInsertStatement(unittest.TestCase):
+def test_insert_one_column(visitors):
+    stmt = InsertStatement(Name("users")).insert([1])
+    assert 'INSERT INTO `users` VALUES (1)' == visitors.mysql.sql(stmt)
+    assert 'INSERT INTO "users" VALUES (1)' == visitors.sqlite.sql(stmt)
+    assert 'INSERT INTO "users" VALUES (1)' == visitors.pg.sql(stmt)
 
-    def setUp(self):
-        self.mysql = MySQLVisitor()
-        self.sqlite = SQLiteVisitor()
-        self.pg = PostgreSQLVisitor()
-        self.table_users = Name("users")
 
-    def test_insert_one_column(self):
-        stmt = InsertStatement(self.table_users).insert([1])
-        self.assertEqual('INSERT INTO `users` VALUES (1)', self.mysql.sql(stmt))
-        self.assertEqual('INSERT INTO "users" VALUES (1)', self.sqlite.sql(stmt))
-        self.assertEqual('INSERT INTO "users" VALUES (1)', self.pg.sql(stmt))
+def test_insert_one_column_single_element_array(visitors):
+    stmt = InsertStatement(Name("users")).insert((1,))
+    assert 'INSERT INTO `users` VALUES (1)' == visitors.mysql.sql(stmt)
+    assert 'INSERT INTO "users" VALUES (1)' == visitors.sqlite.sql(stmt)
+    assert 'INSERT INTO "users" VALUES (1)' == visitors.pg.sql(stmt)
 
-    def test_insert_one_column_single_element_array(self):
-        stmt = InsertStatement(self.table_users).insert((1,))
-        self.assertEqual('INSERT INTO `users` VALUES (1)', self.mysql.sql(stmt))
-        self.assertEqual('INSERT INTO "users" VALUES (1)', self.sqlite.sql(stmt))
-        self.assertEqual('INSERT INTO "users" VALUES (1)', self.pg.sql(stmt))
 
-    def test_insert_one_column_multi_element_array(self):
-        stmt = InsertStatement(self.table_users).insert((1,), (2,))
-        self.assertEqual('INSERT INTO `users` VALUES (1), (2)', self.mysql.sql(stmt))
-        self.assertEqual('INSERT INTO "users" VALUES (1), (2)', self.sqlite.sql(stmt))
-        self.assertEqual('INSERT INTO "users" VALUES (1), (2)', self.pg.sql(stmt))
+def test_insert_one_column_multi_element_array(visitors):
+    stmt = InsertStatement(Name("users")).insert((1,), (2,))
+    assert 'INSERT INTO `users` VALUES (1), (2)' == visitors.mysql.sql(stmt)
+    assert 'INSERT INTO "users" VALUES (1), (2)' == visitors.sqlite.sql(stmt)
+    assert 'INSERT INTO "users" VALUES (1), (2)' == visitors.pg.sql(stmt)
 
-    def test_insert_single_row_with_array_value(self):
-        stmt = InsertStatement(self.table_users).insert([1, ["a", "b", "c"]])
-        self.assertEqual("INSERT INTO `users` VALUES (1, ['a', 'b', 'c'])", self.mysql.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, ['a', 'b', 'c'])", self.sqlite.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, ['a', 'b', 'c'])", self.pg.sql(stmt))
 
-    def test_insert_multiple_rows_with_array_value(self):
-        stmt = InsertStatement(self.table_users).insert((1, ["a", "b", "c"]), (2, ["c", "d", "e"]))
-        self.assertEqual("""INSERT INTO `users` VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])""", self.mysql.sql(stmt))
-        self.assertEqual("""INSERT INTO "users" VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])""", self.sqlite.sql(stmt))
-        self.assertEqual("""INSERT INTO "users" VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])""", self.pg.sql(stmt))
+def test_insert_single_row_with_array_value(visitors):
+    stmt = InsertStatement(Name("users")).insert([1, ["a", "b", "c"]])
+    assert "INSERT INTO `users` VALUES (1, ['a', 'b', 'c'])" == visitors.mysql.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, ['a', 'b', 'c'])" == visitors.sqlite.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, ['a', 'b', 'c'])" == visitors.pg.sql(stmt)
 
-    def test_insert_all_columns(self):
-        stmt = InsertStatement(self.table_users).insert((1, "a", True))
-        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1)", self.mysql.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1)", self.sqlite.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1)", self.pg.sql(stmt))
 
-    def test_insert_all_columns_single_element(self):
-        stmt = InsertStatement(self.table_users).insert([1, "a", True])
-        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1)", self.mysql.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1)", self.sqlite.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1)", self.pg.sql(stmt))
+def test_insert_multiple_rows_with_array_value(visitors):
+    stmt = InsertStatement(Name("users")).insert((1, ["a", "b", "c"]), (2, ["c", "d", "e"]))
+    assert """INSERT INTO `users` VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])""" == visitors.mysql.sql(stmt)
+    assert """INSERT INTO "users" VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])""" == visitors.sqlite.sql(stmt)
+    assert """INSERT INTO "users" VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])""" == visitors.pg.sql(stmt)
 
-    def test_insert_all_columns_multi_rows(self):
-        stmt = InsertStatement(self.table_users).insert((1, "a", True), (2, "b", False))
-        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)", self.mysql.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", self.sqlite.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", self.pg.sql(stmt))
 
-    def test_insert_all_columns_multi_rows_chained(self):
-        stmt = InsertStatement(self.table_users).insert((1, "a", True)).insert((2, "b", False))
-        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)", self.mysql.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", self.sqlite.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", self.pg.sql(stmt))
+def test_insert_all_columns(visitors):
+    stmt = InsertStatement(Name("users")).insert((1, "a", True))
+    assert "INSERT INTO `users` VALUES (1, 'a', 1)" == visitors.mysql.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1)" == visitors.sqlite.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1)" == visitors.pg.sql(stmt)
 
-    def test_insert_all_columns_multi_rows_chained_mixed(self):
-        stmt = InsertStatement(self.table_users).insert((1, "a", True), (2, "b", False)).insert((3, "c", True))
-        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)", self.mysql.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)", self.sqlite.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)", self.pg.sql(stmt))
 
-    def test_insert_all_columns_multi_rows_chained_multiple_rows(self):
-        stmt = InsertStatement(self.table_users).insert((1, "a", True), (2, "b", False)).insert((3, "c", True), (4, "d", False))
+def test_insert_all_columns_single_element(visitors):
+    stmt = InsertStatement(Name("users")).insert([1, "a", True])
+    assert "INSERT INTO `users` VALUES (1, 'a', 1)" == visitors.mysql.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1)" == visitors.sqlite.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1)" == visitors.pg.sql(stmt)
 
-        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)", self.mysql.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)", self.sqlite.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)", self.pg.sql(stmt))
 
-    def test_insert_selected_columns(self):
-        stmt = InsertStatement(self.table_users).column(Name("foo"), Name("bar"), Name("buz")).insert([1, "a", True])
-        self.assertEqual('INSERT INTO `users` (`foo`, `bar`, `buz`) VALUES (1, \'a\', 1)', self.mysql.sql(stmt))
-        self.assertEqual('INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)', self.sqlite.sql(stmt))
-        self.assertEqual('INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)', self.pg.sql(stmt))
+def test_insert_all_columns_multi_rows(visitors):
+    stmt = InsertStatement(Name("users")).insert((1, "a", True), (2, "b", False))
+    assert "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.mysql.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.sqlite.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.pg.sql(stmt)
 
-    def test_insert_empty_columns(self):
-        stmt = InsertStatement(self.table_users).column().insert([1, "a", True])
-        self.assertEqual('INSERT INTO `users` VALUES (1, \'a\', 1)', self.mysql.sql(stmt))
-        self.assertEqual('INSERT INTO "users" VALUES (1, \'a\', 1)', self.sqlite.sql(stmt))
-        self.assertEqual('INSERT INTO "users" VALUES (1, \'a\', 1)', self.pg.sql(stmt))
 
-    def test_insert_ignore(self):
-        stmt = InsertStatement(self.table_users).insert([1]).ignore()
-        self.assertEqual('INSERT IGNORE INTO `users` VALUES (1)', self.mysql.sql(stmt))
-        self.assertEqual('INSERT IGNORE INTO "users" VALUES (1)', self.sqlite.sql(stmt))
-        self.assertEqual('INSERT IGNORE INTO "users" VALUES (1)', self.pg.sql(stmt))
+def test_insert_all_columns_multi_rows_chained(visitors):
+    stmt = InsertStatement(Name("users")).insert((1, "a", True)).insert((2, "b", False))
+    assert "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.mysql.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.sqlite.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.pg.sql(stmt)
 
-    def test_insert_column(self):
-        stmt = InsertStatement(self.table_users).insert([1])
-        self.assertEqual('INSERT INTO `users` VALUES (1)', self.mysql.sql(stmt))
-        self.assertEqual('INSERT INTO "users" VALUES (1)', self.sqlite.sql(stmt))
-        self.assertEqual('INSERT INTO "users" VALUES (1)', self.pg.sql(stmt))
 
-    def test_insert_column_with_chain(self):
-        stmt = InsertStatement(self.table_users).insert([1, "a", True]).insert([2, "b", False])
-        self.assertEqual("INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)", self.mysql.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", self.sqlite.sql(stmt))
-        self.assertEqual("INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)", self.pg.sql(stmt))
+def test_insert_all_columns_multi_rows_chained_mixed(visitors):
+    stmt = InsertStatement(Name("users")).insert((1, "a", True), (2, "b", False)).insert((3, "c", True))
+    assert "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)" == visitors.mysql.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)" == visitors.sqlite.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)" == visitors.pg.sql(stmt)
 
-    def test_replace_simple(self):
-        stmt = InsertStatement(self.table_users).replace(["v1", "v2", "v3"])
-        self.assertEqual("REPLACE INTO `users` VALUES ('v1', 'v2', 'v3')", self.mysql.sql(stmt))
-        self.assertEqual("REPLACE INTO \"users\" VALUES ('v1', 'v2', 'v3')", self.sqlite.sql(stmt))
-        self.assertEqual("REPLACE INTO \"users\" VALUES ('v1', 'v2', 'v3')", self.pg.sql(stmt))
 
-    # def test_replace_subquery(self):
-    #     table_users, table_def = Tables("abc", "efg")
-    #     query = Query.into(self.table_users).replace(Query.from_(self.table_def).select("f1", "f2"))
-    #     expected_output = 'REPLACE INTO "abc" VALUES ((SELECT "f1","f2" FROM "efg"))'
-    #     self.assertEqual(str(query), expected_output)
+def test_insert_all_columns_multi_rows_chained_multiple_rows(visitors):
+    stmt = InsertStatement(Name("users")).insert((1, "a", True), (2, "b", False)).insert((3, "c", True), (4, "d", False))
 
-#     def test_insert_with_statement(self):
-#         sub_query = Query().select(self.table_users.id).from_(self.table_users)
+    assert "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)" == visitors.mysql.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)" == visitors.sqlite.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)" == visitors.pg.sql(stmt)
+
+
+def test_insert_selected_columns(visitors):
+    stmt = InsertStatement(Name("users")).column(Name("foo"), Name("bar"), Name("buz")).insert([1, "a", True])
+    assert 'INSERT INTO `users` (`foo`, `bar`, `buz`) VALUES (1, \'a\', 1)' == visitors.mysql.sql(stmt)
+    assert 'INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)' == visitors.sqlite.sql(stmt)
+    assert 'INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)' == visitors.pg.sql(stmt)
+
+
+def test_insert_empty_columns(visitors):
+    stmt = InsertStatement(Name("users")).column().insert([1, "a", True])
+    assert 'INSERT INTO `users` VALUES (1, \'a\', 1)' == visitors.mysql.sql(stmt)
+    assert 'INSERT INTO "users" VALUES (1, \'a\', 1)' == visitors.sqlite.sql(stmt)
+    assert 'INSERT INTO "users" VALUES (1, \'a\', 1)' == visitors.pg.sql(stmt)
+
+
+def test_insert_ignore(visitors):
+    stmt = InsertStatement(Name("users")).insert([1]).ignore()
+    assert 'INSERT IGNORE INTO `users` VALUES (1)' == visitors.mysql.sql(stmt)
+    assert 'INSERT IGNORE INTO "users" VALUES (1)' == visitors.sqlite.sql(stmt)
+    assert 'INSERT IGNORE INTO "users" VALUES (1)' == visitors.pg.sql(stmt)
+
+
+def test_insert_column(visitors):
+    stmt = InsertStatement(Name("users")).insert([1])
+    assert 'INSERT INTO `users` VALUES (1)' == visitors.mysql.sql(stmt)
+    assert 'INSERT INTO "users" VALUES (1)' == visitors.sqlite.sql(stmt)
+    assert 'INSERT INTO "users" VALUES (1)' == visitors.pg.sql(stmt)
+
+
+def test_insert_column_with_chain(visitors):
+    stmt = InsertStatement(Name("users")).insert([1, "a", True]).insert([2, "b", False])
+    assert "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.mysql.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.sqlite.sql(stmt)
+    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.pg.sql(stmt)
+
+
+def test_replace_simple(visitors):
+    stmt = InsertStatement(Name("users")).replace(["v1", "v2", "v3"])
+    assert "REPLACE INTO `users` VALUES ('v1', 'v2', 'v3')" == visitors.mysql.sql(stmt)
+    assert "REPLACE INTO \"users\" VALUES ('v1', 'v2', 'v3')" == visitors.sqlite.sql(stmt)
+    assert "REPLACE INTO \"users\" VALUES ('v1', 'v2', 'v3')" == visitors.pg.sql(stmt)
+
+# def test_replace_subquery(visitors):
+#     table_users, table_def = Tables("abc", "efg")
+#     query = Query.into(Name("users")).replace(Query.from_(self.table_def).select("f1", "f2"))
+#     expected_output = 'REPLACE INTO "abc" VALUES ((SELECT "f1","f2" FROM "efg"))'
+#     assert str(query), expected_output)
+
+#     def test_insert_with_statement(visitors):
+#         sub_query = Query().select(Name("users").id).from_(Name("users"))
 #         aliased = AliasedQuery('sub_qs')
 #
-#         q = Query().with_(sub_query, 'sub_qs').into(self.table_users).select(aliased.id).from_(aliased)
-#         self.assertEqual(
+#         q = Query().with_(sub_query, 'sub_qs').into(Name("users")).select(aliased.id).from_(aliased)
+#         assert
 #             'WITH sub_qs AS (SELECT "id" FROM "abc") INSERT INTO "users" SELECT "sub_qs"."id" FROM sub_qs', str(q)
 #         )
 #
@@ -137,156 +143,156 @@ class TestInsertStatement(unittest.TestCase):
 # class PostgresInsertIntoOnConflictTests(unittest.TestCase):
 #     table_users = Table("abc")
 #
-#     def test_insert_on_conflict_do_nothing_field(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1).on_conflict(self.table_users.id).do_nothing()
+#     def test_insert_on_conflict_do_nothing_field(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1).on_conflict(Name("users").id).do_nothing()
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) ON CONFLICT ("id") DO NOTHING', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) ON CONFLICT ("id") DO NOTHING', str(query))
 #
-#     def test_insert_on_conflict_do_nothing_multiple_fields(self):
+#     def test_insert_on_conflict_do_nothing_multiple_fields(visitors):
 #         query = (
-#             PostgreSQLQuery.into(self.table_users)
+#             PostgreSQLQuery.into(Name("users"))
 #             .insert(1)
-#             .on_conflict(self.table_users.id, self.table_users.sub_id)
+#             .on_conflict(Name("users").id, Name("users").sub_id)
 #             .do_nothing()
 #         )
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) ON CONFLICT ("id", "sub_id") DO NOTHING', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) ON CONFLICT ("id", "sub_id") DO NOTHING', str(query))
 #
-#     def test_insert_on_conflict_do_nothing_field_str(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1).on_conflict("id").do_nothing()
+#     def test_insert_on_conflict_do_nothing_field_str(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1).on_conflict("id").do_nothing()
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) ON CONFLICT ("id") DO NOTHING', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) ON CONFLICT ("id") DO NOTHING', str(query))
 #
-#     def test_insert_on_conflict_do_nothing_multiple_fields_str(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1).on_conflict("id", "sub_id").do_nothing()
+#     def test_insert_on_conflict_do_nothing_multiple_fields_str(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1).on_conflict("id", "sub_id").do_nothing()
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) ON CONFLICT ("id", "sub_id") DO NOTHING', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) ON CONFLICT ("id", "sub_id") DO NOTHING', str(query))
 #
-#     def test_insert_on_conflict_do_nothing_mixed_fields(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1).on_conflict("id", self.table_users.sub_id).do_nothing()
+#     def test_insert_on_conflict_do_nothing_mixed_fields(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1).on_conflict("id", Name("users").sub_id).do_nothing()
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) ON CONFLICT ("id", "sub_id") DO NOTHING', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) ON CONFLICT ("id", "sub_id") DO NOTHING', str(query))
 #
-#     def test_insert_on_conflict_do_update_field(self):
+#     def test_insert_on_conflict_do_update_field(visitors):
 #         query = (
-#             PostgreSQLQuery.into(self.table_users)
+#             PostgreSQLQuery.into(Name("users"))
 #             .insert(1, "m")
-#             .on_conflict(self.table_users.id)
-#             .do_update(self.table_users.name, "m")
+#             .on_conflict(Name("users").id)
+#             .do_update(Name("users").name, "m")
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO \"users\" VALUES (1,'m') ON CONFLICT (\"id\") DO UPDATE SET \"name\"='m'",
 #             str(query),
 #         )
 #
-#     def test_insert_on_conflict_do_update_multiple_fields(self):
+#     def test_insert_on_conflict_do_update_multiple_fields(visitors):
 #         query = (
-#             PostgreSQLQuery.into(self.table_users)
+#             PostgreSQLQuery.into(Name("users"))
 #             .insert(1, "m")
-#             .on_conflict(self.table_users.id, self.table_users.sub_id)
-#             .do_update(self.table_users.name, "m")
+#             .on_conflict(Name("users").id, Name("users").sub_id)
+#             .do_update(Name("users").name, "m")
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO \"users\" VALUES (1,'m') ON CONFLICT (\"id\", \"sub_id\") DO UPDATE SET \"name\"='m'",
 #             str(query),
 #         )
 #
-#     def test_insert_on_conflict_do_update_field_str(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1, "m").on_conflict("id").do_update("name", "m")
+#     def test_insert_on_conflict_do_update_field_str(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1, "m").on_conflict("id").do_update("name", "m")
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO \"users\" VALUES (1,'m') ON CONFLICT (\"id\") DO UPDATE SET \"name\"='m'",
 #             str(query),
 #         )
 #
-#     def test_insert_on_conflict_do_update_multiple_fields_str(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1, "m").on_conflict("id", "sub_id").do_update("name", "m")
+#     def test_insert_on_conflict_do_update_multiple_fields_str(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1, "m").on_conflict("id", "sub_id").do_update("name", "m")
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO \"users\" VALUES (1,'m') ON CONFLICT (\"id\", \"sub_id\") DO UPDATE SET \"name\"='m'",
 #             str(query),
 #         )
 #
-#     def test_insert_on_conflict_do_update_multiple_mixed_fields(self):
+#     def test_insert_on_conflict_do_update_multiple_mixed_fields(visitors):
 #         query = (
-#             PostgreSQLQuery.into(self.table_users)
+#             PostgreSQLQuery.into(Name("users"))
 #             .insert(1, "m")
-#             .on_conflict("id", self.table_users.sub_id)
+#             .on_conflict("id", Name("users").sub_id)
 #             .do_update("name", "m")
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO \"users\" VALUES (1,'m') ON CONFLICT (\"id\", \"sub_id\") DO UPDATE SET \"name\"='m'",
 #             str(query),
 #         )
 #
-#     def test_insert_on_conflict_no_handler(self):
+#     def test_insert_on_conflict_no_handler(visitors):
 #         with self.assertRaises(QueryException):
-#             query = str(PostgreSQLQuery.into(self.table_users).insert(1).on_conflict(self.table_users.id))
+#             query = str(PostgreSQLQuery.into(Name("users")).insert(1).on_conflict(Name("users").id))
 #
-#     def test_insert_on_conflict_two_handlers_do_nothing(self):
+#     def test_insert_on_conflict_two_handlers_do_nothing(visitors):
 #         with self.assertRaises(QueryException):
 #             query = (
-#                 PostgreSQLQuery.into(self.table_users)
+#                 PostgreSQLQuery.into(Name("users"))
 #                 .insert(1)
 #                 .on_conflict("id")
 #                 .do_nothing()
-#                 .do_update(self.table_users.name, "m")
+#                 .do_update(Name("users").name, "m")
 #             )
 #
-#     def test_insert_on_conflict_two_handlers_do_update(self):
+#     def test_insert_on_conflict_two_handlers_do_update(visitors):
 #         with self.assertRaises(QueryException):
 #             query = (
-#                 PostgreSQLQuery.into(self.table_users)
+#                 PostgreSQLQuery.into(Name("users"))
 #                 .insert(1)
-#                 .on_conflict(self.table_users.id)
-#                 .do_update(self.table_users.name, "m")
+#                 .on_conflict(Name("users").id)
+#                 .do_update(Name("users").name, "m")
 #                 .do_nothing()
 #             )
 #
-#     def test_non_insert_on_conflict_do_nothing(self):
+#     def test_non_insert_on_conflict_do_nothing(visitors):
 #         with self.assertRaises(QueryException):
-#             query = PostgreSQLQuery.update(self.table_users).set("foo", "bar").on_conflict("id").do_nothing()
+#             query = PostgreSQLQuery.update(Name("users")).set("foo", "bar").on_conflict("id").do_nothing()
 #
-#     def test_non_insert_on_conflict_do_update(self):
+#     def test_non_insert_on_conflict_do_update(visitors):
 #         with self.assertRaises(QueryException):
 #             query = (
-#                 PostgreSQLQuery.update(self.table_users).set("foo", "bar").on_conflict("id").do_update(["name"], ["m"])
+#                 PostgreSQLQuery.update(Name("users")).set("foo", "bar").on_conflict("id").do_update(["name"], ["m"])
 #             )
 #
-#     def test_insert_on_fieldless_conflict_do_nothing(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1).on_conflict(None).do_nothing()
+#     def test_insert_on_fieldless_conflict_do_nothing(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1).on_conflict(None).do_nothing()
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) ON CONFLICT DO NOTHING', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) ON CONFLICT DO NOTHING', str(query))
 #
-#     def test_insert_on_fieldless_conflict_do_update_field(self):
+#     def test_insert_on_fieldless_conflict_do_update_field(visitors):
 #         with self.assertRaises(QueryException):
 #             query = str(
-#                 PostgreSQLQuery.into(self.table_users)
+#                 PostgreSQLQuery.into(Name("users"))
 #                 .insert(1, "m")
 #                 .on_conflict(None)
-#                 .do_update(self.table_users.name, "m")
+#                 .do_update(Name("users").name, "m")
 #             )
 #
-#     def test_on_conflict_from_subquery(self):
+#     def test_on_conflict_from_subquery(visitors):
 #         table_bcd = Table('bcd')
 #         query = (
-#             PostgreSQLQuery.into(self.table_users)
-#             .insert(self.table_users.fname, self.table_users.lname)
+#             PostgreSQLQuery.into(Name("users"))
+#             .insert(Name("users").fname, Name("users").lname)
 #             .select(table_bcd.fname, table_bcd.lname)
 #             .from_(table_bcd)
-#             .on_conflict(self.table_users.id, self.table_users.sub_id)
-#             .do_update(self.table_users.fname, 1)
-#             .do_update(self.table_users.lname, table_bcd.lname)
+#             .on_conflict(Name("users").id, Name("users").sub_id)
+#             .do_update(Name("users").fname, 1)
+#             .do_update(Name("users").lname, table_bcd.lname)
 #             .do_update(
-#                 self.table_users.cname,
-#                 Case().when(self.table_users.cname.eq('cname'), 'new_name').else_(self.table_users.cname),
+#                 Name("users").cname,
+#                 Case().when(Name("users").cname.eq('cname'), 'new_name').else_(Name("users").cname),
 #             )
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             'INSERT INTO "users" VALUES ("fname","lname") '
 #             'ON CONFLICT ("id", "sub_id") '
 #             'DO UPDATE SET "fname"=1,"lname"="bcd"."lname",'
@@ -294,138 +300,138 @@ class TestInsertStatement(unittest.TestCase):
 #             str(query),
 #         )
 #
-#     def test_on_conflict_where_empty_conflict_fields_do_nothing(self):
+#     def test_on_conflict_where_empty_conflict_fields_do_nothing(visitors):
 #         with self.assertRaises(QueryException):
 #             (
-#                 PostgreSQLQuery.into(self.table_users)
+#                 PostgreSQLQuery.into(Name("users"))
 #                 .insert(1, "m")
 #                 .on_conflict()
-#                 .where(self.table_users.abc.eq(0))
-#                 .where(self.table_users.cde.eq(0))
+#                 .where(Name("users").abc.eq(0))
+#                 .where(Name("users").cde.eq(0))
 #                 .do_nothing()
 #             )
 #
-#     def test_on_conflict_where_conflict_fields_do_nothing(self):
+#     def test_on_conflict_where_conflict_fields_do_nothing(visitors):
 #         qs = (
-#             PostgreSQLQuery.into(self.table_users)
+#             PostgreSQLQuery.into(Name("users"))
 #             .insert(1, "m")
 #             .on_conflict('id')
-#             .where(self.table_users.abc.eq(0))
-#             .where(self.table_users.cde.eq(0))
+#             .where(Name("users").abc.eq(0))
+#             .where(Name("users").cde.eq(0))
 #             .do_nothing()
 #         )
-#         self.assertEqual(
+#         assert
 #             '''INSERT INTO "users" VALUES (1,'m') ON CONFLICT ("id") WHERE "abc"=0 AND "cde"=0 DO NOTHING''', str(qs)
 #         )
 #
-#     def test_on_conflict_where_empty_conflict_fields_do_update(self):
+#     def test_on_conflict_where_empty_conflict_fields_do_update(visitors):
 #         with self.assertRaises(QueryException):
 #             (
-#                 PostgreSQLQuery.into(self.table_users)
+#                 PostgreSQLQuery.into(Name("users"))
 #                 .insert(1, "m")
 #                 .on_conflict()
-#                 .where(self.table_users.abc.eq(0))
-#                 .where(self.table_users.cde.eq(0))
+#                 .where(Name("users").abc.eq(0))
+#                 .where(Name("users").cde.eq(0))
 #                 .do_update('field', 'val')
 #             )
 #
-#     def test_on_conflict_where_conflict_fields_do_update(self):
+#     def test_on_conflict_where_conflict_fields_do_update(visitors):
 #         qs = (
-#             PostgreSQLQuery.into(self.table_users)
+#             PostgreSQLQuery.into(Name("users"))
 #             .insert(1, "m")
 #             .on_conflict('id')
-#             .where(self.table_users.abc.eq(0))
-#             .where(self.table_users.cde.eq(0))
+#             .where(Name("users").abc.eq(0))
+#             .where(Name("users").cde.eq(0))
 #             .do_update('field', 'val')
 #         )
-#         self.assertEqual(
+#         assert
 #             '''INSERT INTO "users" VALUES (1,'m') ON CONFLICT ("id") WHERE "abc"=0 AND "cde"=0 '''
 #             '''DO UPDATE SET "field"='val\'''',
 #             str(qs),
 #         )
 #
-#     def test_where_and_on_conflict_where(self):
+#     def test_where_and_on_conflict_where(visitors):
 #         table_bcd = Table('bcd')
 #
 #         qs = (
-#             PostgreSQLQuery.into(self.table_users)
+#             PostgreSQLQuery.into(Name("users"))
 #             .select(table_bcd.abc)
 #             .from_(table_bcd)
 #             .where(table_bcd.abc.eq('1'))
 #             .on_conflict('id')
-#             .where(self.table_users.abc.eq(0))
-#             .where(self.table_users.cde.eq(0))
+#             .where(Name("users").abc.eq(0))
+#             .where(Name("users").cde.eq(0))
 #             .do_update('field', 'val')
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             'INSERT INTO "users" SELECT "abc" FROM "bcd" WHERE "abc"=\'1\' '
 #             'ON CONFLICT ("id") WHERE "abc"=0 AND "cde"=0 DO UPDATE SET "field"=\'val\'',
 #             str(qs),
 #         )
 #
-#     def test_on_conflict_do_nothing_where(self):
+#     def test_on_conflict_do_nothing_where(visitors):
 #         with self.assertRaises(QueryException):
 #             (
-#                 PostgreSQLQuery.into(self.table_users)
+#                 PostgreSQLQuery.into(Name("users"))
 #                 .insert(1, "m")
 #                 .on_conflict()
 #                 .do_nothing()
-#                 .where(self.table_users.abc.eq(1))
+#                 .where(Name("users").abc.eq(1))
 #             )
 #
-#     def test_empty_on_conflict_do_update_where(self):
+#     def test_empty_on_conflict_do_update_where(visitors):
 #         with self.assertRaises(QueryException):
 #             (
-#                 PostgreSQLQuery.into(self.table_users)
+#                 PostgreSQLQuery.into(Name("users"))
 #                 .insert(1, "m")
 #                 .on_conflict()
 #                 .do_update('abc', 1)
-#                 .where(self.table_users.abc.eq(1))
+#                 .where(Name("users").abc.eq(1))
 #             )
 #
-#     def test_on_conflict_do_update_where(self):
+#     def test_on_conflict_do_update_where(visitors):
 #         qs = (
-#             PostgreSQLQuery.into(self.table_users)
+#             PostgreSQLQuery.into(Name("users"))
 #             .insert(1, "m")
 #             .on_conflict("id")
 #             .do_update('abc', 1)
-#             .where(self.table_users.abc.eq(1))
+#             .where(Name("users").abc.eq(1))
 #         )
-#         self.assertEqual(
+#         assert
 #             'INSERT INTO "users" VALUES (1,\'m\') ON CONFLICT ("id") DO UPDATE SET "abc"=1 WHERE "abc"."abc"=1', str(qs)
 #         )
 #
-#     def test_on_conflict_do_update_with_excluded_where(self):
+#     def test_on_conflict_do_update_with_excluded_where(visitors):
 #         qs = (
-#             PostgreSQLQuery.into(self.table_users)
+#             PostgreSQLQuery.into(Name("users"))
 #             .insert(1, "m")
 #             .on_conflict("id")
 #             .do_update('abc')
-#             .where(self.table_users.abc.eq(1))
+#             .where(Name("users").abc.eq(1))
 #         )
-#         self.assertEqual(
+#         assert
 #             'INSERT INTO "users" VALUES (1,\'m\') ON CONFLICT ("id") DO UPDATE SET "abc"=EXCLUDED."abc" WHERE '
 #             '"abc"."abc"=1',
 #             str(qs),
 #         )
 #
-#     def test_on_conflict_where_complex(self):
+#     def test_on_conflict_where_complex(visitors):
 #         table_bcd = Table('bcd')
 #
 #         qs = (
-#             PostgreSQLQuery.into(self.table_users)
+#             PostgreSQLQuery.into(Name("users"))
 #             .select(table_bcd.abc)
 #             .from_(table_bcd)
 #             .where(table_bcd.abc.eq('1'))
 #             .on_conflict('id')
-#             .where(self.table_users.abc.eq(0))
-#             .where(self.table_users.cde.eq(0))
+#             .where(Name("users").abc.eq(0))
+#             .where(Name("users").cde.eq(0))
 #             .do_update('field', 'val')
-#             .where(self.table_users.id.eq(2))
-#             .where(self.table_users.sub_id.eq(3))
+#             .where(Name("users").id.eq(2))
+#             .where(Name("users").sub_id.eq(3))
 #         )
-#         self.assertEqual(
+#         assert
 #             'INSERT INTO "users" SELECT "abc" FROM "bcd" WHERE "abc"=\'1\' '
 #             'ON CONFLICT ("id") WHERE "abc"=0 AND "cde"=0 '
 #             'DO UPDATE SET "field"=\'val\' WHERE "abc"."id"=2 AND "abc"."sub_id"=3',
@@ -436,174 +442,174 @@ class TestInsertStatement(unittest.TestCase):
 # class PostgresInsertIntoReturningTests(unittest.TestCase):
 #     table_users = Table("abc")
 #
-#     def test_insert_returning_one_field(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1).returning(self.table_users.id)
+#     def test_insert_returning_one_field(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1).returning(Name("users").id)
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) RETURNING "id"', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) RETURNING "id"', str(query))
 #
-#     def test_insert_returning_one_field_str(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1).returning("id")
+#     def test_insert_returning_one_field_str(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1).returning("id")
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) RETURNING "id"', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) RETURNING "id"', str(query))
 #
-#     def test_insert_returning_all_fields(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1).returning(self.table_users.star)
+#     def test_insert_returning_all_fields(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1).returning(Name("users").star)
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) RETURNING *', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) RETURNING *', str(query))
 #
-#     def test_insert_returning_all_fields_and_arithmetics(self):
+#     def test_insert_returning_all_fields_and_arithmetics(visitors):
 #         query = (
-#             PostgreSQLQuery.into(self.table_users)
+#             PostgreSQLQuery.into(Name("users"))
 #             .insert(1)
-#             .returning(self.table_users.star, self.table_users.f1 + self.table_users.f2)
+#             .returning(Name("users").star, Name("users").f1 + Name("users").f2)
 #         )
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) RETURNING *,"f1"+"f2"', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) RETURNING *,"f1"+"f2"', str(query))
 #
-#     def test_insert_all_columns_multi_rows_chained_returning_star(self):
+#     def test_insert_all_columns_multi_rows_chained_returning_star(visitors):
 #         query = (
-#             PostgreSQLQuery.into(self.table_users)
+#             PostgreSQLQuery.into(Name("users"))
 #             .insert(1, "a", True)
 #             .insert(2, "b", False)
-#             .returning(self.table_users.star)
+#             .returning(Name("users").star)
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO \"users\" VALUES (1,'a',true),(2,'b',false) RETURNING *",
 #             str(query),
 #         )
 #
-#     def test_insert_all_columns_multi_rows_chained_returning_star_and_id(self):
+#     def test_insert_all_columns_multi_rows_chained_returning_star_and_id(visitors):
 #         query = (
-#             PostgreSQLQuery.into(self.table_users)
+#             PostgreSQLQuery.into(Name("users"))
 #             .insert(1, "a", True)
 #             .insert(2, "b", False)
 #             .returning(
-#                 self.table_users.name,
-#                 self.table_users.star,
-#                 self.table_users.id,
+#                 Name("users").name,
+#                 Name("users").star,
+#                 Name("users").id,
 #             )
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO \"users\" VALUES (1,'a',true),(2,'b',false) RETURNING *",
 #             str(query),
 #         )
 #
-#     def test_insert_all_columns_multi_rows_chained_returning_star_str(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1, "a", True).insert(2, "b", False).returning("*")
+#     def test_insert_all_columns_multi_rows_chained_returning_star_str(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1, "a", True).insert(2, "b", False).returning("*")
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO \"users\" VALUES (1,'a',true),(2,'b',false) RETURNING *",
 #             str(query),
 #         )
 #
-#     def test_insert_all_columns_single_element_arrays(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert((1, "a", True)).returning(self.table_users.star)
+#     def test_insert_all_columns_single_element_arrays(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert((1, "a", True)).returning(Name("users").star)
 #
-#         self.assertEqual("INSERT INTO \"users\" VALUES (1,'a',true) RETURNING *", str(query))
+#         assert "INSERT INTO \"users\" VALUES (1,'a',true) RETURNING *", str(query))
 #
-#     def test_insert_returning_null(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1).returning(None)
+#     def test_insert_returning_null(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1).returning(None)
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) RETURNING NULL', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) RETURNING NULL', str(query))
 #
-#     def test_insert_returning_tuple(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1).returning((1, 2, 3))
+#     def test_insert_returning_tuple(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1).returning((1, 2, 3))
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) RETURNING (1,2,3)', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) RETURNING (1,2,3)', str(query))
 #
-#     def test_insert_returning_arithmetics(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1).returning(self.table_users.f1 + self.table_users.f2)
+#     def test_insert_returning_arithmetics(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1).returning(Name("users").f1 + Name("users").f2)
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) RETURNING "f1"+"f2"', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) RETURNING "f1"+"f2"', str(query))
 #
-#     def test_insert_returning_functions(self):
-#         query = PostgreSQLQuery.into(self.table_users).insert(1).returning(Cast(self.table_users.f1, "int"))
+#     def test_insert_returning_functions(visitors):
+#         query = PostgreSQLQuery.into(Name("users")).insert(1).returning(Cast(Name("users").f1, "int"))
 #
-#         self.assertEqual('INSERT INTO "users" VALUES (1) RETURNING CAST("f1" AS INT)', str(query))
+#         assert 'INSERT INTO "users" VALUES (1) RETURNING CAST("f1" AS INT)', str(query))
 #
-#     def test_insert_returning_aggregate(self):
+#     def test_insert_returning_aggregate(visitors):
 #         with self.assertRaises(QueryException):
-#             PostgreSQLQuery.into(self.table_users).insert(1).returning(Avg(self.table_users.views))
+#             PostgreSQLQuery.into(Name("users")).insert(1).returning(Avg(Name("users").views))
 #
-#     def test_insert_returning_from_other_table(self):
+#     def test_insert_returning_from_other_table(visitors):
 #         table_cba = Table("cba")
 #         with self.assertRaises(QueryException):
-#             PostgreSQLQuery.into(self.table_users).insert(1).returning(table_cba.id)
+#             PostgreSQLQuery.into(Name("users")).insert(1).returning(table_cba.id)
 #
 #
 # class InsertIntoOnDuplicateTests(unittest.TestCase):
 #     table_users = Table("abc")
 #
-#     def test_insert_one_column(self):
+#     def test_insert_one_column(visitors):
 #         query = (
-#             MySQLQuery.into(self.table_users).insert(1).on_duplicate_key_update(self.table_users.foo, self.table_users.foo)
+#             MySQLQuery.into(Name("users")).insert(1).on_duplicate_key_update(Name("users").foo, Name("users").foo)
 #         )
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO `abc` VALUES (1) ON DUPLICATE KEY UPDATE `foo`=`foo`",
 #             str(query),
 #         )
 #
-#     def test_insert_one_column_using_values(self):
+#     def test_insert_one_column_using_values(visitors):
 #         query = (
-#             MySQLQuery.into(self.table_users)
+#             MySQLQuery.into(Name("users"))
 #             .insert(1)
-#             .on_duplicate_key_update(self.table_users.foo, Values(self.table_users.foo))
+#             .on_duplicate_key_update(Name("users").foo, Values(Name("users").foo))
 #         )
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO `abc` VALUES (1) ON DUPLICATE KEY UPDATE `foo`=VALUES(`foo`)",
 #             str(query),
 #         )
 #
-#     def test_insert_one_column_single_element_array(self):
+#     def test_insert_one_column_single_element_array(visitors):
 #         query = (
-#             MySQLQuery.into(self.table_users).insert((1,)).on_duplicate_key_update(self.table_users.foo, self.table_users.foo)
+#             MySQLQuery.into(Name("users")).insert((1,)).on_duplicate_key_update(Name("users").foo, Name("users").foo)
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO `abc` VALUES (1) ON DUPLICATE KEY UPDATE `foo`=`foo`",
 #             str(query),
 #         )
 #
-#     def test_insert_one_column_multi_element_array(self):
+#     def test_insert_one_column_multi_element_array(visitors):
 #         query = (
-#             MySQLQuery.into(self.table_users)
+#             MySQLQuery.into(Name("users"))
 #             .insert((1,), (2,))
-#             .on_duplicate_key_update(self.table_users.foo, self.table_users.foo)
+#             .on_duplicate_key_update(Name("users").foo, Name("users").foo)
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO `abc` VALUES (1),(2) ON DUPLICATE KEY UPDATE `foo`=`foo`",
 #             str(query),
 #         )
 #
-#     def test_insert_multiple_columns_on_duplicate_update_one_with_same_value(self):
+#     def test_insert_multiple_columns_on_duplicate_update_one_with_same_value(visitors):
 #         query = (
-#             MySQLQuery.into(self.table_users)
+#             MySQLQuery.into(Name("users"))
 #             .insert(1, "a")
-#             .on_duplicate_key_update(self.table_users.bar, Values(self.table_users.bar))
+#             .on_duplicate_key_update(Name("users").bar, Values(Name("users").bar))
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO `abc` VALUES (1,'a') ON DUPLICATE KEY UPDATE `bar`=VALUES(`bar`)",
 #             str(query),
 #         )
 #
-#     def test_insert_multiple_columns_on_duplicate_update_one_with_different_value(self):
-#         query = MySQLQuery.into(self.table_users).insert(1, "a").on_duplicate_key_update(self.table_users.bar, "b")
+#     def test_insert_multiple_columns_on_duplicate_update_one_with_different_value(visitors):
+#         query = MySQLQuery.into(Name("users")).insert(1, "a").on_duplicate_key_update(Name("users").bar, "b")
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO `abc` VALUES (1,'a') ON DUPLICATE KEY UPDATE `bar`='b'",
 #             str(query),
 #         )
 #
-#     def test_insert_multiple_columns_on_duplicate_update_one_with_expression(self):
+#     def test_insert_multiple_columns_on_duplicate_update_one_with_expression(visitors):
 #         query = (
-#             MySQLQuery.into(self.table_users).insert(1, 2).on_duplicate_key_update(self.table_users.bar, 4 + F("bar"))
+#             MySQLQuery.into(Name("users")).insert(1, 2).on_duplicate_key_update(Name("users").bar, 4 + F("bar"))
 #         )  # todo sql expression? not python
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO `abc` VALUES (1,2) ON DUPLICATE KEY UPDATE `bar`=4+`bar`",
 #             str(query),
 #         )
@@ -612,12 +618,12 @@ class TestInsertStatement(unittest.TestCase):
 #         self,
 #     ):
 #         query = (
-#             MySQLQuery.into(self.table_users)
+#             MySQLQuery.into(Name("users"))
 #             .insert(1, "a")
-#             .on_duplicate_key_update(self.table_users.bar, fn.Concat(self.table_users.bar, "update"))
+#             .on_duplicate_key_update(Name("users").bar, fn.Concat(Name("users").bar, "update"))
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO `abc` VALUES (1,'a') ON DUPLICATE KEY UPDATE `bar`=CONCAT(`bar`,'update')",
 #             str(query),
 #         )
@@ -626,81 +632,81 @@ class TestInsertStatement(unittest.TestCase):
 #         self,
 #     ):
 #         query = (
-#             MySQLQuery.into(self.table_users)
+#             MySQLQuery.into(Name("users"))
 #             .insert(1, "a")
-#             .on_duplicate_key_update(self.table_users.bar, fn.Concat(Values(self.table_users.bar), "update"))
+#             .on_duplicate_key_update(Name("users").bar, fn.Concat(Values(Name("users").bar), "update"))
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO `abc` VALUES (1,'a') ON DUPLICATE KEY UPDATE `bar`=CONCAT(VALUES(`bar`),'update')",
 #             str(query),
 #         )
 #
-#     def test_insert_multiple_columns_on_duplicate_update_multiple(self):
+#     def test_insert_multiple_columns_on_duplicate_update_multiple(visitors):
 #         query = (
-#             MySQLQuery.into(self.table_users)
+#             MySQLQuery.into(Name("users"))
 #             .insert(1, "a", "b")
-#             .on_duplicate_key_update(self.table_users.bar, "b")
-#             .on_duplicate_key_update(self.table_users.baz, "c")
+#             .on_duplicate_key_update(Name("users").bar, "b")
+#             .on_duplicate_key_update(Name("users").baz, "c")
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO `abc` VALUES (1,'a','b') ON DUPLICATE KEY UPDATE `bar`='b',`baz`='c'",
 #             str(query),
 #         )
 #
-#     def test_insert_multi_rows_chained_mixed_on_duplicate_update_multiple(self):
+#     def test_insert_multi_rows_chained_mixed_on_duplicate_update_multiple(visitors):
 #         query = (
-#             MySQLQuery.into(self.table_users)
+#             MySQLQuery.into(Name("users"))
 #             .insert((1, "a", True), (2, "b", False))
 #             .insert(3, "c", True)
-#             .on_duplicate_key_update(self.table_users.foo, self.table_users.foo)
-#             .on_duplicate_key_update(self.table_users.bar, Values(self.table_users.bar))
+#             .on_duplicate_key_update(Name("users").foo, Name("users").foo)
+#             .on_duplicate_key_update(Name("users").bar, Values(Name("users").bar))
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO `abc` VALUES (1,'a',true),(2,'b',false),(3,'c',true) "
 #             "ON DUPLICATE KEY UPDATE `foo`=`foo`,`bar`=VALUES(`bar`)",
 #             str(query),
 #         )
 #
-#     def test_insert_selected_columns_on_duplicate_update_one(self):
+#     def test_insert_selected_columns_on_duplicate_update_one(visitors):
 #         query = (
-#             MySQLQuery.into(self.table_users)
-#             .column(self.table_users.foo, self.table_users.bar, self.table_users.baz)
+#             MySQLQuery.into(Name("users"))
+#             .column(Name("users").foo, Name("users").bar, Name("users").baz)
 #             .insert(1, "a", True)
-#             .on_duplicate_key_update(self.table_users.baz, False)
+#             .on_duplicate_key_update(Name("users").baz, False)
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO `abc` (`foo`,`bar`,`baz`) VALUES (1,'a',true) ON DUPLICATE KEY UPDATE `baz`=false",
 #             str(query),
 #         )
 #
-#     def test_insert_selected_columns_on_duplicate_update_multiple(self):
+#     def test_insert_selected_columns_on_duplicate_update_multiple(visitors):
 #         query = (
-#             MySQLQuery.into(self.table_users)
-#             .column(self.table_users.foo, self.table_users.bar, self.table_users.baz)
+#             MySQLQuery.into(Name("users"))
+#             .column(Name("users").foo, Name("users").bar, Name("users").baz)
 #             .insert(1, "a", True)
-#             .on_duplicate_key_update(self.table_users.baz, False)
-#             .on_duplicate_key_update(self.table_users.bar, Values(self.table_users.bar))
+#             .on_duplicate_key_update(Name("users").baz, False)
+#             .on_duplicate_key_update(Name("users").bar, Values(Name("users").bar))
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT INTO `abc` (`foo`,`bar`,`baz`) VALUES (1,'a',true) "
 #             "ON DUPLICATE KEY UPDATE `baz`=false,`bar`=VALUES(`bar`)",
 #             str(query),
 #         )
 #
-#     def test_insert_none_skipped(self):
-#         query = MySQLQuery.into(self.table_users).insert().on_duplicate_key_update(self.table_users.baz, False)
+#     def test_insert_none_skipped(visitors):
+#         query = MySQLQuery.into(Name("users")).insert().on_duplicate_key_update(Name("users").baz, False)
 #
-#         self.assertEqual("", str(query))
+#         assert "", str(query))
 #
-#     def test_insert_ignore(self):
-#         query = MySQLQuery.into(self.table_users).insert(1).ignore().on_duplicate_key_update(self.table_users.baz, False)
+#     def test_insert_ignore(visitors):
+#         query = MySQLQuery.into(Name("users")).insert(1).ignore().on_duplicate_key_update(Name("users").baz, False)
 #
-#         self.assertEqual(
+#         assert
 #             "INSERT IGNORE INTO `abc` VALUES (1) ON DUPLICATE KEY UPDATE `baz`=false",
 #             str(query),
 #         )
@@ -709,60 +715,60 @@ class TestInsertStatement(unittest.TestCase):
 # class InsertSelectFromTests(unittest.TestCase):
 #     table_users, table_efg, table_hij = Tables("abc", "efg", "hij")
 #
-#     def test_insert_star(self):
-#         query = Query.into(self.table_users).from_(self.table_efg).select("*")
+#     def test_insert_star(visitors):
+#         query = Query.into(Name("users")).from_(self.table_efg).select("*")
 #
-#         self.assertEqual('INSERT INTO "users" SELECT * FROM "efg"', str(query))
+#         assert 'INSERT INTO "users" SELECT * FROM "efg"', str(query))
 #
-#     def test_insert_ignore_star(self):
-#         query = Query.into(self.table_users).from_(self.table_efg).select("*").ignore()
+#     def test_insert_ignore_star(visitors):
+#         query = Query.into(Name("users")).from_(self.table_efg).select("*").ignore()
 #
-#         self.assertEqual('INSERT IGNORE INTO "abc" SELECT * FROM "efg"', str(query))
+#         assert 'INSERT IGNORE INTO "abc" SELECT * FROM "efg"', str(query))
 #
-#     def test_insert_from_columns(self):
+#     def test_insert_from_columns(visitors):
 #         query = (
-#             Query.into(self.table_users)
+#             Query.into(Name("users"))
 #             .from_(self.table_efg)
 #             .select(self.table_efg.fiz, self.table_efg.buz, self.table_efg.baz)
 #         )
 #
-#         self.assertEqual('INSERT INTO "users" ' 'SELECT "fiz","buz","baz" FROM "efg"', str(query))
+#         assert 'INSERT INTO "users" ' 'SELECT "fiz","buz","baz" FROM "efg"', str(query))
 #
-#     def test_insert_columns_from_star(self):
+#     def test_insert_columns_from_star(visitors):
 #         query = (
-#             Query.into(self.table_users)
+#             Query.into(Name("users"))
 #             .column(
-#                 self.table_users.foo,
-#                 self.table_users.bar,
-#                 self.table_users.buz,
+#                 Name("users").foo,
+#                 Name("users").bar,
+#                 Name("users").buz,
 #             )
 #             .from_(self.table_efg)
 #             .select("*")
 #         )
 #
-#         self.assertEqual('INSERT INTO "users" ("foo","bar","buz") ' 'SELECT * FROM "efg"', str(query))
+#         assert 'INSERT INTO "users" ("foo","bar","buz") ' 'SELECT * FROM "efg"', str(query))
 #
-#     def test_insert_columns_from_columns(self):
+#     def test_insert_columns_from_columns(visitors):
 #         query = (
-#             Query.into(self.table_users)
-#             .column(self.table_users.foo, self.table_users.bar, self.table_users.buz)
+#             Query.into(Name("users"))
+#             .column(Name("users").foo, Name("users").bar, Name("users").buz)
 #             .from_(self.table_efg)
 #             .select(self.table_efg.fiz, self.table_efg.buz, self.table_efg.baz)
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             'INSERT INTO "users" ("foo","bar","buz") ' 'SELECT "fiz","buz","baz" FROM "efg"',
 #             str(query),
 #         )
 #
-#     def test_insert_columns_from_columns_with_join(self):
+#     def test_insert_columns_from_columns_with_join(visitors):
 #         query = (
-#             Query.into(self.table_users)
+#             Query.into(Name("users"))
 #             .column(
-#                 self.table_users.c1,
-#                 self.table_users.c2,
-#                 self.table_users.c3,
-#                 self.table_users.c4,
+#                 Name("users").c1,
+#                 Name("users").c2,
+#                 Name("users").c3,
+#                 Name("users").c4,
 #             )
 #             .from_(self.table_efg)
 #             .select(self.table_efg.foo, self.table_efg.bar)
@@ -771,7 +777,7 @@ class TestInsertStatement(unittest.TestCase):
 #             .select(self.table_hij.fiz, self.table_hij.buz)
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             'INSERT INTO "users" ("c1","c2","c3","c4") '
 #             'SELECT "efg"."foo","efg"."bar","hij"."fiz","hij"."buz" FROM "efg" '
 #             'JOIN "hij" ON "efg"."id"="hij"."abc_id"',
@@ -780,7 +786,7 @@ class TestInsertStatement(unittest.TestCase):
 #
 #
 # class InsertSubqueryTests(unittest.TestCase):
-#     def test_insert_subquery_wrapped_in_brackets(self):
+#     def test_insert_subquery_wrapped_in_brackets(visitors):
 #         purchase_order_item, part = Tables("purchase_order_item", "part")
 #
 #         q = (
@@ -792,7 +798,7 @@ class TestInsertStatement(unittest.TestCase):
 #             )
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             'INSERT INTO "purchase_order_item" '
 #             '("id_part","id_customer") '
 #             "VALUES "
@@ -804,31 +810,31 @@ class TestInsertStatement(unittest.TestCase):
 # class SelectIntoTests(unittest.TestCase):
 #     table_users, table_efg, table_hij = Tables("abc", "efg", "hij")
 #
-#     def test_select_star_into(self):
-#         query = Query.from_(self.table_users).select("*").into(self.table_efg)
+#     def test_select_star_into(visitors):
+#         query = Query.from_(Name("users")).select("*").into(self.table_efg)
 #
-#         self.assertEqual('SELECT * INTO "efg" FROM "abc"', str(query))
+#         assert 'SELECT * INTO "efg" FROM "abc"', str(query))
 #
-#     def test_select_columns_into(self):
+#     def test_select_columns_into(visitors):
 #         query = (
-#             Query.from_(self.table_users)
-#             .select(self.table_users.foo, self.table_users.bar, self.table_users.buz)
+#             Query.from_(Name("users"))
+#             .select(Name("users").foo, Name("users").bar, Name("users").buz)
 #             .into(self.table_efg)
 #         )
 #
-#         self.assertEqual('SELECT "foo","bar","buz" INTO "efg" FROM "abc"', str(query))
+#         assert 'SELECT "foo","bar","buz" INTO "efg" FROM "abc"', str(query))
 #
-#     def test_select_columns_into_with_join(self):
+#     def test_select_columns_into_with_join(visitors):
 #         query = (
-#             Query.from_(self.table_users)
-#             .select(self.table_users.foo, self.table_users.bar)
+#             Query.from_(Name("users"))
+#             .select(Name("users").foo, Name("users").bar)
 #             .join(self.table_hij)
-#             .on(self.table_users.id == self.table_hij.abc_id)
+#             .on(Name("users").id == self.table_hij.abc_id)
 #             .select(self.table_hij.fiz, self.table_hij.buz)
 #             .into(self.table_efg)
 #         )
 #
-#         self.assertEqual(
+#         assert
 #             'SELECT "abc"."foo","abc"."bar","hij"."fiz","hij"."buz" '
 #             'INTO "efg" FROM "abc" '
 #             'JOIN "hij" ON "abc"."id"="hij"."abc_id"',
