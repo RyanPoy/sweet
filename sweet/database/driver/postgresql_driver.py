@@ -59,7 +59,11 @@ class PostgreSQLDriver(BaseDriver):
     async def fetchone(self, sql, *params):
         """Returns the first row returned for the given query."""
         rows = await self._fetch(sql, *params)
-        return rows[0] if rows else None
+        if not rows:
+            return None
+        row = rows[0]
+        columns = list(row.keys())
+        return dict(zip(columns, row))
 
     async def fetchall(self, sql, *params):
         """Returns a row list for the given query and parameters."""

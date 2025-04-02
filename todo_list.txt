@@ -1,5 +1,8 @@
 √ # model进行__init__的时候，要根据column的类型，从而进行数据的强制类型转化
 √ # model进行from__db的时候，要根据column的类型，把数据进行强制类型转化
+
+# model 的 integration tests 需要提前准备好表格和数据库，这个时候的sqlite可以考虑用文件的，不用memory了
+
 # model的查询
 model.objects.filter()
 model.objects.sql()
@@ -17,10 +20,13 @@ model.objects.create()
 model.objects.bulk_create()
 注意：bulk_create()的时候，怎么给model的id赋值呢？
 
+
 # model的修改
 model.objects.update()
 model.objects.bulk_update()
 
+
+# 在adapter通过fetchone或者fetchall后，怎么把结果中的row，转成为一个model
 
 # integration tests中，使用db的连接，需要性能改进，不能每次都去连接，应该共用连接池
 
@@ -69,5 +75,3 @@ model.objects.bulk_update()
   封装了Binary的集合
 
 √ Select + Update + Delete => Where + Having => Q => Binary => Value + K + Array
-
-

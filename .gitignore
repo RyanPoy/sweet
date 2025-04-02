@@ -5,4 +5,5 @@ __pycache__
 sweet.iml
 sweet.sqlite
 poetry.lock
+tests/sweet.sqlite3
 venv/

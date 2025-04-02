@@ -244,6 +244,9 @@ class Columns:
     def get(self, name: str) -> Column:
         return self.data.get(name, None)
 
+    def __iter__(self):
+        return iter(self.data.items())
+
 
 @dataclass
 class Table:

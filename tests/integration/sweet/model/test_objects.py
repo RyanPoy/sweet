@@ -3,16 +3,27 @@ import unittest
 from sweet.environment import Environment
 from sweet.model import Column, Model
 from sweet.model.objects import Objects
+from tests import helper
 from tests.helper import db, settings_mysql, settings_postgresql, settings_sqlite, User
+from tests.helper.sqls import mysql_sql, postgres_sql, sqlite_sql
 
 
 class TestObjects(unittest.IsolatedAsyncioTestCase):
 
-    def setUp(self):
+    async def asyncSetUp(self):
         self.mysql_env = Environment(settings_mysql)
         self.sqlite_env = Environment(settings_sqlite)
         self.pg_env = Environment(settings_postgresql)
         self.envs = (self.mysql_env, self.sqlite_env, self.pg_env)
+
+        for env, sqls in zip(self.envs, [mysql_sql.CREATE_SQLS, sqlite_sql.CREATE_SQLS, postgres_sql.CREATE_SQLS]):
+            async with db.using(env) as driver:
+                await helper.create_tables_for_model(driver, sqls)
+
+    async def asyncTearDown(self):
+        for env, sqls in zip(self.envs, [mysql_sql.DROP_SQLS, sqlite_sql.DROP_SQLS, postgres_sql.DROP_SQLS]):
+            async with db.using(env) as driver:
+                await helper.delete_all_models(driver, sqls)
 
     def test_init_from_model(self):
         class Demo(Model): pass
@@ -49,17 +60,12 @@ class TestObjects(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(expected, sql, f'Environment[{driver.__class__.__name__}]')
 
     async def test_insert_and_first(self):
-        expectations = [
-            """SELECT * FROM `users` LIMIT 1""",
-            """SELECT * FROM "users" LIMIT 1""",
-            """SELECT * FROM "users" LIMIT 1""",
-        ]
-        user = User(id=1, name=20)
         for i, env in enumerate(self.envs):
-            u = User.objects.insert(user.dict())
             async with db.using(env):
-                u = await User.objects.first()
-                self.assertEqual(u, '')
+                u1 = await User.objects.insert({'id': 1, 'name': "lily"})
+                u2 = await User.objects.first()
+                self.assertEqual(u2.id, 1)
+                self.assertEqual(u2.name, "lily")
 
 
 if __name__ == '__main__':

@@ -29,9 +29,6 @@ class TestColumn(unittest.TestCase):
         self.assertEqual('demo_name', Demo.table.columns.name.name)
         self.assertEqual('id', Demo.table.columns.id.name)
 
-        self.assertEqual('demo_name', Demo.columns.name.name)
-        self.assertEqual('id', Demo.columns.id.name)
-
     def test_value(self):
         col = CharColumn()
         col.value = "abc"

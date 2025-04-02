@@ -42,7 +42,9 @@ class BaseDriver(ABC):
     async def fetchone(self, sql, *params):
         """Returns the first row returned for the given query."""
         async with self._execute(sql, *params) as cursor:
-            return await cursor.fetchone()
+            columns = [col[0] for col in cursor.description]
+            row = await cursor.fetchone()
+            return dict(zip(columns, row))
 
     async def fetchall(self, sql, *params):
         """Returns a row list for the given query and parameters."""

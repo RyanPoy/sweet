@@ -3,7 +3,8 @@ from __future__ import annotations
 import copy
 from typing import Self, TYPE_CHECKING
 
-from sweet.sequel.terms.name_fn import Count
+from sweet.sequel.statements.insert_statement import InsertStatement
+from sweet.sequel.terms.name_fn import Name
 from sweet.sequel.visitors.visitor import Visitor
 from sweet.utils import class_property
 from sweet.model import Column, consts
@@ -46,9 +47,7 @@ class Objects:
         :param kwargs:
         :return:
         """
-        for k, v in kwargs.items():
-            if not self.model_class.table.has_column(k):
-                raise Column.DoesNotExist(k, self.model_class.table.name)
+        self.check_column_exists(kwargs)
         objs = self._copy()
         objs._select_stmt.where(**kwargs)
         return objs
@@ -57,11 +56,12 @@ class Objects:
         sql = self.sql()
         return self.adapter.fetchall(sql)
 
-    # def first(self) -> 'Model' | None:
-    #     stmt = SelectStatement().from_(self.model_class.table.name_named).where(self.binary).limit(1)
-    #     sql = self.sql_visitor.sql(stmt)
-    #     return self.adapter.fetchone(sql)
-    #
+    async def first(self) -> 'Model' | None:
+        stmt = copy.deepcopy(self._select_stmt).limit(1)
+        sql = self.sql_visitor.sql(stmt)
+        d = await self.adapter.fetchone(sql)
+        return self.model_class(**d)
+
     # def last(self) -> 'Model' | None:
     #     stmt = SelectStatement().from_(self.model_class.table.name_named).where(self.binary)
     #     sql = self.sql_visitor.sql(stmt.select(Count()))
@@ -79,3 +79,21 @@ class Objects:
         objs = self.__class__(self.model_class)
         objs.__select_stmt = copy.deepcopy(self.__select_stmt)
         return objs
+
+    async def insert(self, *records: [dict]) -> None:
+        for r in records:
+            self.check_column_exists(r)
+
+        cols = [Name(k) for k, v in records[0].items()]
+        stmt = InsertStatement(self.model_class.table.name_named).column(*cols)
+        values = [tuple(r.values()) for r in records]
+        stmt.insert(*values)
+
+        sql = self.sql_visitor.sql(stmt)
+        await self.adapter.execute(sql)
+
+    def check_column_exists(self, r: dict) -> bool:
+        for k, v in r.items():
+            if not self.model_class.table.has_column(k):
+                raise Column.DoesNotExist(k, self.model_class.table.name)
+        return True
