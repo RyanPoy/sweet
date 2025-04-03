@@ -61,9 +61,8 @@ class SQLiteDriver(BaseDriver):
     async def columns(self, table_name: str) -> list[dict]:
         sql = f"PRAGMA table_info({table_name})"
         rows = await self.fetchall(sql)
-        # names = ('cid', 'name', 'type', 'notnull', 'default', 'is_pk')
         return [
-            {'name': r[1], 'kind': r[2], 'null': r[3] == 0, 'key': '', 'default': r[4], 'extra': str(r[5])} for r in rows
+            {'name': r['name'], 'kind': r['type'], 'null': r['notnull'] == 0, 'key': '', 'default': r['dflt_value'], 'extra': str(r['pk'])} for r in rows
         ]
 
 

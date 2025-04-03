@@ -50,21 +50,18 @@ async def _env(settings, create_sqls, drop_sqls):
 
 @pytest_asyncio.fixture
 async def mysql_env():
-    print("*" * 20, "mysql")
     async with _env(settings_mysql, mysql_sql.CREATE_SQLS, mysql_sql.DROP_SQLS) as env:
         yield env
 
 
 @pytest_asyncio.fixture
 async def sqlite_env():
-    print("*" * 20, "sqlite")
     async with _env(settings_sqlite, sqlite_sql.CREATE_SQLS, sqlite_sql.DROP_SQLS) as env:
         yield env
 
 
 @pytest_asyncio.fixture
 async def pg_env():
-    print("*" * 20, "pg")
     async with _env(settings_postgresql, postgres_sql.CREATE_SQLS, postgres_sql.DROP_SQLS) as env:
         yield env
 

@@ -7,7 +7,6 @@ CREATE_SQLS = [
     """
 ]
 
-
 DROP_SQLS = [
     """DROP TABLE IF EXISTS users""",
 ]

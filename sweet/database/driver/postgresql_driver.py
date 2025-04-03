@@ -101,10 +101,7 @@ class PostgreSQLDriver(BaseDriver):
 
     async def columns(self, table_name: str) -> list[dict]:
         sql = f"SELECT column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_name = '{table_name}'"
-
         rows = await self.fetchall(sql)
-        # Field | Type | Null | Default |
-        # names = ('name', 'kind', 'null', 'default')
         return [
-            {'name': r[0], 'kind': r[1], 'null': r[2], 'key': '', 'default': r[3], 'extra': ''} for r in rows
+            {'name': r['column_name'], 'kind': r['data_type'], 'null': r['is_nullable'], 'key': '', 'default': r['column_default'], 'extra': ''} for r in rows
         ]

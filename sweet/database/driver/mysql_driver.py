@@ -59,5 +59,5 @@ class MySQLDriver(BaseDriver):
         # Field | Type | Null | Key | Default | Extra |
         # names = ('name', 'kind', 'null', 'key', 'default', 'extra')
         return [
-            {'name': r[0], 'kind': r[1], 'null': r[2], 'key': r[3], 'default': r[4], 'extra': r[5]} for r in rows
+            {'name': r['Field'], 'kind': r['Type'], 'null': r['Null'], 'key': r['Key'], 'default': r['Default'], 'extra': r['Extra']} for r in rows
         ]
