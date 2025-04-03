@@ -1,5 +1,5 @@
 import pytest
-from sweet.model.auto_column import Column, ColumnKind, Columns
+from sweet.models.auto_column import Column, ColumnKind, Columns
 
 
 @pytest.mark.asyncio

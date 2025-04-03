@@ -10,7 +10,7 @@ class ModelMetaClass(type):
     def __init__(cls, name, bases, attr):
 
         if name != 'Model' and getattr(cls, '_%s__abs' % name, False) is False:
-            # set __tablename__ to model Class
+            # set __tablename__ to models Class
             if not hasattr(cls, '__tablename__'):
                 setattr(cls, '__tablename__', tableize(cls.__name__))
 
@@ -242,8 +242,8 @@ class Model(metaclass=ModelMetaClass):
     @classmethod
     def find(cls, *ids):
         """ find by ids. there are 2 cases.
-        case 1: one id，should return model instance if found else None
-        case 2: multiple ids, should return the model list
+        case 1: one id，should return models instance if found else None
+        case 2: multiple ids, should return the models list
         """
         if len(ids) == 1:
             return cls.objects.where(id=ids).first()

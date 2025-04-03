@@ -65,7 +65,7 @@ class ReloadCacheMethod:
 
     def __call__(self):
         name = self.__class__.pattern.match(self.method_name).groups()[0]
-        # return self.model._delete_relation_cache(name)
+        # return self.models._delete_relation_cache(name)
         return self
 
 
@@ -86,7 +86,7 @@ class BuildAssociationMethod:
     def __call__(self):
         name = self.__class__.pattern.match(self.method_name).groups()[0]
         print ('*'*10, name)
-        # return self.model._delete_relation_cache(name)
+        # return self.models._delete_relation_cache(name)
         return self
 
 

@@ -9,9 +9,9 @@ from sweet.utils import *
 class HasMany(Relation):
     
     def __init__(self, owner=None, target=None, name=None, fk=None, cascade=False):
-        """ owner model has many target model
-        :param owner: model class
-        :param target: model class
+        """ owner models has many target models
+        :param owner: models class
+        :param target: models class
         :param name: attribute name of owner.
         :param fk: foreign key of target
         :param pk: primary key of owner

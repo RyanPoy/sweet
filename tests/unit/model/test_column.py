@@ -2,9 +2,9 @@ import pytest
 from datetime import date, datetime, time
 from decimal import Decimal
 
-from sweet.model.columns import BinaryColumn, BooleanColumn, CharColumn, DateColumn, DatetimeColumn, DecimalColumn, FloatColumn, IntColumn, TextColumn, \
+from sweet.models.columns import BinaryColumn, BooleanColumn, CharColumn, DateColumn, DatetimeColumn, DecimalColumn, FloatColumn, IntColumn, TextColumn, \
     TimeColumn
-from sweet.model import Model
+from sweet.models import Model
 
 
 def test_unavailable_length():

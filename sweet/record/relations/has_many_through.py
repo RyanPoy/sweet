@@ -6,9 +6,9 @@ from sweet.utils import *
 
 
 class HasManyThrough(Relation):
-    """owner model belongs to target model
-    :param owner: model class
-    :param target: model class
+    """owner models belongs to target models
+    :param owner: models class
+    :param target: models class
     :param name: attribute name of owner.
     :param fk: foreign key of owner
     :param pk: primary key of target

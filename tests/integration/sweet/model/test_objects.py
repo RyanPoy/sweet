@@ -1,7 +1,7 @@
 import pytest
 
-from sweet.model import Column, Model
-from sweet.model.objects import Objects
+from sweet.models import Column, Model
+from sweet.models.objects import Objects
 from tests.helper import User
 
 

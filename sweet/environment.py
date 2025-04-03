@@ -3,7 +3,8 @@ from typing import Self
 from sweet.drivers import MySQLDriver
 from sweet.drivers import PostgreSQLDriver
 from sweet.drivers import SQLiteDriver
-from sweet.model import Objects, consts
+from sweet.models import Objects
+from sweet import consts
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor

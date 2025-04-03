@@ -7,10 +7,11 @@ from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.terms.name_fn import Name
 from sweet.sequel.visitors.visitor import Visitor
 from sweet.utils import class_property
-from sweet.model import Column, consts
+from sweet.models.columns import Column
+from sweet import consts
 
 if TYPE_CHECKING:
-    from sweet.model import Model
+    from sweet.models import Model
 
 from sweet.sequel.statements.select_statement import SelectStatement
 

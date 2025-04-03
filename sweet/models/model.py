@@ -1,6 +1,6 @@
-from sweet.model import consts
-from sweet.model.columns import Column, Table
-from sweet.model.objects import Objects
+from sweet import consts
+from sweet.models.columns import Column, Table
+from sweet.models.objects import Objects
 from sweet.utils import class_property
 from sweet.utils.inflection import tableize
 
