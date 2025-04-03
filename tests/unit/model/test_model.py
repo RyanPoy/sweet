@@ -1,5 +1,5 @@
 from sweet.sequel.terms.name_fn import Name
-from tests.helper import User
+from tests.helper.models import User
 
 
 def test_table_name():

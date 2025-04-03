@@ -2,7 +2,7 @@ import pytest
 
 from sweet.models import Column, Model
 from sweet.models.objects import Objects
-from tests.helper import User
+from tests.helper.models import User
 
 
 def test_init_from_model():
