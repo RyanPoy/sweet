@@ -5,13 +5,13 @@ from sweet.sequel.terms.binary import Binary
 from sweet.sequel.terms.name_fn import Name
 
 
-def test_name__equals_star(visitors):
+def test_name__equals_star():
     n1, n2, n3 = Name("*"), "*", literal.STAR
     assert n1 == n2
     assert n1 == n3
 
 
-def test_value(visitors):
+def test_value():
     assert Name("users").name == "users"
     assert Name("name").name == "name"
     assert Name("users.name").name == "users.name"
@@ -43,95 +43,95 @@ def test_sql_of_name_alias(visitors):
     assert visitors.pg.sql(n) == '"id" AS "user_id"'
 
 
-def test_eq(visitors):
+def test_eq():
     assert Name('name').eq('jim') == Binary.parse(name="jim")
     n = Name("nickname", "users")
     assert Name('name', 'users').eq(n) == Binary.parse(users__name=n)
 
 
-def test_not_eq(visitors):
+def test_not_eq():
     assert Name('name').not_eq('jim') == Binary.parse(name__not='jim')
     assert Name('name', 'users').not_eq('jim') == Binary.parse(users__name__not='jim')
     assert Name('name', 'users').not_eq(Name("nickname", "users")) == Binary.parse(users__name__not=Name("nickname", "users"))
 
 
-def test_is_null(visitors):
+def test_is_null():
     assert Name('name').eq(None) == Binary.parse(name=None)
 
 
-def test_is_not_null(visitors):
+def test_is_not_null():
     assert Name('name').not_eq(None) == Binary.parse(name__not=None)
 
 
-def test_in(visitors):
+def test_in():
     assert Name('name').eq(['jim', 'lucy', 'lily']) == Binary.parse(name=['jim', 'lucy', 'lily'])
 
 
-def test_not_in(visitors):
+def test_not_in():
     assert Name('name').not_eq(['jim', 'lucy', 'lily']) == Binary.parse(name__not=['jim', 'lucy', 'lily'])
 
 
-def test_gt(visitors):
+def test_gt():
     assert Name('age').gt(10) == Binary.parse(age__gt=10)
 
 
-def test_not_gt(visitors):
+def test_not_gt():
     assert Name('age').not_gt(10) == Binary.parse(age__lte=10)
 
 
-def test_gte(visitors):
+def test_gte():
     assert Name('age').gte(10) == Binary.parse(age__gte=10)
 
 
-def test_not_gte(visitors):
+def test_not_gte():
     assert Name('age').not_gte(10) == Binary.parse(age__lt=10)
 
 
-def test_lt(visitors):
+def test_lt():
     assert Name('age').lt(10) == Binary.parse(age__lt=10)
 
 
-def test_not_lt(visitors):
+def test_not_lt():
     assert Name('age').not_lt(10) == Binary.parse(age__gte=10)
 
 
-def test_lte(visitors):
+def test_lte():
     assert Name('age').lte(10) == Binary.parse(age__lte=10)
 
 
-def test_not_lte(visitors):
+def test_not_lte():
     assert Name('age').not_lte(10) == Binary.parse(age__gt=10)
 
 
-def test_like(visitors):
+def test_like():
     assert Name('name').like('%jim') == Binary.parse(name__like='%jim')
 
 
-def test_not_like(visitors):
+def test_not_like():
     assert Name('name').not_like('%jim') == Binary.parse(name__not_like='%jim')
 
 
-def test_between(visitors):
+def test_between():
     assert Name('age').between([10, 60]) == Binary.parse(age__bt=[10, 60])
 
 
-def test_between_err(visitors):
+def test_between_err():
     with pytest.raises(ValueError, match='The "BETWEEN" operation expects a list or tuple of length 2, but it is not.'):
         Name('age').between([10, 60, 30])
 
 
-def test_not_between(visitors):
+def test_not_between():
     assert Name('age').not_between([10, 60]) == Binary.parse(age__not_bt=[10, 60])
 
 
-def test_not_between_err(visitors):
+def test_not_between_err():
     with pytest.raises(ValueError, match='The "NOT BETWEEN" operation expects a list or tuple of length 2, but it is not.'):
         Name('age').not_between([10, 60, 30])
 
 
-def test_pair_with_regex_value(visitors):
+def test_pair_with_regex_value():
     assert Name('username', 'users').regex("^[b]abc") == Binary.parse(users__username__regex="^[b]abc")
 
 
-def test_pair_with_not_regex_value(visitors):
+def test_pair_with_not_regex_value():
     assert Name('username', 'users').not_regex("^[b]abc") == Binary.parse(users__username__not_regex="^[b]abc")

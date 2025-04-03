@@ -4,12 +4,12 @@ from sweet.sequel.terms.name_fn import Name
 from sweet.sequel.terms.binary import Binary
 
 
-def test_error_init(visitors):
+def test_error_init():
     with pytest.raises(ValueError, match="Only one parameter is allowed for construction."):
         Binary.parse(a=1, b=2)
 
 
-def test_init_from_parse(visitors):
+def test_init_from_parse():
     assert Binary.parse(name='jim') == Binary(Name("name"), Operator.EQ, 'jim')
     assert Binary.parse(name__not='jim') == Binary(Name("name"), Operator.NOT_EQ, 'jim')
     assert Binary.parse(nick__name='jim') == Binary(Name("name", schema_name="nick"), Operator.EQ, 'jim')
@@ -100,7 +100,7 @@ def test_between(visitors):
     assert visitors.pg.sql(b) == "\"age\" BETWEEN 10 AND 60"
 
 
-def test_between_err(visitors):
+def test_between_err():
     with pytest.raises(ValueError, match='The "BETWEEN" operation expects a list or tuple of length 2, but it is not.'):
         Binary.parse(age__bt=[10, 60, 10])
 
@@ -115,7 +115,7 @@ def test_not_between(visitors):
     assert visitors.pg.sql(b) == "\"age\" NOT BETWEEN 10 AND 60"
 
 
-def test_not_between_err(visitors):
+def test_not_between_err():
     with pytest.raises(ValueError, match='The "NOT BETWEEN" operation expects a list or tuple of length 2, but it is not.'):
         Binary.parse(age__not_bt=[10, 60, 10])
 
@@ -172,13 +172,13 @@ def test_not_regex_value(visitors):
     assert visitors.pg.sql(b) == "\"users\".\"username\" NOT REGEX '^[b]abc'"
 
 
-def test_equals(visitors):
+def test_equals():
     b1 = Binary(Name("pk"), Operator.IN, [1, 2])
     b2 = Binary(Name("pk"), Operator.IN, [1, 2])
     assert b1 == b2
 
 
-def test_not_equals(visitors):
+def test_not_equals():
     b1 = Binary(Name("pk"), Operator.IN, [1, 2]) & Binary(Name("name"), Operator.EQ, "Lily")
     b2 = Binary(Name("pk"), Operator.IN, [1, 2])
     assert b1 != b2

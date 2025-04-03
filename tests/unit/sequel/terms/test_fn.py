@@ -47,58 +47,58 @@ def test_sum_distinct(visitors):
     assert visitors.pg.sql(func) == 'SUM(DISTINCT "foo")'
 
 
-def test_gt(visitors):
+def test_gt():
     f = Sum(Name("foo"))
     assert f.gt(1) == Binary(f, Operator.GT, 1), f.gt(1)
 
 
-def test_gt_Name(visitors):
+def test_gt_Name():
     f = Sum(Name("foo"))
     n = Name("age")
     assert f.gt(n) == Binary(f, Operator.GT, n), f.gt(n)
 
 
-def test_not_gt(visitors):
+def test_not_gt():
     f = Sum(Name("foo"))
     assert f.not_gt(1) == Binary(f, Operator.NOT_GT, 1), f.not_gt(1)
 
 
-def test_gte(visitors):
+def test_gte():
     f = Sum(Name("foo"))
     assert f.gte(1) == Binary(f, Operator.GTE, 1), f.gte(1)
 
 
-def test_not_gte(visitors):
+def test_not_gte():
     f = Sum(Name("foo"))
     assert f.not_gte(1) == Binary(f, Operator.NOT_GTE, 1), f.not_gte(1)
 
 
-def test_lt(visitors):
+def test_lt():
     f = Sum(Name("foo"))
     assert f.lt(1) == Binary(f, Operator.LT, 1), f.lt(1)
 
 
-def test_not_lt(visitors):
+def test_not_lt():
     f = Sum(Name("foo"))
     assert f.not_lt(1) == Binary(f, Operator.NOT_LT, 1), f.not_lt(1)
 
 
-def test_lte(visitors):
+def test_lte():
     f = Sum(Name("foo"))
     assert f.lte(1) == Binary(f, Operator.LTE, 1), f.lte(1)
 
 
-def test_not_lte(visitors):
+def test_not_lte():
     f = Sum(Name("foo"))
     assert f.not_lte(1) == Binary(f, Operator.NOT_LTE, 1), f.not_lte(1)
 
 
-def test_eq(visitors):
+def test_eq():
     f = Sum(Name("foo"))
     assert f.eq(1) == Binary(f, Operator.EQ, 1), f.eq(1)
 
 
-def test_not_eq(visitors):
+def test_not_eq():
     f = Sum(Name("foo"))
     assert f.not_eq(1) == Binary(f, Operator.NOT_EQ, 1), f.not_eq(1)
 

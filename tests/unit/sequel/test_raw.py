@@ -6,7 +6,7 @@ from sweet.sequel.terms.name_fn import Sum, Name
 from sweet.sequel.types import Array, Raw
 
 
-def test__basic_raw_init_error(visitors):
+def test__basic_raw_init_error():
     with pytest.raises(TypeError,
                        match="Raw initialize accept None | bool | str | bytes | int | float | decimal.Decimal | datetime.date | datetime.datetime, but got 'object'"):
         Raw(object())

@@ -68,6 +68,3 @@ def test_complex_logic(visitors):
     assert visitors.sqlite.sql(q) == """("price" >= 'discounted_price' OR NOT "price" = 'discounted_price') AND NOT ("age" <= 20 OR NOT "name" = 'abc')"""
     assert visitors.pg.sql(q) == """("price" >= 'discounted_price' OR NOT "price" = 'discounted_price') AND NOT ("age" <= 20 OR NOT "name" = 'abc')"""
 
-
-if __name__ == '__main__':
-    unittest.main()

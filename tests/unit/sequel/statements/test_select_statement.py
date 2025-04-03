@@ -1,4 +1,3 @@
-import unittest
 from datetime import date
 
 from sweet.sequel.statements.select_statement import SelectStatement
@@ -772,7 +771,3 @@ def test_extraneous_quotes(visitors):
     #         )
     #
     #
-
-
-if __name__ == '__main__':
-    unittest.main()
