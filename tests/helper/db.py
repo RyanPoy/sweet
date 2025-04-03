@@ -32,13 +32,3 @@ async def close(driver: Driver) -> None:
     await driver.close_pool()
 
 
-@asynccontextmanager
-async def using(env: Environment):
-    driver = None
-    try:
-        driver = await model.init(env)
-        yield driver
-    finally:
-        if driver:
-            await driver.close_pool()
-

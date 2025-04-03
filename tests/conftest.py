@@ -1,9 +1,14 @@
 import pytest
 import pytest_asyncio
 
+from sweet.database.driver.base_driver import BaseDriver
+from sweet.environment import Environment
+from sweet import model
+from sweet.model import Objects, consts
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
+from tests.helper import settings_mysql, settings_postgresql, settings_sqlite
 
 
 class ObjDict(dict):
@@ -25,6 +30,26 @@ def visitors():
         sqlite=SQLiteVisitor(),
         pg=PostgreSQLVisitor(),
     )
+
+
+@pytest_asyncio.fixture
+async def using():
+    async def init(env: Environment, do_connect=True) -> BaseDriver:
+        db = env.db_driver(**env.db_settings)
+        if do_connect:
+            await db.init_pool()
+        setattr(Objects, consts.db_adapter, db)
+        setattr(Objects, consts.sql_visitor, env.sql_visitor)
+        return db
+
+    for env in [Environment(settings_mysql), Environment(settings_sqlite), Environment(settings_postgresql)]:
+        driver = None
+        try:
+            driver = await init(env)
+            yield driver
+        finally:
+            if driver:
+                await driver.close_pool()
 
 
 @pytest.fixture
@@ -128,4 +153,3 @@ def singular_and_plural():
         ("money", "money"),
         ("pretty_fish", "pretty_fish")
     ]
-

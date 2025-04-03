@@ -1,19 +1,8 @@
-from sweet.database.driver.base_driver import BaseDriver
 from sweet.model import consts
-from sweet.model.columns import Column, Columns, Table
+from sweet.model.columns import Column, Table
 from sweet.model.objects import Objects
-from sweet.environment import Environment
 from sweet.utils import class_property
 from sweet.utils.inflection import tableize
-
-
-async def init(env: Environment, do_connect=True) -> BaseDriver:
-    db = env.db_driver(**env.db_settings)
-    if do_connect:
-        await db.init_pool()
-    setattr(Objects, consts.db_adapter, db)
-    setattr(Objects, consts.sql_visitor, env.sql_visitor)
-    return db
 
 
 async def release():
@@ -30,10 +19,14 @@ class Model:
     def table(cls) -> Table:
         return getattr(cls, consts.table_name)
 
-    # # noinspection PyMethodParameters
-    # @class_property
-    # def columns(cls) -> Columns:
-    #     return cls.table.columns
+    # noinspection PyMethodParameters
+    @class_property
+    def column_names(cls) -> [str]:
+        if not hasattr(cls, "__column_names__"):
+            cls.__column_names__ = []
+            for col_name, _ in cls.table.columns:
+                cls.__column_names__.append(col_name)
+        return cls.__column_names__
 
     # noinspection PyMethodParameters
     @class_property
