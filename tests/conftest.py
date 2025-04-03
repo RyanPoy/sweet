@@ -7,8 +7,7 @@ from sweet.environment import Environment
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
-from tests.helper import settings_mysql, settings_postgresql, settings_sqlite
-from tests.helper.sqls import mysql_sql, postgres_sql, sqlite_sql
+from tests.helper import sqls_mysql, sqls_postgresql, settings_mysql, settings_postgresql, settings_sqlite, sqls_sqlite
 
 
 class ObjDict(dict):
@@ -50,19 +49,19 @@ async def _env(settings, create_sqls, drop_sqls):
 
 @pytest_asyncio.fixture
 async def mysql_env():
-    async with _env(settings_mysql, mysql_sql.CREATE_SQLS, mysql_sql.DROP_SQLS) as env:
+    async with _env(settings_mysql, sqls_mysql.CREATE_SQLS, sqls_mysql.DROP_SQLS) as env:
         yield env
 
 
 @pytest_asyncio.fixture
 async def sqlite_env():
-    async with _env(settings_sqlite, sqlite_sql.CREATE_SQLS, sqlite_sql.DROP_SQLS) as env:
+    async with _env(settings_sqlite, sqls_sqlite.CREATE_SQLS, sqls_sqlite.DROP_SQLS) as env:
         yield env
 
 
 @pytest_asyncio.fixture
 async def pg_env():
-    async with _env(settings_postgresql, postgres_sql.CREATE_SQLS, postgres_sql.DROP_SQLS) as env:
+    async with _env(settings_postgresql, sqls_postgresql.CREATE_SQLS, sqls_postgresql.DROP_SQLS) as env:
         yield env
 
 
