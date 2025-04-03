@@ -42,14 +42,18 @@ class BaseDriver(ABC):
     async def fetchone(self, sql, *params):
         """Returns the first row returned for the given query."""
         async with self._execute(sql, *params) as cursor:
-            columns = [col[0] for col in cursor.description]
             row = await cursor.fetchone()
+            if row is None:
+                return None
+            columns = [col[0] for col in cursor.description]
             return dict(zip(columns, row))
 
     async def fetchall(self, sql, *params):
         """Returns a row list for the given query and parameters."""
         async with self._execute(sql, *params) as cursor:
-            return await cursor.fetchall()
+            columns = [col[0] for col in cursor.description]
+            rows = await cursor.fetchall()
+            return [dict(zip(columns, row)) for row in rows]
 
     async def execute_lastrowid(self, sql, *params):
         """Executes the given query, returning the lastrowid from the query."""

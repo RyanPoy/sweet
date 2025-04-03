@@ -23,4 +23,3 @@ class ModelTest(unittest.TestCase):
             async with db.using(env):
                 us = User.objects.all()
                 self.assertEqual(3, len(us))
-                self.assertEqual()

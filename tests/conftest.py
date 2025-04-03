@@ -1,4 +1,5 @@
 import pytest
+import pytest_asyncio
 
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
@@ -127,3 +128,4 @@ def singular_and_plural():
         ("money", "money"),
         ("pretty_fish", "pretty_fish")
     ]
+

@@ -68,7 +68,10 @@ class PostgreSQLDriver(BaseDriver):
     async def fetchall(self, sql, *params):
         """Returns a row list for the given query and parameters."""
         rows = await self._fetch(sql, *params)
-        return rows
+        if not rows:
+            return None
+        columns = list(rows[0].keys())
+        return [dict(zip(columns, row)) for row in rows]
 
     async def execute_lastrowid(self, sql, *params):
         """Executes the given query, returning the lastrowid from the query."""
