@@ -1,4 +1,3 @@
-import unittest
 from sweet.utils.validation import InclusionValidator
 
 
@@ -24,7 +23,3 @@ def test_inclusion():
 
 def test_inclusion_if_value_not_in():
     assert InclusionValidator().validate('poy', ['peng', 'ryan']) is False
-
-
-if __name__ == '__main__':
-    unittest.main()

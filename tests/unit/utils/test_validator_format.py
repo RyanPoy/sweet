@@ -20,7 +20,3 @@ def test_format_should_return_true_if_value_is_none_and_allow_null():
 def test_format_should_return_false_if_value_is_blank_and_disallow_blank():
     assert FormatValidator().validate('     ', **{'_with': '\s+', 'allow_blank': False}) is False
     assert FormatValidator().validate('     ', **{'_with': '\s+', 'allow_blank': True}) is True
-
-
-if __name__ == '__main__':
-    unittest.main()

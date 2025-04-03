@@ -1,4 +1,3 @@
-import unittest
 from sweet.utils.validation import PresenceValidator
 
 
@@ -47,7 +46,3 @@ def test_presence_validate_should_return_true_if_value_is_empty_hash_and_allow_b
 def test_presence_validate_should_return_true_if_value_is_hash_has_any_element():
     assert PresenceValidator().validate({'a': 'b'}) is True
     assert PresenceValidator().validate({'a': 'b'}, allow_blank=True) is True
-
-
-if __name__ == '__main__':
-    unittest.main()

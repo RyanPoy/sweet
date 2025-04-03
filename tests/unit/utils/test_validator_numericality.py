@@ -1,4 +1,3 @@
-import unittest
 from sweet.utils.validation import NumericalityValidator
 
 
@@ -78,7 +77,3 @@ def test_numericality_even():
 
 def test_numericality_not_even():
     assert NumericalityValidator().validate(11, even=False) is True
-
-
-if __name__ == '__main__':
-    unittest.main()

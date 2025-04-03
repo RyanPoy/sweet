@@ -1,5 +1,3 @@
-import unittest
-
 from sweet.utils.inflection import javaize, pluralize, pythonize, singularize
 
 

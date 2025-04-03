@@ -1,4 +1,3 @@
-import unittest
 from sweet.utils.validation import LengthValidator
 
 
@@ -42,7 +41,3 @@ def test_length_should_return_true_if_value_is_blank_str_and_allow_blank():
 
 def test_length_should_return_false_if_value_is_blank_and_disallow_blank():
     assert LengthValidator().validate([], allow_blank=False) is False
-
-
-if __name__ == '__main__':
-    unittest.main()
