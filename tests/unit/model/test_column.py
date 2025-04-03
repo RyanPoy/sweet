@@ -23,26 +23,26 @@ def test_name_is_not_none_when_defined_in_model():
         id = IntColumn()
         name = CharColumn("demo_name")
 
-    assert 'demo_name' == Demo.table.columns.name.name
-    assert 'id' == Demo.table.columns.id.name
+    assert Demo.table.columns.name.name == 'demo_name'
+    assert Demo.table.columns.id.name == 'id'
 
 
 def test_value():
     col = CharColumn()
     col.value = "abc"
-    assert "abc" == col.value
+    assert col.value == "abc"
 
     col = TextColumn()
     col.value = "abc"
-    assert "abc" == col.value
+    assert col.value == "abc"
 
     col = BinaryColumn()
     col.value = "abc"
-    assert b"abc" == col.value
+    assert col.value == b"abc"
 
     col = IntColumn()
     col.value = 10
-    assert 10 == col.value
+    assert col.value == 10
 
     col = BooleanColumn()
     col.value = "y"
@@ -53,23 +53,23 @@ def test_value():
 
     col = FloatColumn()
     col.value = " 12.33"
-    assert 12.33 == col.value
+    assert col.value == 12.33
 
     col = DecimalColumn()
     col.value = "12.45"
-    assert Decimal("12.45") == col.value
+    assert col.value == Decimal("12.45")
 
     col = DateColumn()
     col.value = "2016-10-9"
-    assert date(2016, 10, 9) == col.value
+    assert col.value == date(2016, 10, 9)
 
     col = DatetimeColumn()
     col.value = "2016-10-9 11:12:3"
-    assert datetime(2016, 10, 9, 11, 12, 3) == col.value
+    assert col.value == datetime(2016, 10, 9, 11, 12, 3)
 
     col = TimeColumn()
     col.value = "11:12:3"
-    assert time(11, 12, 3) == col.value
+    assert col.value == time(11, 12, 3)
 
 
 def test_value_error():

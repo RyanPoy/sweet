@@ -29,6 +29,3 @@ def test_pythonize():
     assert 'test_model_for_table_name' == pythonize('Test_model_forTableName')
     assert 'create_user' == pythonize('CreateUser')
 
-
-if __name__ == '__main__':
-    unittest.main()

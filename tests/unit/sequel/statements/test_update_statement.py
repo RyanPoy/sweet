@@ -4,45 +4,45 @@ from sweet.sequel.terms.name_fn import Name
 
 def test_empty(visitors):
     stmt = UpdateStatement(Name("users"))
-    assert "" == visitors.mysql.sql(stmt)
-    assert "" == visitors.sqlite.sql(stmt)
-    assert "" == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == ""
+    assert visitors.sqlite.sql(stmt) == ""
+    assert visitors.pg.sql(stmt) == ""
 
 
 def test_update_to_other_column(visitors):
     stmt = UpdateStatement(Name("users")).set(foo=Name("bar"))
-    assert 'UPDATE `users` SET `foo` = `bar`' == visitors.mysql.sql(stmt)
-    assert 'UPDATE "users" SET "foo" = "bar"' == visitors.sqlite.sql(stmt)
-    assert 'UPDATE "users" SET "foo" = "bar"' == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == 'UPDATE `users` SET `foo` = `bar`'
+    assert visitors.sqlite.sql(stmt) == 'UPDATE "users" SET "foo" = "bar"'
+    assert visitors.pg.sql(stmt) == 'UPDATE "users" SET "foo" = "bar"'
 
 
 def test_omit_where(visitors):
     stmt = UpdateStatement(Name("users")).set(foo="bar")
-    assert 'UPDATE `users` SET `foo` = \'bar\'' == visitors.mysql.sql(stmt)
-    assert 'UPDATE "users" SET "foo" = \'bar\'' == visitors.sqlite.sql(stmt)
-    assert 'UPDATE "users" SET "foo" = \'bar\'' == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == 'UPDATE `users` SET `foo` = \'bar\''
+    assert visitors.sqlite.sql(stmt) == 'UPDATE "users" SET "foo" = \'bar\''
+    assert visitors.pg.sql(stmt) == 'UPDATE "users" SET "foo" = \'bar\''
 
 
 def test_single_quote_escape_in_set(visitors):
     stmt = UpdateStatement(Name("users")).set(foo="bar'foo")
-    assert "UPDATE `users` SET `foo` = 'bar''foo'" == visitors.mysql.sql(stmt)
-    assert "UPDATE \"users\" SET \"foo\" = 'bar''foo'" == visitors.sqlite.sql(stmt)
-    assert "UPDATE \"users\" SET \"foo\" = 'bar''foo'" == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == "UPDATE `users` SET `foo` = 'bar''foo'"
+    assert visitors.sqlite.sql(stmt) == "UPDATE \"users\" SET \"foo\" = 'bar''foo'"
+    assert visitors.pg.sql(stmt) == "UPDATE \"users\" SET \"foo\" = 'bar''foo'"
 
 
 def test_update__table_schema(visitors):
     stmt = UpdateStatement(Name("schema1.users")).set(foo=1).where(foo=0)
 
-    assert 'UPDATE `schema1`.`users` SET `foo` = 1 WHERE `foo` = 0' == visitors.mysql.sql(stmt)
-    assert 'UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0' == visitors.sqlite.sql(stmt)
-    assert 'UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0' == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == 'UPDATE `schema1`.`users` SET `foo` = 1 WHERE `foo` = 0'
+    assert visitors.sqlite.sql(stmt) == 'UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0'
+    assert visitors.pg.sql(stmt) == 'UPDATE "schema1"."users" SET "foo" = 1 WHERE "foo" = 0'
 
 
 def test_update_with_none(visitors):
     stmt = UpdateStatement(Name("users")).set(foo=None)
-    assert 'UPDATE `users` SET `foo` = NULL' == visitors.mysql.sql(stmt)
-    assert 'UPDATE "users" SET "foo" = NULL' == visitors.sqlite.sql(stmt)
-    assert 'UPDATE "users" SET "foo" = NULL' == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == 'UPDATE `users` SET `foo` = NULL'
+    assert visitors.sqlite.sql(stmt) == 'UPDATE "users" SET "foo" = NULL'
+    assert visitors.pg.sql(stmt) == 'UPDATE "users" SET "foo" = NULL'
 
     # def test_update_with_join(visitors):
     #     table_def = Table("def")

@@ -1,128 +1,125 @@
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.terms.name_fn import Name
-from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
-from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
-from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
 
 
 def test_insert_one_column(visitors):
     stmt = InsertStatement(Name("users")).insert([1])
-    assert 'INSERT INTO `users` VALUES (1)' == visitors.mysql.sql(stmt)
-    assert 'INSERT INTO "users" VALUES (1)' == visitors.sqlite.sql(stmt)
-    assert 'INSERT INTO "users" VALUES (1)' == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == 'INSERT INTO `users` VALUES (1)'
+    assert visitors.sqlite.sql(stmt) == 'INSERT INTO "users" VALUES (1)'
+    assert visitors.pg.sql(stmt) == 'INSERT INTO "users" VALUES (1)'
 
 
 def test_insert_one_column_single_element_array(visitors):
     stmt = InsertStatement(Name("users")).insert((1,))
-    assert 'INSERT INTO `users` VALUES (1)' == visitors.mysql.sql(stmt)
-    assert 'INSERT INTO "users" VALUES (1)' == visitors.sqlite.sql(stmt)
-    assert 'INSERT INTO "users" VALUES (1)' == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == 'INSERT INTO `users` VALUES (1)'
+    assert visitors.sqlite.sql(stmt) == 'INSERT INTO "users" VALUES (1)'
+    assert visitors.pg.sql(stmt) == 'INSERT INTO "users" VALUES (1)'
 
 
 def test_insert_one_column_multi_element_array(visitors):
     stmt = InsertStatement(Name("users")).insert((1,), (2,))
-    assert 'INSERT INTO `users` VALUES (1), (2)' == visitors.mysql.sql(stmt)
-    assert 'INSERT INTO "users" VALUES (1), (2)' == visitors.sqlite.sql(stmt)
-    assert 'INSERT INTO "users" VALUES (1), (2)' == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == 'INSERT INTO `users` VALUES (1), (2)'
+    assert visitors.sqlite.sql(stmt) == 'INSERT INTO "users" VALUES (1), (2)'
+    assert visitors.pg.sql(stmt) == 'INSERT INTO "users" VALUES (1), (2)'
 
 
 def test_insert_single_row_with_array_value(visitors):
     stmt = InsertStatement(Name("users")).insert([1, ["a", "b", "c"]])
-    assert "INSERT INTO `users` VALUES (1, ['a', 'b', 'c'])" == visitors.mysql.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, ['a', 'b', 'c'])" == visitors.sqlite.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, ['a', 'b', 'c'])" == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == "INSERT INTO `users` VALUES (1, ['a', 'b', 'c'])"
+    assert visitors.sqlite.sql(stmt) == "INSERT INTO \"users\" VALUES (1, ['a', 'b', 'c'])"
+    assert visitors.pg.sql(stmt) == "INSERT INTO \"users\" VALUES (1, ['a', 'b', 'c'])"
 
 
 def test_insert_multiple_rows_with_array_value(visitors):
     stmt = InsertStatement(Name("users")).insert((1, ["a", "b", "c"]), (2, ["c", "d", "e"]))
-    assert """INSERT INTO `users` VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])""" == visitors.mysql.sql(stmt)
-    assert """INSERT INTO "users" VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])""" == visitors.sqlite.sql(stmt)
-    assert """INSERT INTO "users" VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])""" == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == """INSERT INTO `users` VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])"""
+    assert visitors.sqlite.sql(stmt) == """INSERT INTO "users" VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])"""
+    assert visitors.pg.sql(stmt) == """INSERT INTO "users" VALUES (1, ['a', 'b', 'c']), (2, ['c', 'd', 'e'])"""
 
 
 def test_insert_all_columns(visitors):
     stmt = InsertStatement(Name("users")).insert((1, "a", True))
-    assert "INSERT INTO `users` VALUES (1, 'a', 1)" == visitors.mysql.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1)" == visitors.sqlite.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1)" == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == "INSERT INTO `users` VALUES (1, 'a', 1)"
+    assert visitors.sqlite.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1)"
+    assert visitors.pg.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1)"
 
 
 def test_insert_all_columns_single_element(visitors):
     stmt = InsertStatement(Name("users")).insert([1, "a", True])
-    assert "INSERT INTO `users` VALUES (1, 'a', 1)" == visitors.mysql.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1)" == visitors.sqlite.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1)" == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == "INSERT INTO `users` VALUES (1, 'a', 1)"
+    assert visitors.sqlite.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1)"
+    assert visitors.pg.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1)"
 
 
 def test_insert_all_columns_multi_rows(visitors):
     stmt = InsertStatement(Name("users")).insert((1, "a", True), (2, "b", False))
-    assert "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.mysql.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.sqlite.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)"
+    assert visitors.sqlite.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)"
+    assert visitors.pg.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)"
 
 
 def test_insert_all_columns_multi_rows_chained(visitors):
     stmt = InsertStatement(Name("users")).insert((1, "a", True)).insert((2, "b", False))
-    assert "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.mysql.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.sqlite.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)"
+    assert visitors.sqlite.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)"
+    assert visitors.pg.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)"
 
 
 def test_insert_all_columns_multi_rows_chained_mixed(visitors):
     stmt = InsertStatement(Name("users")).insert((1, "a", True), (2, "b", False)).insert((3, "c", True))
-    assert "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)" == visitors.mysql.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)" == visitors.sqlite.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)" == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)"
+    assert visitors.sqlite.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)"
+    assert visitors.pg.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1)"
 
 
 def test_insert_all_columns_multi_rows_chained_multiple_rows(visitors):
     stmt = InsertStatement(Name("users")).insert((1, "a", True), (2, "b", False)).insert((3, "c", True), (4, "d", False))
 
-    assert "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)" == visitors.mysql.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)" == visitors.sqlite.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)" == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)"
+    assert visitors.sqlite.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)"
+    assert visitors.pg.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0), (3, 'c', 1), (4, 'd', 0)"
 
 
 def test_insert_selected_columns(visitors):
     stmt = InsertStatement(Name("users")).column(Name("foo"), Name("bar"), Name("buz")).insert([1, "a", True])
-    assert 'INSERT INTO `users` (`foo`, `bar`, `buz`) VALUES (1, \'a\', 1)' == visitors.mysql.sql(stmt)
-    assert 'INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)' == visitors.sqlite.sql(stmt)
-    assert 'INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)' == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == 'INSERT INTO `users` (`foo`, `bar`, `buz`) VALUES (1, \'a\', 1)'
+    assert visitors.sqlite.sql(stmt) == 'INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)'
+    assert visitors.pg.sql(stmt) == 'INSERT INTO "users" ("foo", "bar", "buz") VALUES (1, \'a\', 1)'
 
 
 def test_insert_empty_columns(visitors):
     stmt = InsertStatement(Name("users")).column().insert([1, "a", True])
-    assert 'INSERT INTO `users` VALUES (1, \'a\', 1)' == visitors.mysql.sql(stmt)
-    assert 'INSERT INTO "users" VALUES (1, \'a\', 1)' == visitors.sqlite.sql(stmt)
-    assert 'INSERT INTO "users" VALUES (1, \'a\', 1)' == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == 'INSERT INTO `users` VALUES (1, \'a\', 1)'
+    assert visitors.sqlite.sql(stmt) == 'INSERT INTO "users" VALUES (1, \'a\', 1)'
+    assert visitors.pg.sql(stmt) == 'INSERT INTO "users" VALUES (1, \'a\', 1)'
 
 
 def test_insert_ignore(visitors):
     stmt = InsertStatement(Name("users")).insert([1]).ignore()
-    assert 'INSERT IGNORE INTO `users` VALUES (1)' == visitors.mysql.sql(stmt)
-    assert 'INSERT IGNORE INTO "users" VALUES (1)' == visitors.sqlite.sql(stmt)
-    assert 'INSERT IGNORE INTO "users" VALUES (1)' == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == 'INSERT IGNORE INTO `users` VALUES (1)'
+    assert visitors.sqlite.sql(stmt) == 'INSERT IGNORE INTO "users" VALUES (1)'
+    assert visitors.pg.sql(stmt) == 'INSERT IGNORE INTO "users" VALUES (1)'
 
 
 def test_insert_column(visitors):
     stmt = InsertStatement(Name("users")).insert([1])
-    assert 'INSERT INTO `users` VALUES (1)' == visitors.mysql.sql(stmt)
-    assert 'INSERT INTO "users" VALUES (1)' == visitors.sqlite.sql(stmt)
-    assert 'INSERT INTO "users" VALUES (1)' == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == 'INSERT INTO `users` VALUES (1)'
+    assert visitors.sqlite.sql(stmt) == 'INSERT INTO "users" VALUES (1)'
+    assert visitors.pg.sql(stmt) == 'INSERT INTO "users" VALUES (1)'
 
 
 def test_insert_column_with_chain(visitors):
     stmt = InsertStatement(Name("users")).insert([1, "a", True]).insert([2, "b", False])
-    assert "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.mysql.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.sqlite.sql(stmt)
-    assert "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)" == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0)"
+    assert visitors.sqlite.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)"
+    assert visitors.pg.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0)"
 
 
 def test_replace_simple(visitors):
     stmt = InsertStatement(Name("users")).replace(["v1", "v2", "v3"])
-    assert "REPLACE INTO `users` VALUES ('v1', 'v2', 'v3')" == visitors.mysql.sql(stmt)
-    assert "REPLACE INTO \"users\" VALUES ('v1', 'v2', 'v3')" == visitors.sqlite.sql(stmt)
-    assert "REPLACE INTO \"users\" VALUES ('v1', 'v2', 'v3')" == visitors.pg.sql(stmt)
+    assert visitors.mysql.sql(stmt) == "REPLACE INTO `users` VALUES ('v1', 'v2', 'v3')"
+    assert visitors.sqlite.sql(stmt) == "REPLACE INTO \"users\" VALUES ('v1', 'v2', 'v3')"
+    assert visitors.pg.sql(stmt) == "REPLACE INTO \"users\" VALUES ('v1', 'v2', 'v3')"
 
 # def test_replace_subquery(visitors):
 #     table_users, table_def = Tables("abc", "efg")

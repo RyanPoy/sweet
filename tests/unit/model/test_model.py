@@ -3,5 +3,5 @@ from tests.helper import User
 
 
 def test_table_name():
-    assert "users" == User.table.name
-    assert Name("users") == User.table.name_named
+    assert User.table.name == "users"
+    assert User.table.name_named == Name("users")
