@@ -1,10 +1,8 @@
-from contextlib import asynccontextmanager
 from enum import StrEnum
 
-from sweet import model
-from sweet.database.driver import Driver
+from sweet.driver import Driver
 from sweet.environment import Environment
-from tests.helper import User, settings_mysql, settings_postgresql, settings_sqlite
+from tests.helper import settings_mysql, settings_postgresql, settings_sqlite
 
 
 class DB_TYPE(StrEnum):
@@ -30,5 +28,3 @@ async def init_db(db_type: DB_TYPE) -> Driver:
 
 async def close(driver: Driver) -> None:
     await driver.close_pool()
-
-

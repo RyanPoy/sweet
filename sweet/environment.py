@@ -1,8 +1,8 @@
 from typing import Self
 
-from sweet.database.driver import MySQLDriver
-from sweet.database.driver.postgresql_driver import PostgreSQLDriver
-from sweet.database.driver.sqlite_driver import SQLiteDriver
+from sweet.driver import MySQLDriver
+from sweet.driver import PostgreSQLDriver
+from sweet.driver import SQLiteDriver
 from sweet.model import Objects, consts
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor

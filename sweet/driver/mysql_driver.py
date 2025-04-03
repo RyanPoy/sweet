@@ -1,68 +1,63 @@
-from asyncio import Queue
-
-from sweet.database.driver.base_driver import BaseDriver
-import aiosqlite
+from sweet.driver.base_driver import BaseDriver
+import aiomysql
 
 
-class SQLiteDriver(BaseDriver):
+class MySQLDriver(BaseDriver):
 
     def __init__(self, **db_config):
         """
         kwargs contain:
             db,
+            user='root',
+            password='',
+            host='localhost',
+            port=3306,
             charset='utf8',
             show_sql=False
         """
         super().__init__()
         self.db_config = db_config
-        self.db_config['check_same_thread'] = False
+        self.db_config['init_command'] = "SET sql_mode = 'ANSI_QUOTES';"
+
         self.pool = None
 
     async def init_pool(self, minsize=1, maxsize=10):
         """ initialize connection pool
         """
-        self.pool = Queue(maxsize + 2)
-        for x in range(maxsize):
-            conn = await aiosqlite.connect(self.db_config['db'], check_same_thread=self.db_config['check_same_thread'])
-            await self.pool.put(conn)
+        self.pool = await aiomysql.create_pool(minsize=minsize, maxsize=maxsize, echo=True, **self.db_config)
         return self
 
     async def close_pool(self):
         """ close the connection pool """
         await self._release_connection()
         if self.pool:
-            while not self.pool.empty():
-                conn = await self.pool.get()
-                await conn.close()
+            self.pool.close()
+            await self.pool.wait_closed()
 
     async def _release_connection(self):
         """ release the connection of current coroutine """
         connection = self._local_connection.get(None)
         if connection:
             self._local_connection.set(None)
-            await self.pool.put(connection)
+            await self.pool.release(connection)
 
     async def get_connection(self):
         """ get the connection of current coroutine """
         connection = self._local_connection.get(None)
         if connection is None:
-            connection = await self.pool.get()
+            connection = await self.pool.acquire()
             await self.set_autocommit(connection)
             self._local_connection.set(connection)
         return connection
 
     async def set_autocommit(self, conn, auto=True):
-        if auto is True:
-            conn.isolation_level = None
-        else:
-            conn.isolation_level = 'DEFERRED'
-        return self
+        await conn.autocommit(auto)
 
     async def columns(self, table_name: str) -> list[dict]:
-        sql = f"PRAGMA table_info({table_name})"
+        sql = f"SHOW COLUMNS FROM `{table_name}`"
         rows = await self.fetchall(sql)
+        # Field | Type | Null | Key | Default | Extra |
+        # names = ('name', 'kind', 'null', 'key', 'default', 'extra')
         return [
-            {'name': r['name'], 'kind': r['type'], 'null': r['notnull'] == 0, 'key': '', 'default': r['dflt_value'], 'extra': str(r['pk'])} for r in rows
+            {'name': r['Field'], 'kind': r['Type'], 'null': r['Null'], 'key': r['Key'], 'default': r['Default'], 'extra': r['Extra']} for r in rows
         ]
-
-
