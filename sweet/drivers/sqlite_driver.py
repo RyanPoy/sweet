@@ -1,6 +1,6 @@
 from asyncio import Queue
 
-from sweet.driver.base_driver import BaseDriver
+from sweet.drivers.base_driver import BaseDriver
 import aiosqlite
 
 

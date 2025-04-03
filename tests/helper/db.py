@@ -1,6 +1,6 @@
 from enum import StrEnum
 
-from sweet.driver import Driver
+from sweet.drivers import Driver
 from sweet.environment import Environment
 from tests.helper import settings_mysql, settings_postgresql, settings_sqlite
 

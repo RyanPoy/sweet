@@ -11,7 +11,7 @@ from sweet.record.relations import *
 current_dir = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
 db_mgr = DBManager({
     'default': {
-        'driver': 'sqlite',
+        'drivers': 'sqlite',
         'dbname': os.path.join(current_dir, 'sweet_test.database'),
         'show_sql': True,
     }

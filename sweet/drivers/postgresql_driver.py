@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 
 import asyncpg
 
-from sweet.driver.base_driver import BaseDriver
+from sweet.drivers.base_driver import BaseDriver
 
 
 class PostgreSQLDriver(BaseDriver):

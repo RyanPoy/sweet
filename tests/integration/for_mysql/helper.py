@@ -10,7 +10,7 @@ from sweet.record.relations import *
 
 db_mgr = DBManager({
     'default': {
-        'driver': 'mysql',
+        'drivers': 'mysql',
         'host'  : 'localhost',
         'port'  : 3306,
         'dbname': 'sweet_test',
