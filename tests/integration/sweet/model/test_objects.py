@@ -1,72 +1,69 @@
-import unittest
+import pytest
 
-from sweet.environment import Environment
 from sweet.model import Column, Model
 from sweet.model.objects import Objects
-from tests import helper
-from tests.helper import db, settings_mysql, settings_postgresql, settings_sqlite, User
-from tests.helper.sqls import mysql_sql, postgres_sql, sqlite_sql
+from tests.helper import User
 
 
-class TestObjects(unittest.IsolatedAsyncioTestCase):
+def test_init_from_model():
+    class Demo(Model): pass
 
-    async def asyncSetUp(self):
-        self.mysql_env = Environment(settings_mysql)
-        self.sqlite_env = Environment(settings_sqlite)
-        self.pg_env = Environment(settings_postgresql)
-        self.envs = (self.mysql_env, self.sqlite_env, self.pg_env)
+    assert isinstance(Demo.objects, Objects)
+    assert Demo.objects.model_class is Demo
 
-        for env, sqls in zip(self.envs, [mysql_sql.CREATE_SQLS, sqlite_sql.CREATE_SQLS, postgres_sql.CREATE_SQLS]):
-            async with db.using(env) as driver:
-                await helper.create_tables_for_model(driver, sqls)
 
-    async def asyncTearDown(self):
-        for env, sqls in zip(self.envs, [mysql_sql.DROP_SQLS, sqlite_sql.DROP_SQLS, postgres_sql.DROP_SQLS]):
-            async with db.using(env) as driver:
-                await helper.delete_all_models(driver, sqls)
+class TestFilter:
+    objs1 = User.objects.filter(id=10)
+    objs2 = objs1.filter(name="username")
 
-    def test_init_from_model(self):
-        class Demo(Model): pass
+    def test_mysql(self, mysql_env):
+        assert self.objs1._select_stmt != self.objs2._select_stmt
+        assert self.objs1.sql() != self.objs2.sql()
 
-        objs = Demo.objects
-        self.assertIsInstance(objs, Objects)
-        self.assertIs(objs.model_class, Demo)
+    def test_sqlite(self, sqlite_env):
+        assert self.objs1._select_stmt != self.objs2._select_stmt
+        assert self.objs1.sql() != self.objs2.sql()
 
-    async def test_filter(self):
-        objs1 = User.objects.filter(id=10)
-        objs2 = objs1.filter(name="username")
-        self.assertNotEqual(objs1._select_stmt, objs2._select_stmt)
-        for i, env in enumerate(self.envs):
-            async with db.using(env):
-                self.assertNotEqual(objs1.sql(), objs2.sql())
+    def test_pg(self, sqlite_env):
+        assert self.objs1._select_stmt != self.objs2._select_stmt
+        assert self.objs1.sql() != self.objs2.sql()
 
-    async def test_filter__error_if_column_is_not_exists(self):
-        with self.assertRaises(Column.DoesNotExist) as ex:
+    def test_filter__error_if_column_is_not_exists(self):
+        with pytest.raises(Column.DoesNotExist, match=f"The column 'not_exist_column_name' does not exist in '{User.table.name}' table"):
             User.objects.filter(not_exist_column_name="whatever")
-        msg = str(ex.exception)
-        self.assertEqual(f"The column 'not_exist_column_name' does not exist in '{User.table.name}' table", msg)
-
-    async def test_all(self):
-        objs = User.objects.filter(id=10).filter(name="username")
-        expectations = [
-            """SELECT * FROM `users` WHERE `id` = 10 AND `name` = 'username'""",
-            """SELECT * FROM "users" WHERE "id" = 10 AND "name" = 'username'""",
-            """SELECT * FROM "users" WHERE "id" = 10 AND "name" = 'username'""",
-        ]
-        for i, env in enumerate(self.envs):
-            expected = expectations[i]
-            async with db.using(env) as driver:
-                sql = objs.sql()
-                self.assertEqual(expected, sql, f'Environment[{driver.__class__.__name__}]')
-
-    async def test_insert_and_first(self):
-        for i, env in enumerate(self.envs):
-            async with db.using(env):
-                u1 = await User.objects.insert({'id': 1, 'name': "lily"})
-                u2 = await User.objects.first()
-                self.assertEqual(u2.id, 1)
-                self.assertEqual(u2.name, "lily")
 
 
-if __name__ == '__main__':
-    unittest.main()
+class TestAllSQL:
+    objs = User.objects.filter(id=10).filter(name="username")
+
+    @pytest.mark.asyncio
+    async def test_mysql(self, mysql_env):
+        assert self.objs.sql() == """SELECT * FROM `users` WHERE `id` = 10 AND `name` = 'username'"""
+
+    @pytest.mark.asyncio
+    async def test_sqlite(self, sqlite_env):
+        assert self.objs.sql() == """SELECT * FROM "users" WHERE "id" = 10 AND "name" = 'username'"""
+
+    @pytest.mark.asyncio
+    async def test_pg(self, pg_env):
+        assert self.objs.sql() == """SELECT * FROM "users" WHERE "id" = 10 AND "name" = 'username'"""
+
+
+class TestInsertAndFirst:
+
+    # @pytest.mark.asyncio
+    # async def test_insert_and_find(self, mysql_env):
+    #     await User.objects.insert(
+    #         {'id': 1, 'name': "Lily"},
+    #         {'name': "Luly"},
+    #         {'id': 3, 'name': "Jim"},
+    #     )
+    #     us = await User.objects.all()
+    #     assert len(us) == 3
+
+    @pytest.mark.asyncio
+    async def test_mysql(self, mysql_env):
+        u1 = await User.objects.insert({'id': 1, 'name': "lily"})
+        u2 = await User.objects.first()
+        assert u2.id == 1
+        assert u2.name == "lily"

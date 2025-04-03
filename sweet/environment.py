@@ -1,6 +1,9 @@
+from typing import Self
+
 from sweet.database.driver import MySQLDriver
 from sweet.database.driver.postgresql_driver import PostgreSQLDriver
 from sweet.database.driver.sqlite_driver import SQLiteDriver
+from sweet.model import Objects, consts
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
@@ -14,6 +17,7 @@ class Environment:
         self.db_settings = None
         self.sql_visitor = None
 
+        self.db = None
         self._init_db_settings()
 
     def _init_db_settings(self):
@@ -41,3 +45,15 @@ class Environment:
         self.db_driver = driver_class
         self.db_settings = db_settings.copy()
         self.db_settings.pop(DRIVER)
+
+    async def init_db(self) -> Self:
+        self.db = self.db_driver(**self.db_settings)
+        await self.db.init_pool()
+        setattr(Objects, consts.db_adapter, self.db)
+        setattr(Objects, consts.sql_visitor, self.sql_visitor)
+        return self
+
+    async def release_db(self) -> Self:
+        if self.db is not None:
+            await self.db.close_pool()
+        return self

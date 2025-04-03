@@ -82,10 +82,3 @@ class User(Model):
     # organizations = relationship("Organization", secondary="teams", back_populates="users")
 
 
-async def create_tables_for_model(driver, sqls):
-    for sql in sqls:
-        await driver.execute(sql)
-
-async def delete_all_models(driver, sqls):
-    for sql in sqls:
-        await driver.execute(sql)
