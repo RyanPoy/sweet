@@ -12,7 +12,7 @@ class ModelTest(unittest.TestCase):
         self.pg_env = Environment(settings_postgresql)
         self.envs = (self.mysql_env, self.sqlite_env, self.pg_env)
 
-    def test_insert_and_find(self):
+    async def test_insert_and_find(self):
         for env in self.envs:
             async with db.using(env):
                 User.objects.create(User(id=1, name="Lily"))
