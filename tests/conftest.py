@@ -7,19 +7,8 @@ from sweet.environment import Environment
 from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
 from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
 from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
+from sweet.utils import ObjDict
 from tests.helper import sqls_mysql, sqls_postgresql, settings_mysql, settings_postgresql, settings_sqlite, sqls_sqlite
-
-
-class ObjDict(dict):
-
-    def __getattr__(self, key):
-        try:
-            return self[key]
-        except KeyError:
-            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{key}'")
-
-    def __setattr__(self, key, value):
-        self[key] = value
 
 
 @pytest.fixture

@@ -45,8 +45,9 @@ str2binary = lambda v: v.encode('utf-8')  # Used to convert from Strings to BLOB
 binary2str = lambda v: v.decode("utf-8")  # Used to convert from BLOBs to Strings
 microseconds = lambda t: to_i((to_f(t) % 1) * 1000000)  # '0.123456' -> 123456; '1.123456' -> 123456
 
-
 ISO_DATETIME = r'^(\d{4})[-/](\d{1,2})[-/](\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d+)?$'
+
+
 def str2datetime(s) -> datetime | None:
     def __fast_str2datetime(string):
         """ Doesn't handle time zones. """
@@ -87,6 +88,8 @@ def str2datetime(s) -> datetime | None:
 
 
 ISO_DATE = r'^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$'
+
+
 def str2date(s) -> date | None:
     def __fast_str2date(string):
         if re.match(ISO_DATE, string):
@@ -117,7 +120,10 @@ def str2date(s) -> date | None:
     if not s.strip():       return None
     return __fast_str2date(s) or __fallback_str2date(s)
 
+
 ISO_TIME = r'^(\d{1,2}):(\d{1,2}):(\d{1,2})$'
+
+
 def str2time(s) -> Time | None:
     if s is None:           return None
     if is_time(s):          return s
@@ -217,3 +223,15 @@ class mydict(dict):
         if k in self:
             return self[k]
         return super().__getattribute__(k)
+
+
+class ObjDict(dict):
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{key}'")
+
+    def __setattr__(self, key, value):
+        self[key] = value
