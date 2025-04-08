@@ -1,3 +1,6 @@
+from functools import cached_property
+from typing import Any, List
+
 from sweet import consts
 from sweet.models.columns import Column, Table
 from sweet.models.objects import Objects
@@ -22,7 +25,7 @@ class Model:
     # noinspection PyMethodParameters
     @class_property
     def column_names(cls) -> [str]:
-        if not hasattr(cls, "__column_names__"):
+        if not hasattr(cls, ""):
             cls.__column_names__ = []
             for col_name, _ in cls.table.columns:
                 cls.__column_names__.append(col_name)

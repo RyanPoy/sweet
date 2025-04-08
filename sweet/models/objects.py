@@ -18,8 +18,8 @@ from sweet.sequel.statements.select_statement import SelectStatement
 
 class Objects:
 
-    def __init__(self, model_class: 'Model') -> None:
-        self.model_class = model_class
+    def __init__(self, model_class: Model) -> None:
+        self.model_class: Model = model_class
         self.__select_stmt = None
 
     @property
@@ -57,7 +57,7 @@ class Objects:
         sql = self.sql()
         return self.adapter.fetchall(sql)
 
-    async def first(self) -> 'Model' | None:
+    async def first(self) -> Model | None:
         stmt = copy.deepcopy(self._select_stmt).limit(1)
         sql = self.sql_visitor.sql(stmt)
         d = await self.adapter.fetchone(sql)
