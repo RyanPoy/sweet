@@ -256,6 +256,7 @@ class Table:
 
         # self.pk: Column = None
         self.columns: Columns = Columns()
+        self._pks: list = []
 
     @property
     def name(self):
@@ -272,3 +273,16 @@ class Table:
 
     def has_column(self, name) -> bool:
         return self.columns.get(name) is not None
+
+    @property
+    def pks(self) -> list:
+        return self._pks
+
+    def pk(self, c: Column) -> Self:
+        if c.pk is True:
+            self._pks.append(c)
+        return self
+
+    @property
+    def pk_names(self) -> list:
+        return [pk.name for pk in self._pks]
