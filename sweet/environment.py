@@ -1,13 +1,9 @@
 from typing import Self
 
-from sweet.drivers import MySQLDriver
-from sweet.drivers import PostgreSQLDriver
-from sweet.drivers import SQLiteDriver
+from sweet.db.drivers import get_driver
 from sweet.models import Objects
 from sweet import consts
-from sweet.sequel.visitors.mysql_visitor import MySQLVisitor
-from sweet.sequel.visitors.postgresql_visitor import PostgreSQLVisitor
-from sweet.sequel.visitors.sqlite_visitor import SQLiteVisitor
+from sweet.sequel.visitors import get_visitor
 
 
 class Environment:
@@ -26,24 +22,12 @@ class Environment:
         db_settings = getattr(self.settings, DATABASE, {})
         if not db_settings:
             raise EnvironmentError(f"'{DATABASE}' environment does not exists")
-        DRIVER = 'drivers'
-        match db_settings.get(DRIVER, None):
-            case 'mysql':
-                driver_class = MySQLDriver
-                sql_visitor = MySQLVisitor
-            case 'sqlite':
-                driver_class = SQLiteDriver
-                sql_visitor = SQLiteVisitor
-            case 'postgresql':
-                driver_class = PostgreSQLDriver
-                sql_visitor = PostgreSQLVisitor
-            case None:
-                raise EnvironmentError(f"DATABASE['{DRIVER}'] environment does not exists")
-            case invalid_driver:
-                raise EnvironmentError(f"'{invalid_driver}' drivers is not supported")
-
-        self.sql_visitor = sql_visitor
-        self.db_driver = driver_class
+        DRIVER = 'driver'
+        db_type = db_settings.get(DRIVER)
+        if db_type is None:
+            raise EnvironmentError(f"DATABASE['{DRIVER}'] environment does not exists")
+        self.db_driver = get_driver(db_type)
+        self.sql_visitor = get_visitor(db_type)
         self.db_settings = db_settings.copy()
         self.db_settings.pop(DRIVER)
 

@@ -2,6 +2,7 @@ from typing import Self
 
 from sweet.sequel.terms import literal
 from sweet.sequel.terms.name_fn import Name
+from sweet.sequel.terms.returings import Returnings
 from sweet.sequel.terms.values import Values
 from sweet.sequel.types import ArrayType
 
@@ -59,9 +60,10 @@ class InsertStatement:
 
     def __init__(self, table_name: Name) -> None:
         self.insert_or_update = literal.INSERT
-        self.table_name : Name = table_name
+        self.table_name: Name = table_name
         self._column_names: [Name] = []
         self.values: Values = Values()
+        self._retunings = Returnings()
 
     @property
     def columns(self) -> [Name]:
@@ -86,4 +88,12 @@ class InsertStatement:
         if args:
             self.values.append(*args)
         self.insert_or_update = literal.REPLACE
+        return self
+
+    @property
+    def returnings(self) -> Returnings:
+        return self._retunings
+
+    def returning(self, *cols: [Name]) -> Self:
+        self._retunings.append(*cols)
         return self
