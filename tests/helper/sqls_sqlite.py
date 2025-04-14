@@ -1,11 +1,4 @@
 CREATE_SQLS = [
-    # create table foos for sqlite driver testings
-    """CREATE TABLE IF NOT EXISTS \"foos\" (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name VARCHAR(255) NOT NULL,
-        code INTEGER NOT NULL
-    )""",
-
     # create table for old column testing
     """create table if not exists table_types (
         column_integer integer not null default 30,
@@ -19,7 +12,7 @@ CREATE_SQLS = [
 
     # create table users for the User model class
     """CREATE TABLE IF NOT EXISTS users (
-        id int auto_increment primary key,
+        id INTEGER PRIMARY KEY,
         name varchar(64) not null
     )
     """
@@ -27,6 +20,5 @@ CREATE_SQLS = [
 
 DROP_SQLS = [
     """drop table if exists table_types""",
-    """DROP TABLE IF EXISTS foos""",
     """DROP TABLE IF EXISTS users""",
 ]

@@ -1,11 +1,4 @@
 CREATE_SQLS = [
-    # create table foos for mysql driver testing
-    """CREATE TABLE IF NOT EXISTS `foos` (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        name VARCHAR(255) NOT NULL,
-        code INT NOT NULL
-    )""",
-
     # create table for auto column testing
     """create table if not exists table_types (
         column_int int , 
@@ -33,7 +26,7 @@ CREATE_SQLS = [
 
     # create table users for the User model class
     """CREATE TABLE IF NOT EXISTS users (
-        id int auto_increment primary key,
+        id INT PRIMARY KEY AUTO_INCREMENT,
         name varchar(64) not null
     )
     """,
@@ -41,6 +34,5 @@ CREATE_SQLS = [
 
 DROP_SQLS = [
     """drop table if exists table_types""",
-    """DROP TABLE IF EXISTS foos""",
     """DROP TABLE IF EXISTS users""",
 ]
