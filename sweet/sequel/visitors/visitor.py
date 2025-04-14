@@ -14,6 +14,7 @@ from sweet.sequel.terms.name_fn import Name, Fn
 from sweet.sequel.terms.literal import Literal
 from sweet.sequel.terms.lock import Lock
 from sweet.sequel.terms.order import OrderClause
+from sweet.sequel.terms.returings import Returnings
 from sweet.sequel.terms.values import Values
 from sweet.sequel.terms.filter import Filter
 from sweet.sequel.types import Array, ArrayType, Raw, RawType
@@ -26,7 +27,7 @@ class Visitor:
     def quote_column_name(self, name: str) -> str:
         pointer = "."
         name = name.replace("__", pointer)
-        return '.'.join([ f'{self.qchar}{x}{self.qchar}' for x in name.split(pointer) ])
+        return '.'.join([f'{self.qchar}{x}{self.qchar}' for x in name.split(pointer)])
 
     def visit_Name(self, n: Name, sql: SQLCollector) -> SQLCollector:
         if n.schema_name:
@@ -104,7 +105,7 @@ class Visitor:
             self.visit_Binary(b.right, sql)
             if b.inverted and b.right is not None:
                 sql << ")"
-            elif b.parent is not None and b.right is not None: # 表示是一个logic关系的组合
+            elif b.parent is not None and b.right is not None:  # 表示是一个logic关系的组合
                 if b.logic.priority() < b.parent.logic.priority():
                     sql << ')'
         else:
@@ -133,6 +134,7 @@ class Visitor:
                 else:
                     raise TypeError(f"Got a unavailable element type {x.__class__.__name__}")
             sql << ("]" if to_insert else ")")
+
         _visit_seq(a.data)
         return sql
 
@@ -164,6 +166,14 @@ class Visitor:
                     sql << ")"
         return sql
 
+    def visit_Returnings(self, returnings: Returnings, sql: SQLCollector) -> SQLCollector:
+        if not returnings.is_empty():
+            sql << " RETURNING "
+            for i, r in enumerate(returnings):
+                if i != 0: sql << ", "
+                self.visit(r, sql)
+        return sql
+
     def visit_InsertStatement(self, stmt: InsertStatement, sql: SQLCollector) -> SQLCollector:
         self.visit(stmt.insert_or_update, sql)
         sql << " INTO "
@@ -176,6 +186,7 @@ class Visitor:
             sql << ")"
         sql << " VALUES "
         self.visit_Values(stmt.values, sql)
+        self.visit_Returnings(stmt.returnings, sql)
         return sql
 
     def visit_DeleteStatement(self, stmt: DeleteStatement, sql: SQLCollector) -> SQLCollector:
@@ -306,4 +317,3 @@ class Visitor:
         method = self.__getattribute__(name)
         methods[name] = method
         return method
-

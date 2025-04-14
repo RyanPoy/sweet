@@ -1,5 +1,17 @@
+# driver insert_one_rowid  插入一条数据，并且返回rowid，
+# driver insert_many_rowids 插入多条数据，并且返回rowids
+# driver insert_one_count 插入一条数据，并且返回执行的条数
+# driver insert_many_count 插入多条数据，并且返回执行的条数
+# driver fetch_one
+# driver fetch_all
+
 √ # model进行__init__的时候，要根据column的类型，从而进行数据的强制类型转化
 √ # model进行from__db的时候，要根据column的类型，把数据进行强制类型转化
+
+# objects 里面有太多的magic，是否考虑env变成全局的，然后全局使用？
+# objects 是否考虑变成Repository? 增加对应的Repository接口？
+# model变成 纯的domain ？
+# 通过 Table来进行migration？并反向关联纯domain的Model？
 
 # model 的 integration tests 需要提前准备好表格和数据库，这个时候的sqlite可以考虑用文件的，不用memory了
 
@@ -15,15 +27,22 @@ model.objects.max()
 model.objects.min()
 model.objects.avg()
 
+
 # model的创建
-model.objects.create()
-model.objects.bulk_create()
+model.objects.insert(**kwargs: [any])
+model.objects.bulk_insert(*args: [dict])
 注意：bulk_create()的时候，怎么给model的id赋值呢？
 
 
 # model的修改
-model.objects.update()
-model.objects.bulk_update()
+model.objects.update(**kwargs: [any])
+model.objects.bulk_update(*args: [dict])
+model.objects.filter(...).update(**kwargs: [any])
+
+# model的删除
+model.objects.delete(**kwargs: [any])
+model.objects.bulk_delete(*args: [dict])
+model.objects.filter(...).delete(**kwargs: [any])
 
 
 # 在adapter通过fetchone或者fetchall后，怎么把结果中的row，转成为一个model

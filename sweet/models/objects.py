@@ -1,8 +1,8 @@
 from __future__ import annotations
-
 import copy
 from typing import Self, TYPE_CHECKING
 
+from sweet.db.drivers import MySQLDriver, PostgreSQLDriver, SQLiteDriver
 from sweet.sequel.statements.insert_statement import InsertStatement
 from sweet.sequel.terms.name_fn import Name
 from sweet.sequel.visitors.visitor import Visitor
@@ -82,16 +82,54 @@ class Objects:
         return objs
 
     async def insert(self, *records: [dict]) -> None:
-        for r in records:
-            self.check_column_exists(r)
+        if len(records) > 1:
+            return await self.insert_many(records)
+        return await self.insert_one(records[0])
 
-        cols = [Name(k) for k, v in records[0].items()]
-        stmt = InsertStatement(self.model_class.table.name_named).column(*cols)
-        values = [tuple(r.values()) for r in records]
-        stmt.insert(*values)
+    async def insert_one(self, record: dict):
+        self.check_column_exists(record)
+        cols, values, id_manualed = [], [], False
+        pk_names = set(self.model_class.table.pk_names)
+        for k, v in record.items():
+            if k in pk_names:
+                id_manualed = True
+            cols.append(Name(k))
+            values.append(v)
+        stmt = InsertStatement(self.model_class.table.name_named)
+        stmt.column(*cols).insert(values)
 
-        sql = self.sql_visitor.sql(stmt)
-        await self.adapter.execute(sql)
+        adapter_class = type(self.adapter)
+        if adapter_class is MySQLDriver:
+            sql = self.sql_visitor.sql(stmt)
+            id = await self.adapter.execute_lastrowid(sql)
+        elif adapter_class is SQLiteDriver:
+            if id_manualed:
+                stmt.returning(*[Name(n) for n in self.model_class.table.pk_names])
+                sql = self.sql_visitor.sql(stmt)
+                id = await self.adapter.execute_returnrowid(sql)
+            else:
+                sql = self.sql_visitor.sql(stmt)
+                id = await self.adapter.execute_lastrowid(sql)
+        elif adapter_class is PostgreSQLDriver:
+            stmt.returning(*[Name(n) for n in self.model_class.table.pk_names])
+            sql = self.sql_visitor.sql(stmt)
+            id = await self.adapter.execute_returnrowid(sql)
+        else:
+            raise TypeError(f"Unknown driver type, expect MySQLDriver、SQLiteDriver、PostgresSQLDriver，but got {adapter_class}")
+        return id
+
+    async def insert_many(self, records: [dict]):
+        pass
+        # for r in records:
+        #     self.check_column_exists(r)
+        #
+        # cols = [Name(k) for k, v in records[0].items()]
+        # stmt = InsertStatement(self.model_class.table.name_named).column(*cols)
+        # values = [tuple(r.values()) for r in records]
+        # stmt.insert(*values)
+        #
+        # sql = self.sql_visitor.sql(stmt)
+        # await self.adapter.execute(sql)
 
     def check_column_exists(self, r: dict) -> bool:
         for k, v in r.items():

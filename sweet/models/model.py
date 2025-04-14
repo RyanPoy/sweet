@@ -1,6 +1,3 @@
-from functools import cached_property
-from typing import Any, List
-
 from sweet import consts
 from sweet.models.columns import Column, Table
 from sweet.models.objects import Objects
@@ -43,6 +40,8 @@ class Model:
             for n in col_names:
                 col = getattr(cls, n)
                 table.columns.add(n, col)
+                if col.pk is True:
+                    table.pk(col)
                 delattr(cls, n)
             if consts.table_name not in cls.__dict__:
                 setattr(cls, consts.table_name, table)

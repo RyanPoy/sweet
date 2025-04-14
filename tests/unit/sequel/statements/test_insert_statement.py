@@ -121,6 +121,13 @@ def test_replace_simple(visitors):
     assert visitors.sqlite.sql(stmt) == "REPLACE INTO \"users\" VALUES ('v1', 'v2', 'v3')"
     assert visitors.pg.sql(stmt) == "REPLACE INTO \"users\" VALUES ('v1', 'v2', 'v3')"
 
+
+def test_insert_column_and_returning(visitors):
+    stmt = InsertStatement(Name("users")).insert([1, "a", True]).insert([2, "b", False]).returning(Name("id1"), Name("id2")).returning(Name("id3"))
+    assert visitors.mysql.sql(stmt) == "INSERT INTO `users` VALUES (1, 'a', 1), (2, 'b', 0) RETURNING `id1`, `id2`, `id3`"
+    assert visitors.sqlite.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0) RETURNING \"id1\", \"id2\", \"id3\""
+    assert visitors.pg.sql(stmt) == "INSERT INTO \"users\" VALUES (1, 'a', 1), (2, 'b', 0) RETURNING \"id1\", \"id2\", \"id3\""
+
 # def test_replace_subquery(visitors):
 #     table_users, table_def = Tables("abc", "efg")
 #     query = Query.into(Name("users")).replace(Query.from_(self.table_def).select("f1", "f2"))

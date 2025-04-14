@@ -116,6 +116,9 @@ class Name(ExtType):
             return False
         return self.name == other.name and self.schema_name == other.schema_name and self.alias == other.alias
 
+    def __hash__(self):
+        return hash(f'{self.schema_name}-{self.name}-{self.alias}')
+
     def copy(self) -> Self:
         return copy.deepcopy(self)
 

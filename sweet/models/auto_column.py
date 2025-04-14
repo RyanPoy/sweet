@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Self
 
-from sweet.drivers import Driver
+from sweet.db.drivers import Driver
 from sweet.utils import extract_number, extract_numbers, to_bool
 
 
