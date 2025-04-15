@@ -69,7 +69,7 @@ class PostgreSQLDriver(BaseDriver):
         self.pool = await asyncpg.create_pool(dsn, min_size=minsize, max_size=maxsize)
         return self
 
-    async def close_pool(self):
+    async def destroy(self):
         """ close the connection pool """
         await self._release_connection()
         if self.pool:

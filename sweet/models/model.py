@@ -8,7 +8,7 @@ from sweet.utils.inflection import tableize
 async def release():
     db = getattr(Objects, consts.db_adapter, None)
     if db is not None:
-        await db.close_pool()
+        await db.destroy()
 
 
 class Model:

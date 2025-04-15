@@ -28,7 +28,7 @@ class MySQLDriver(BaseDriver):
         self.pool = await aiomysql.create_pool(minsize=minsize, maxsize=maxsize, echo=True, **self.db_config)
         return self
 
-    async def close_pool(self):
+    async def destroy(self):
         """ close the connection pool """
         await self._release_connection()
         if self.pool:

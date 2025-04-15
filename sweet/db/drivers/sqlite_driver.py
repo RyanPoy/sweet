@@ -29,7 +29,7 @@ class SQLiteDriver(BaseDriver):
             await self.pool.put(conn)
         return self
 
-    async def close_pool(self):
+    async def destroy(self):
         """ close the connection pool """
         await self._release_connection()
         if self.pool:

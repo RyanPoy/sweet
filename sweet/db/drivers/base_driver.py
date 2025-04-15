@@ -6,6 +6,14 @@ from sweet.utils.logger import get_logger
 logger = get_logger()
 
 
+class IDriver(ABC):
+    async def initialize(self, minsize=1, maxsize=10):
+        """ initialize the connection pool"""
+
+    async def destroy(self):
+        """ close the connection pool """
+
+
 class BaseDriver(ABC):
     def __init__(self, **db_config):
         self._local_connection = ContextVar('connection')  # 协程局部变量，用于存储连接
@@ -15,7 +23,7 @@ class BaseDriver(ABC):
         """ initialize the connection pool"""
 
     @abstractmethod
-    async def close_pool(self):
+    async def destroy(self):
         """ close the connection pool """
 
     @abstractmethod

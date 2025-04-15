@@ -40,5 +40,5 @@ class Environment:
 
     async def release_db(self) -> Self:
         if self.db is not None:
-            await self.db.close_pool()
+            await self.db.destroy()
         return self
