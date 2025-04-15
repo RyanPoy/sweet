@@ -1,21 +1,24 @@
-from abc import ABC, abstractmethod
 
 
-class AbsTransaction(ABC):
-    @abstractmethod
-    async def __aenter__(self): pass
+class Transaction:
 
-    @abstractmethod
-    async def __aexit__(self, exc_type, exc_val, exc_tb): pass
-
-
-class Transaction(AbsTransaction):
-
-    def __init__(self, tx_ctx):
-        self._ctx = tx_ctx
+    def __init__(self, conn):
+        self.conn = conn
 
     async def __aenter__(self):
-        return await self._ctx.__aenter__()
+        await self.begin()
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        return await self._ctx.__aexit__(exc_type, exc_val, exc_tb)
+        if exc_tb:
+            await self.rollback()
+        else:
+            await self.commit()
+
+    async def begin(self):
+        await self.conn.manual_commit()
+
+    async def commit(self):
+        await self.conn.raw_conn().commit()
+
+    async def rollback(self):
+        await self.conn.raw_conn().rollback()

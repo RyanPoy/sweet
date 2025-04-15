@@ -1,9 +1,14 @@
 from __future__ import annotations
-from sweet.db.drivers.base_driver import BaseDriver
+
+from contextvars import ContextVar
+
 import aiomysql
 
+from sweet.db.connection import Connection, MySQLConnection
+from sweet.db.drivers.base_driver import IDriver
 
-class MySQLDriver(BaseDriver):
+
+class MySQLDriver(IDriver):
 
     def __init__(self, **db_config):
         """
@@ -15,44 +20,39 @@ class MySQLDriver(BaseDriver):
             port=3306,
             charset='utf8',
             show_sql=False
+
+            min_size=1
+            max_size=10
         """
-        super().__init__()
         self.db_config = db_config
         self.db_config['init_command'] = "SET sql_mode = 'ANSI_QUOTES';"
-
+        self.minsize = db_config.pop('min_size', 1)
+        self.maxsize = db_config.pop('max_size', 10)
         self.pool = None
+        self._local_connection = ContextVar('connection')  # 协程局部变量，用于存储连接
 
-    async def initialize(self, minsize=1, maxsize=10):
-        """ initialize connection pool
-        """
-        self.pool = await aiomysql.create_pool(minsize=minsize, maxsize=maxsize, echo=True, **self.db_config)
-        return self
+    async def initialize(self):
+        self.pool = await aiomysql.create_pool(minsize=self.minsize, maxsize=self.maxsize, echo=True, **self.db_config)
+
+    async def get_connection(self) -> Connection:
+        conn = self._local_connection.get(None)
+        if conn is None:
+            conn = await self.pool.acquire()
+            conn = await MySQLConnection(conn, self).auto_commit()
+            self._local_connection.set(conn)
+        return conn
+
+    async def release_connection(self, conn: Connection = None):
+        conn = conn or self._local_connection.get(None)
+        if conn:
+            await self.pool.release(conn.raw_conn())
+        # await self.pool.release(conn)
 
     async def destroy(self):
-        """ close the connection pool """
-        await self._release_connection()
+        await self.release_connection()
         if self.pool:
             self.pool.close()
             await self.pool.wait_closed()
-
-    async def _release_connection(self):
-        """ release the connection of current coroutine """
-        connection = self._local_connection.get(None)
-        if connection:
-            self._local_connection.set(None)
-            await self.pool.release(connection)
-
-    async def get_connection(self):
-        """ get the connection of current coroutine """
-        connection = self._local_connection.get(None)
-        if connection is None:
-            connection = await self.pool.acquire()
-            await self.set_autocommit(connection)
-            self._local_connection.set(connection)
-        return connection
-
-    async def set_autocommit(self, conn, auto=True):
-        await conn.autocommit(auto)
 
     async def columns(self, table_name: str) -> list[dict]:
         sql = f"SHOW COLUMNS FROM `{table_name}`"

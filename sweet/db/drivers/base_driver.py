@@ -1,17 +1,25 @@
 from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
+
+from sweet.db.connection import Connection
 from sweet.utils.logger import get_logger
 
 logger = get_logger()
 
 
 class IDriver(ABC):
-    async def initialize(self, minsize=1, maxsize=10):
-        """ initialize the connection pool"""
+    @abstractmethod
+    async def initialize(self): """initialize the connection pool"""
 
-    async def destroy(self):
-        """ close the connection pool """
+    @abstractmethod
+    async def destroy(self): """close the connection pool """
+
+    @abstractmethod
+    async def get_connection(self) -> Connection: """get a connection"""
+
+    @abstractmethod
+    async def release_connection(self, conn: Connection = None): """release a connection"""
 
 
 class BaseDriver(ABC):
@@ -20,15 +28,15 @@ class BaseDriver(ABC):
 
     @abstractmethod
     async def initialize(self, minsize=1, maxsize=10):
-        """ initialize the connection pool"""
+        """initialize the connection pool"""
 
     @abstractmethod
     async def destroy(self):
-        """ close the connection pool """
+        """close the connection pool """
 
     @abstractmethod
     async def get_connection(self):
-        """ get the connection of current coroutine from pool """
+        """get the connection of current coroutine from pool """
 
     @abstractmethod
     async def set_autocommit(self, conn, auto=True):

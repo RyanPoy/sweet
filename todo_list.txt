@@ -1,3 +1,13 @@
+# driver的几种调用方式
+# 1、用with方式：
+with db.get_connection() as conn:
+    do_something()
+
+# 2、用常规方式：
+conn = await db.get_connection()
+do_something()
+conn.close()
+
 # driver insert_one_rowid  插入一条数据，并且返回rowid，
 # driver insert_many_rowids 插入多条数据，并且返回rowids
 # driver insert_one_count 插入一条数据，并且返回执行的条数

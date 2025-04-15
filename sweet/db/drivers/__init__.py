@@ -1,5 +1,4 @@
 import copy
-from typing import Type
 
 from sweet.db.drivers.base_driver import BaseDriver as Driver
 from sweet.db.drivers.mysql_driver import MySQLDriver
@@ -16,7 +15,7 @@ async def get_driver(**db_settings) -> Driver:
     :return: 返回对应的驱动类型
     """
     DRIVER = 'driver'
-    db_type = db_settings.get(DRIVER)
+    db_type = db_settings.pop(DRIVER, None)
     driver = None
     if db_type == 'mysql':
         driver = MySQLDriver
@@ -26,8 +25,6 @@ async def get_driver(**db_settings) -> Driver:
         driver = SQLiteDriver
     else:
         raise ValueError(f"Unsupported database type: {db_type}")
-    new_db_settings = copy.copy(db_settings)
-    new_db_settings.pop(DRIVER)
-    db = driver(**new_db_settings)
+    db = driver(**db_settings)
     await db.initialize()
     return db

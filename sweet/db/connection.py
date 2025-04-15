@@ -4,15 +4,19 @@ from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
 from typing import Any
 
+from sweet.db.transaction import Transaction
 from sweet.utils.logger import get_logger
 
 logger = get_logger()
 
 
-class BaseConnection(ABC):
+class Connection(ABC):
 
     async def raw(self, sql: str, *params: Any) -> None:
         return await self.execute(sql, *params)
+
+    @abstractmethod
+    def raw_conn(self): """get raw connection"""
 
     @abstractmethod
     async def execute(self, sql: str, *params: Any) -> None: """execute a sql statement"""
@@ -35,12 +39,32 @@ class BaseConnection(ABC):
     @abstractmethod
     async def close(self) -> list[dict]: """close the connection"""
 
+    @abstractmethod
+    def transaction(self) -> Transaction: """create a transaction"""
+    # def __await__(self):
+    #     return self
+    #
+    # async def __aenter__(self):
+    #     return self
+    #
+    # async def __aexit__(self, exc_type, exc_val, exc_tb):
+    #     return await self.close()
 
-class MySQLConnection(BaseConnection):
+
+class MySQLConnection(Connection):
 
     def __init__(self, conn, driver):
-        self._conn = conn
+        self._raw_conn = conn
         self._driver = driver
+
+    def raw_conn(self):
+        return self._raw_conn
+
+    async def auto_commit(self) -> None:
+        await self._raw_conn.autocommit(True)
+
+    async def manual_commit(self) -> None:
+        await self._raw_conn.autocommit(False)
 
     async def execute(self, sql: str, *params: Any) -> None:
         async with self._execute(sql, *params):
@@ -76,7 +100,7 @@ class MySQLConnection(BaseConnection):
         logger.debug(sql)
         cursor = None
         try:
-            cursor = await self._conn.cursor()
+            cursor = await self._raw_conn.cursor()
             await cursor.execute(sql, params)
             yield cursor
         finally:
@@ -86,4 +110,7 @@ class MySQLConnection(BaseConnection):
                     await r
 
     async def close(self):
-        self._driver.release(self)
+        await self._driver.release_connection(self)
+
+    def transaction(self) -> Transaction:
+        return Transaction(self)

@@ -10,7 +10,6 @@ class Environment:
 
     def __init__(self, settings):
         self.settings = settings
-        self.db_driver = None
         self.db_settings = None
         self.sql_visitor = None
 
