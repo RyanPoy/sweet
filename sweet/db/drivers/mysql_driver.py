@@ -1,78 +1,8 @@
 from __future__ import annotations
-
-from contextlib import asynccontextmanager
-from typing import Any, Self
-
-from sweet.db import MySQLPool
 from sweet.db.drivers.base_driver import BaseDriver
-from sweet.db.transaction import Transaction
-
 import aiomysql
 
 
-# class MySQLDriver(BaseDriver):
-#     def __init__(self, **db_config):
-#         self.pool = MySQLPool(**db_config)
-#
-#     async def initialize(self, **db_config) -> Self:
-#         await self.pool.initialize()
-#         return self
-#
-#     @asynccontextmanager
-#     async def transaction(self):
-#         conn = await self.pool.acquire()
-#         async with conn.cursor() as cur:
-#             await conn.begin()
-#             try:
-#                 yield Transaction(conn)
-#                 await conn.commit()
-#             except Exception:
-#                 await conn.rollback()
-#                 raise
-#
-#     async def execute_rowid(self, sql: str, *params):
-#         conn = await self.pool.acquire()
-#         async with conn.cursor() as cur:
-#             await cur.execute(sql, params)
-#             return cur.lastrowid
-#
-#     async def execute_rowids(self, sql: str, params_seq):
-#         ids = []
-#         conn = await self.pool.acquire()
-#         async with conn.cursor() as cur:
-#             for params in params_seq:
-#                 await cur.execute(sql, params)
-#                 ids.append(cur.lastrowid)
-#         return ids
-#
-#     async def execute_rowcount(self, sql: str, *params):
-#         conn = await self.pool.acquire()
-#         async with conn.cursor() as cur:
-#             await cur.execute(sql, params)
-#             return cur.rowcount
-#
-#     async def fetchone(self, sql: str, *params: Any) -> dict[str, Any] | None:
-#         conn = await self.pool.acquire()
-#         async with conn.cursor(aiomysql.DictCursor) as cur:
-#             await cur.execute(sql, params)
-#             row = await cur.fetchone()
-#             return row  # already dict or None
-#
-#     async def fetchall(self, sql: str, *params: Any) -> list[dict[str, Any]] | None:
-#         conn = await self.pool.acquire()
-#         async with conn.cursor(aiomysql.DictCursor) as cur:
-#             await cur.execute(sql, params)
-#             rows = await cur.fetchall()
-#             return list(rows) if rows else None
-#
-#     async def close(self) -> Self:
-#         await self.pool.close()
-#         return Self
-
-# # from sweet.db.drivers.base_driver import BaseDriver
-# # import aiomysql
-#
-#
 class MySQLDriver(BaseDriver):
 
     def __init__(self, **db_config):

@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
 from sqlite3 import Connection
-from typing import Any, AsyncIterator, Self, Type, TypeVar
+from typing import Any, AsyncIterator, Self
 import aiosqlite
 import aiomysql
 import asyncio
 
 
-class Pool(ABC):
+class ConnectionPool(ABC):
 
     @abstractmethod
     async def initialize(self) -> Self: """ initialize connection pool"""
@@ -23,7 +23,7 @@ class Pool(ABC):
     async def close(self) -> Self: """close pool"""
 
 
-class MySQLPool(Pool):
+class MySQLPool(ConnectionPool):
     """ MySQL connection pool """
 
     def __init__(self, **db_config):
