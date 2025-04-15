@@ -58,7 +58,7 @@ class PostgreSQLDriver(BaseDriver):
         self.db_config['dbname'] = self.db_config.pop('db')
         self.pool = None
 
-    async def init_pool(self, minsize=1, maxsize=10):
+    async def initialize(self, minsize=1, maxsize=10):
         dsn = ' '.join([f'{k}={v}' for k, v in self.db_config.items()])
         user = self.db_config['user']
         pwd = self.db_config['password']

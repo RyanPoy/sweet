@@ -20,7 +20,7 @@ class SQLiteDriver(BaseDriver):
         self.db_config['check_same_thread'] = False
         self.pool = None
 
-    async def init_pool(self, minsize=1, maxsize=10):
+    async def initialize(self, minsize=1, maxsize=10):
         """ initialize connection pool
         """
         self.pool = Queue(maxsize + 2)

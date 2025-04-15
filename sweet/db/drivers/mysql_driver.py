@@ -22,7 +22,7 @@ class MySQLDriver(BaseDriver):
 
         self.pool = None
 
-    async def init_pool(self, minsize=1, maxsize=10):
+    async def initialize(self, minsize=1, maxsize=10):
         """ initialize connection pool
         """
         self.pool = await aiomysql.create_pool(minsize=minsize, maxsize=maxsize, echo=True, **self.db_config)

@@ -5,18 +5,22 @@ from sweet.utils.logger import get_logger
 
 logger = get_logger()
 
+
 class BaseDriver(ABC):
     def __init__(self, **db_config):
         self._local_connection = ContextVar('connection')  # 协程局部变量，用于存储连接
 
     @abstractmethod
-    async def init_pool(self, minsize=1, maxsize=10): """ initialize the connection pool"""
+    async def initialize(self, minsize=1, maxsize=10):
+        """ initialize the connection pool"""
 
     @abstractmethod
-    async def close_pool(self): """ close the connection pool """
+    async def close_pool(self):
+        """ close the connection pool """
 
     @abstractmethod
-    async def get_connection(self): """ get the connection of current coroutine from pool """
+    async def get_connection(self):
+        """ get the connection of current coroutine from pool """
 
     @abstractmethod
     async def set_autocommit(self, conn, auto=True):

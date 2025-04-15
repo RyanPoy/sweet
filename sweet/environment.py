@@ -33,7 +33,7 @@ class Environment:
 
     async def init_db(self) -> Self:
         self.db = self.db_driver(**self.db_settings)
-        await self.db.init_pool()
+        await self.db.initialize()
         setattr(Objects, consts.db_adapter, self.db)
         setattr(Objects, consts.sql_visitor, self.sql_visitor)
         return self
