@@ -1,6 +1,5 @@
 from typing import Type
 
-from sweet.db import Pool
 from sweet.db.drivers.base_driver import BaseDriver as Driver
 from sweet.db.drivers.mysql_driver import MySQLDriver
 from sweet.db.drivers.postgresql_driver import PostgreSQLDriver
