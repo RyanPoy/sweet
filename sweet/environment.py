@@ -26,14 +26,11 @@ class Environment:
         db_type = db_settings.get(DRIVER)
         if db_type is None:
             raise EnvironmentError(f"DATABASE['{DRIVER}'] environment does not exists")
-        self.db_driver = get_driver(db_type)
         self.sql_visitor = get_visitor(db_type)
-        self.db_settings = db_settings.copy()
-        self.db_settings.pop(DRIVER)
+        self.db_settings = db_settings
 
     async def init_db(self) -> Self:
-        self.db = self.db_driver(**self.db_settings)
-        await self.db.initialize()
+        self.db = await get_driver(**self.db_settings)
         setattr(Objects, consts.db_adapter, self.db)
         setattr(Objects, consts.sql_visitor, self.sql_visitor)
         return self
