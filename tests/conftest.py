@@ -58,7 +58,7 @@ async def sqlite_env():
 
 @pytest_asyncio.fixture
 async def pg_env():
-    async with _env(settings_postgresql, sqls_postgresql.CREATE_SQLS, sqls_postgresql.DROP_SQLS, False) as env:
+    async with _env(settings_postgresql, sqls_postgresql.CREATE_SQLS, sqls_postgresql.DROP_SQLS, True) as env:
         yield env
 
 
