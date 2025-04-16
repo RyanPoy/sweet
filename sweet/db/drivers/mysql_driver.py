@@ -26,8 +26,8 @@ class MySQLDriver(IDriver):
         """
         self.db_config = db_config
         self.db_config['init_command'] = "SET sql_mode = 'ANSI_QUOTES';"
-        self.minsize = db_config.pop('min_size', 1)
-        self.maxsize = db_config.pop('max_size', 10)
+        self.minsize = self.db_config.pop('min_size', 1)
+        self.maxsize = self.db_config.pop('max_size', 10)
         self.pool = None
         self._local_connection = ContextVar('connection')  # 协程局部变量，用于存储连接
 
@@ -47,7 +47,6 @@ class MySQLDriver(IDriver):
         conn = conn or self._local_connection.get(None)
         if conn:
             await self.pool.release(conn.raw_conn())
-        # await self.pool.release(conn)
 
     async def destroy(self):
         await self.release_connection()
