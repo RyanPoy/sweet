@@ -38,7 +38,8 @@ class MySQLDriver(IDriver):
         conn = self._local_connection.get(None)
         if conn is None:
             conn = await self.pool.acquire()
-            conn = await MySQLConnection(conn, self).auto_commit()
+            conn = MySQLConnection(conn, self)
+            await conn.auto_commit()
             self._local_connection.set(conn)
         return conn
 

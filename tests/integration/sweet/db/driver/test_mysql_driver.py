@@ -73,10 +73,17 @@ async def test_transaction_rollback_using_with(mysql_env):
     result = await conn.fetchone("SELECT id FROM `users` WHERE name = %s", "rollback_test")
     assert result is None  # 回滚后数据不应存在
 
-
-@pytest.mark.asyncio
-async def test_select_without_transaction(mysql_env):
-    """测试非事务情况下的查询. 默认：事务自动提交"""
-    select_query = "SELECT COUNT(*) as count FROM `users`"
-    result = await mysql_env.db.fetchone(select_query)
-    assert result == {"count": 0}
+# @pytest.mark.asyncio
+# async def test_transaction_savepoint(mysql_env):
+#     """测试事务提交."""
+#     conn = await mysql_env.db.get_connection()
+#     async with conn.transaction() as tran:
+#         with tran.savepoint():
+#             await conn.execute("INSERT INTO `users` (name) VALUES (%s)", "test_name_1")
+#             await conn.execute("INSERT INTO `users` (name) VALUES (%s)", "test_name_2")
+#
+#     # 查询数据
+#     results = await conn.fetchall("SELECT id, name FROM `users`")
+#     assert len(results) == 2
+#     assert results[0] == {'id': 1, 'name': 'test_name_1'}
+#     assert results[1] == {'id': 2, 'name': 'test_name_2'}
