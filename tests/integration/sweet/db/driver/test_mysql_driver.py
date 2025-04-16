@@ -30,7 +30,7 @@ async def test_transaction_commit_manual(mysql_env):
 
 
 @pytest.mark.asyncio
-async def test_transaction_commit_using_with(mysql_env):
+async def test_transaction_commit_use_with(mysql_env):
     """测试事务提交."""
     conn = await mysql_env.db.get_connection()
     async with conn.transaction():
