@@ -6,7 +6,7 @@ class Transaction:
         self.conn = conn
 
     async def __aenter__(self):
-        await self.begin()
+        await self.start()
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if exc_tb:
@@ -14,7 +14,7 @@ class Transaction:
         else:
             await self.commit()
 
-    async def begin(self):
+    async def start(self):
         await self.conn.manual_commit()
 
     async def commit(self):
