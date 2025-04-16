@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 
-from sweet.db.connection import Connection
+from sweet.db.connections.postgresql_connection import Connection
 from sweet.utils.logger import get_logger
 
 logger = get_logger()

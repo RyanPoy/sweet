@@ -5,8 +5,6 @@ from sweet.db.drivers.mysql_driver import MySQLDriver
 from sweet.db.drivers.postgresql_driver import PostgreSQLDriver
 from sweet.db.drivers.sqlite_driver import SQLiteDriver
 
-__all__ = ["Driver", "MySQLDriver", "SQLiteDriver", "PostgreSQLDriver"]
-
 
 async def get_driver(**db_settings) -> Driver:
     """
@@ -28,3 +26,6 @@ async def get_driver(**db_settings) -> Driver:
     db = driver(**db_settings)
     await db.initialize()
     return db
+
+
+__all__ = ["Driver", "MySQLDriver", "SQLiteDriver", "PostgreSQLDriver"]

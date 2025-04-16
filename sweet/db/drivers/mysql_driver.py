@@ -4,7 +4,7 @@ from contextvars import ContextVar
 
 import aiomysql
 
-from sweet.db.connection import Connection, MySQLConnection
+from sweet.db.connections import Connection, MySQLConnection
 from sweet.db.drivers.base_driver import IDriver
 
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from contextvars import ContextVar
-from sweet.db.connection import Connection, PostgreSQLConnection
+from sweet.db.connections import Connection, PostgreSQLConnection
 from sweet.db.drivers.base_driver import IDriver
 from sweet.utils.logger import get_logger
 import asyncpg
