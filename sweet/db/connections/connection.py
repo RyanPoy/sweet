@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from sweet.db.transaction import Transaction
+from sweet.db.connections.transaction import Transaction
 
 
 class Connection(ABC):

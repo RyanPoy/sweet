@@ -10,7 +10,7 @@ from sweet.utils.logger import get_logger
 logger = get_logger()
 
 
-class MySQLConnection(Connection):
+class SQLiteConnection(Connection):
 
     def __init__(self, conn, driver):
         self._raw_conn = conn
@@ -19,11 +19,11 @@ class MySQLConnection(Connection):
     def raw_conn(self):
         return self._raw_conn
 
-    async def auto_commit(self) -> None:
-        await self._raw_conn.autocommit(True)
+    def auto_commit(self) -> None:
+        self._raw_conn.isolation_level = None
 
-    async def manual_commit(self) -> None:
-        await self._raw_conn.autocommit(False)
+    def manual_commit(self) -> None:
+        self._raw_conn.isolation_level = "DEFERRED"
 
     async def execute(self, sql: str, *params: Any) -> None:
         async with self._execute(sql, *params):

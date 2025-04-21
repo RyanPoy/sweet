@@ -21,44 +21,38 @@ def visitors():
 
 
 @asynccontextmanager
-async def _env(settings, create_sqls, drop_sqls, is_mysql=False):
+async def _env(settings, create_sqls, drop_sqls):
     env = Environment(settings)
     try:
         await env.init_db()
         for sql in create_sqls:
-            if is_mysql:
-                conn = await env.db.get_connection()
-                await conn.execute(sql)
-            else:
-                await env.db.execute(sql)
+            conn = await env.db.get_connection()
+            await conn.execute(sql)
 
         yield env
 
         for sql in drop_sqls:
-            if is_mysql:
-                conn = await env.db.get_connection()
-                await conn.execute(sql)
-            else:
-                await env.db.execute(sql)
+            conn = await env.db.get_connection()
+            await conn.execute(sql)
     finally:
         await env.release_db()
 
 
 @pytest_asyncio.fixture
 async def mysql_env():
-    async with _env(settings_mysql, sqls_mysql.CREATE_SQLS, sqls_mysql.DROP_SQLS, True) as env:
+    async with _env(settings_mysql, sqls_mysql.CREATE_SQLS, sqls_mysql.DROP_SQLS) as env:
         yield env
 
 
 @pytest_asyncio.fixture
 async def sqlite_env():
-    async with _env(settings_sqlite, sqls_sqlite.CREATE_SQLS, sqls_sqlite.DROP_SQLS, False) as env:
+    async with _env(settings_sqlite, sqls_sqlite.CREATE_SQLS, sqls_sqlite.DROP_SQLS) as env:
         yield env
 
 
 @pytest_asyncio.fixture
 async def pg_env():
-    async with _env(settings_postgresql, sqls_postgresql.CREATE_SQLS, sqls_postgresql.DROP_SQLS, True) as env:
+    async with _env(settings_postgresql, sqls_postgresql.CREATE_SQLS, sqls_postgresql.DROP_SQLS) as env:
         yield env
 
 

@@ -1,12 +1,10 @@
-import copy
-
-from sweet.db.drivers.base_driver import BaseDriver as Driver
+from sweet.db.drivers.base_driver import IDriver
 from sweet.db.drivers.mysql_driver import MySQLDriver
 from sweet.db.drivers.postgresql_driver import PostgreSQLDriver
 from sweet.db.drivers.sqlite_driver import SQLiteDriver
 
 
-async def get_driver(**db_settings) -> Driver:
+async def get_driver(**db_settings) -> IDriver:
     """
     根据数据库类型返回相应的数据库连接池
     :param db_type: str 类型，支持 'mysql', 'postgresql', 'sqlite'
