@@ -42,12 +42,14 @@ class Pool:
         await self._fill_pool()
         return self
 
-    def __init__(self, minsize: int, maxsize: int, db_path: str):
+    def __init__(self, minsize: int, maxsize: int, db_path: str, **db_config):
         self.db_path = db_path
         self.maxsize = max(minsize, maxsize)
         self._pool = asyncio.Queue(self.maxsize)
         self._closed = False
         self.initialized = False
+        self.db_config = db_config
+        self.db_config['check_same_thread'] = False
 
     @property
     def size(self):
@@ -55,7 +57,7 @@ class Pool:
 
     async def _create_conn(self) -> aiosqlite.Connection:
         """创建新连接"""
-        return await aiosqlite.connect(self.db_path)
+        return await aiosqlite.connect(self.db_path, check_same_thread=self.db_config['check_same_thread'])
 
     async def _fill_pool(self):
         """初始化最小连接池"""
@@ -64,23 +66,20 @@ class Pool:
 
         while self.size < self.maxsize:
             conn = await self._create_conn()
-            self._pool.put_nowait(conn)
+            await self._pool.put(conn)
         self.initialized = True
 
-    def release(self, conn: aiosqlite.Connection):
-        self._pool.put_nowait(conn)
+    async def release(self, conn: aiosqlite.Connection):
+        await self._pool.put(conn)
 
-    def acquire(self) -> aiosqlite.Connection:
+    async def acquire(self) -> aiosqlite.Connection:
         """使用标准库的异步上下文管理器"""
         if self._closed:
             raise RuntimeError("Connection pool is closed")
         if not self.initialized:
             raise RuntimeError("Connection pool is not initialized")
 
-        conn = self._pool.get_nowait()
-        logger.debug(">"*50)
-        logger.debug(conn)
-        logger.debug(">"*50)
+        conn = await self._pool.get()
         return conn
 
     async def close(self):

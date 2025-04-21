@@ -30,13 +30,13 @@ class SQLiteDriver(IDriver):
         """ close the connection pool """
         await self.release_connection()
         if self.pool:
-            self.pool.close()
+            await self.pool.close()
 
     async def get_connection(self):
         """ get the connection of current coroutine """
         conn = self._local_connection.get(None)
         if conn is None:
-            conn = self.pool.acquire()
+            conn = await self.pool.acquire()
             conn = SQLiteConnection(conn, self)
             conn.auto_commit()
             self._local_connection.set(conn)
@@ -46,7 +46,7 @@ class SQLiteDriver(IDriver):
         """ release the connection of current coroutine """
         conn = conn or self._local_connection.get(None)
         if conn:
-            self.pool.release(conn.raw_conn())
+            await self.pool.release(conn.raw_conn())
 
     async def columns(self, table_name: str) -> list[dict]:
         sql = f"PRAGMA table_info({table_name})"
