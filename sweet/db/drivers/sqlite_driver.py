@@ -38,7 +38,7 @@ class SQLiteDriver(IDriver):
         if conn is None:
             conn = await self.pool.acquire()
             conn = SQLiteConnection(conn, self)
-            conn.auto_commit()
+            await conn.auto_commit()
             self._local_connection.set(conn)
         return conn
 

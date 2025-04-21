@@ -19,11 +19,15 @@ class SQLiteConnection(Connection):
     def raw_conn(self):
         return self._raw_conn
 
-    def auto_commit(self) -> None:
-        self._raw_conn.isolation_level = None
+    async def auto_commit(self) -> None:
+        def _():
+            self._raw_conn.isolation_level = "DEFERRED"
+        await self._raw_conn._execute(_)
 
-    def manual_commit(self) -> None:
-        self._raw_conn.isolation_level = "DEFERRED"
+    async def manual_commit(self) -> None:
+        def _():
+            self._raw_conn.isolation_level = "DEFERRED"
+        await self._raw_conn._execute(_)
 
     async def execute(self, sql: str, *params: Any) -> None:
         async with self._execute(sql, *params):
