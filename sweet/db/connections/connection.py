@@ -35,11 +35,3 @@ class Connection(ABC):
 
     @abstractmethod
     def transaction(self) -> Transaction: """create a transaction"""
-    # def __await__(self):
-    #     return self
-    #
-    # async def __aenter__(self):
-    #     return self
-    #
-    # async def __aexit__(self, exc_type, exc_val, exc_tb):
-    #     return await self.close()

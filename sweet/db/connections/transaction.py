@@ -1,3 +1,6 @@
+import inspect
+
+
 class Transaction:
 
     def __init__(self, conn):
@@ -13,7 +16,11 @@ class Transaction:
             await self.commit()
 
     async def start(self):
-        await self.conn.manual_commit()
+        func = self.conn.manual_commit
+        if inspect.iscoroutinefunction(func):
+            await func()
+        else:
+            func()
 
     async def commit(self):
         await self.conn.raw_conn().commit()
