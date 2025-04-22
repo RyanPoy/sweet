@@ -21,8 +21,8 @@ class PostgreSQLConnection(Connection):
         await self._execute(sql, *params)
 
     async def execute_rowid(self, sql: str, *params: Any) -> int:  # ok
-        rows = await self._execute(sql, *params)
-        return rows['id']
+        rows = await self._fetch(sql, *params)
+        return int(rows[-1])
 
     async def execute_rowids(self, sql: str, params_seq: [Any]) -> list[int]:
         raise NotImplementedError
@@ -33,12 +33,8 @@ class PostgreSQLConnection(Connection):
         return rowcount
 
     async def _execute(self, sql: str, *params: Any):
-        logger.debug("*" * 10)
         logger.debug(sql)
         rows = await self._raw_conn.execute(sql, *params)
-        logger.debug(type(rows))
-        logger.debug("+++" + rows + "+++")
-        logger.debug("*" * 10)
         return rows
 
     async def fetchone(self, sql: str, *params: Any) -> dict | None:  # ok
@@ -55,6 +51,10 @@ class PostgreSQLConnection(Connection):
             return []
         columns = list(rows[0].keys())
         return [dict(zip(columns, row)) for row in rows]
+
+    async def _fetch(self, sql: str, *params: Any) -> list:
+        rows = await self._raw_conn.fetchrow(sql, *params)
+        return rows
 
     async def close(self):
         await self._driver.release_connection(self)

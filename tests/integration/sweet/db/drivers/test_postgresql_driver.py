@@ -61,4 +61,3 @@ async def test_transaction_rollback(pg_env):
 
     result = await conn.fetchone("SELECT * FROM \"users\" WHERE name = $1", "rollback_test")
     assert result is None  # 回滚后数据不应存在
-

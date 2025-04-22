@@ -1,7 +1,6 @@
 import pytest
 
 
-
 @pytest.mark.asyncio
 async def test_transaction_commit_manual(sqlite_env):
     conn = await sqlite_env.db.get_connection()
