@@ -63,7 +63,6 @@ class MySQLConnection(Connection):
         async def do(cur, sql_str, ps):
             await cur.execute(sql_str, ps)
 
-        logger.debug(sql)
         async with self._execute(do, sql, params) as cursor:
             yield cursor
 
@@ -73,12 +72,12 @@ class MySQLConnection(Connection):
         async def do(cur, sql_str, ps):
             await cur.executemany(sql_str, ps)
 
-        logger.debug(sql)
         async with self._execute(do, sql, param_seq) as cursor:
             yield cursor
 
     @asynccontextmanager
     async def _execute(self, func: Callable, sql, params):
+        logger.debug(sql)
         cursor = None
         try:
             cursor = await self._raw_conn.cursor()
