@@ -53,6 +53,7 @@ class PostgreSQLConnection(Connection):
         return [dict(zip(columns, row)) for row in rows]
 
     async def _fetch(self, sql: str, *params: Any) -> list:
+        logger.debug(sql)
         rows = await self._raw_conn.fetchrow(sql, *params)
         return rows
 
