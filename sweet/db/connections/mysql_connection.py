@@ -34,7 +34,11 @@ class MySQLConnection(Connection):
             return cur.lastrowid
 
     async def execute_rowids(self, sql: str, params_seq: [Any]) -> list[int]:
-        raise NotImplementedError
+        """ the rowids is not safe """
+        async with self._execute_many(sql, params_seq) as cur:
+            begin = cur.lastrowid
+            cnt = cur.rowcount
+            return list(range(begin, begin + cnt))
 
     async def execute_rowcount(self, sql: str, *params: Any) -> int:
         async with self._execute(sql, *params) as cur:
@@ -61,6 +65,20 @@ class MySQLConnection(Connection):
         try:
             cursor = await self._raw_conn.cursor()
             await cursor.execute(sql, params)
+            yield cursor
+        finally:
+            if cursor:
+                r = cursor.close()
+                if r is not None:
+                    await r
+
+    @asynccontextmanager
+    async def _execute_many(self, sql: str, params: [Any]):
+        logger.debug(sql)
+        cursor = None
+        try:
+            cursor = await self._raw_conn.cursor()
+            await cursor.executemany(sql, params)
             yield cursor
         finally:
             if cursor:
