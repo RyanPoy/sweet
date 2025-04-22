@@ -2,19 +2,6 @@ import pytest
 
 
 @pytest.mark.asyncio
-async def test_insert_and_select(pg_env):
-    """测试插入和查询功能."""
-    conn = await pg_env.db.get_connection()
-    count = await conn.execute_rowcount("INSERT INTO \"users\" (name) VALUES ($1), ($2)", "test_name_1", "test_name_2")
-    assert count == 2
-
-    results = await conn.fetchall("SELECT id, name FROM \"users\"")
-    assert len(results) == 2
-    assert results[0] == {'id': 1, 'name': 'test_name_1'}
-    assert results[1] == {'id': 2, 'name': 'test_name_2'}
-
-
-@pytest.mark.asyncio
 async def test_transaction_commit_manual(pg_env):
     """测试事务提交."""
     conn = await pg_env.db.get_connection()

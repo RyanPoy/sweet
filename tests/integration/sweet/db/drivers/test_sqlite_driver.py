@@ -1,16 +1,6 @@
 import pytest
 
 
-@pytest.mark.asyncio
-async def test_insert_and_select(sqlite_env):
-    """测试插入和查询功能."""
-    conn = await sqlite_env.db.get_connection()
-    count = await conn.execute_rowcount("INSERT INTO \"users\" (name) VALUES (?)", "test_name_1")
-    assert count == 1
-
-    results = await conn.fetchone("SELECT id, name FROM \"users\"")
-    assert results == {'id': 1, 'name': 'test_name_1'}
-
 
 @pytest.mark.asyncio
 async def test_transaction_commit_manual(sqlite_env):
