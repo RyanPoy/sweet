@@ -20,21 +20,26 @@ async def test_mysql_driver__execute_rowids(mysql_env):
     assert results[5] == {'id': 12, 'name': 'test_name_12'}
 
 
-# @pytest.mark.asyncio
-# async def test_sqlite_driver__execute_rowids(sqlite_env):
-#     conn = await sqlite_env.db.get_connection()
-#     await conn.execute_rowids("INSERT INTO \"users\" (name) VALUES (?)",
-#                               [("test_name_1",), ("test_name_2",), ("test_name_3",)])
-#
-#     await conn.execute_rowids("INSERT INTO \"users\" (id, name) VALUES (?, ?)",
-#                               [(12, "test_name_12"), (10, "test_name_10"), (11, "test_name_11")])
-#
-#     results = await conn.fetchall("SELECT id, name FROM \"users\" ORDER BY id ASC")
-#     assert len(results) == 3
-#     assert results[0] == {'id': 0, 'name': 'test_name_2'}
-#     assert results[1] == {'id': 1, 'name': 'test_name_1'}
-#     assert results[2] == {'id': 10, 'name': 'test_name_3'}
-#
+@pytest.mark.asyncio
+async def test_sqlite_driver__execute_rowids(sqlite_env):
+    conn = await sqlite_env.db.get_connection()
+    ids = await conn.execute_rowids("INSERT INTO \"users\" (name) VALUES (?) RETURNING rowid",
+                                    [("test_name_1",), ("test_name_2",), ("test_name_3",)])
+    assert ids == [1, 2, 3]
+
+    ids = await conn.execute_rowids("INSERT INTO \"users\" (id, name) VALUES (?, ?)",
+                                    [(12, "test_name_12"), (10, "test_name_10"), (11, "test_name_11")])
+    assert ids == [12, 10, 11]
+
+    results = await conn.fetchall("SELECT id, name FROM \"users\" ORDER BY id ASC")
+    assert len(results) == 6
+    assert results[0] == {'id': 1, 'name': 'test_name_1'}
+    assert results[1] == {'id': 2, 'name': 'test_name_2'}
+    assert results[2] == {'id': 3, 'name': 'test_name_3'}
+    assert results[3] == {'id': 10, 'name': 'test_name_10'}
+    assert results[4] == {'id': 11, 'name': 'test_name_11'}
+    assert results[5] == {'id': 12, 'name': 'test_name_12'}
+
 # @pytest.mark.asyncio
 # async def test_pg_driver__execute_rowids(pg_env):
 #     conn = await pg_env.db.get_connection()
