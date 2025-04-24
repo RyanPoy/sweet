@@ -55,17 +55,13 @@ class Pool:
     def size(self):
         return self._pool.qsize()
 
-    async def _create_conn(self) -> aiosqlite.Connection:
-        """创建新连接"""
-        return await aiosqlite.connect(self.db_path, check_same_thread=self.db_config['check_same_thread'])
-
     async def _fill_pool(self):
         """初始化最小连接池"""
         if self.initialized:
             raise RuntimeError("The pool has already been initialized")
 
         while self.size < self.maxsize:
-            conn = await self._create_conn()
+            conn = await aiosqlite.connect(self.db_path, check_same_thread=self.db_config['check_same_thread'])
             await self._pool.put(conn)
         self.initialized = True
 
@@ -91,10 +87,12 @@ class Pool:
         # 关闭所有空闲连接
         while not self._pool.empty():
             try:
-                conn = self._pool.get_nowait()
+                conn = await self._pool.get()
                 await conn.close()
             except asyncio.QueueEmpty:
                 break
+            except:  # noqa: E722
+                continue
 
     async def __aenter__(self):
         return self

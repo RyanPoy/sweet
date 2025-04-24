@@ -25,7 +25,13 @@ class PostgreSQLConnection(Connection):
         return int(rows[-1])
 
     async def execute_rowids(self, sql: str, params_seq: [Any]) -> list[int]:
-        raise NotImplementedError
+        ids = []
+        for params in params_seq:
+            if not isinstance(params, (list, tuple)):
+                params = [params]
+            id = await self.execute_rowid(sql, *params)
+            ids.append(id)
+        return ids
 
     async def execute_rowcount(self, sql: str, *params: Any) -> int:  # ok
         rows = await self._execute(sql, *params)
@@ -55,6 +61,11 @@ class PostgreSQLConnection(Connection):
     async def _fetch(self, sql: str, *params: Any) -> list:
         logger.debug(sql)
         rows = await self._raw_conn.fetchrow(sql, *params)
+        return rows
+
+    async def _fetch_many(self, sql: str, *params: Any) -> list:
+        logger.debug(sql)
+        rows = await self._raw_conn.fetchall(sql, *params)
         return rows
 
     async def close(self):
