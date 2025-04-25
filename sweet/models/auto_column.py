@@ -175,4 +175,3 @@ class Columns:
 class Table:
     name: str
     columns: Columns
-

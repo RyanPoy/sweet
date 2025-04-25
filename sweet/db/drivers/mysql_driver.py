@@ -5,10 +5,10 @@ from contextvars import ContextVar
 import aiomysql
 
 from sweet.db.connections import Connection, MySQLConnection
-from sweet.db.drivers.base_driver import IDriver
+from sweet.db.drivers.base_driver import Driver
 
 
-class MySQLDriver(IDriver):
+class MySQLDriver(Driver):
 
     def __init__(self, **db_config):
         """

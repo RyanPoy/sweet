@@ -5,10 +5,10 @@ from contextvars import ContextVar
 from sweet.db.connections import Pool
 from sweet.db.connections.connection import Connection
 from sweet.db.connections.sqlite_connection import SQLiteConnection
-from sweet.db.drivers.base_driver import IDriver
+from sweet.db.drivers.base_driver import Driver
 
 
-class SQLiteDriver(IDriver):
+class SQLiteDriver(Driver):
 
     def __init__(self, **db_config):
         """

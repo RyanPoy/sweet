@@ -1,14 +1,14 @@
 from __future__ import annotations
 from contextvars import ContextVar
 from sweet.db.connections import Connection, PostgreSQLConnection
-from sweet.db.drivers.base_driver import IDriver
+from sweet.db.drivers.base_driver import Driver
 from sweet.utils.logger import get_logger
 import asyncpg
 
 logger = get_logger()
 
 
-class PostgreSQLDriver(IDriver):
+class PostgreSQLDriver(Driver):
 
     def __init__(self, **db_config):
         self.db_config = db_config
