@@ -37,7 +37,7 @@ class PostgreSQLDriver(Driver):
 
     async def release_connection(self, conn: Connection = None):
         conn = conn or self._local_connection.get(None)
-        if conn:
+        if conn and not conn.closed:
             await self.pool.release(conn.raw_conn())
 
     async def destroy(self):

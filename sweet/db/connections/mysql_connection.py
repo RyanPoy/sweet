@@ -15,6 +15,7 @@ class MySQLConnection(Connection):
     def __init__(self, conn, driver):
         self._raw_conn = conn
         self._driver = driver
+        self.closed = False
 
     def raw_conn(self):
         return self._raw_conn
@@ -90,7 +91,12 @@ class MySQLConnection(Connection):
                     await r
 
     async def close(self):
-        await self._driver.release_connection(self)
+        if self.closed is True:
+            return
+        try:
+            await self._driver.release_connection(self)
+        finally:
+            self.closed = True
 
     def transaction(self) -> Transaction:
         return Transaction(self)
