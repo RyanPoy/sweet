@@ -102,11 +102,10 @@ class SQLiteConnection(Connection):
         if self.closed is True:
             return
         try:
-            await self._driver.release_connection(self)
+            if self._driver:
+                await self._driver.release_connection(self)
         finally:
             self.closed = True
-
-
 
     def transaction(self) -> Transaction:
         return Transaction(self)

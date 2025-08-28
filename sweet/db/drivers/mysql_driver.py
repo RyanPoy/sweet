@@ -36,7 +36,7 @@ class MySQLDriver(Driver):
 
     async def get_connection(self) -> Connection:
         conn = self._local_connection.get(None)
-        if conn is None:
+        if conn is None or conn.closed:
             conn = await self.pool.acquire()
             conn = MySQLConnection(conn, self)
             await conn.auto_commit()

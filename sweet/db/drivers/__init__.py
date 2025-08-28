@@ -26,4 +26,4 @@ async def get_driver(**db_settings) -> Driver:
     return db
 
 
-__all__ = ["Driver", "MySQLDriver", "SQLiteDriver", "PostgreSQLDriver"]
+__all__ = ["Driver", "MySQLDriver", "SQLiteDriver", "PostgreSQLDriver", "get_driver"]

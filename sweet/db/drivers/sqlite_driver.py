@@ -35,7 +35,7 @@ class SQLiteDriver(Driver):
     async def get_connection(self):
         """ get the connection of current coroutine """
         conn = self._local_connection.get(None)
-        if conn is None:
+        if conn is None or conn.closed:
             conn = await self.pool.acquire()
             conn = SQLiteConnection(conn, self)
             await conn.auto_commit()
@@ -45,7 +45,7 @@ class SQLiteDriver(Driver):
     async def release_connection(self, conn: Connection = None):
         """ release the connection of current coroutine """
         conn = conn or self._local_connection.get(None)
-        if conn:
+        if conn and not conn.closed:
             await self.pool.release(conn.raw_conn())
 
     async def columns(self, table_name: str) -> list[dict]:

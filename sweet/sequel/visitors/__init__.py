@@ -22,4 +22,4 @@ def get_visitor(db_type: str) -> Type[Visitor]:
         raise ValueError(f"Unsupported database type: {db_type}")
 
 
-__all__ = ["Visitor", "MySQLVisitor", "SQLiteVisitor", "PostgreSQLVisitor"]
+__all__ = ["Visitor", "MySQLVisitor", "SQLiteVisitor", "PostgreSQLVisitor", "get_visitor"]

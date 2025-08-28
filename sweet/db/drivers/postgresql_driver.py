@@ -29,7 +29,7 @@ class PostgreSQLDriver(Driver):
 
     async def get_connection(self) -> Connection:
         conn = self._local_connection.get(None)
-        if conn is None:
+        if conn is None or conn.closed:
             conn = await self.pool.acquire()
             conn = PostgreSQLConnection(conn, self)
             self._local_connection.set(conn)
